@@ -149,6 +149,11 @@
   .text-mlk-glow { text-shadow: 0 0 24px rgba(199, 123, 44, 0.4); }
   .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
   .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -8px rgba(199, 123, 44, 0.25); }
+  .fade-in-up { animation: mlk-fade-in-up 0.35s ease-out both; }
+  @keyframes mlk-fade-in-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .shimmer-text {
     background: linear-gradient(90deg, #C77B2C 0%, #E89B45 25%, #C77B2C 50%, #E89B45 75%, #C77B2C 100%);
     background-size: 200% auto;
@@ -165,4 +170,44 @@
   .scrollbar-mlk::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-mlk::-webkit-scrollbar-thumb { background: rgba(199, 123, 44, 0.3); border-radius: 4px; }
   .scrollbar-mlk::-webkit-scrollbar-thumb:hover { background: rgba(199, 123, 44, 0.5); }
+
+  /* === AI-ASSISTANT-01 utility animations === */
+  .fade-in { animation: mlk-fade-in 0.3s ease-out both; }
+  @keyframes mlk-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .slide-up { animation: mlk-slide-up 0.4s ease-out both; }
+  @keyframes mlk-slide-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MLK amber-gold gradient border via pseudo-element */
+  .gradient-border { position: relative; }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #C77B2C 0%, #E89B45 50%, #C77B2C 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Frosted-glass backdrop-blur surface */
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border: 1px solid rgba(199, 123, 44, 0.18);
+  }
+  .dark .glass {
+    background: rgba(20, 20, 22, 0.55);
+    border: 1px solid rgba(232, 155, 69, 0.22);
+  }
 }

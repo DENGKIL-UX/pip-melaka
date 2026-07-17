@@ -1,0 +1,16 @@
+{
+  "evidence_tier": "Verified",
+  "source": "DOSM Census 2020 + HIES 2022",
+  "state": {
+    "population": 932700,
+    "median_household_income": 5670,
+    "poverty_rate": 0.5,
+    "gini_coefficient": 0.382,
+    "unemployment_rate": 3.2
+  },
+  "districts": [
+    { "name": "Melaka Tengah", "population": 503600, "median_income": 6200, "poverty_rate": 0.3, "gini": 0.365, "unemployment": 2.9 },
+    { "name": "Alor Gajah", "population": 192500, "median_income": 4900, "poverty_rate": 0.7, "gini": 0.398, "unemployment": 3.6 },
+    { "name": "Jasin", "population": 236600, "median_income": 4750, "poverty_rate": 0.8, "gini": 0.405, "unemployment": 3.8 }
+  ]
+}

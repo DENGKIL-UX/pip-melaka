@@ -1,15 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
+import { OverviewTab } from "@/components/tabs/overview-tab";
+import { ElectionsTab } from "@/components/tabs/elections-tab";
+import { DemographicsTab } from "@/components/tabs/demographics-tab";
+import { AnalysisTab } from "@/components/tabs/analysis-tab";
+import { RiskSocioeconomicTab } from "@/components/tabs/risk-socioeconomic-tab";
+import { CompareTab } from "@/components/tabs/compare-tab";
+import { GovernanceTab } from "@/components/tabs/governance-tab";
+import { AssistantPanel } from "@/components/shared/assistant-panel";
+import { SelectedDunDrawer } from "@/components/shared/selected-dun-drawer";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 // Lazy-load map components (Leaflet + Three.js are heavy)
 const Map2DTab = dynamic(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab })), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 2D map…</div> });
@@ -68,6 +77,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                 <Users className="h-3 w-3 me-1" />
                 {TOTAL_VOTERS_P134.toLocaleString()}
               </Badge>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -114,21 +124,13 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "map-2d" && <Map2DTab />}
         {activeTab === "map-3d" && <Map3DTab />}
         {activeTab === "s2d" && <S2DConsoleTab />}
-        {(activeTab === "overview" || activeTab === "elections" || activeTab === "demographics" || activeTab === "analysis" || activeTab === "risk" || activeTab === "compare" || activeTab === "governance") && (
-          <Card className="border-mlk/20">
-            <CardContent className="p-8 text-center text-muted-foreground">
-              <p className="text-sm">This tab is available. Use Alt+2 for 2D Map or Alt+3 for 3D Map — the two modules built with real DOSM kawasanku GeoJSON.</p>
-              <div className="flex justify-center gap-2 mt-4">
-                <Button onClick={() => setActiveTab("map-2d")} className="bg-mlk text-white hover:bg-mlk-amber-dark">
-                  <MapIcon className="h-4 w-4 me-1" /> Open 2D Map
-                </Button>
-                <Button onClick={() => setActiveTab("map-3d")} className="bg-mlk text-white hover:bg-mlk-amber-dark">
-                  <Box className="h-4 w-4 me-1" /> Open 3D Map
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {activeTab === "overview" && <OverviewTab />}
+        {activeTab === "elections" && <ElectionsTab />}
+        {activeTab === "demographics" && <DemographicsTab />}
+        {activeTab === "analysis" && <AnalysisTab />}
+        {activeTab === "risk" && <RiskSocioeconomicTab />}
+        {activeTab === "compare" && <CompareTab />}
+        {activeTab === "governance" && <GovernanceTab />}
       </main>
 
       {/* Footer */}
@@ -141,6 +143,10 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
           </div>
         </div>
       </footer>
+
+      {/* Floating overlays — render last so they sit above all content */}
+      <SelectedDunDrawer />
+      <AssistantPanel />
     </div>
   );
 }

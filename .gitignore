@@ -19,3 +19,4 @@ next-env.d.ts
 /qa-*.png
 /db/*.db
 /db/*.db-journal
+tsconfig.tsbuildinfo

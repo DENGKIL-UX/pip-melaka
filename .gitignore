@@ -20,3 +20,5 @@ next-env.d.ts
 /db/*.db
 /db/*.db-journal
 tsconfig.tsbuildinfo
+test-*.png
+verify-*.png

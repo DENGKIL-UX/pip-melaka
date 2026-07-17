@@ -1,0 +1,74 @@
+{
+  "artifact": "PIP_VOTER_DASHBOARD_OVERVIEW",
+  "schema_version": "1.0",
+  "generated_at_utc": "2026-07-08T07:28:27.187Z",
+  "run_id": "PVT_20260708T072822499Z_30adf30e",
+  "source": {
+    "input_file": "C:\\Users\\USER\\Documents\\PIP\\MELAKA\\pipML-app\\PIP-VOTER-INTELLIGENCE\\data\\clean\\P134-full\\voter-cleaned.jsonl",
+    "contract": {
+      "contract_type": "pip_voter_source_contract",
+      "expected_source_field_count": 41,
+      "source_schema_mode": "pseudonymised_41_field"
+    },
+    "ontology": null,
+    "transform_mode": "SOURCE_CONTRACT_FALLBACK"
+  },
+  "overview": {
+    "level": "overall",
+    "id": "OVERALL",
+    "geography": {},
+    "metrics": {
+      "total_voters": 71415,
+      "male_voters": 34827,
+      "female_voters": 36588,
+      "other_or_unknown_gender_voters": 0,
+      "senior_voters_56_plus": 19146,
+      "known_age_voters": 71415,
+      "voter_density_score": "HIGH",
+      "senior_dependency_percent": 26.8095,
+      "gender_balance_score": 97.5341,
+      "male_percent": 48.7671,
+      "female_percent": 51.2329,
+      "dominant_age_group": "30_39",
+      "dominant_ethnicity_group": "OTHER",
+      "dominant_profession_group": "UNKNOWN",
+      "profile_completeness_score": 99.9258,
+      "average_cleansing_confidence": 0.999997,
+      "clean_records": 71411,
+      "clean_with_flags_records": 4
+    },
+    "distributions": {
+      "age_band_counts": {
+        "30_39": 16086,
+        "50_55": 5993,
+        "56_64": 8610,
+        "65_PLUS": 10536,
+        "18_20": 2978,
+        "21_29": 14030,
+        "40_49": 13182
+      },
+      "ethnicity_counts": {
+        "OTHER": 71415
+      },
+      "profession_group_counts": {
+        "UNKNOWN": 71207,
+        "OTHER": 208
+      }
+    }
+  },
+  "geography_counts": {
+    "states": 1,
+    "parliaments": 1,
+    "duns": 5,
+    "dms": 30,
+    "localities": 368
+  },
+  "record_quality": {
+    "transformed_records": 71415,
+    "failed_records": 0,
+    "clean_records": 71411,
+    "clean_with_flags_records": 4,
+    "review_required_records": 4,
+    "duplicate_voter_id_hash_records": 0
+  }
+}

@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, ShieldAlert } from "lucide-react";
+import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff } from "lucide-react";
 import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
 
 interface OverviewData {
   overview: {
@@ -61,7 +62,7 @@ export function OverviewTab() {
   const [elections, setElections] = useState<ElectionSummary[]>([]);
   const [dpt, setDpt] = useState<DptSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -71,11 +72,16 @@ export function OverviewTab() {
           fetch("/data/elections/melaka-elections.json").then((r) => r.json()),
           fetch("/data/dpt/spr-dpt-pameran-summary.json").then((r) => r.json()),
         ]);
-        setOverview(ov);
-        setElections(el.elections ?? []);
+        setOverview(ov as OverviewData);
+        setElections((el.elections ?? []) as ElectionSummary[]);
         setDpt({ total_additions: dp.total_additions, total_deletions: dp.total_deletions, total_net: dp.total_net });
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load overview");
+      } catch {
+        // Dev server OOM / fetch failure — render inline fallback so the tab
+        // ALWAYS shows content. Same data as public/data/*.json.
+        setOverview(OVERVIEW_FALLBACK);
+        setElections(ELECTIONS_SUMMARY_FALLBACK);
+        setDpt({ total_additions: 8420, total_deletions: 3180, total_net: 5240 });
+        setOffline(true);
       } finally {
         setLoading(false);
       }
@@ -92,8 +98,9 @@ export function OverviewTab() {
     );
   }
 
-  if (error || !overview) {
-    return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-destructive">{error ?? "No data"}</CardContent></Card>;
+  if (!overview) {
+    // Should never happen — fallback always sets data. Defensive guard.
+    return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-muted-foreground">No data</CardContent></Card>;
   }
 
   const m = overview.overview.metrics;
@@ -101,6 +108,17 @@ export function OverviewTab() {
 
   return (
     <div className="space-y-4 fade-in-up">
+      {/* Offline banner — shown only when fetch failed and fallback is rendered */}
+      {offline && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="p-3 flex items-center gap-2 text-xs">
+            <WifiOff className="h-4 w-4 text-amber-600 flex-shrink-0" />
+            <span className="text-amber-700 dark:text-amber-300 font-medium">Offline data mode.</span>
+            <span className="text-muted-foreground">Live fetch failed (dev server may have restarted) — showing cached inline snapshot of the last verified P134 / SPR / DOSM build.</span>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Honesty banner */}
       <Card className="border-mlk/30 bg-mlk-radial">
         <CardContent className="p-4 flex flex-col md:flex-row md:items-center gap-3">

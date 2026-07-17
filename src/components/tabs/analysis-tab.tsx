@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TrendingUp, TrendingDown, PlusCircle, MinusCircle, Info, Star } from "lucide-react";
+import { TrendingUp, TrendingDown, PlusCircle, MinusCircle, Info, Star, WifiOff } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
+import { DPT_FALLBACK } from "@/lib/fallback-data";
 
 interface DptData {
   evidence_tier: string;
@@ -34,16 +35,20 @@ function Kpi({ icon: Icon, label, value, color }: { icon: React.ComponentType<{ 
 
 export function AnalysisTab() {
   const [data, setData] = useState<DptData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     fetch("/data/dpt/spr-dpt-pameran-summary.json")
       .then((r) => r.json())
-      .then(setData)
-      .catch((e) => setError(e.message));
+      .then((d) => setData(d as DptData))
+      .catch(() => {
+        // Dev server OOM / fetch failure — render inline fallback so the tab
+        // ALWAYS shows content. Mirrors public/data/dpt/spr-dpt-pameran-summary.json.
+        setData(DPT_FALLBACK as DptData);
+        setOffline(true);
+      });
   }, []);
 
-  if (error) return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-destructive">{error}</CardContent></Card>;
   if (!data) return <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Card key={i} className="border-mlk/20"><CardContent className="p-4 h-32 animate-pulse bg-muted/40" /></Card>)}</div>;
 
   const monthData = data.per_month.map((m) => ({ ...m, label: m.month.slice(5) }));
@@ -55,7 +60,13 @@ export function AnalysisTab() {
         <CardContent className="p-3 flex items-center gap-2 text-xs">
           <Info className="h-4 w-4 text-mlk" />
           <span><strong className="text-mlk">Verified tier.</strong> {data.source}. {data.months.length} months of SPR DPT Pameran PDFs (Jan–May 2026).</span>
-          <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk flex items-center gap-1"><Star className="h-2.5 w-2.5" /> Melaka unique feature</Badge>
+          {offline ? (
+            <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
+              <WifiOff className="h-2.5 w-2.5" /> offline data
+            </span>
+          ) : (
+            <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk flex items-center gap-1"><Star className="h-2.5 w-2.5" /> Melaka unique feature</Badge>
+          )}
         </CardContent>
       </Card>
 

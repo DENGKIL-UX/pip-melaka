@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShieldAlert, Heart, Users, DollarSign, Home, Scale, Info } from "lucide-react";
+import { ShieldAlert, Heart, Users, DollarSign, Home, Scale, Info, WifiOff } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
+import { DUN_FALLBACK, DOSM_FALLBACK } from "@/lib/fallback-data";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
@@ -34,16 +35,22 @@ function seniorTier(pct: number): "critical" | "warning" | "clear" {
 export function RiskSocioeconomicTab() {
   const [duns, setDuns] = useState<DunRecord[] | null>(null);
   const [dosm, setDosm] = useState<DosmData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     Promise.all([
       fetch("/data/p134/dun-intelligence.jsonl").then((r) => r.text()).then((t) => t.trim().split("\n").map((l) => JSON.parse(l) as DunRecord)),
       fetch("/data/socioeconomic/melaka-dosm.json").then((r) => r.json()),
-    ]).then(([d, s]) => { setDuns(d); setDosm(s); }).catch((e) => setError(e.message));
+    ]).then(([d, s]) => { setDuns(d); setDosm(s as DosmData); }).catch(() => {
+      // Dev server OOM / fetch failure — render inline fallback so the tab
+      // ALWAYS shows content. Mirrors public/data/p134/dun-intelligence.jsonl
+      // and public/data/socioeconomic/melaka-dosm.json.
+      setDuns(DUN_FALLBACK as DunRecord[]);
+      setDosm(DOSM_FALLBACK);
+      setOffline(true);
+    });
   }, []);
 
-  if (error) return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-destructive">{error}</CardContent></Card>;
   if (!duns || !dosm) return <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Card key={i} className="border-mlk/20"><CardContent className="p-4 h-32 animate-pulse bg-muted/40" /></Card>)}</div>;
 
   const critical = duns.filter((d) => d.metrics.senior_dependency_percent >= 30);
@@ -62,6 +69,16 @@ export function RiskSocioeconomicTab() {
 
   return (
     <div className="space-y-4 fade-in-up">
+      {offline && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="p-3 flex items-center gap-2 text-xs">
+            <WifiOff className="h-4 w-4 text-amber-600 flex-shrink-0" />
+            <span className="text-amber-700 dark:text-amber-300 font-medium">Offline data mode.</span>
+            <span className="text-muted-foreground">Live fetch failed (dev server may have restarted) — showing cached inline snapshot of P134 DUN + DOSM data.</span>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Risk KPI summary */}
       <div className="grid grid-cols-3 gap-3">
         <Card className="border-red-500/30 hover-lift"><CardContent className="p-4">

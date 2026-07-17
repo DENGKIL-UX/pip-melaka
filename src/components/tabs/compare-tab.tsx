@@ -4,9 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeftRight, Copy, Twitter, MessageCircle, FileSpreadsheet, Users, Building2, TrendingUp, Trophy } from "lucide-react";
+import { ArrowLeftRight, Copy, Twitter, MessageCircle, FileSpreadsheet, Users, Building2, TrendingUp, Trophy, WifiOff } from "lucide-react";
 import { PARLIAMENTS } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
+import { DUN_FALLBACK, DPT_FALLBACK } from "@/lib/fallback-data";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
@@ -34,6 +35,7 @@ function StatRow({ label, a, b, highlight }: { label: string; a: string; b: stri
 export function CompareTab() {
   const [duns, setDuns] = useState<DunRecord[]>([]);
   const [dpt, setDpt] = useState<DptData | null>(null);
+  const [offline, setOffline] = useState(false);
   const [codeA, setCodeA] = useState<string>("134");
   const [codeB, setCodeB] = useState<string>("137");
   const [toast, setToast] = useState<string | null>(null);
@@ -42,7 +44,14 @@ export function CompareTab() {
     Promise.all([
       fetch("/data/p134/dun-intelligence.jsonl").then((r) => r.text()).then((t) => t.trim().split("\n").map((l) => JSON.parse(l) as DunRecord)),
       fetch("/data/dpt/spr-dpt-pameran-summary.json").then((r) => r.json()),
-    ]).then(([d, dp]) => { setDuns(d); setDpt(dp); }).catch(() => {});
+    ]).then(([d, dp]) => { setDuns(d); setDpt(dp); }).catch(() => {
+      // Dev server OOM / fetch failure — render inline fallback so the tab
+      // ALWAYS shows content. Mirrors public/data/p134/dun-intelligence.jsonl
+      // and public/data/dpt/spr-dpt-pameran-summary.json.
+      setDuns(DUN_FALLBACK as unknown as DunRecord[]);
+      setDpt(DPT_FALLBACK as DptData);
+      setOffline(true);
+    });
   }, []);
 
   // Aggregate by parliament from P134 DUN data. P135-P139 fallback to PARLIAMENTS constants (no raw voter rolls yet).
@@ -96,8 +105,13 @@ export function CompareTab() {
     <div className="space-y-4 fade-in-up">
       <Card className="border-mlk/20">
         <CardContent className="p-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <ArrowLeftRight className="h-4 w-4 text-mlk" />
+          <ArrowLeftRight className="h-4 w-4 text-mlk flex-shrink-0" />
           <span>Compare two parliaments side by side. P134 has full engine data; P135–P139 use summary fallbacks pending raw SPR rolls.</span>
+          {offline && (
+            <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
+              <WifiOff className="h-2.5 w-2.5" /> offline data
+            </span>
+          )}
         </CardContent>
       </Card>
 

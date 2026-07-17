@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, ShieldAlert, Heart, Info } from "lucide-react";
+import { Users, ShieldAlert, Heart, Info, WifiOff } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import { getDunName } from "@/lib/melaka-constants";
 import { MLK_ACCENT } from "@/lib/party-colors";
+import { DUN_FALLBACK } from "@/lib/fallback-data";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
@@ -51,7 +52,7 @@ function RiskSignal({ d }: { d: DunRecord }) {
 
 export function DemographicsTab() {
   const [duns, setDuns] = useState<DunRecord[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     fetch("/data/p134/dun-intelligence.jsonl")
@@ -60,10 +61,14 @@ export function DemographicsTab() {
         const lines = txt.trim().split("\n");
         setDuns(lines.map((l) => JSON.parse(l) as DunRecord));
       })
-      .catch((e) => setError(e.message));
+      .catch(() => {
+        // Dev server OOM / fetch failure — render inline fallback so the tab
+        // ALWAYS shows content. Mirrors public/data/p134/dun-intelligence.jsonl.
+        setDuns(DUN_FALLBACK as DunRecord[]);
+        setOffline(true);
+      });
   }, []);
 
-  if (error) return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-destructive">{error}</CardContent></Card>;
   if (!duns) {
     return (
       <div className="space-y-3">
@@ -92,7 +97,13 @@ export function DemographicsTab() {
         <CardContent className="p-3 flex items-center gap-2 text-xs">
           <Info className="h-4 w-4 text-mlk" />
           <span><strong className="text-mlk">Proxy evidence tier.</strong> 5 DUNs (N01–N05) within P134 Masjid Tanah — real engine output, 71,415 verified voters. P135–P139 pending raw SPR rolls.</span>
-          <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk">{duns.length} DUN · {totalVoters.toLocaleString()} voters</Badge>
+          {offline ? (
+            <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
+              <WifiOff className="h-2.5 w-2.5" /> offline data
+            </span>
+          ) : (
+            <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk">{duns.length} DUN · {totalVoters.toLocaleString()} voters</Badge>
+          )}
         </CardContent>
       </Card>
 

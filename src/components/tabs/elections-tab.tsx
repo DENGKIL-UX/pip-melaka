@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Vote, Calendar, Trophy } from "lucide-react";
+import { Vote, Calendar, Trophy, WifiOff } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
+import { ELECTIONS_FALLBACK } from "@/lib/fallback-data";
 
 interface Election {
   id: string; name: string; date: string; headline_fact: string;
@@ -160,24 +161,33 @@ function ElectionView({ el }: { el: Election }) {
 
 export function ElectionsTab() {
   const [data, setData] = useState<Election[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     fetch("/data/elections/melaka-elections.json")
       .then((r) => r.json())
-      .then((d) => setData(d.elections))
-      .catch((e) => setError(e.message));
+      .then((d) => setData(d.elections as Election[]))
+      .catch(() => {
+        // Dev server OOM / fetch failure — render inline fallback so the tab
+        // ALWAYS shows content. Mirrors public/data/elections/melaka-elections.json.
+        setData(ELECTIONS_FALLBACK as Election[]);
+        setOffline(true);
+      });
   }, []);
 
-  if (error) return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-destructive">{error}</CardContent></Card>;
   if (!data) return <Card className="border-mlk/20"><CardContent className="p-8 animate-pulse bg-muted/30 text-muted-foreground text-sm">Loading elections…</CardContent></Card>;
 
   return (
     <div className="space-y-3 fade-in-up">
       <Card className="border-mlk/20">
         <CardContent className="p-3 text-xs text-muted-foreground flex items-center gap-2">
-          <Vote className="h-4 w-4 text-mlk" />
+          <Vote className="h-4 w-4 text-mlk flex-shrink-0" />
           <span>Verified tier · source: ElectionData.my (community-maintained, sourced from SPR gazettes). PRN15 is the headline: BN landslide 21/28 DUN.</span>
+          {offline && (
+            <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
+              <WifiOff className="h-2.5 w-2.5" /> offline data
+            </span>
+          )}
         </CardContent>
       </Card>
       <Tabs defaultValue="PRN15">

@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell } from "lucide-react";
+import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, Radar } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
@@ -32,6 +32,7 @@ const PredictiveTab = dynamic(() => import("@/components/tabs/predictive-tab").t
 const InsightReportsTab = dynamic(() => import("@/components/tabs/insight-reports-tab").then((m) => ({ default: m.InsightReportsTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Insights…</div> });
 const AlertsTab = dynamic(() => import("@/components/tabs/alerts-tab").then((m) => ({ default: m.AlertsTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Alerts…</div> });
 const DualLayerTab = dynamic(() => import("@/components/tabs/dual-layer-tab").then((m) => ({ default: m.DualLayerTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Dual-Layer…</div> });
+const ScraperTab = dynamic(() => import("@/components/tabs/scraper-tab").then((m) => ({ default: m.ScraperTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Scraper…</div> });
 
 const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -44,6 +45,7 @@ const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{
   { id: "compare", label: "Compare", icon: ArrowLeftRight },
   { id: "s2d", label: "S2D Console", icon: Activity },
   { id: "s2d-360", label: "S2D 360", icon: Brain },
+  { id: "scraper", label: "Scraper", icon: Radar },
   { id: "public-comm", label: "Public Comm", icon: MessageSquare },
   { id: "incidents", label: "Incidents", icon: AlertTriangle },
   { id: "scenarios", label: "Scenarios", icon: Layers3 },
@@ -141,6 +143,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "map-3d" && <Map3DTab />}
         {activeTab === "s2d" && <S2DConsoleTab />}
         {activeTab === "s2d-360" && <S2D360Tab />}
+        {activeTab === "scraper" && <ScraperTab />}
         {activeTab === "public-comm" && <PublicCommunicationTab />}
         {activeTab === "incidents" && <IncidentCasebookTab />}
         {activeTab === "scenarios" && <ScenarioTab />}

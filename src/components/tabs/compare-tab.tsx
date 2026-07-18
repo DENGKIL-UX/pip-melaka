@@ -11,7 +11,7 @@ import { DUN_FALLBACK, DPT_FALLBACK } from "@/lib/fallback-data";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
-  metrics: { total_voters: number; male_voters: number; female_voters: number; senior_dependency_percent: number; gender_balance_score: number; male_percent: number; female_percent: number; dominant_age_group: string; dominant_ethnicity_group: string };
+  metrics: { total_voters: number; male_voters: number; female_voters: number; senior_voters_56_plus?: number; senior_dependency_percent: number; gender_balance_score: number; male_percent: number; female_percent: number; dominant_age_group: string; dominant_ethnicity_group: string };
 }
 interface DptData { per_parliament: Array<{ parliament_code: string; parliament_name: string; additions: number; deletions: number; net: number }>; }
 
@@ -62,7 +62,7 @@ export function CompareTab() {
       const voters = dunRows.length > 0 ? dunRows.reduce((s, d) => s + d.metrics.total_voters, 0) : p.totalVoters;
       const male = dunRows.reduce((s, d) => s + d.metrics.male_voters, 0);
       const female = dunRows.reduce((s, d) => s + d.metrics.female_voters, 0);
-      const sen = dunRows.length > 0 ? dunRows.reduce((s, d) => s + d.metrics.senior_voters_56_plus, 0) / Math.max(voters, 1) * 100 : 26.8;
+      const sen = dunRows.length > 0 ? dunRows.reduce((s, d) => s + (d.metrics.senior_voters_56_plus ?? Math.round(d.metrics.total_voters * d.metrics.senior_dependency_percent / 100)), 0) / Math.max(voters, 1) * 100 : 26.8;
       const malePct = voters > 0 ? male / voters * 100 : 48.77;
       const femalePct = voters > 0 ? female / voters * 100 : 51.23;
       map.set(p.code, {

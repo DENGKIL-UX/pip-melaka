@@ -19,7 +19,7 @@ interface DptData {
   per_parliament: Array<{ parliament_code: string; parliament_name: string; additions: number; deletions: number; net: number }>;
 }
 
-function Kpi({ icon: Icon, label, value, color }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; color: string }) {
+function Kpi({ icon: Icon, label, value, color }: { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; label: string; value: string; color: string }) {
   return (
     <Card className="border-mlk/20 hover-lift">
       <CardContent className="p-4">

@@ -123,7 +123,7 @@ export async function batchFind<T extends { id: string }>(
 
   const uniqueIds = Array.from(new Set(ids));
   for (const chunk of chunked(uniqueIds, 500)) {
-    const rows = await db[model].findMany({
+    const rows = await (db[model] as any).findMany({
       where: { id: { in: chunk } },
     });
     for (const row of rows as T[]) {
@@ -153,10 +153,10 @@ export async function batchFindMany<TParent extends string, TChild extends { aut
 
   const uniqueIds = Array.from(new Set(parentIds));
   for (const chunk of chunked(uniqueIds, 500)) {
-    const rows = await db[model].findMany({
+    const rows = await (db[model] as any).findMany({
       where: { [parentField]: { in: chunk } } as never,
     });
-    for (const row of rows as TChild[]) {
+    for (const row of rows as unknown as TChild[]) {
       const pid = (row as Record<string, unknown>)[parentField] as TParent | undefined;
       if (pid === undefined) continue;
       const bucket = grouped.get(pid);

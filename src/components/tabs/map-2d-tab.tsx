@@ -67,6 +67,7 @@ export function Map2DTab() {
     (async () => {
       try {
         const L = (await import("leaflet")).default;
+        // @ts-ignore — CSS import for Leaflet
         await import("leaflet/dist/leaflet.css");
         if (cancelled || !containerRef.current) return;
 

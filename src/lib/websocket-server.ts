@@ -132,7 +132,7 @@ class WsServerHolder {
     }
 
     this.httpServer = createServer();
-    this.io = new socketIoMod.Server(this.httpServer, {
+    this.io = new socketIoMod!.Server(this.httpServer, {
       path: "/", // Caddy requires this — see Caddyfile + examples/websocket/server.ts
       cors: { origin: "*", methods: ["GET", "POST"] },
       pingTimeout: 60000,

@@ -92,7 +92,7 @@ export function Map3DTab() {
 
     (async () => {
       try {
-        const THREE = await import("three");
+        const THREE: any = await import("three");
         if (cancelled || !mountRef.current) return;
 
         const mount = mountRef.current;
@@ -135,7 +135,7 @@ export function Map3DTab() {
         scene.add(gridHelper);
 
         // Build 28 DUN extrusions from real GeoJSON
-        const extrusions: Array<{ mesh: THREE.Mesh; parliament: string; dun: string; baseHeight: number }> = [];
+        const extrusions: Array<{ mesh: any; parliament: string; dun: string; baseHeight: number }> = [];
 
         for (const feat of dunData.features) {
           const coords = getCoords(feat.geometry);

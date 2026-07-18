@@ -301,7 +301,7 @@ export function Map3DTab() {
   const seatCounts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
   if (scenario === "PRN15") { seatCounts.BN = 21; seatCounts.PH = 5; seatCounts.PN = 2; }
   else if (scenario === "GE14") { seatCounts.PH = 15; seatCounts.BN = 13; seatCounts.PN = 0; }
-  else if (scenario === "GE15") { seatCounts.PN = 4; seatCounts.PH = 2; seatCounts.BN = 0; }
+  else if (scenario === "GE15") { seatCounts.PN = 3; seatCounts.PH = 3; seatCounts.BN = 0; }
   else { seatCounts.BN = 18; seatCounts.PH = 6; seatCounts.PN = 4; } // PROJ_2026 estimate
 
   const SCENARIO_LABELS: Record<Scenario, string> = {

@@ -47,7 +47,7 @@ const ASSISTANT_CIRCUIT = {
 const MELAKA_FACTS: string[] = [
   "P134 (Masjid Tanah) has 71,415 verified voters — built from the PIP-VOTER-INTELLIGENCE engine output, not raw SPR xlsx.",
   "PRN15 (Melaka state election, 20 Nov 2021): BN won 21/28 DUN seats in a landslide. PH won 5, PN won 2. BN regained the state government.",
-  "GE15 (19 Nov 2022): PN won 4 parliaments (P134 Masjid Tanah, P135 Alor Gajah, P136 Tangga Batu, P139 Jasin). PH won 2 (P137 Hang Tuah Jaya, P138 Kota Melaka). BN won 0.",
+  "GE15 (19 Nov 2022): PN won 3 parliaments (P134 Masjid Tanah, P136 Tangga Batu, P139 Jasin). PH won 3 (P135 Alor Gajah, P137 Hang Tuah Jaya, P138 Kota Melaka). BN won 0. Split: PN 3 / PH 3.",
   "GE14 (9 May 2018): PH won 4/6 parliaments + 15/28 DUN seats. BN won 2 parliaments + 13 DUN. PH formed the state government.",
   "Melaka state population: 932,700 (DOSM Census 2020).",
   "Melaka median household income: RM 5,670 (HIES 2022).",
@@ -295,7 +295,7 @@ function staticFallback(question: string): string {
     return "PRN15 (20 Nov 2021): BN won 21/28 DUN seats — a landslide. PH won 5, PN won 2. BN regained the Melaka state government. [ElectionData.my]";
   }
   if (has(q, "ge15", "pn 4", "parliament")) {
-    return "GE15 (19 Nov 2022): PN won 4 parliaments (P134, P135, P136, P139). PH won 2 (P137, P138). BN won 0. Melaka's parliamentary delegation split. [ElectionData.my]";
+    return "GE15 (19 Nov 2022): PN won 3 parliaments (P134, P136, P139). PH won 3 (P135, P137, P138). BN won 0. Melaka's parliamentary delegation split. [ElectionData.my]";
   }
   if (has(q, "senior", "taboh", "n05")) {
     return "N05 Taboh Naning has 30.6% senior dependency (56+) — CRITICAL threshold breached. N03 Ayer Limau is at 27.7% (WARNING). These are aging DUNs under healthcare pressure. [P134 engine]";

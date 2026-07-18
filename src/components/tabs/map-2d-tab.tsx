@@ -259,7 +259,7 @@ export function Map2DTab() {
   // For now, show a placeholder based on known results
   if (scenario === "PRN15") { seatCounts.BN = 21; seatCounts.PH = 5; seatCounts.PN = 2; }
   else if (scenario === "GE14") { seatCounts.PH = 15; seatCounts.BN = 13; seatCounts.PN = 0; }
-  else if (scenario === "GE15") { seatCounts.PN = 4; seatCounts.PH = 2; seatCounts.BN = 0; }
+  else if (scenario === "GE15") { seatCounts.PN = 3; seatCounts.PH = 3; seatCounts.BN = 0; }
 
   return (
     <Card className="border-mlk/20" role="region" aria-label="2D Map module — Leaflet with real Melaka GeoJSON">

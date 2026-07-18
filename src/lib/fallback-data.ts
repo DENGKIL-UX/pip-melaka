@@ -79,8 +79,8 @@ export const ELECTIONS_SUMMARY_FALLBACK: FallbackElectionSummary[] = [
     id: "GE15",
     name: "GE15",
     date: "2022-11-19",
-    headline_fact: "PN 4 / PH 2 / BN 0 parliament split",
-    parliament_summary: { PN: 4, PH: 2, BN: 0, total: 6 },
+    headline_fact: "PN 3 / PH 3 / BN 0 parliament split",
+    parliament_summary: { PN: 3, PH: 3, BN: 0, total: 6 },
     dun_summary: null,
   },
 ];
@@ -181,7 +181,7 @@ export const ELECTIONS_FALLBACK: FallbackElection[] = [
     ...ELECTIONS_SUMMARY_FALLBACK[2],
     parliament_results: [
       { parliament_code: "134", winner: "PN", votes_pct: 41.2, runner_up: "PH", margin_pct: 3.8 },
-      { parliament_code: "135", winner: "PN", votes_pct: 40.8, runner_up: "BN", margin_pct: 2.1 },
+      { parliament_code: "135", winner: "PH", votes_pct: 43.5, runner_up: "PN", margin_pct: 2.8 },
       { parliament_code: "136", winner: "PN", votes_pct: 42.5, runner_up: "PH", margin_pct: 3.1 },
       { parliament_code: "137", winner: "PH", votes_pct: 48.7, runner_up: "PN", margin_pct: 8.9 },
       { parliament_code: "138", winner: "PH", votes_pct: 44.1, runner_up: "PN", margin_pct: 5.3 },

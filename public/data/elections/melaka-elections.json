@@ -4,103 +4,699 @@
   "elections": [
     {
       "id": "GE14",
-      "name": "GE14 — 14th General Election",
+      "name": "GE14 \u2014 14th General Election",
       "date": "2018-05-09",
       "headline_fact": "PH won 4/6 parliament + 15/28 DUN. BN won 2 parliament + 13 DUN. PH formed state government.",
-      "parliament_summary": { "PH": 4, "BN": 2, "PN": 0, "total": 6 },
-      "dun_summary": { "PH": 15, "BN": 13, "PN": 0, "total": 28 },
+      "parliament_summary": {
+        "PH": 4,
+        "BN": 2,
+        "PN": 0,
+        "total": 6
+      },
+      "dun_summary": {
+        "PH": 15,
+        "BN": 13,
+        "PN": 0,
+        "total": 28
+      },
       "parliament_results": [
-        { "parliament_code": "134", "winner": "PH", "votes_pct": 52.3, "runner_up": "BN", "margin_pct": 4.1 },
-        { "parliament_code": "135", "winner": "PH", "votes_pct": 51.8, "runner_up": "BN", "margin_pct": 3.2 },
-        { "parliament_code": "136", "winner": "PH", "votes_pct": 55.1, "runner_up": "BN", "margin_pct": 8.7 },
-        { "parliament_code": "137", "winner": "PH", "votes_pct": 58.4, "runner_up": "BN", "margin_pct": 12.3 },
-        { "parliament_code": "138", "winner": "BN", "votes_pct": 50.9, "runner_up": "PH", "margin_pct": 1.8 },
-        { "parliament_code": "139", "winner": "PH", "votes_pct": 53.7, "runner_up": "BN", "margin_pct": 5.9 }
+        {
+          "parliament_code": "134",
+          "winner": "PH",
+          "votes_pct": 52.3,
+          "runner_up": "BN",
+          "margin_pct": 4.1
+        },
+        {
+          "parliament_code": "135",
+          "winner": "PH",
+          "votes_pct": 51.8,
+          "runner_up": "BN",
+          "margin_pct": 3.2
+        },
+        {
+          "parliament_code": "136",
+          "winner": "PH",
+          "votes_pct": 55.1,
+          "runner_up": "BN",
+          "margin_pct": 8.7
+        },
+        {
+          "parliament_code": "137",
+          "winner": "PH",
+          "votes_pct": 58.4,
+          "runner_up": "BN",
+          "margin_pct": 12.3
+        },
+        {
+          "parliament_code": "138",
+          "winner": "BN",
+          "votes_pct": 50.9,
+          "runner_up": "PH",
+          "margin_pct": 1.8
+        },
+        {
+          "parliament_code": "139",
+          "winner": "PH",
+          "votes_pct": 53.7,
+          "runner_up": "BN",
+          "margin_pct": 5.9
+        }
       ],
       "dun_results": [
-        { "parliament_code": "134", "dun_code": "01", "winner": "PH", "vote_share": { "PH": 0.54, "BN": 0.42, "PN": 0.0 } },
-        { "parliament_code": "134", "dun_code": "02", "winner": "PH", "vote_share": { "PH": 0.51, "BN": 0.45, "PN": 0.0 } },
-        { "parliament_code": "134", "dun_code": "03", "winner": "BN", "vote_share": { "PH": 0.48, "BN": 0.49, "PN": 0.0 } },
-        { "parliament_code": "134", "dun_code": "04", "winner": "PH", "vote_share": { "PH": 0.52, "BN": 0.44, "PN": 0.0 } },
-        { "parliament_code": "134", "dun_code": "05", "winner": "BN", "vote_share": { "PH": 0.47, "BN": 0.50, "PN": 0.0 } },
-        { "parliament_code": "135", "dun_code": "06", "winner": "PH", "vote_share": { "PH": 0.53, "BN": 0.43, "PN": 0.0 } },
-        { "parliament_code": "135", "dun_code": "07", "winner": "PH", "vote_share": { "PH": 0.50, "BN": 0.47, "PN": 0.0 } },
-        { "parliament_code": "135", "dun_code": "08", "winner": "BN", "vote_share": { "PH": 0.46, "BN": 0.51, "PN": 0.0 } },
-        { "parliament_code": "135", "dun_code": "09", "winner": "PH", "vote_share": { "PH": 0.52, "BN": 0.44, "PN": 0.0 } },
-        { "parliament_code": "135", "dun_code": "10", "winner": "BN", "vote_share": { "PH": 0.47, "BN": 0.50, "PN": 0.0 } },
-        { "parliament_code": "136", "dun_code": "11", "winner": "PH", "vote_share": { "PH": 0.54, "BN": 0.42, "PN": 0.0 } },
-        { "parliament_code": "136", "dun_code": "12", "winner": "PH", "vote_share": { "PH": 0.53, "BN": 0.43, "PN": 0.0 } },
-        { "parliament_code": "136", "dun_code": "13", "winner": "PH", "vote_share": { "PH": 0.55, "BN": 0.41, "PN": 0.0 } },
-        { "parliament_code": "136", "dun_code": "14", "winner": "PH", "vote_share": { "PH": 0.53, "BN": 0.43, "PN": 0.0 } },
-        { "parliament_code": "137", "dun_code": "15", "winner": "PH", "vote_share": { "PH": 0.57, "BN": 0.39, "PN": 0.0 } },
-        { "parliament_code": "137", "dun_code": "16", "winner": "PH", "vote_share": { "PH": 0.59, "BN": 0.37, "PN": 0.0 } },
-        { "parliament_code": "137", "dun_code": "17", "winner": "PH", "vote_share": { "PH": 0.55, "BN": 0.41, "PN": 0.0 } },
-        { "parliament_code": "137", "dun_code": "18", "winner": "PH", "vote_share": { "PH": 0.57, "BN": 0.39, "PN": 0.0 } },
-        { "parliament_code": "138", "dun_code": "19", "winner": "PH", "vote_share": { "PH": 0.59, "BN": 0.37, "PN": 0.0 } },
-        { "parliament_code": "138", "dun_code": "20", "winner": "PH", "vote_share": { "PH": 0.61, "BN": 0.35, "PN": 0.0 } },
-        { "parliament_code": "138", "dun_code": "21", "winner": "PH", "vote_share": { "PH": 0.58, "BN": 0.38, "PN": 0.0 } },
-        { "parliament_code": "138", "dun_code": "22", "winner": "PH", "vote_share": { "PH": 0.57, "BN": 0.39, "PN": 0.0 } },
-        { "parliament_code": "138", "dun_code": "23", "winner": "PH", "vote_share": { "PH": 0.57, "BN": 0.39, "PN": 0.0 } },
-        { "parliament_code": "139", "dun_code": "24", "winner": "BN", "vote_share": { "PH": 0.48, "BN": 0.49, "PN": 0.0 } },
-        { "parliament_code": "139", "dun_code": "25", "winner": "PH", "vote_share": { "PH": 0.52, "BN": 0.44, "PN": 0.0 } },
-        { "parliament_code": "139", "dun_code": "26", "winner": "BN", "vote_share": { "PH": 0.47, "BN": 0.50, "PN": 0.0 } },
-        { "parliament_code": "139", "dun_code": "27", "winner": "PH", "vote_share": { "PH": 0.50, "BN": 0.47, "PN": 0.0 } },
-        { "parliament_code": "139", "dun_code": "28", "winner": "PH", "vote_share": { "PH": 0.55, "BN": 0.41, "PN": 0.0 } }
+        {
+          "parliament_code": "134",
+          "dun_code": "01",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.54,
+            "BN": 0.42,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "02",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.51,
+            "BN": 0.45,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "03",
+          "winner": "BN",
+          "vote_share": {
+            "PH": 0.48,
+            "BN": 0.49,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "04",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.52,
+            "BN": 0.44,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "05",
+          "winner": "BN",
+          "vote_share": {
+            "PH": 0.47,
+            "BN": 0.5,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "06",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.53,
+            "BN": 0.43,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "07",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.5,
+            "BN": 0.47,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "08",
+          "winner": "BN",
+          "vote_share": {
+            "PH": 0.46,
+            "BN": 0.51,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "09",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.52,
+            "BN": 0.44,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "10",
+          "winner": "BN",
+          "vote_share": {
+            "PH": 0.47,
+            "BN": 0.5,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "11",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.54,
+            "BN": 0.42,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "12",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.53,
+            "BN": 0.43,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "13",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.55,
+            "BN": 0.41,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "14",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.53,
+            "BN": 0.43,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "15",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.57,
+            "BN": 0.39,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "16",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.59,
+            "BN": 0.37,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "17",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.55,
+            "BN": 0.41,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "18",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.57,
+            "BN": 0.39,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "19",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.59,
+            "BN": 0.37,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "20",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.61,
+            "BN": 0.35,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "21",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.58,
+            "BN": 0.38,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "22",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.57,
+            "BN": 0.39,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "23",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.57,
+            "BN": 0.39,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "24",
+          "winner": "BN",
+          "vote_share": {
+            "PH": 0.48,
+            "BN": 0.49,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "25",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.52,
+            "BN": 0.44,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "26",
+          "winner": "BN",
+          "vote_share": {
+            "PH": 0.47,
+            "BN": 0.5,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "27",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.5,
+            "BN": 0.47,
+            "PN": 0.0
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "28",
+          "winner": "PH",
+          "vote_share": {
+            "PH": 0.55,
+            "BN": 0.41,
+            "PN": 0.0
+          }
+        }
       ]
     },
     {
       "id": "PRN15",
-      "name": "PRN15 — 15th State Election",
+      "name": "PRN15 \u2014 15th State Election",
       "date": "2021-11-20",
       "headline_fact": "BN LANDSLIDE: 21/28 DUN seats. PH won 5, PN won 2. BN regained state government.",
-      "dun_summary": { "BN": 21, "PH": 5, "PN": 2, "total": 28 },
+      "dun_summary": {
+        "BN": 21,
+        "PH": 5,
+        "PN": 2,
+        "total": 28
+      },
       "parliament_summary": null,
       "parliament_results": [],
       "dun_results": [
-        { "parliament_code": "134", "dun_code": "01", "winner": "BN", "vote_share": { "BN": 0.55, "PH": 0.28, "PN": 0.12 } },
-        { "parliament_code": "134", "dun_code": "02", "winner": "BN", "vote_share": { "BN": 0.52, "PH": 0.30, "PN": 0.14 } },
-        { "parliament_code": "134", "dun_code": "03", "winner": "BN", "vote_share": { "BN": 0.58, "PH": 0.25, "PN": 0.12 } },
-        { "parliament_code": "134", "dun_code": "04", "winner": "PH", "vote_share": { "BN": 0.41, "PH": 0.45, "PN": 0.10 } },
-        { "parliament_code": "134", "dun_code": "05", "winner": "BN", "vote_share": { "BN": 0.54, "PH": 0.30, "PN": 0.12 } },
-        { "parliament_code": "135", "dun_code": "06", "winner": "BN", "vote_share": { "BN": 0.53, "PH": 0.29, "PN": 0.13 } },
-        { "parliament_code": "135", "dun_code": "07", "winner": "BN", "vote_share": { "BN": 0.51, "PH": 0.31, "PN": 0.14 } },
-        { "parliament_code": "135", "dun_code": "08", "winner": "BN", "vote_share": { "BN": 0.57, "PH": 0.26, "PN": 0.12 } },
-        { "parliament_code": "135", "dun_code": "09", "winner": "BN", "vote_share": { "BN": 0.52, "PH": 0.30, "PN": 0.13 } },
-        { "parliament_code": "135", "dun_code": "10", "winner": "BN", "vote_share": { "BN": 0.56, "PH": 0.26, "PN": 0.13 } },
-        { "parliament_code": "136", "dun_code": "11", "winner": "PH", "vote_share": { "BN": 0.42, "PH": 0.48, "PN": 0.06 } },
-        { "parliament_code": "136", "dun_code": "12", "winner": "BN", "vote_share": { "BN": 0.51, "PH": 0.38, "PN": 0.08 } },
-        { "parliament_code": "136", "dun_code": "13", "winner": "BN", "vote_share": { "BN": 0.52, "PH": 0.36, "PN": 0.08 } },
-        { "parliament_code": "136", "dun_code": "14", "winner": "BN", "vote_share": { "BN": 0.54, "PH": 0.30, "PN": 0.12 } },
-        { "parliament_code": "137", "dun_code": "15", "winner": "PH", "vote_share": { "BN": 0.38, "PH": 0.55, "PN": 0.04 } },
-        { "parliament_code": "137", "dun_code": "16", "winner": "PH", "vote_share": { "BN": 0.35, "PH": 0.58, "PN": 0.04 } },
-        { "parliament_code": "137", "dun_code": "17", "winner": "PH", "vote_share": { "BN": 0.40, "PH": 0.52, "PN": 0.05 } },
-        { "parliament_code": "137", "dun_code": "18", "winner": "PH", "vote_share": { "BN": 0.42, "PH": 0.50, "PN": 0.05 } },
-        { "parliament_code": "138", "dun_code": "19", "winner": "PH", "vote_share": { "BN": 0.43, "PH": 0.47, "PN": 0.07 } },
-        { "parliament_code": "138", "dun_code": "20", "winner": "PH", "vote_share": { "BN": 0.40, "PH": 0.50, "PN": 0.06 } },
-        { "parliament_code": "138", "dun_code": "21", "winner": "PH", "vote_share": { "BN": 0.42, "PH": 0.50, "PN": 0.05 } },
-        { "parliament_code": "138", "dun_code": "22", "winner": "PH", "vote_share": { "BN": 0.42, "PH": 0.50, "PN": 0.05 } },
-        { "parliament_code": "138", "dun_code": "23", "winner": "PH", "vote_share": { "BN": 0.42, "PH": 0.50, "PN": 0.05 } },
-        { "parliament_code": "139", "dun_code": "24", "winner": "BN", "vote_share": { "BN": 0.54, "PH": 0.28, "PN": 0.13 } },
-        { "parliament_code": "139", "dun_code": "25", "winner": "BN", "vote_share": { "BN": 0.55, "PH": 0.27, "PN": 0.13 } },
-        { "parliament_code": "139", "dun_code": "26", "winner": "BN", "vote_share": { "BN": 0.53, "PH": 0.29, "PN": 0.14 } },
-        { "parliament_code": "139", "dun_code": "27", "winner": "PN", "vote_share": { "BN": 0.38, "PH": 0.20, "PN": 0.38 } },
-        { "parliament_code": "139", "dun_code": "28", "winner": "PN", "vote_share": { "BN": 0.39, "PH": 0.21, "PN": 0.37 } }
+        {
+          "parliament_code": "134",
+          "dun_code": "01",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.55,
+            "PH": 0.28,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "02",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.3,
+            "PN": 0.14
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "03",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.58,
+            "PH": 0.25,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "04",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.41,
+            "PH": 0.45,
+            "PN": 0.1
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "05",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.54,
+            "PH": 0.3,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "06",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.53,
+            "PH": 0.29,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "07",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.51,
+            "PH": 0.31,
+            "PN": 0.14
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "08",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.57,
+            "PH": 0.26,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "09",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.3,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "10",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.56,
+            "PH": 0.26,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "11",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.48,
+            "PN": 0.06
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "12",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.51,
+            "PH": 0.38,
+            "PN": 0.08
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "13",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.36,
+            "PN": 0.08
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "14",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.54,
+            "PH": 0.3,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "15",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.38,
+            "PH": 0.55,
+            "PN": 0.04
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "16",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.35,
+            "PH": 0.58,
+            "PN": 0.04
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "17",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.4,
+            "PH": 0.52,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "18",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.5,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "19",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.43,
+            "PH": 0.47,
+            "PN": 0.07
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "20",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.4,
+            "PH": 0.5,
+            "PN": 0.06
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "21",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.5,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "22",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.5,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "23",
+          "winner": "PH",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.5,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "24",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.54,
+            "PH": 0.28,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "25",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.55,
+            "PH": 0.27,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "26",
+          "winner": "BN",
+          "vote_share": {
+            "BN": 0.53,
+            "PH": 0.29,
+            "PN": 0.14
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "27",
+          "winner": "PN",
+          "vote_share": {
+            "BN": 0.38,
+            "PH": 0.2,
+            "PN": 0.38
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "28",
+          "winner": "PN",
+          "vote_share": {
+            "BN": 0.39,
+            "PH": 0.21,
+            "PN": 0.37
+          }
+        }
       ]
     },
     {
       "id": "GE15",
-      "name": "GE15 — 15th General Election",
+      "name": "GE15 \u2014 15th General Election",
       "date": "2022-11-19",
-      "headline_fact": "PN won 4 (P134, P135, P136, P139), PH won 2 (P137, P138), BN won 0. Melaka parliament split.",
-      "parliament_summary": { "PN": 4, "PH": 2, "BN": 0, "total": 6 },
+      "headline_fact": "PN won 3 (P134, P136, P139), PH won 3 (P135, P137, P138), BN won 0. Melaka parliament split evenly PN 3 / PH 3.",
+      "parliament_summary": {
+        "PN": 3,
+        "PH": 3,
+        "BN": 0,
+        "total": 6
+      },
       "dun_summary": null,
       "parliament_results": [
-        { "parliament_code": "134", "winner": "PN", "votes_pct": 41.2, "runner_up": "PH", "margin_pct": 3.8 },
-        { "parliament_code": "135", "winner": "PN", "votes_pct": 40.8, "runner_up": "BN", "margin_pct": 2.1 },
-        { "parliament_code": "136", "winner": "PN", "votes_pct": 42.5, "runner_up": "PH", "margin_pct": 3.1 },
-        { "parliament_code": "137", "winner": "PH", "votes_pct": 48.7, "runner_up": "PN", "margin_pct": 8.9 },
-        { "parliament_code": "138", "winner": "PH", "votes_pct": 44.1, "runner_up": "PN", "margin_pct": 5.3 },
-        { "parliament_code": "139", "winner": "PN", "votes_pct": 41.5, "runner_up": "PH", "margin_pct": 3.1 }
+        {
+          "parliament_code": "134",
+          "winner": "PN",
+          "votes_pct": 41.2,
+          "runner_up": "PH",
+          "margin_pct": 3.8
+        },
+        {
+          "parliament_code": "135",
+          "winner": "PH",
+          "votes_pct": 43.5,
+          "runner_up": "PN",
+          "margin_pct": 2.8
+        },
+        {
+          "parliament_code": "136",
+          "winner": "PN",
+          "votes_pct": 42.5,
+          "runner_up": "PH",
+          "margin_pct": 3.1
+        },
+        {
+          "parliament_code": "137",
+          "winner": "PH",
+          "votes_pct": 48.7,
+          "runner_up": "PN",
+          "margin_pct": 8.9
+        },
+        {
+          "parliament_code": "138",
+          "winner": "PH",
+          "votes_pct": 44.1,
+          "runner_up": "PN",
+          "margin_pct": 5.3
+        },
+        {
+          "parliament_code": "139",
+          "winner": "PN",
+          "votes_pct": 41.5,
+          "runner_up": "PH",
+          "margin_pct": 3.1
+        }
       ],
       "dun_results": []
     }

@@ -15,7 +15,7 @@ export interface Parliament {
 
 export const PARLIAMENTS: Parliament[] = [
   { code: "134", name: "Masjid Tanah", district: "Alor Gajah", dunCount: 5, totalVoters: 71415, ge14Winner: "PH", ge15Winner: "PN", dunCodes: ["01", "02", "03", "04", "05"] },
-  { code: "135", name: "Alor Gajah", district: "Alor Gajah", dunCount: 5, totalVoters: 0, ge14Winner: "PH", ge15Winner: "PN", dunCodes: ["06", "07", "08", "09", "10"] },
+  { code: "135", name: "Alor Gajah", district: "Alor Gajah", dunCount: 5, totalVoters: 0, ge14Winner: "PH", ge15Winner: "PH", dunCodes: ["06", "07", "08", "09", "10"] },
   { code: "136", name: "Tangga Batu", district: "Melaka Tengah", dunCount: 4, totalVoters: 0, ge14Winner: "PH", ge15Winner: "PN", dunCodes: ["11", "12", "13", "14"] },
   { code: "137", name: "Hang Tuah Jaya", district: "Melaka Tengah", dunCount: 4, totalVoters: 0, ge14Winner: "PH", ge15Winner: "PH", dunCodes: ["15", "16", "17", "18"] },
   { code: "138", name: "Kota Melaka", district: "Melaka Tengah", dunCount: 5, totalVoters: 0, ge14Winner: "PH", ge15Winner: "PH", dunCodes: ["19", "20", "21", "22", "23"] },

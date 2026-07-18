@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
@@ -24,6 +24,9 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 const Map2DTab = dynamic(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab })), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 2D map…</div> });
 const Map3DTab = dynamic(() => import("@/components/tabs/map-3d-tab").then((m) => ({ default: m.Map3DTab })), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 3D map…</div> });
 const S2DConsoleTab = dynamic(() => import("@/components/tabs/s2d-console-tab").then((m) => ({ default: m.S2DConsoleTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D console…</div> });
+const S2D360Tab = dynamic(() => import("@/components/tabs/s2d-360-tab").then((m) => ({ default: m.S2D360Tab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D 360…</div> });
+const PublicCommunicationTab = dynamic(() => import("@/components/tabs/public-communication-tab").then((m) => ({ default: m.PublicCommunicationTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Public Comm…</div> });
+const IncidentCasebookTab = dynamic(() => import("@/components/tabs/incident-casebook-tab").then((m) => ({ default: m.IncidentCasebookTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Incidents…</div> });
 
 const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -35,6 +38,9 @@ const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{
   { id: "risk", label: "Risk + Socio", icon: ShieldAlert },
   { id: "compare", label: "Compare", icon: ArrowLeftRight },
   { id: "s2d", label: "S2D Console", icon: Activity },
+  { id: "s2d-360", label: "S2D 360", icon: Brain },
+  { id: "public-comm", label: "Public Comm", icon: MessageSquare },
+  { id: "incidents", label: "Incidents", icon: AlertTriangle },
   { id: "governance", label: "Governance", icon: ShieldCheck },
 ];
 
@@ -124,6 +130,9 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "map-2d" && <Map2DTab />}
         {activeTab === "map-3d" && <Map3DTab />}
         {activeTab === "s2d" && <S2DConsoleTab />}
+        {activeTab === "s2d-360" && <S2D360Tab />}
+        {activeTab === "public-comm" && <PublicCommunicationTab />}
+        {activeTab === "incidents" && <IncidentCasebookTab />}
         {activeTab === "overview" && <OverviewTab />}
         {activeTab === "elections" && <ElectionsTab />}
         {activeTab === "demographics" && <DemographicsTab />}

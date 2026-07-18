@@ -56,7 +56,7 @@ function stampHeaders(res: NextResponse, req: NextRequest): NextResponse {
 // Main middleware
 // ---------------------------------------------------------------------------
 
-export function middleware(req: NextRequest): NextResponse {
+export function proxy(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
 
   // ---------------------------------------------------------------------

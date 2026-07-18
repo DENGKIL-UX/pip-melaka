@@ -368,9 +368,14 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
     if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
       return NextResponse.json({ error: "messages[] required" }, { status: 400 });
     }
+    // R10: Limit message count and content length to prevent abuse
+    if (body.messages.length > 20) {
+      return NextResponse.json({ error: "Too many messages (max 20)" }, { status: 413 });
+    }
     messages = body.messages
-      .filter((m) => typeof m.content === "string")
-      .map((m) => ({ role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant", content: m.content }));
+      .filter((m) => typeof m.content === "string" && m.content.length <= 5000)
+      .slice(-20) // Keep only last 20 messages
+      .map((m) => ({ role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant", content: m.content.slice(0, 5000) }));
   } catch {
     return NextResponse.json({ error: "invalid JSON body" }, { status: 400 });
   }

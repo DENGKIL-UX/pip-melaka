@@ -213,7 +213,11 @@ async function handler(): Promise<Response> {
       uptime: Math.floor((Date.now() - PROCESS_STARTED_AT) / 1000),
       version: APP_VERSION,
       requestId: getRequestId(),
-      checks,
+      checks: {
+        database: { status: checks.database.status, detail: checks.database.status === "pass" ? "ok" : checks.database.detail },
+        engine: { status: checks.engine.status, detail: checks.engine.status === "pass" ? "ok" : checks.engine.detail },
+        memory: { status: checks.memory.status, detail: checks.memory.status === "pass" ? "ok" : "memory pressure detected" },
+      },
     };
 
     const httpStatus = status === "unhealthy" ? 503 : 200;

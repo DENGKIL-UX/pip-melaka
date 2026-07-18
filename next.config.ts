@@ -24,7 +24,7 @@ const config: NextConfig = {
       {
         source: "/api/(.*)",
         headers: [
-          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Origin", value: "https://pip-melaka.ritz-analytics.workers.dev" },
           { key: "Access-Control-Allow-Methods", value: "GET,POST,PUT,DELETE,PATCH,OPTIONS" },
           { key: "Access-Control-Allow-Headers", value: "Content-Type,Authorization,X-Requested-With,X-Request-ID,Idempotency-Key" },
           { key: "Access-Control-Max-Age", value: "86400" },

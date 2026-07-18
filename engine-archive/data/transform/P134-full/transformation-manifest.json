@@ -1,0 +1,60 @@
+{
+  "artifact": "PIP_VOTER_INTELLIGENCE_TRANSFORM_OUTPUT",
+  "transformer": "pip-voter-intelligence-transformer-v1.0.js",
+  "transformer_version": "1.0.0",
+  "run_id": "PVT_20260708T072822499Z_30adf30e",
+  "started_at_utc": "2026-07-08T07:28:22.499Z",
+  "completed_at_utc": "2026-07-08T07:28:27.189Z",
+  "duration_ms": 4690,
+  "input": {
+    "file": "C:\\Users\\USER\\Documents\\PIP\\MELAKA\\pipML-app\\PIP-VOTER-INTELLIGENCE\\data\\clean\\P134-full\\voter-cleaned.jsonl",
+    "sha256": "2ef60e356241d0067ba019423302da7ac7a3e593a91a6642e73e0a3239ef8a6c",
+    "records": 71415
+  },
+  "contract": {
+    "contract_type": "pip_voter_source_contract",
+    "expected_source_field_count": 41,
+    "source_schema_mode": "pseudonymised_41_field"
+  },
+  "ontology": null,
+  "transform_mode": "SOURCE_CONTRACT_FALLBACK",
+  "results": {
+    "input_records": 71415,
+    "transformed_records": 71415,
+    "failed_records": 0,
+    "clean_records": 71411,
+    "clean_with_flags_records": 4,
+    "review_required_records": 4,
+    "unique_voter_id_hashes": 71415,
+    "duplicate_voter_id_hash_records": 0,
+    "aggregate_counts": {
+      "states": 1,
+      "parliaments": 1,
+      "duns": 5,
+      "dms": 30,
+      "localities": 368
+    }
+  },
+  "privacy": {
+    "removed_fields_enforced": [
+      "IC",
+      "IC_LAMA",
+      "IC_PERSONEL",
+      "IC_SPOUSE",
+      "NAMA",
+      "NO_TEL_HF",
+      "NOAHLI",
+      "CATATAN"
+    ]
+  },
+  "outputs": {
+    "voter_intelligence_jsonl": "voter-intelligence.jsonl",
+    "locality_intelligence_jsonl": "locality-intelligence.jsonl",
+    "dm_intelligence_jsonl": "dm-intelligence.jsonl",
+    "dun_intelligence_jsonl": "dun-intelligence.jsonl",
+    "parliament_intelligence_jsonl": "parliament-intelligence.jsonl",
+    "state_intelligence_jsonl": "state-intelligence.jsonl",
+    "dashboard_overview_json": "dashboard-overview.json",
+    "transform_issues_csv": "transform-issues.csv"
+  }
+}

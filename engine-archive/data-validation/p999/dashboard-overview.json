@@ -1,0 +1,73 @@
+{
+  "artifact": "PIP_VOTER_DASHBOARD_OVERVIEW",
+  "schema_version": "1.0",
+  "generated_at_utc": "2026-07-13T00:00:00.000Z",
+  "run_id": "P999_VALIDATION_FIXTURE_20260713",
+  "source": {
+    "source_type": "VALIDATION_FIXTURE",
+    "classification": "NON_PRODUCTION",
+    "description": "Aggregate-only reusable dashboard validation fixture."
+  },
+  "overview": {
+    "level": "overall",
+    "id": "OVERALL",
+    "geography": {
+      "parliament_code": "P999",
+      "parliament_name": "VALIDATION CONSTITUENCY",
+      "state_name": "TEST STATE"
+    },
+    "metrics": {
+      "total_voters": 1234,
+      "male_voters": 600,
+      "female_voters": 634,
+      "other_or_unknown_gender_voters": 0,
+      "senior_voters_56_plus": 312,
+      "known_age_voters": 1234,
+      "voter_density_score": "MEDIUM",
+      "senior_dependency_percent": 25.2836,
+      "gender_balance_score": 94.6372,
+      "male_percent": 48.6224,
+      "female_percent": 51.3776,
+      "dominant_age_group": "30_39",
+      "dominant_ethnicity_group": "OTHER",
+      "dominant_profession_group": "UNKNOWN",
+      "profile_completeness_score": 99.2,
+      "average_cleansing_confidence": 0.9985,
+      "clean_records": 1228,
+      "clean_with_flags_records": 6
+    },
+    "distributions": {
+      "age_band_counts": {
+        "18_20": 80,
+        "21_29": 210,
+        "30_39": 300,
+        "40_49": 240,
+        "50_55": 92,
+        "56_64": 170,
+        "65_PLUS": 142
+      },
+      "ethnicity_counts": {
+        "OTHER": 1234
+      },
+      "profession_group_counts": {
+        "UNKNOWN": 1220,
+        "OTHER": 14
+      }
+    }
+  },
+  "geography_counts": {
+    "states": 1,
+    "parliaments": 1,
+    "duns": 2,
+    "dms": 4,
+    "localities": 8
+  },
+  "record_quality": {
+    "transformed_records": 1234,
+    "failed_records": 0,
+    "clean_records": 1228,
+    "clean_with_flags_records": 6,
+    "review_required_records": 6,
+    "duplicate_voter_id_hash_records": 0
+  }
+}

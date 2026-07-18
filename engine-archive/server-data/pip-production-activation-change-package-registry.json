@@ -1,0 +1,3614 @@
+{
+  "schema": "pip.production-change-package.registry.v1",
+  "generated_at": "2026-07-15T02:44:06.098Z",
+  "updated_at": "2026-07-15T04:16:51.293Z",
+  "version": 24,
+  "current_revision": 9,
+  "latest_package_id": "PKG-20260715041651221-000009",
+  "latest_handoff_id": "HO-20260715041651293-000005",
+  "request_index": {
+    "REQ-1784083446081-60C-PREPARE": "PKG-20260715024406111-000001",
+    "REQ-1784083483677-60C-PREPARE": "PKG-20260715024443691-000002",
+    "REQ-1784083523655-PREPARE": "PKG-20260715024526308-000003",
+    "REQ-1784083564616-PREPARE": "PKG-20260715024604748-000004",
+    "REQ-1784083589595-60C-PREPARE": "PKG-20260715024629606-000005",
+    "REQ-1784083605738-60C-PREPARE": "PKG-20260715024645749-000006",
+    "REQ-1784088961141-60C-PREPARE": "PKG-20260715041601154-000007",
+    "REQ-1784088962402-B61A-60C-PREP": "PKG-20260715041602415-000008",
+    "REQ-1784089011133-B61A-60C-PREP": "PKG-20260715041651221-000009"
+  },
+  "handoff_request_index": {
+    "REQ-1784083592345-60C-HANDOFF": "HO-20260715024632356-000001",
+    "REQ-1784083605827-60C-HANDOFF": "HO-20260715024645838-000002",
+    "REQ-1784088961221-60C-HANDOFF": "HO-20260715041601268-000003",
+    "REQ-1784088962547-B61A-60C-HANDOFF": "HO-20260715041602560-000004",
+    "REQ-1784089011282-B61A-60C-HANDOFF": "HO-20260715041651293-000005"
+  },
+  "package_revisions": [
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715024406111-000001",
+      "package_revision": 1,
+      "package_digest": "5bef80a45bef80a45bef80a45bef80a45bef80a45bef80a45bef80a45bef80a4",
+      "request_id": "REQ-1784083446081-60C-PREPARE",
+      "intake_id": "INTAKE-20260715024405973-000003",
+      "intake_request_id": "REQ-1784083445957-B60C-INTAKE",
+      "intake_receipt_digest": "4fa5e61a4fa5e61a4fa5e61a4fa5e61a4fa5e61a4fa5e61a4fa5e61a4fa5e61a",
+      "approval_id": "APPROVAL-20260715024406026-000002",
+      "approval_request_id": "REQ-1784083446005-B60C-APPROVAL",
+      "approval_revision": 2,
+      "approval_receipt_digest": "64245e3c64245e3c64245e3c64245e3c64245e3c64245e3c64245e3c64245e3c",
+      "activation_readiness_digest": "010fa87e010fa87e010fa87e010fa87e010fa87e010fa87e010fa87e010fa87e",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784083445957",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:44:06.112Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715024443691-000002",
+      "package_revision": 2,
+      "package_digest": "6401471564014715640147156401471564014715640147156401471564014715",
+      "request_id": "REQ-1784083483677-60C-PREPARE",
+      "intake_id": "INTAKE-20260715024443610-000004",
+      "intake_request_id": "REQ-1784083483595-B60C-INTAKE",
+      "intake_receipt_digest": "81ab6ed381ab6ed381ab6ed381ab6ed381ab6ed381ab6ed381ab6ed381ab6ed3",
+      "approval_id": "APPROVAL-20260715024443640-000003",
+      "approval_request_id": "REQ-1784083483627-B60C-APPROVAL",
+      "approval_revision": 3,
+      "approval_receipt_digest": "c093f353c093f353c093f353c093f353c093f353c093f353c093f353c093f353",
+      "activation_readiness_digest": "bbe9a242bbe9a242bbe9a242bbe9a242bbe9a242bbe9a242bbe9a242bbe9a242",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784083483595",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:44:43.691Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715024526308-000003",
+      "package_revision": 3,
+      "package_digest": "b633e260b633e260b633e260b633e260b633e260b633e260b633e260b633e260",
+      "request_id": "REQ-1784083523655-PREPARE",
+      "intake_id": "INTAKE-20260715024524170-000005",
+      "intake_request_id": "REQ-1784083523655-INT",
+      "intake_receipt_digest": "6212289362122893621228936212289362122893621228936212289362122893",
+      "approval_id": "APPROVAL-20260715024525540-000004",
+      "approval_request_id": "REQ-1784083523655-APP",
+      "approval_revision": 4,
+      "approval_receipt_digest": "6b4166606b4166606b4166606b4166606b4166606b4166606b4166606b416660",
+      "activation_readiness_digest": "d9f39abbd9f39abbd9f39abbd9f39abbd9f39abbd9f39abbd9f39abbd9f39abb",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784083523655",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:45:26.308Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715024604748-000004",
+      "package_revision": 4,
+      "package_digest": "348f9efb348f9efb348f9efb348f9efb348f9efb348f9efb348f9efb348f9efb",
+      "request_id": "REQ-1784083564616-PREPARE",
+      "intake_id": "INTAKE-20260715024604634-000006",
+      "intake_request_id": "REQ-1784083564616-INT",
+      "intake_receipt_digest": "d29da43bd29da43bd29da43bd29da43bd29da43bd29da43bd29da43bd29da43b",
+      "approval_id": "APPROVAL-20260715024604664-000005",
+      "approval_request_id": "REQ-1784083564616-APP",
+      "approval_revision": 5,
+      "approval_receipt_digest": "8c756e368c756e368c756e368c756e368c756e368c756e368c756e368c756e36",
+      "activation_readiness_digest": "0f7dab1b0f7dab1b0f7dab1b0f7dab1b0f7dab1b0f7dab1b0f7dab1b0f7dab1b",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784083564616",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:46:04.748Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715024629606-000005",
+      "package_revision": 5,
+      "package_digest": "92746f3492746f3492746f3492746f3492746f3492746f3492746f3492746f34",
+      "request_id": "REQ-1784083589595-60C-PREPARE",
+      "intake_id": "INTAKE-20260715024629337-000007",
+      "intake_request_id": "REQ-1784083589327-B60C-INTAKE",
+      "intake_receipt_digest": "39395ee139395ee139395ee139395ee139395ee139395ee139395ee139395ee1",
+      "approval_id": "APPROVAL-20260715024629543-000006",
+      "approval_request_id": "REQ-1784083589530-B60C-APPROVAL",
+      "approval_revision": 6,
+      "approval_receipt_digest": "38ebc67538ebc67538ebc67538ebc67538ebc67538ebc67538ebc67538ebc675",
+      "activation_readiness_digest": "e00d6817e00d6817e00d6817e00d6817e00d6817e00d6817e00d6817e00d6817",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784083589327",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "HANDOFF_ACKNOWLEDGED",
+      "generated_at": "2026-07-15T02:46:29.607Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715024645749-000006",
+      "package_revision": 6,
+      "package_digest": "587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5",
+      "request_id": "REQ-1784083605738-60C-PREPARE",
+      "intake_id": "INTAKE-20260715024645658-000010",
+      "intake_request_id": "REQ-1784083605651-B60C-INTAKE",
+      "intake_receipt_digest": "69752b1569752b1569752b1569752b1569752b1569752b1569752b1569752b15",
+      "approval_id": "APPROVAL-20260715024645688-000008",
+      "approval_request_id": "REQ-1784083605679-B60C-APPROVAL",
+      "approval_revision": 8,
+      "approval_receipt_digest": "d6c036b8d6c036b8d6c036b8d6c036b8d6c036b8d6c036b8d6c036b8d6c036b8",
+      "activation_readiness_digest": "e1994c9de1994c9de1994c9de1994c9de1994c9de1994c9de1994c9de1994c9d",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784083605651",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "HANDOFF_ACKNOWLEDGED",
+      "generated_at": "2026-07-15T02:46:45.749Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715041601154-000007",
+      "package_revision": 7,
+      "package_digest": "c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3",
+      "request_id": "REQ-1784088961141-60C-PREPARE",
+      "intake_id": "INTAKE-20260715041601035-000013",
+      "intake_request_id": "REQ-1784088961023-B60C-INTAKE",
+      "intake_receipt_digest": "3b508d923b508d923b508d923b508d923b508d923b508d923b508d923b508d92",
+      "approval_id": "APPROVAL-20260715041601065-000010",
+      "approval_request_id": "REQ-1784088961053-B60C-APPROVAL",
+      "approval_revision": 10,
+      "approval_receipt_digest": "8ffc67cb8ffc67cb8ffc67cb8ffc67cb8ffc67cb8ffc67cb8ffc67cb8ffc67cb",
+      "activation_readiness_digest": "d61177dad61177dad61177dad61177dad61177dad61177dad61177dad61177da",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784088961023",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "HANDOFF_ACKNOWLEDGED",
+      "generated_at": "2026-07-15T04:16:01.154Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715041602415-000008",
+      "package_revision": 8,
+      "package_digest": "4992a9304992a9304992a9304992a9304992a9304992a9304992a9304992a930",
+      "request_id": "REQ-1784088962402-B61A-60C-PREP",
+      "intake_id": "INTAKE-20260715041602349-000014",
+      "intake_request_id": "REQ-1784088962333-B61A-INTAKE",
+      "intake_receipt_digest": "1960980619609806196098061960980619609806196098061960980619609806",
+      "approval_id": "APPROVAL-20260715041602385-000011",
+      "approval_request_id": "REQ-1784088962371-B61A-APPROVAL",
+      "approval_revision": 11,
+      "approval_receipt_digest": "10e94da810e94da810e94da810e94da810e94da810e94da810e94da810e94da8",
+      "activation_readiness_digest": "1bf1b6191bf1b6191bf1b6191bf1b6191bf1b6191bf1b6191bf1b6191bf1b619",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784088962333",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "HANDOFF_ACKNOWLEDGED",
+      "generated_at": "2026-07-15T04:16:02.415Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    },
+    {
+      "schema": "pip.production-change-package.v1",
+      "package_id": "PKG-20260715041651221-000009",
+      "package_revision": 9,
+      "package_digest": "288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a",
+      "request_id": "REQ-1784089011133-B61A-60C-PREP",
+      "intake_id": "INTAKE-20260715041651079-000015",
+      "intake_request_id": "REQ-1784089011066-B61A-INTAKE",
+      "intake_receipt_digest": "1846ba8c1846ba8c1846ba8c1846ba8c1846ba8c1846ba8c1846ba8c1846ba8c",
+      "approval_id": "APPROVAL-20260715041651115-000012",
+      "approval_request_id": "REQ-1784089011100-B61A-APPROVAL",
+      "approval_revision": 12,
+      "approval_receipt_digest": "f455a602f455a602f455a602f455a602f455a602f455a602f455a602f455a602",
+      "activation_readiness_digest": "831bcd83831bcd83831bcd83831bcd83831bcd83831bcd83831bcd83831bcd83",
+      "target_environment": "PRODUCTION",
+      "provider_kind": "POSTGRESQL",
+      "provider_vendor": "AWS_RDS",
+      "deployment_model": "MANAGED_SERVICE",
+      "region_classification": "MALAYSIA",
+      "tls_mode": "REQUIRED",
+      "reference_alias_count": 2,
+      "reference_alias_set_digest": "8e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c29288e6c2928",
+      "change_reference": "CHG-1784089011066",
+      "change_window_classification": "CONTROLLED_MAINTENANCE_WINDOW",
+      "rollback_classification": "CONFIGURATION_REVERSION_ONLY",
+      "monitoring_classification": "MANUAL_OBSERVATION_ONLY",
+      "activation_mode": "EXTERNAL_MANUAL_OPERATOR",
+      "dry_run_mode": "STATIC_GOVERNANCE_NO_CONNECTIVITY",
+      "status": "HANDOFF_ACKNOWLEDGED",
+      "generated_at": "2026-07-15T04:16:51.221Z",
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false
+    }
+  ],
+  "dry_run_reports": [
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715024406111-000001",
+      "package_revision": 1,
+      "package_digest": "5bef80a45bef80a45bef80a45bef80a45bef80a45bef80a45bef80a45bef80a4",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:44:06.202Z",
+      "passed_checks": 48,
+      "blocked_checks": 2,
+      "blocker_count": 1,
+      "blocker_codes": [
+        "ACTIVATION_READINESS_NOT_READY"
+      ],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "FAIL",
+          "message": "Activation readiness report is invalid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "FAIL",
+          "message": "Activation readiness is not READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": false,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715024443691-000002",
+      "package_revision": 2,
+      "package_digest": "6401471564014715640147156401471564014715640147156401471564014715",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:44:43.852Z",
+      "passed_checks": 48,
+      "blocked_checks": 2,
+      "blocker_count": 1,
+      "blocker_codes": [
+        "ACTIVATION_READINESS_NOT_READY"
+      ],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "FAIL",
+          "message": "Activation readiness report is invalid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "FAIL",
+          "message": "Activation readiness is not READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": false,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715024526308-000003",
+      "package_revision": 3,
+      "package_digest": "b633e260b633e260b633e260b633e260b633e260b633e260b633e260b633e260",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:45:27.511Z",
+      "passed_checks": 48,
+      "blocked_checks": 2,
+      "blocker_count": 1,
+      "blocker_codes": [
+        "ACTIVATION_READINESS_NOT_READY"
+      ],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "FAIL",
+          "message": "Activation readiness report is invalid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "FAIL",
+          "message": "Activation readiness is not READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": false,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715024604748-000004",
+      "package_revision": 4,
+      "package_digest": "348f9efb348f9efb348f9efb348f9efb348f9efb348f9efb348f9efb348f9efb",
+      "status": "BLOCKED",
+      "generated_at": "2026-07-15T02:46:04.783Z",
+      "passed_checks": 48,
+      "blocked_checks": 2,
+      "blocker_count": 1,
+      "blocker_codes": [
+        "ACTIVATION_READINESS_NOT_READY"
+      ],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "FAIL",
+          "message": "Activation readiness report is invalid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "FAIL",
+          "message": "Activation readiness is not READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": false,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715024629606-000005",
+      "package_revision": 5,
+      "package_digest": "92746f3492746f3492746f3492746f3492746f3492746f3492746f3492746f34",
+      "status": "PASSED",
+      "generated_at": "2026-07-15T02:46:32.283Z",
+      "passed_checks": 50,
+      "blocked_checks": 0,
+      "blocker_count": 0,
+      "blocker_codes": [],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "PASS",
+          "message": "Activation readiness report is valid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "PASS",
+          "message": "Activation readiness is READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715024645749-000006",
+      "package_revision": 6,
+      "package_digest": "587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5",
+      "status": "PASSED",
+      "generated_at": "2026-07-15T02:46:45.803Z",
+      "passed_checks": 50,
+      "blocked_checks": 0,
+      "blocker_count": 0,
+      "blocker_codes": [],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "PASS",
+          "message": "Activation readiness report is valid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "PASS",
+          "message": "Activation readiness is READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715041601154-000007",
+      "package_revision": 7,
+      "package_digest": "c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3",
+      "status": "PASSED",
+      "generated_at": "2026-07-15T04:16:01.201Z",
+      "passed_checks": 50,
+      "blocked_checks": 0,
+      "blocker_count": 0,
+      "blocker_codes": [],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "PASS",
+          "message": "Activation readiness report is valid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "PASS",
+          "message": "Activation readiness is READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715041602415-000008",
+      "package_revision": 8,
+      "package_digest": "4992a9304992a9304992a9304992a9304992a9304992a9304992a9304992a930",
+      "status": "PASSED",
+      "generated_at": "2026-07-15T04:16:02.525Z",
+      "passed_checks": 50,
+      "blocked_checks": 0,
+      "blocker_count": 0,
+      "blocker_codes": [],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "PASS",
+          "message": "Activation readiness report is valid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "PASS",
+          "message": "Activation readiness is READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    },
+    {
+      "schema": "pip.production-change-dry-run.v1",
+      "package_id": "PKG-20260715041651221-000009",
+      "package_revision": 9,
+      "package_digest": "288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a",
+      "status": "PASSED",
+      "generated_at": "2026-07-15T04:16:51.259Z",
+      "passed_checks": 50,
+      "blocked_checks": 0,
+      "blocker_count": 0,
+      "blocker_codes": [],
+      "checks": [
+        {
+          "check_key": "change_package_contract_valid",
+          "status": "PASS",
+          "message": "Change package contract manifest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "intake_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60A intake contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_present",
+          "status": "PASS",
+          "message": "Latest intake receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_intake_valid",
+          "status": "PASS",
+          "message": "Latest intake receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_contract_valid",
+          "status": "PASS",
+          "message": "Batch 60B approval contract assumptions are valid.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_present",
+          "status": "PASS",
+          "message": "Latest approval receipt is present.",
+          "required": true
+        },
+        {
+          "check_key": "latest_approval_valid",
+          "status": "PASS",
+          "message": "Latest approval receipt is valid.",
+          "required": true
+        },
+        {
+          "check_key": "approval_action_is_approve",
+          "status": "PASS",
+          "message": "Approval action is APPROVE.",
+          "required": true
+        },
+        {
+          "check_key": "approval_status_is_approved",
+          "status": "PASS",
+          "message": "Approval status is APPROVED.",
+          "required": true
+        },
+        {
+          "check_key": "approval_matches_latest_intake",
+          "status": "PASS",
+          "message": "Approval intake matches latest intake.",
+          "required": true
+        },
+        {
+          "check_key": "intake_digest_matches",
+          "status": "PASS",
+          "message": "Intake digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "approval_digest_matches",
+          "status": "PASS",
+          "message": "Approval digest matches.",
+          "required": true
+        },
+        {
+          "check_key": "change_reference_matches",
+          "status": "PASS",
+          "message": "Change reference matches.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_report_valid",
+          "status": "PASS",
+          "message": "Activation readiness report is valid.",
+          "required": true
+        },
+        {
+          "check_key": "activation_readiness_is_ready",
+          "status": "PASS",
+          "message": "Activation readiness is READY.",
+          "required": true
+        },
+        {
+          "check_key": "all_batch60b_attestations_complete",
+          "status": "PASS",
+          "message": "All Batch 60B attestation requirements are complete.",
+          "required": true
+        },
+        {
+          "check_key": "reference_alias_count_complete",
+          "status": "PASS",
+          "message": "Reference alias count is complete.",
+          "required": true
+        },
+        {
+          "check_key": "opaque_reference_aliases_confirmed",
+          "status": "PASS",
+          "message": "Opaque reference aliases are confirmed.",
+          "required": true
+        },
+        {
+          "check_key": "package_digest_valid",
+          "status": "PASS",
+          "message": "Package digest is valid.",
+          "required": true
+        },
+        {
+          "check_key": "package_not_superseded",
+          "status": "PASS",
+          "message": "Package is not superseded.",
+          "required": true
+        },
+        {
+          "check_key": "durable_intake_readback_valid",
+          "status": "PASS",
+          "message": "Intake durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_approval_readback_valid",
+          "status": "PASS",
+          "message": "Approval durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "durable_package_readback_valid",
+          "status": "PASS",
+          "message": "Package durable readback is valid.",
+          "required": true
+        },
+        {
+          "check_key": "authenticated_administrator_required",
+          "status": "PASS",
+          "message": "Authenticated administrator required invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "user_admin_permission_required",
+          "status": "PASS",
+          "message": "user:admin permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "audit_maintain_permission_required",
+          "status": "PASS",
+          "message": "audit:maintain permission invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "csrf_required_for_mutations",
+          "status": "PASS",
+          "message": "CSRF requirement invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "p999_protected",
+          "status": "PASS",
+          "message": "P999 protection invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_secret_values_present",
+          "status": "PASS",
+          "message": "no_secret_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_environment_values_present",
+          "status": "PASS",
+          "message": "no_environment_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_connection_values_present",
+          "status": "PASS",
+          "message": "no_connection_values_present invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "no_executable_commands_generated",
+          "status": "PASS",
+          "message": "no_executable_commands_generated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_driver_not_invoked",
+          "status": "PASS",
+          "message": "database_driver_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "database_adapter_not_invoked",
+          "status": "PASS",
+          "message": "database_adapter_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "connection_probe_not_invoked",
+          "status": "PASS",
+          "message": "connection_probe_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "network_resolution_not_invoked",
+          "status": "PASS",
+          "message": "network_resolution_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "outbound_network_not_invoked",
+          "status": "PASS",
+          "message": "outbound_network_not_invoked invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "sql_not_executed",
+          "status": "PASS",
+          "message": "sql_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "ddl_not_executed",
+          "status": "PASS",
+          "message": "ddl_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "schema_not_created",
+          "status": "PASS",
+          "message": "schema_not_created invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "migration_not_executed",
+          "status": "PASS",
+          "message": "migration_not_executed invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "production_data_not_written",
+          "status": "PASS",
+          "message": "production_data_not_written invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "binding_not_activated",
+          "status": "PASS",
+          "message": "binding_not_activated invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "shadow_write_disabled",
+          "status": "PASS",
+          "message": "shadow_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "dual_write_disabled",
+          "status": "PASS",
+          "message": "dual_write_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "repository_cutover_disabled",
+          "status": "PASS",
+          "message": "repository_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_read_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_read_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "operational_write_cutover_disabled",
+          "status": "PASS",
+          "message": "operational_write_cutover_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_synchronisation_disabled",
+          "status": "PASS",
+          "message": "automatic_synchronisation_disabled invariant passed.",
+          "required": true
+        },
+        {
+          "check_key": "automatic_activation_disabled",
+          "status": "PASS",
+          "message": "automatic_activation_disabled invariant passed.",
+          "required": true
+        }
+      ],
+      "ready_for_external_manual_change_review": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false,
+      "durable_readback": true,
+      "invariant_flags": {
+        "activation_performed": false,
+        "deployment_execution_enabled": false,
+        "executable_commands_generated": false,
+        "shell_script_generated": false,
+        "environment_file_generated": false,
+        "secret_resolution": false,
+        "secret_values_read": false,
+        "environment_values_read": false,
+        "credential_materialization": false,
+        "connection_string_construction": false,
+        "database_connection_attempted": false,
+        "database_driver_invoked": false,
+        "database_adapter_invoked": false,
+        "connection_probe": false,
+        "network_resolution": false,
+        "outbound_network": false,
+        "sql_execution": false,
+        "ddl_execution": false,
+        "schema_creation": false,
+        "migration_execution": false,
+        "production_data_write": false,
+        "binding_activated": false,
+        "shadow_write": false,
+        "dual_write": false,
+        "repository_cutover": false,
+        "read_cutover": false,
+        "write_cutover": false,
+        "automatic_activation": false,
+        "automatic_retry": false,
+        "automatic_synchronisation": false,
+        "p999_protected": true
+      }
+    }
+  ],
+  "handoff_receipts": [
+    {
+      "schema": "pip.production-change-handoff.v1",
+      "handoff_id": "HO-20260715024632356-000001",
+      "request_id": "REQ-1784083592345-60C-HANDOFF",
+      "package_id": "PKG-20260715024629606-000005",
+      "package_revision": 5,
+      "package_digest": "92746f3492746f3492746f3492746f3492746f3492746f3492746f3492746f34",
+      "dry_run_status": "PASSED",
+      "handoff_status": "ACKNOWLEDGED",
+      "idempotency_status": "CREATED",
+      "acknowledged_at": "2026-07-15T02:46:32.356Z",
+      "stored_at": "2026-07-15T02:46:32.356Z",
+      "durable_readback": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false
+    },
+    {
+      "schema": "pip.production-change-handoff.v1",
+      "handoff_id": "HO-20260715024645838-000002",
+      "request_id": "REQ-1784083605827-60C-HANDOFF",
+      "package_id": "PKG-20260715024645749-000006",
+      "package_revision": 6,
+      "package_digest": "587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5587b71a5",
+      "dry_run_status": "PASSED",
+      "handoff_status": "ACKNOWLEDGED",
+      "idempotency_status": "CREATED",
+      "acknowledged_at": "2026-07-15T02:46:45.838Z",
+      "stored_at": "2026-07-15T02:46:45.838Z",
+      "durable_readback": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false
+    },
+    {
+      "schema": "pip.production-change-handoff.v1",
+      "handoff_id": "HO-20260715041601268-000003",
+      "request_id": "REQ-1784088961221-60C-HANDOFF",
+      "package_id": "PKG-20260715041601154-000007",
+      "package_revision": 7,
+      "package_digest": "c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3c2a203c3",
+      "dry_run_status": "PASSED",
+      "handoff_status": "ACKNOWLEDGED",
+      "idempotency_status": "CREATED",
+      "acknowledged_at": "2026-07-15T04:16:01.268Z",
+      "stored_at": "2026-07-15T04:16:01.268Z",
+      "durable_readback": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false
+    },
+    {
+      "schema": "pip.production-change-handoff.v1",
+      "handoff_id": "HO-20260715041602560-000004",
+      "request_id": "REQ-1784088962547-B61A-60C-HANDOFF",
+      "package_id": "PKG-20260715041602415-000008",
+      "package_revision": 8,
+      "package_digest": "4992a9304992a9304992a9304992a9304992a9304992a9304992a9304992a930",
+      "dry_run_status": "PASSED",
+      "handoff_status": "ACKNOWLEDGED",
+      "idempotency_status": "CREATED",
+      "acknowledged_at": "2026-07-15T04:16:02.560Z",
+      "stored_at": "2026-07-15T04:16:02.560Z",
+      "durable_readback": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false
+    },
+    {
+      "schema": "pip.production-change-handoff.v1",
+      "handoff_id": "HO-20260715041651293-000005",
+      "request_id": "REQ-1784089011282-B61A-60C-HANDOFF",
+      "package_id": "PKG-20260715041651221-000009",
+      "package_revision": 9,
+      "package_digest": "288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a288fcd3a",
+      "dry_run_status": "PASSED",
+      "handoff_status": "ACKNOWLEDGED",
+      "idempotency_status": "CREATED",
+      "acknowledged_at": "2026-07-15T04:16:51.293Z",
+      "stored_at": "2026-07-15T04:16:51.293Z",
+      "durable_readback": true,
+      "activation_performed": false,
+      "connection_attempted": false,
+      "database_operation_performed": false,
+      "executable_commands_generated": false
+    }
+  ]
+}

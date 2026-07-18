@@ -1,0 +1,35 @@
+{
+  "schema": "pip.auth.repository.v2",
+  "version": 2,
+  "repository_id": "pip-auth-repo-1a04914e6c2968bd",
+  "revision": 5,
+  "created_at": "2026-07-14T16:20:34.919Z",
+  "updated_at": "2026-07-15T09:26:28.793Z",
+  "users": {
+    "usr_33ea77784a1b5437e278": {
+      "id": "usr_33ea77784a1b5437e278",
+      "email": "batch59b.admin@example.local",
+      "email_normalized": "batch59b.admin@example.local",
+      "password_hash": "0b4721cdcd7f748079a673bbcb60288919d90002c2afbc8fbb4c05bf96c3da92d79f66b4a8ae9da8903aeaf27a9aeaaaad19344ae684c0420230ea272b93c4b4",
+      "password_salt": "6708e46be3e73742f775c87cce5ececc",
+      "password_algorithm": "SCRYPT",
+      "password_parameters": {
+        "N": 32768,
+        "r": 8,
+        "p": 1,
+        "maxmem": 268435456,
+        "key_length": 64
+      },
+      "role": "ADMINISTRATOR",
+      "role_assigned_at": "2026-07-14T16:20:35.052Z",
+      "role_source": "BOOTSTRAP",
+      "status": "ACTIVE",
+      "failed_login_count": 0,
+      "locked_until": null,
+      "created_at": "2026-07-14T16:20:35.052Z",
+      "updated_at": "2026-07-14T16:20:57.577Z",
+      "last_login_at": "2026-07-14T16:20:57.577Z"
+    }
+  },
+  "sessions": {}
+}

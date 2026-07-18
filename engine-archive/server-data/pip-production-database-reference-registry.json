@@ -1,0 +1,64 @@
+{
+  "schema": "pip.database-reference-registry.store.v1",
+  "version": 1,
+  "created_at": "2026-07-14T16:20:35.132Z",
+  "updated_at": "2026-07-14T16:20:35.132Z",
+  "slot_records": {
+    "HOST_REFERENCE": {
+      "slot_key": "HOST_REFERENCE",
+      "slot_id": "slot-0c3b2a11cc974a44",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "PORT_REFERENCE": {
+      "slot_key": "PORT_REFERENCE",
+      "slot_id": "slot-cc81413be5006391",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "DATABASE_NAME_REFERENCE": {
+      "slot_key": "DATABASE_NAME_REFERENCE",
+      "slot_id": "slot-6052768ceaba0c95",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "USERNAME_REFERENCE": {
+      "slot_key": "USERNAME_REFERENCE",
+      "slot_id": "slot-717467c2c0cfd8bf",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "PASSWORD_REFERENCE": {
+      "slot_key": "PASSWORD_REFERENCE",
+      "slot_id": "slot-176bb2508c5f2692",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "TLS_MODE_REFERENCE": {
+      "slot_key": "TLS_MODE_REFERENCE",
+      "slot_id": "slot-ed183089d49aa279",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "TLS_CA_REFERENCE": {
+      "slot_key": "TLS_CA_REFERENCE",
+      "slot_id": "slot-2e9f9e11b7496877",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    },
+    "SECRET_MANAGER_REFERENCE": {
+      "slot_key": "SECRET_MANAGER_REFERENCE",
+      "slot_id": "slot-ed2fdb9b4ccbc927",
+      "logical_reference_token": null,
+      "registered_at": null,
+      "updated_at": null
+    }
+  }
+}

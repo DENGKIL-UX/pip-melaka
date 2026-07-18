@@ -1,0 +1,19 @@
+{
+  "schema": "pip.central-storage.repository.v1",
+  "repository_id": "pip-central-store-v1",
+  "storage_mode": "DURABLE_FILE",
+  "version": 1,
+  "revision": 0,
+  "created_at": "2026-07-14T16:20:34.903Z",
+  "updated_at": "2026-07-14T16:20:34.903Z",
+  "scenarios": {},
+  "collections": {},
+  "counters": {
+    "scenario_count": 0,
+    "active_scenario_count": 0,
+    "deleted_scenario_count": 0,
+    "collection_count": 0,
+    "active_collection_count": 0,
+    "deleted_collection_count": 0
+  }
+}

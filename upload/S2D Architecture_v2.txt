@@ -1,0 +1,907 @@
+ROADMAP: S2D FROM DESCRIPTIVE DASHBOARD TO POLITICAL INTELLIGENCE ENGINE
+
+Your target capability should be:
+
+	Apify public-source collection
+			↓
+	S2D data and evidence foundation
+			↓
+	Descriptive analysis — what happened?
+			↓
+	Diagnostic analysis — why did it happen?
+			↓
+	Predictive analysis — what is likely to happen next?
+			↓
+	Prescriptive analysis — what should be examined or done?
+			↓
+	Human-reviewed insight and recommendation reports
+			↓
+	PIP population-context fusion
+			↓
+	PIP 360 Intelligence
+
+The most important strategic decision is:
+
+Use PRN Johor as a reference and training corpus, not as a model that is copied directly into Negeri Sembilan and Melaka.
+
+Johor can teach S2D how Malaysian political narratives behave, how issues spread across platforms and how sentiment changes around an election. 
+Negeri Sembilan and Melaka will still require their own geography, local vocabulary, candidates, issues, media ecosystems and calibration data.
+
+
+1. CURRENT S2D MATURITY
+
+Your existing engine is a good descriptive and operational prototype. It already contains:
+
+	Apify-supported social scraping;
+	TikTok, Facebook, Instagram and Threads extraction;
+	Signal Feed;
+	Echo Tracker;
+	Narrative Echo;
+	locality aggregation;
+	sentiment summaries;
+	evidence, approval and response workflow;
+	outcome recording;
+	reporting and export functions.
+
+However, the analytical layer is still mainly heuristic.
+
+For example, the current engine:
+
+	converts the word Negative to a fixed score of 85;
+	converts Positive to 20;
+	calculates priority using fixed weights;
+	hardcodes platform: "TikTok" in the main signal normaliser;
+	stores multi-platform signal information inside a tiktok object;
+	uses keyword matching for sentiment;
+	stores most records locally through window.storage.
+
+Therefore, the current maturity is approximately:
+
+	CAPABILITY				CURRENT MATURITY
+	Collection				Functional prototype
+	Normalisation			Partial, platform-specific
+	Descriptive analysis	Functional
+	Diagnostic analysis		Early rules only
+	Predictive analysis		Not yet implemented
+	Prescriptive analysis	Basic decision rules
+	Model validation		Not yet systematic
+	Cross-state transfer	Not yet implemented
+	PIP integration			Planned through future contracts/API
+
+The architecture you prepared—separating ingestion, monitoring, sentiment, narrative, evidence, response and outcome modules—is the correct direction.
+
+
+2. TARGET INTELLIGENCE ARCHITECTURE
+
+Keep S2D independent from PIP and add four analytical layers.
+
+	s2d-engine/
+	├── src/
+	│   ├── modules/
+	│   │   ├── signal-monitoring/
+	│   │   ├── sentiment/
+	│   │   ├── narrative/
+	│   │   ├── evidence/
+	│   │   ├── diagnostic/
+	│   │   ├── predictive/
+	│   │   ├── prescriptive/
+	│   │   ├── reporting/
+	│   │   ├── response-agent/
+	│   │   └── outcome-monitoring/
+	│   │
+	│   ├── contracts/
+	│   ├── services/
+	│   ├── storage/
+	│   └── pages/
+	│
+	├── server/
+	│   ├── routes/
+	│   ├── jobs/
+	│   ├── webhooks/
+	│   ├── repositories/
+	│   └── orchestration/
+	│
+	├── ml-service/
+	│   ├── datasets/
+	│   ├── annotation/
+	│   ├── features/
+	│   ├── training/
+	│   ├── inference/
+	│   ├── evaluation/
+	│   └── model-registry/
+	│
+	└── tests/
+
+
+Recommended technology division:
+
+REACT:
+Dashboard and analyst workflows
+
+NODE.JS:
+Apify integration, APIs, scheduling, authentication and orchestration
+
+PYTHON:
+NLP, clustering, forecasting, model training and evaluation
+
+POSTGRESQL:
+Structured signals, snapshots, clusters, cases and reports
+
+OBJECT STORAGE:
+Raw Apify datasets, evidence files and model artifacts
+
+
+3. THE ANALYTICAL LADDER
+LEVEL 1 — DESCRIPTIVE
+	Answers:
+		What happened?
+		How many posts were detected?
+		What was the positive/neutral/negative split?
+		Which issues and entities were mentioned?
+		Which localities generated the most signals?
+		What changed compared with yesterday?
+
+	Typical outputs:
+		Signal volume
+		Net sentiment
+		Negative share
+		Conversation share
+		Engagement
+		Narrative velocity
+		Source diversity
+		Cross-platform spread
+		Locality concentration
+
+LEVEL 2 — DIAGNOSTIC
+	Answers:
+		Why did sentiment change?
+		Which issue drove the change?
+		Which event triggered the narrative?
+		Which sources accelerated it?
+		Did the narrative begin locally or nationally?
+		Did political pages, community pages or media pages lead the spread?
+		Is the apparent increase genuine or caused by duplicate amplification?
+
+LEVEL 3 — PREDICTIVE
+	Answers:
+		Is this narrative likely to grow within 6, 24 or 72 hours?
+		Is it likely to move to the next Echo stage?
+		Will it spread into additional localities?
+		Is media pickup becoming more likely?
+		Is the issue likely to persist?
+		What is the expected range of volume and engagement?
+
+LEVEL 4 — PRESCRIPTIVE
+	Answers:
+		Should the issue be monitored, investigated, clarified or escalated?
+		What evidence is missing?
+		What response type is appropriate?
+		Is responding likely to amplify a low-reach issue?
+		Which public-information format is most appropriate?
+		What outcome should be monitored after action?
+
+LEVEL 5 — INSIGHT AND RECOMMENDATION
+	Produces:
+		executive judgement;
+		evidence-based interpretation;
+		risk assessment;
+		scenario outlook;
+		recommended actions;
+		confidence and limitations;
+		locality and constituency implications;
+		follow-up monitoring plan.
+
+
+4. FULL DEVELOPMENT ROADMAP
+PHASE S2D-1 — DATA FOUNDATION
+
+BATCH S2D-1A — GENERALISE THE SIGNAL MODEL
+Replace platform-specific signal structures with a common contract.
+
+	{
+	  signalId: "SIG-JHR-000001",
+	  collectionRunId: "RUN-0001",
+	  platform: "facebook",
+
+	  source: {
+		sourceId: "",
+		authorLabel: "",
+		url: "",
+		text: "",
+		publishedAt: "",
+		collectedAt: ""
+	  },
+
+	  metrics: {
+		followers: 0,
+		views: 0,
+		likes: 0,
+		comments: 0,
+		shares: 0
+	  },
+
+	  classification: {
+		entities: [],
+		primaryIssue: "",
+		secondaryIssues: [],
+		sentimentLabel: "",
+		sentimentPolarity: 0,
+		sentimentConfidence: 0,
+		emotions: [],
+		narrativeClusterId: null
+	  },
+
+	  geography: {
+		stateCode: "JHR",
+		parliamentCode: null,
+		dunCode: null,
+		dmCode: null,
+		localityCode: null,
+		confidence: 0,
+		basis: ""
+	  }
+	}
+OUTCOME: ALL PLATFORMS USE ONE STABLE RECORD STRUCTURE.
+
+BATCH S2D-1B — DURABLE INGESTION AND EVIDENCE STORE
+Move from browser-only storage to:
+	Raw Apify dataset
+	Normalised records
+	Deduplicated records
+	Evidence records
+	Rejected records
+	Quarantined records
+	Processing receipts
+Store:
+	Apify Actor ID;
+	run ID;
+	dataset ID;
+	source URL;
+	raw payload hash;
+	collection timestamp;
+	processing version;
+	deduplication decision.
+OUTCOME: EVERY RESULT BECOMES REPRODUCIBLE AND AUDITABLE.
+
+BATCH S2D-1C — DEDUPLICATION AND SOURCE VALIDATION
+Implement:
+	Exact URL matching
+	Platform-post-ID matching
+	Canonical URL matching
+	Text fingerprint matching
+	Near-duplicate similarity
+	Repost relationship
+	Screenshot/evidence availability
+	Publication-date validation
+OUTCOME: VOLUME IS NOT FALSELY INFLATED BY REPEATED CONTENT.
+
+
+PHASE S2D-2 — POLITICAL ONTOLOGY AND TRAINING DATASET
+BATCH S2D-2A — MALAYSIAN POLITICAL ONTOLOGY
+Create state-independent master categories.
+
+	ENTITY
+	├── Coalition
+	├── Party
+	├── Candidate
+	├── Leader
+	├── Government
+	├── Agency
+	└── Civil-society stakeholder
+
+	ISSUE
+	├── Economy
+	├── Cost of living
+	├── Employment
+	├── Wages
+	├── Housing
+	├── Transport
+	├── Infrastructure
+	├── Flooding
+	├── Healthcare
+	├── Education
+	├── Governance
+	├── Integrity
+	└── Public service
+
+	NARRATIVE FUNCTION
+	├── Complaint
+	├── Praise
+	├── Question
+	├── Claim
+	├── Rumour
+	├── Correction
+	├── Mobilisation
+	├── Service information
+	└── Policy discussion
+
+KEEP STATE-SPECIFIC TERMS IN SEPARATE LEXICONS:
+	lexicon-johor.json
+	lexicon-negeri-sembilan.json
+	lexicon-melaka.json
+
+BATCH S2D-2B — ANNOTATION PLATFORM
+Create a human-review interface for labelling scraped records.
+Required labels:
+	Relevance
+	Language
+	Entity mentioned
+	Target of sentiment
+	Primary issue
+	Secondary issue
+	Sentiment
+	Emotion
+	Narrative claim
+	Locality
+	Locality confidence
+	Source type
+	Evidence quality
+	Coordination indicator
+	Echo stage
+Each important sample should be reviewed by at least two annotators where practical.
+Disagreement should be resolved by a senior reviewer.
+
+
+BATCH S2D-2C — JOHOR REFERENCE CORPUS
+Divide Johor data into election-cycle periods:
+	T-90 to T-31 days  — baseline
+	T-30 to T-15 days  — early campaign environment
+	T-14 to T-1 days   — active campaign
+	T0                 — polling day
+	T+1 to T+7 days    — immediate reaction
+	T+8 to T+30 days   — post-election consolidation
+Balance the corpus by:
+	platform;
+	language;
+	party/entity;
+	positive, neutral and negative sentiment;
+	issue;
+	urban, semi-urban and rural geography;
+	high- and low-engagement content;
+	community, political, media and public sources.
+OUTCOME: A REUSABLE JOHOR POLITICAL-SIGNAL RESEARCH DATASET.
+
+PHASE S2D-3 — DESCRIPTIVE INTELLIGENCE 2.0
+BATCH S2D-3A — DAILY SENTIMENT SNAPSHOTS
+Generate daily snapshots for:
+	State
+	Parliament
+	DUN
+	DM
+	Locality
+	Political entity
+	Issue
+	Platform
+	Source type
+	Language
+Snapshot metrics:
+	Total records
+	Accepted evidence count
+	Unique source count
+	Positive share
+	Neutral share
+	Negative share
+	Net sentiment
+	Conversation share
+	Engagement
+	Velocity
+	Persistence
+	Cross-platform spread
+	Evidence confidence
+
+BATCH S2D-3B — LOCAL SIGNAL PROFILES
+For every locality, generate:
+	{
+	  localityCode: "LOC-001",
+	  date: "YYYY-MM-DD",
+
+	  signalContext: {
+		totalSignals: 0,
+		uniqueSources: 0,
+		leadingIssue: "",
+		leadingNarrative: "",
+		netSentiment: 0,
+		movement24h: 0,
+		velocity: 0,
+		evidenceConfidence: 0
+	  }
+	}
+
+This later connects to PIP aggregate population context:
+	PIP population context
+	+
+	S2D public-signal context
+	=
+	PIP 360 locality intelligence
+
+	Keep the two layers visibly separate.
+
+BATCH S2D-3C — AUTOMATED DESCRIPTIVE REPORTS
+Generate:
+	daily statewide brief;
+	party/entity sentiment brief;
+	issue movement report;
+	locality hotspot report;
+	narrative watchlist;
+	evidence appendix.
+Outcome: reliable descriptive reporting without manual spreadsheet preparation.
+
+
+PHASE S2D-4 — DIAGNOSTIC INTELLIGENCE
+BATCH S2D-4A — CHANGE-POINT DETECTION
+Detect significant changes rather than showing every fluctuation.
+Examples:
+	Sudden increase in negative share
+	Abrupt engagement acceleration
+	New locality concentration
+	New cross-platform spread
+	New political entity entering a narrative
+	Narrative returning after a period of inactivity
+The engine should compare changes against each issue’s historical baseline, not one universal threshold.
+
+BATCH S2D-4B — NARRATIVE DRIVER DECOMPOSITION
+For each change, calculate contribution by:
+	Issue
+	Entity
+	Platform
+	Locality
+	Source type
+	Language
+	Narrative cluster
+	High-reach source
+	External event
+Example diagnostic output:
+	Net sentiment decreased by 14 points.
+Estimated contribution:
+	Housing affordability        42%
+	Cost of food                 25%
+	Youth employment             18%
+	Other issues                 15%
+Main geographic concentration:
+	Johor Bahru and Pasir Gudang
+Main acceleration source:
+	Community pages followed by political-page reposting
+
+CALL THIS DRIVER CONTRIBUTION, NOT PROOF OF CAUSALITY.
+
+BATCH S2D-4C — NARRATIVE PROPAGATION GRAPH
+Build a graph containing:
+	Original source
+	Early reposts
+	Community pickup
+	Influencer pickup
+	Political pickup
+	Media pickup
+	Cross-platform migration
+	Locality spread
+Calculate:
+	earliest known source;
+	strongest amplifier;
+	time between platforms;
+	source diversity;
+	repeated-message similarity;
+	coordinated-posting indicators;
+	current Echo stage.
+
+BATCH S2D-4D — DIAGNOSTIC CASE BUILDER
+For every high-priority change, create:
+	Observation
+	Evidence
+	Change detected
+	Likely drivers
+	Alternative explanations
+	Geographic concentration
+	Political relevance
+	Confidence
+	Missing evidence
+	Recommended investigation
+OUTCOME: S2D BEGINS EXPLAINING WHY THE SIGNAL CHANGED.
+
+PHASE S2D-5 — PREDICTIVE INTELLIGENCE
+DO NOT BEGIN WITH ELECTION-RESULT PREDICTIONS.
+START BY PREDICTING SIGNAL BEHAVIOUR, BECAUSE THIS CAN BE TRAINED AND VALIDATED DIRECTLY FROM APIFY TIME-SERIES DATA.
+
+BATCH S2D-5A — FORECAST TARGETS
+	CREATE THESE INITIAL FORECAST TARGETS:
+		Probability narrative grows within 6 hours
+		Probability narrative grows within 24 hours
+		Probability narrative grows within 72 hours
+		Probability of next Echo-stage transition
+		Expected post-volume range
+		Expected engagement range
+		Probability of cross-platform spread
+		Probability of media pickup
+		Probability issue remains active for seven days
+		Probability issue spreads to another locality
+
+BATCH S2D-5B — BASELINE FORECASTING
+	BEFORE MACHINE LEARNING, CREATE SIMPLE BASELINES:
+		Last-value forecast
+		Moving average
+		Seasonal average
+		Exponential smoothing
+		Rule-based Echo transition
+		Every predictive model must beat these baselines.
+
+BATCH S2D-5C — FEATURE ENGINEERING
+	POTENTIAL FEATURES:
+		Post volume in previous 1h, 6h and 24h
+		Engagement growth
+		Share-to-like ratio
+		Comment-to-view ratio
+		Unique source growth
+		Source-type diversity
+		Follower distribution
+		Cross-platform presence
+		Narrative similarity
+		Sentiment movement
+		Emotion intensity
+		Locality concentration
+		Issue sensitivity
+		Echo stage
+		Time since first detection
+		Election-cycle period
+		Relevant external event
+	AVOID USING USERNAMES AS PREDICTIVE POLITICAL PROFILES.
+
+BATCH S2D-5D — Predictive model training
+	SUITABLE STARTING MODELS:
+	GRADIENT-BOOSTED TREES:
+		Escalation and media-pickup probability
+	TIME-SERIES MODELS:
+		Volume and engagement forecasting
+	SURVIVAL MODEL:
+		Expected narrative persistence
+	GRAPH FEATURES:
+		Propagation and amplifier risk
+	TEXT EMBEDDINGS:
+		Narrative similarity and emerging clusters
+	USE A CHAMPION–CHALLENGER STRATEGY:
+	CHAMPION:
+		Current heuristic S2D rules
+	CHALLENGER:
+		New predictive model
+	REPLACEMENT:
+		Only after challenger beats the champion on unseen data
+
+BATCH S2D-5E — BACKTESTING AND CALIBRATION
+	USE CHRONOLOGICAL SPLITTING:
+	TRAINING:
+		Earlier Johor periods
+	VALIDATION:
+		Later campaign periods
+	TEST:
+		Completely unseen final period
+
+ALSO HOLD OUT SELECTED LOCALITIES SO THE MODEL CANNOT SIMPLY MEMORISE PLACE NAMES.
+	MEASURE:
+	CLASSIFICATION:
+		Precision, recall, macro-F1
+	FORECASTING:
+		MAE, RMSE, MAPE where suitable
+	PROBABILITY:
+		Brier score and calibration
+	EARLY WARNING:
+		Precision at top alerts and false-alert rate
+	OPERATIONAL:
+		Lead time before Echo-stage transition
+	EVERY FORECAST MUST SHOW:
+		Prediction
+		Confidence interval
+		Model version
+		Data window
+		Main contributing factors
+		Limitations
+
+
+PHASE S2D-6 — PRESCRIPTIVE INTELLIGENCE
+BATCH S2D-6A — DECISION-POLICY ENGINE
+	POSSIBLE RECOMMENDATIONS:
+		NO_RESPONSE_MONITOR
+		VERIFY_EVIDENCE
+		INVESTIGATE_LOCAL_SERVICE
+		ACKNOWLEDGE_CONCERN
+		CLARIFY_CONTEXT
+		CORRECT_WITH_EVIDENCE
+		PROVIDE_SERVICE_UPDATE
+		AMPLIFY_VERIFIED_POSITIVE
+		PREPARE_FAQ
+		ESCALATE_TO_SENIOR_REVIEW
+	THE SYSTEM SHOULD FIRST DETERMINE WHETHER A RESPONSE IS NEEDED.
+	A LOW-REACH NEGATIVE POST MAY BE BETTER MONITORED BECAUSE RESPONDING COULD AMPLIFY IT.
+
+BATCH S2D-6B — RECOMMENDATION SCORING
+	CREATE SEPARATE SCORES:
+		Response Need
+		Amplification Risk
+		Evidence Confidence
+		Public Impact
+		Urgency
+		Reputational Risk
+		Service-delivery Impact
+		Forecasted Escalation
+	EXAMPLE:
+		Response Need =
+		Public impact          × 20%
+		Forecasted escalation  × 20%
+		Narrative velocity     × 15%
+		Evidence confidence    × 15%
+		Issue sensitivity      × 10%
+		Reach                  × 10%
+		Persistence            ×  5%
+		Locality confidence    ×  5%
+
+BATCH S2D-6C — RECOMMENDATION JUSTIFICATION
+	EVERY RECOMMENDATION MUST PROVIDE:
+		Recommended action
+		Reason
+		Evidence supporting it
+		Forecast supporting it
+		Alternative action
+		Risk of responding
+		Risk of not responding
+		Information still required
+		Approval level
+		Monitoring period
+	THIS PREVENTS THE SYSTEM FROM BECOMING A BLACK-BOX INSTRUCTION GENERATOR.
+
+BATCH S2D-6D — NARRATIVE AND CONTENT BRIEF
+	After human approval, generate:
+		factual communication objective;
+		core message;
+		supporting evidence;
+		wording to avoid;
+		FAQ;
+		Facebook draft;
+		Instagram caption;
+		Threads post;
+		short-video brief;
+		infographic brief;
+		holding statement.
+	THE SYSTEM SHOULD PRODUCE DRAFT PUBLIC-INFORMATION CONTENT, NOT AUTOMATICALLY PUBLISH OR MICROTARGET INDIVIDUALS.
+
+PHASE S2D-7 — INSIGHT AND RECOMMENDATION REPORTS
+BATCH S2D-7A — DAILY INTELLIGENCE BRIEF
+	SECTIONS:
+		Executive judgement
+		Most important change
+		Highest-risk narrative
+		Main opportunity
+		BN/PH/PN sentiment movement
+		Top economic issues
+		Youth-related public themes
+		Locality hotspots
+		24–72-hour outlook
+		Recommended actions
+		Evidence links
+		Confidence and limitations
+
+BATCH S2D-7B — WEEKLY DIAGNOSTIC REPORT
+	SECTIONS:
+		Seven-day political environment
+		Sentiment and conversation-share trends
+		Narrative lifecycle
+		Key drivers
+		Locality comparison
+		Cross-platform propagation
+		Emerging risks
+		Forecasts for the next seven days
+		Recommended management priorities
+
+BATCH S2D-7C — CONSTITUENCY INTELLIGENCE REPORT
+	FOR EACH PARLIAMENT OR DUN:
+		Population context from PIP
+		Public-signal context from S2D
+		Leading issues
+		Sentiment trend
+		Narrative clusters
+		Source ecosystem
+		Locality concentration
+		Evidence confidence
+		Emerging-risk forecast
+		Recommended investigations or public-information actions
+
+BATCH S2D-7D — AFTER-ACTION AND EFFECTIVENESS REPORT
+	COMPARE:
+		Before action
+		6 hours after
+		12 hours after
+		24 hours after
+		72 hours after
+		7 days after
+	EVALUATE:
+		narrative volume;
+		sentiment;
+		repeated questions;
+		misinformation repetition;
+		official-information visibility;
+		locality spread;
+		secondary narratives.
+	OUTCOME: EVERY RECOMMENDATION BECOMES MEASURABLE.
+
+PHASE S2D-8 — JOHOR-TO-NEGERI SEMBILAN/MELAKA TRANSFER
+BATCH S2D-8A — FREEZE JOHOR MODEL PACK
+	THE JOHOR PACK SHOULD CONTAIN:
+		Johor raw-data manifest
+		Normalised dataset
+		Gold-labelled dataset
+		Ontology version
+		Johor lexicon
+		Geography dictionary
+		Model artifacts
+		Evaluation results
+		Known biases
+		Model card
+		Data-retention rules
+
+BATCH S2D-8B — SEPARATE UNIVERSAL AND STATE-SPECIFIC LEARNING
+UNIVERSAL LEARNING
+	CAN TRANSFER:
+		Malay political sentiment patterns
+		Complaint and praise structures
+		Narrative-growth patterns
+		Cross-platform propagation
+		Echo-stage transitions
+		Issue ontology
+		Source-type behaviour
+		Evidence-confidence rules
+		State-specific learning
+	MUST BE REBUILT:
+		Locality names
+		DUN and Parliament boundaries
+		Candidate and leader names
+		Local slang
+		State agencies
+		Local media pages
+		Historical issues
+		Coalition configuration
+		Community-page ecosystem
+
+BATCH S2D-8C — DOMAIN ADAPTATION
+	FOR EACH NEW STATE:
+		load the universal Johor model;
+		add the new state geography and lexicon;
+		collect pre-election baseline data;
+		manually label a smaller state-specific sample;
+		fine-tune classification;
+		recalibrate prediction probabilities;
+		run in shadow mode;
+		compare human analyst findings with model outputs.
+	DO NOT ASSUME A MODEL THAT PERFORMS WELL IN JOHOR WILL PERFORM EQUALLY WELL ELSEWHERE.
+
+BATCH S2D-8D — CROSS-STATE HOLDOUT TESTING
+	RECOMMENDED TESTS:
+		Train mainly on Johor
+		Test on unseen Negeri Sembilan records
+		Train on Johor + Negeri Sembilan
+		Test on unseen Melaka records
+	THIS REVEALS WHETHER S2D LEARNED GENERAL POLITICAL-SIGNAL BEHAVIOUR OR ONLY MEMORISED JOHOR VOCABULARY.
+
+
+PHASE S2D-9 — PIP 360 INTEGRATION
+THIS SHOULD BEGIN AFTER THE CORE PIP PRODUCTION ARCHITECTURE IS READY.
+
+BATCH S2D-9A — SHARED CONTRACTS
+	Create:
+		SignalRecord
+		NarrativeCluster
+		SentimentSnapshot
+		DiagnosticCase
+		ForecastRecord
+		RecommendationCase
+		ContentBrief
+		PublicationRecord
+		OutcomeReport
+
+	BATCH S2D-9B — INTELLIGENCE API
+		GET /signals
+		GET /narratives
+		GET /sentiment-snapshots
+		GET /diagnostic-cases
+		GET /forecasts
+		GET /recommendations
+		POST /response-cases
+		POST /content-briefs
+		POST /outcomes
+
+BATCH S2D-9C — PIP CONTEXT FUSION
+		{
+		  geography: {
+			stateCode: "MLK",
+			parliamentCode: "P134",
+			dunCode: "NXX",
+			dmCode: "DM-XXX",
+			localityCode: "LOC-001"
+		  },
+
+		  populationContext: {
+			totalVoters: 2840,
+			ageComposition: {},
+			genderComposition: {},
+			dataReadiness: 97
+		  },
+
+		  publicSignalContext: {
+			activeSignals: 31,
+			netSentiment: -26,
+			movement24h: -9,
+			leadingIssue: "Housing",
+			narrativeVelocity: 74,
+			forecastEscalationProbability: 0.68,
+			evidenceConfidence: 0.83
+		  }
+		}
+	NEVER CONNECT AN INDIVIDUAL SOCIAL-MEDIA ACCOUNT TO AN INDIVIDUAL VOTER RECORD.
+
+5. IMPORTANT DISTINCTION: PREDICTIVE POLITICAL SIGNALS VERSUS VOTER FORECASTING
+	THE FIRST PREDICTIVE S2D RELEASE SHOULD FORECAST:
+		narrative escalation;
+		issue persistence;
+		engagement;
+		cross-platform migration;
+		locality spread;
+		media pickup;
+		response urgency.
+	IT SHOULD NOT INITIALLY CLAIM:
+		“This party will win.”
+		“This voter supports this party.”
+		“This demographic will vote for this candidate.”
+	ELECTION-OUTCOME FORECASTING REQUIRES A SEPARATE METHODOLOGY USING:
+		1. valid surveys;
+		2. turnout history;
+		3. official electoral data;
+		4. candidate effects;
+		5. demographic aggregates;
+		6. economic indicators;
+		7. field observations;
+		8. uncertainty modelling.
+	SOCIAL SENTIMENT MAY BE ONE FEATURE, BUT IT CANNOT BE TREATED AS VOTER SUPPORT BY ITSELF.
+
+6. RECOMMENDED MODEL ACCEPTANCE GATES
+	BEFORE A CAPABILITY IS RELEASED:
+		Capability				Minimum acceptance principle
+		Sentiment				Beats keyword baseline on human-labelled holdout
+		Entity extraction		High precision on party, candidate and agency names
+		Issue classification	Stable across language and platform
+		Geography				Confidence shown; uncertain records remain unassigned
+		Narrative clustering	Analyst review confirms clusters are coherent
+		Forecasting				Beats naive forecast in chronological backtesting
+		Escalation alerts		False-alert rate is operationally acceptable
+		Recommendation			Evidence and explanation always present
+		Cross-state model		Recalibrated on state-specific validation data
+		Reporting				Observation, inference and recommendation separated
+	SUGGESTED INITIAL ENGINEERING TARGETS—NOT GUARANTEES—ARE:
+		Sentiment macro-F1:          ≥ 0.75
+		Issue classification F1:    ≥ 0.80
+		Entity extraction F1:       ≥ 0.85
+		High-confidence geography:  ≥ 0.85 precision
+		Forecast model:             outperform naive baseline
+		Alert calibration:          probabilities reflect actual frequency
+
+7. IMMEDIATE IMPLEMENTATION ORDER
+	Your practical sequence should be:
+		1. Freeze the current S2D prototype.
+		2. Complete S2D PREP 3 — generalise the signal model.
+		3. Build durable Apify ingestion and evidence storage.
+		4. Create the political ontology and annotation workflow.
+		5. Collect and label the Johor reference corpus.
+		6. Upgrade descriptive daily snapshots.
+		7. Build diagnostic driver and narrative analysis.
+		8. Build predictive signal-trajectory models.
+		9. Build the prescriptive recommendation engine.
+		10. Build insight and recommendation reports.
+		11. Adapt and recalibrate for Negeri Sembilan.
+		12. Adapt and recalibrate for Melaka.
+		13. Integrate approved outputs with PIP after PIP production readiness.
+
+RECOMMENDED NEXT BATCH
+S2D PREP 3A — CREATE THE GENERIC MULTI-PLATFORM SIGNAL CONTRACT
+	THIS BATCH SHOULD:
+		create src/contracts/s2d-signal-contract.js;
+		remove TikTok-only assumptions;
+		separate sentiment polarity from risk score;
+		introduce entity, issue, geography and evidence structures;
+		preserve the existing UI through a backward-compatible adapter;
+		add validation and regression tests;
+		make no predictive model changes yet.
+	THAT FOUNDATION IS REQUIRED BEFORE JOHOR DATA CAN BECOME A RELIABLE TRAINING CORPUS FOR DIAGNOSTIC, PREDICTIVE AND PRESCRIPTIVE S2D CAPABILITIES.

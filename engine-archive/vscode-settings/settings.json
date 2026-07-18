@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^node -e \"import\\('\\./server/pip-production-runbook-builder\\.mjs'\\)\\.then\\(async \\(\\{createPipProductionRunbookBuilder,validatePipProductionDeploymentRunbook\\}\\)=>\\{const b=createPipProductionRunbookBuilder\\(\\{clock:\\(\\)=> '2026-07-14T12:00:00\\.000Z'\\}\\); const r=b\\.buildPipProductionDeploymentRunbook\\(\\{targetEnvironment:'PRODUCTION'\\}\\); const v=validatePipProductionDeploymentRunbook\\(r\\); console\\.log\\(JSON\\.stringify\\(\\{valid:v\\.valid, errors:v\\.errors\\?\\.slice\\(0,5\\)\\},null,2\\)\\);\\}\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

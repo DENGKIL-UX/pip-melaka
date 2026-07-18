@@ -4,6 +4,21 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// ---------------------------------------------------------------------------
+// Schema versioning
+// ---------------------------------------------------------------------------
+// This schema is the single source of truth for the PIP-MLK database shape.
+// Every change is captured by a Prisma migration under prisma/migrations/.
+// See docs/RESEARCH-DATABASE.md for the full versioning + rollback strategy.
+//
+// Index strategy (see docs/RESEARCH-DATABASE.md §5):
+//   - All foreign-key columns carry @@index (Prisma does NOT auto-index FKs on SQLite).
+//   - Hot-path filter columns (published, status) carry @@index.
+//   - Sort columns (createdAt, updatedAt) carry @@index to avoid filesort on range scans.
+//   - Composite @@index is added for the most common list-view query
+//     (e.g. "published posts by author, newest first" → [authorId, published, createdAt]).
+// ---------------------------------------------------------------------------
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,8 +32,15 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
+  role      String   @default("analyst")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  posts Post[]
+
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Post {
@@ -29,4 +51,17 @@ model Post {
   authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Single-column indexes (hot filter + sort paths)
+  @@index([authorId])
+  @@index([published])
+  @@index([createdAt])
+  @@index([updatedAt])
+
+  // Composite index — supports the dashboard list view
+  // "published posts by author, newest first"
+  @@index([authorId, published, createdAt])
 }

@@ -1,13 +1,44 @@
 // PIP-MLK AI Assistant API route — RAG-enhanced chat with z-ai-web-dev-sdk.
 // Truth Above All: every response is grounded in verified Melaka data.
+//
+// Resilience stack (see src/lib/* + docs/RESEARCH-RESILIENCE.md):
+//   1. POST handler is wrapped by `withIdempotency()` so retried client calls
+//      with the same Idempotency-Key return the cached LLM result instead of
+//      re-invoking the (expensive) model.
+//   2. `rateLimit()` enforces 5 req/min per IP — LLM calls cost real money
+//      and time, and a single abusive client could exhaust the budget.
+//   3. `assessBackpressure()` sheds load (429 + Retry-After) when the
+//      in-process queue is overwhelmed even before the per-IP limit fires.
+//   4. `circuitBreaker("llm-assistant", ...)` opens after 5 consecutive
+//      ZAI failures so subsequent requests fail-fast into the static fallback
+//      instead of queuing behind doomed calls.
 
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import ZAI from "z-ai-web-dev-sdk";
+import { rateLimit, assessBackpressure, withInflight, getClientIdentifier } from "@/lib/rate-limiter";
+import { circuitBreaker, CircuitOpenError } from "@/lib/circuit-breaker";
+import { withIdempotency } from "@/lib/idempotency";
+import { withCORS } from "@/lib/cors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+// ---------------------------------------------------------------------------
+// Resilience config — task spec: 5 req/min per IP for the LLM route.
+// ---------------------------------------------------------------------------
+
+const ASSISTANT_RATE_LIMIT = {
+  limit: 5,
+  windowMs: 60_000, // 1 minute
+};
+
+const ASSISTANT_CIRCUIT = {
+  failureThreshold: 5,
+  resetTimeoutMs: 30_000, // 30s cool-down before half-open probe
+  halfOpenProbeBudget: 1,
+};
 
 // ---------------------------------------------------------------------------
 // 12 VERIFIED MELAKA FACTS — the system-prompt anchor. Every AI reply must be
@@ -277,8 +308,60 @@ function staticFallback(question: string): string {
 
 // ---------------------------------------------------------------------------
 // POST handler
+//
+// The full handler is wrapped by `withIdempotency()` so clients that retry
+// with the same `Idempotency-Key` header get the cached LLM response back
+// without re-invoking the model. Inside, we run:
+//   1. rateLimit() — 5 req/min per IP (per task spec for LLM routes)
+//   2. assessBackpressure() — 429 + Retry-After if the queue is overflowing
+//   3. parse body, build RAG context (no breaker — local fs reads rarely fail)
+//   4. circuitBreaker("llm-assistant", ...) around the ZAI call so 5
+//      consecutive LLM failures open the circuit and we fail-fast into the
+//      static fallback. The static fallback is ALWAYS returned (never a 5xx)
+//      so end users never see a hard error — the resilience primitives are
+//      for budget/backpressure protection, not for degrading UX.
 // ---------------------------------------------------------------------------
-export async function POST(req: NextRequest) {
+
+async function handlePost(req: NextRequest): Promise<NextResponse> {
+  // --- 1. Rate limit (5 req/min per IP) ---
+  // Security-01: rate-limit every LLM call to protect the ZAI budget and to
+  // blunt brute-force prompt-injection attempts. Uses the shared
+  // rate-limiter (`@/lib/rate-limiter`) so middleware and route-level limits
+  // share a single in-memory bucket store.
+  const rl = rateLimit({
+    identifier: getClientIdentifier(req),
+    route: "api:assistant",
+    limit: ASSISTANT_RATE_LIMIT.limit,
+    windowSeconds: ASSISTANT_RATE_LIMIT.windowMs / 1000,
+  });
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "rate_limited", retryAfterSeconds: rl.retryAfter, resetAt: rl.reset * 1000 },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rl.retryAfter),
+          "X-RateLimit-Limit": String(ASSISTANT_RATE_LIMIT.limit),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(rl.reset),
+        },
+      },
+    );
+  }
+
+  // --- 2. Backpressure (429 if server is overwhelmed) ---
+  const bp = assessBackpressure();
+  if (bp.shedLoad) {
+    return NextResponse.json(
+      { error: "backpressure", inflight: bp.inflight, reason: bp.reason },
+      {
+        status: 429,
+        headers: { "Retry-After": String(bp.retryAfterSeconds) },
+      },
+    );
+  }
+
+  // --- 3. Parse body ---
   let messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
   try {
     const body = (await req.json()) as { messages?: Array<{ role: string; content: string }> };
@@ -298,7 +381,11 @@ export async function POST(req: NextRequest) {
 
   const augmentedSystem = SYSTEM_PROMPT + (rag.context ? `\n\nRAG CONTEXT (verified, use these exact figures):\n${rag.context}\n` : "");
 
-  try {
+  // --- 4. Call the LLM through the circuit breaker + inflight tracker ---
+  // `withInflight` ensures backpressure's `inflight` count is accurate even
+  // if the LLM call hangs or throws. `circuitBreaker` opens after 5
+  // consecutive ZAI failures so subsequent requests fail-fast.
+  const runLlm = withInflight(async () => {
     const zai = await ZAI.create();
     const completion = await zai.chat.completions.create({
       messages: [
@@ -309,33 +396,71 @@ export async function POST(req: NextRequest) {
       temperature: 0.2,
       max_tokens: 600,
     });
+    return completion?.choices?.[0]?.message?.content?.trim() || "";
+  });
 
-    const responseText =
-      completion?.choices?.[0]?.message?.content?.trim() || staticFallback(lastUser?.content ?? "");
+  let responseText: string;
+  let llmSource = "zai";
 
-    return NextResponse.json({
-      response: responseText,
-      rag_used: !!rag.context,
-      source: rag.source || "system-facts",
-      evidence_tier: rag.context ? rag.evidence_tier : "Partial",
-    });
+  try {
+    const text = await circuitBreaker("llm-assistant", runLlm, ASSISTANT_CIRCUIT);
+    responseText = text || staticFallback(lastUser?.content ?? "");
   } catch (err) {
-    console.error("[assistant] ZAI error:", err instanceof Error ? err.message : String(err));
-    return NextResponse.json({
-      response: staticFallback(lastUser?.content ?? ""),
-      rag_used: !!rag.context,
-      source: rag.source || "static-fallback",
-      evidence_tier: rag.context ? rag.evidence_tier : "Partial",
-    });
+    // CircuitOpenError = breaker is open OR a probe just failed. Log and fall
+    // back to the static answer — the user still gets a verified response.
+    if (err instanceof CircuitOpenError) {
+      console.warn("[assistant] circuit open:", err.message);
+      llmSource = "circuit-open-fallback";
+    } else {
+      console.error("[assistant] ZAI error:", err instanceof Error ? err.message : String(err));
+      llmSource = "static-fallback";
+    }
+    responseText = staticFallback(lastUser?.content ?? "");
   }
+
+  const res = NextResponse.json({
+    response: responseText,
+    rag_used: !!rag.context,
+    source: rag.source || llmSource,
+    evidence_tier: rag.context ? rag.evidence_tier : "Partial",
+  });
+
+  // Always emit rate-limit headers on successful responses so clients can
+  // self-throttle (X-RateLimit-* is the de-facto convention).
+  res.headers.set("X-RateLimit-Limit", String(ASSISTANT_RATE_LIMIT.limit));
+  res.headers.set("X-RateLimit-Remaining", String(rl.remaining));
+  res.headers.set("X-RateLimit-Reset", String(rl.reset));
+  // Surface the evidence tier + rag flag so the assistant-panel badges can
+  // read them from response headers (idempotency replay re-emits these).
+  res.headers.set("X-Evidence-Tier", rag.context ? rag.evidence_tier : "Partial");
+  res.headers.set("X-Rag-Used", String(!!rag.context));
+  res.headers.set("X-Source", rag.source || llmSource);
+  return res;
 }
 
-export async function GET() {
+// Export the idempotency-wrapped POST handler.
+// Security-01: wrap the entire chain in withCORS so the origin allowlist +
+// preflight handling apply even when the request is rejected by the rate
+// limiter or backpressure gate (withCORS runs OUTERMOST so the rejection
+// response still carries Access-Control-Allow-Origin + the security headers
+// applied by middleware).
+export const POST = withCORS(withIdempotency(handlePost));
+
+export const GET = withCORS(async () => {
   return NextResponse.json({
     endpoint: "/api/assistant",
     method: "POST",
     schema: { messages: "Array<{ role: 'user'|'assistant', content: string }>" },
     response: { response: "string", rag_used: "boolean", source: "string", evidence_tier: "Verified|Proxy|Partial" },
     facts_count: MELAKA_FACTS.length,
+    resilience: {
+      rate_limit: `${ASSISTANT_RATE_LIMIT.limit} req / ${ASSISTANT_RATE_LIMIT.windowMs / 1000}s per IP`,
+      circuit_breaker: {
+        name: "llm-assistant",
+        failure_threshold: ASSISTANT_CIRCUIT.failureThreshold,
+        reset_timeout_ms: ASSISTANT_CIRCUIT.resetTimeoutMs,
+      },
+      idempotency: "POST with Idempotency-Key header returns cached result for 24h",
+    },
   });
-}
+});

@@ -1,0 +1,6 @@
+# Prisma migration lock — do not edit by hand.
+# `prisma migrate dev` and `prisma migrate deploy` use this file to detect
+# drift between local schema state and the migrations history table.
+# See docs/RESEARCH-DATABASE.md §1 for the full migration workflow.
+
+provider = "sqlite"

@@ -1,132 +1,122 @@
-// src/middleware.ts
-// PIP-MLK Next.js Middleware — applies three security layers to every request:
-//   1. Security headers (CSP, HSTS, X-Frame-Options, …) on ALL responses.
-//   2. CORS allowlist on /api/* responses + OPTIONS preflight handling.
-//   3. In-memory rate limiting on /api/* requests (per route policy).
-//
-// Security-01: this is the single chokepoint that hardens every response
-// leaving the Next.js server before Caddy terminates TLS to the browser.
+// src/proxy.ts
+// PIP-MLK Next.js Proxy (middleware) — Edge-compatible only.
+// Cloudflare Workers requires middleware to run on the Edge runtime.
+// No Node.js APIs (no fs, no crypto.subtle sync, no process.env at module level).
 
 import { NextRequest, NextResponse } from "next/server";
-import { applySecurityHeaders, getSecurityHeaders } from "@/lib/security-headers";
-import { resolveAllowedOrigin, handlePreflight } from "@/lib/cors";
-import {
-  rateLimit,
-  getClientIdentifier,
-  resolvePolicy,
-} from "@/lib/rate-limiter";
 
 // ---------------------------------------------------------------------------
-// Matcher — run on everything EXCEPT Next.js internals / static assets.
+// Security headers — inlined here (Edge-compatible, no external imports)
+// ---------------------------------------------------------------------------
+
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+};
+
+function applySecurityHeaders(res: NextResponse): void {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    res.headers.set(key, value);
+  }
+  // Content-Security-Policy — allow inline styles/scripts + data: images
+  res.headers.set(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Simple Edge-compatible rate limiter (in-memory per Worker isolate)
+// ---------------------------------------------------------------------------
+
+const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>();
+
+function rateLimit(identifier: string, limit: number = 60, windowMs: number = 60000): boolean {
+  const now = Date.now();
+  const entry = RATE_LIMIT_MAP.get(identifier);
+  if (!entry || now > entry.resetAt) {
+    RATE_LIMIT_MAP.set(identifier, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  entry.count++;
+  return entry.count <= limit;
+}
+
+// ---------------------------------------------------------------------------
+// CORS — Edge-compatible
+// ---------------------------------------------------------------------------
+
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://pip-melaka.ritz-analytics.workers.dev",
+];
+
+function resolveOrigin(req: NextRequest): string | null {
+  const origin = req.headers.get("origin");
+  if (origin && ALLOWED_ORIGINS.includes(origin)) return origin;
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Matcher
 // ---------------------------------------------------------------------------
 
 export const config = {
   matcher: [
-    /*
-     * Match all paths except:
-     *   - _next/static, _next/image   (static assets)
-     *   - favicon.ico, logo.svg       (root static files)
-     *   - data/                        (served as-is from public/)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|logo.svg|data/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|logo.svg|data/|robots.txt).*)",
   ],
 };
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Main proxy function
 // ---------------------------------------------------------------------------
 
-function isAPIRoute(pathname: string): boolean {
-  return pathname === "/api" || pathname.startsWith("/api/");
-}
+export function proxy(req: NextRequest): NextResponse {
+  const { pathname } = req.nextUrl;
 
-/** Stamp CORS + security headers onto a NextResponse. */
-function stampHeaders(res: NextResponse, req: NextRequest): NextResponse {
-  const allowed = resolveAllowedOrigin(req);
-  if (allowed) {
-    res.headers.set("Access-Control-Allow-Origin", allowed);
+  // Handle CORS preflight for API routes
+  if (pathname.startsWith("/api/") && req.method === "OPTIONS") {
+    const origin = resolveOrigin(req);
+    if (!origin) {
+      return new NextResponse(null, { status: 403 });
+    }
+    const res = new NextResponse(null, { status: 204 });
+    res.headers.set("Access-Control-Allow-Origin", origin);
+    res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Request-ID, Idempotency-Key");
+    res.headers.set("Access-Control-Max-Age", "86400");
+    applySecurityHeaders(res);
+    return res;
+  }
+
+  // Rate limit API routes
+  if (pathname.startsWith("/api/")) {
+    const ip = req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "unknown";
+    const allowed = rateLimit(`api:${ip}`, 60, 60000);
+    if (!allowed) {
+      const res = NextResponse.json(
+        { error: "Rate limit exceeded. Try again in a minute." },
+        { status: 429, headers: { "Retry-After": "60" } }
+      );
+      const origin = resolveOrigin(req);
+      if (origin) res.headers.set("Access-Control-Allow-Origin", origin);
+      applySecurityHeaders(res);
+      return res;
+    }
+  }
+
+  // Continue to the route handler
+  const res = NextResponse.next();
+  const origin = resolveOrigin(req);
+  if (origin) {
+    res.headers.set("Access-Control-Allow-Origin", origin);
     res.headers.set("Access-Control-Allow-Credentials", "true");
     res.headers.set("Vary", "Origin");
   }
   applySecurityHeaders(res);
   return res;
 }
-
-// ---------------------------------------------------------------------------
-// Main middleware
-// ---------------------------------------------------------------------------
-
-export function proxy(req: NextRequest): NextResponse {
-  const { pathname } = req.nextUrl;
-
-  // ---------------------------------------------------------------------
-  // API routes: CORS preflight short-circuit (returns 204 or 403).
-  // ---------------------------------------------------------------------
-  if (isAPIRoute(pathname)) {
-    const preflight = handlePreflight(req);
-    if (preflight) {
-      applySecurityHeaders(preflight);
-      return preflight;
-    }
-  }
-
-  // ---------------------------------------------------------------------
-  // API routes: rate-limit check BEFORE invoking the route handler.
-  // ---------------------------------------------------------------------
-  if (isAPIRoute(pathname)) {
-    const policy = resolvePolicy(pathname);
-    const id = getClientIdentifier(req);
-    const rl = rateLimit({
-      identifier: id,
-      route: policy.route,
-      limit: policy.limit,
-      windowSeconds: policy.windowSeconds,
-    });
-
-    if (!rl.success) {
-      const res = NextResponse.json(
-        {
-          error: "Too Many Requests",
-          message: `Rate limit exceeded. Retry after ${rl.retryAfter}s.`,
-          retry_after: rl.retryAfter,
-        },
-        { status: 429 },
-      );
-      res.headers.set("Retry-After", String(rl.retryAfter));
-      res.headers.set("X-RateLimit-Limit", String(rl.limit));
-      res.headers.set("X-RateLimit-Remaining", "0");
-      res.headers.set("X-RateLimit-Reset", String(rl.reset));
-      // 429 still needs CORS + security headers so the browser can surface
-      // the error to the originating client code.
-      return stampHeaders(res, req);
-    }
-
-    // Forward the rate-limit info as request headers so route handlers
-    // can read them and echo X-RateLimit-* on their own responses if needed.
-    const requestHeaders = new Headers(req.headers);
-    requestHeaders.set("x-ratelimit-limit", String(rl.limit));
-    requestHeaders.set("x-ratelimit-remaining", String(rl.remaining));
-    requestHeaders.set("x-ratelimit-reset", String(rl.reset));
-
-    const res = NextResponse.next({
-      request: { headers: requestHeaders },
-    });
-
-    res.headers.set("X-RateLimit-Limit", String(rl.limit));
-    res.headers.set("X-RateLimit-Remaining", String(rl.remaining));
-    res.headers.set("X-RateLimit-Reset", String(rl.reset));
-    return stampHeaders(res, req);
-  }
-
-  // ---------------------------------------------------------------------
-  // Non-API routes — just stamp security headers on the response.
-  // ---------------------------------------------------------------------
-  const res = NextResponse.next({
-    request: { headers: req.headers },
-  });
-  applySecurityHeaders(res);
-  return res;
-}
-
-// Re-export so route handlers can import the same source of truth.
-export { getSecurityHeaders };

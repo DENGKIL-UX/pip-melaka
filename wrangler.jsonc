@@ -1,0 +1,13 @@
+{
+  "name": "pip-mlk",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
+  // ponytail: MLK — NO D1 binding by default. Add only if Phase 7 S2D
+  // scenario CRUD requires it. NO engine Worker — engine is build-time only.
+  // See CLOUDFLARE-GITHUB-FREE-TIER.md §7 for D1 enablement.
+}

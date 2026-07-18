@@ -13,12 +13,15 @@ next-env.d.ts
 /engine-staging/
 /upload/
 /pip-melaka-blueprint/
+/bp-tmp/
 /skills/
 /tool-results/
 /verify-*.png
 /qa-*.png
+/test-*.png
 /db/*.db
 /db/*.db-journal
 tsconfig.tsbuildinfo
-test-*.png
-verify-*.png
+.dev.vars
+.open-next/
+.wrangler/

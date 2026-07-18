@@ -4,13 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
-    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
-    "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
+    "build": "next build",
+    "build:cf": "npx @opennextjs/cloudflare build",
+    "deploy": "npm run build:cf && npx @opennextjs/cloudflare deploy",
+    "deploy:version": "npx wrangler versions upload",
+    "preview:cf": "npm run build:cf && npx wrangler dev",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "engine:p134": "node engine/pip-voter-intelligence-pipeline-v1.1.js --parliament p134 --xlsx raw-voters/P134.xlsx --contract engine/pip-voter-source-contract-p134-v1.0.json --output-dir pipeline-out/p134 --mode standard --strict-contract --self-check",
+    "verify:no-pdpa-files": "bash scripts/verify-no-pdpa-files.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -86,6 +92,7 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.1",
     "@tailwindcss/postcss": "^4",
     "@types/d3-force": "^3.0.10",
     "@types/leaflet": "^1.9.21",
@@ -99,6 +106,7 @@
     "eslint-config-next": "^16.1.1",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.5",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.112.0"
   }
 }

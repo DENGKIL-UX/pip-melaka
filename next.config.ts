@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  output: "standalone",
-  /* config options here */
+const config: NextConfig = {
+  // ponytail: MLK — images unoptimized (Workers can't optimise images).
+  images: { unoptimized: true },
+  // ponytail: MLK — NO output: 'standalone' (OpenNext handles bundling).
+  // NO /api/engine route exists (engine is build-time only).
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
 };
 
-export default nextConfig;
+export default config;

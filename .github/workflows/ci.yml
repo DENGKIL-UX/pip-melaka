@@ -71,15 +71,20 @@ jobs:
       - name: Prisma generate
         run: bun run db:generate
 
-      # 5. Build — Next.js production build. Catches:
-      #    - RSC/client-server boundary violations
-      #    - Bad imports (server-only in client, etc.)
-      #    - Missing `await` in async server components
-      #    - Static-rendering failures
+      # 5. PDPA verification — ensure no per-voter data is shipped.
+      - name: PDPA file verification
+        run: bash scripts/verify-no-pdpa-files.sh
+
+      # 6. Build — Next.js production build.
       - name: Build
         run: bun run build
         env:
-          # Skip DB push during build — CI does not need a running DB.
+          PRISMA_SKIP_DB_PUSH: "1"
+
+      # 7. Cloudflare Workers build (OpenNext) — verifies Worker bundle compiles.
+      - name: Cloudflare build
+        run: npx @opennextjs/cloudflare build
+        env:
           PRISMA_SKIP_DB_PUSH: "1"
 
   pr-validation:

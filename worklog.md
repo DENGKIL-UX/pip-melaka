@@ -813,3 +813,57 @@ Task: Research + implement 100+ software engineering patterns across 5 domains
 
 ### Verification
 - `bun run lint`: 0 errors, 1 pre-existing warning ✅
+
+---
+Task ID: CLOUDFLARE-SETUP-01
+Agent: main
+Task: Configure PIP-MLK for Cloudflare Workers deployment per blueprint
+
+## Current goals/completed modifications/verification results
+
+### Cloudflare configuration files created
+1. **wrangler.jsonc** — Worker config with `nodejs_compat` flag, asset binding
+2. **open-next.config.ts** — OpenNext Cloudflare config (incremental cache off for Free Tier)
+3. **next.config.ts** — Updated: `images: { unoptimized: true }`, removed `output: "standalone"`
+4. **.dev.vars.example** — Template for local dev secrets (PIP_VOTER_HASH_SALT, JWT_SECRET, CSRF_SECRET)
+5. **scripts/verify-no-pdpa-files.sh** — PDPA compliance guard (checks for voter data, .env, /api/engine)
+6. **docs/CLOUDFLARE-DEPLOYMENT.md** — Full deployment guide with dashboard + CLI paths
+
+### package.json scripts added
+- `build:cf` — `npx @opennextjs/cloudflare build`
+- `deploy` — `npm run build:cf && npx @opennextjs/cloudflare deploy`
+- `deploy:version` — `npx wrangler versions upload`
+- `preview:cf` — `npm run build:cf && npx wrangler dev`
+- `verify:no-pdpa-files` — PDPA compliance check
+- `typecheck` — `tsc --noEmit`
+
+### Dependencies installed
+- `@opennextjs/cloudflare` (devDependency)
+- `wrangler` (devDependency)
+
+### CI/CD workflow updated
+- Added PDPA file verification step
+- Added Cloudflare Workers build step (OpenNext)
+- Runs on every PR and push to main
+
+### Critical rules verified
+- ✅ `compatibility_flags: ["nodejs_compat"]` in wrangler.jsonc
+- ✅ NO `runtime = "edge"` in any API route
+- ✅ NO `/api/engine` route (404 by design)
+- ✅ NO PDPA files in public/ (verified by script)
+- ✅ `images: { unoptimized: true }` in next.config.ts
+- ✅ NO `output: "standalone"` (OpenNext handles bundling)
+
+### Build configuration (for Cloudflare dashboard)
+- Build command: `npx @opennextjs/cloudflare build`
+- Deploy command: `npx @opennextjs/cloudflare deploy`
+- Version command: `npx wrangler versions upload`
+- Root directory: `/`
+- Production branch: `main`
+- Builds for non-production branches: Enabled
+
+### Verification
+- `bun run lint`: 0 errors ✅
+- PDPA verification: PASSED ✅
+- No edge runtime: ✅
+- All config files present: ✅

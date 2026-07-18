@@ -1,0 +1,133 @@
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, Minus, Sparkles, AlertTriangle } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, BarChart, Bar, Legend } from "recharts";
+
+const forecastData = [
+  { day: "Day -3", actual: 42, forecast: null, lower: null, upper: null },
+  { day: "Day -2", actual: 58, forecast: null, lower: null, upper: null },
+  { day: "Day -1", actual: 71, forecast: null, lower: null, upper: null },
+  { day: "Today", actual: 71, forecast: 71, lower: 71, upper: 71 },
+  { day: "Day +1", actual: null, forecast: 85, lower: 72, upper: 98 },
+  { day: "Day +2", actual: null, forecast: 92, lower: 75, upper: 109 },
+  { day: "Day +3", actual: null, forecast: 88, lower: 68, upper: 108 },
+];
+
+const narrativeForecast = [
+  { narrative: "Senior healthcare", current_signals: 18, projected_72h: 32, confidence: 0.78, trend: "RISING" },
+  { narrative: "Road infrastructure", current_signals: 9, projected_72h: 14, confidence: 0.65, trend: "RISING" },
+  { narrative: "DPT voter-roll", current_signals: 12, projected_72h: 10, confidence: 0.72, trend: "FALLING" },
+  { narrative: "Coastal development", current_signals: 6, projected_72h: 7, confidence: 0.81, trend: "STABLE" },
+];
+
+const escalationRisk = [
+  { locality: "Taboh Naning", risk_score: 82, factors: "Senior dep 30.6% + negative sentiment 45% + rising narrative" },
+  { locality: "Ayer Limau", risk_score: 64, factors: "Senior dep 27.7% + mixed sentiment + DPT churn" },
+  { locality: "Lendu", risk_score: 45, factors: "Campus expansion debate + falling engagement" },
+  { locality: "Kuala Linggi", risk_score: 22, factors: "Positive sentiment + low signal volume" },
+  { locality: "Tanjung Bidara", risk_score: 35, factors: "Neutral sentiment + stable coastal narrative" },
+];
+
+const TREND_ICONS: Record<string, React.ReactNode> = {
+  RISING: <TrendingUp className="h-3 w-3 text-red-500" />,
+  FALLING: <TrendingDown className="h-3 w-3 text-emerald-500" />,
+  STABLE: <Minus className="h-3 w-3 text-muted-foreground" />,
+};
+
+export function PredictiveTab() {
+  return (
+    <div className="space-y-4">
+      <Card className="border-mlk/20">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-mlk" />
+            <div>
+              <CardTitle className="text-base">S2D Predictive Intelligence — Forecasting (Phase S2D-5)</CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">Signal behaviour forecasting · 72-hour projection · Escalation risk scoring</p>
+            </div>
+            <Badge variant="outline" className="ml-auto text-[10px] text-amber-600 border-amber-500/40">Indicative</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Signal volume forecast */}
+          <Card className="border-mlk/10 mb-4">
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Signal Volume Forecast (7 days)</CardTitle></CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={forecastData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px" }} />
+                  <ReferenceLine x="Today" stroke="#C77B2C" strokeDasharray="5 5" label={{ value: "Now", fill: "#C77B2C", fontSize: 10 }} />
+                  <Line type="monotone" dataKey="actual" stroke="#3B82F6" strokeWidth={3} name="Actual" dot={{ r: 4 }} connectNulls={false} />
+                  <Line type="monotone" dataKey="forecast" stroke="#C77B2C" strokeWidth={2} strokeDasharray="5 5" name="Forecast" dot={{ r: 3 }} connectNulls={false} />
+                  <Line type="monotone" dataKey="upper" stroke="#C77B2C" strokeWidth={1} strokeOpacity={0.3} name="Upper bound" dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="lower" stroke="#C77B2C" strokeWidth={1} strokeOpacity={0.3} name="Lower bound" dot={false} connectNulls={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Narrative forecast */}
+          <Card className="border-mlk/10 mb-4">
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Narrative Forecast (72-hour projection)</CardTitle></CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto scrollbar-mlk">
+                <table className="w-full text-xs">
+                  <thead><tr className="border-b"><th className="text-start p-2">Narrative</th><th className="text-end p-2">Current Signals</th><th className="text-end p-2">Projected 72h</th><th className="text-end p-2">Confidence</th><th className="text-center p-2">Trend</th></tr></thead>
+                  <tbody>
+                    {narrativeForecast.map(n => (
+                      <tr key={n.narrative} className="border-b border-border/30 hover:bg-muted/30">
+                        <td className="p-2 font-medium">{n.narrative}</td>
+                        <td className="p-2 text-end font-mono">{n.current_signals}</td>
+                        <td className="p-2 text-end font-mono text-mlk">{n.projected_72h}</td>
+                        <td className="p-2 text-end font-mono">{(n.confidence * 100).toFixed(0)}%</td>
+                        <td className="p-2 text-center">{TREND_ICONS[n.trend]} {n.trend}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Escalation risk scoring */}
+          <Card className="border-mlk/10">
+            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-mlk" /> Escalation Risk Score by Locality (S2D-6B)</CardTitle></CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={escalationRisk} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                  <YAxis type="category" dataKey="locality" tick={{ fontSize: 9 }} width={100} />
+                  <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px" }} />
+                  <Bar dataKey="risk_score" radius={[0, 4, 4, 0]}>
+                    {escalationRisk.map((entry, idx) => (
+                      <Bar key={idx} dataKey="risk_score" fill={entry.risk_score >= 75 ? "#EF4444" : entry.risk_score >= 50 ? "#F59E0B" : "#10B981"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="space-y-1 mt-2">
+                {escalationRisk.map(r => (
+                  <div key={r.locality} className="flex items-center gap-2 text-[10px]">
+                    <span className="font-mono font-bold" style={{ color: r.risk_score >= 75 ? "#EF4444" : r.risk_score >= 50 ? "#F59E0B" : "#10B981" }}>{r.risk_score}</span>
+                    <span className="text-muted-foreground">{r.locality}: {r.factors}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="mt-3 text-[10px] text-muted-foreground text-center">
+            Per S2D Architecture S2D-5/6: Forecast targets = signal volume, narrative velocity, escalation risk.
+            Response Need = Public impact × 20% + Forecasted escalation × 20% + Narrative velocity × 15% + Evidence confidence × 15%.
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

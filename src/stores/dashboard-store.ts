@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type DashboardTab =
-  | "overview" | "map-2d" | "map-3d" | "elections" | "demographics" | "analysis" | "risk" | "compare" | "s2d" | "s2d-360" | "public-comm" | "incidents" | "governance";
+  | "overview" | "map-2d" | "map-3d" | "elections" | "demographics" | "analysis" | "risk" | "compare" | "s2d" | "s2d-360" | "public-comm" | "incidents" | "scenarios" | "predictive" | "insights" | "alerts" | "dual-layer" | "governance";
 
 interface DashboardState {
   landed: boolean;

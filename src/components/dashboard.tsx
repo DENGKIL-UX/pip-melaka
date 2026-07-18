@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
@@ -27,6 +27,11 @@ const S2DConsoleTab = dynamic(() => import("@/components/tabs/s2d-console-tab").
 const S2D360Tab = dynamic(() => import("@/components/tabs/s2d-360-tab").then((m) => ({ default: m.S2D360Tab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D 360…</div> });
 const PublicCommunicationTab = dynamic(() => import("@/components/tabs/public-communication-tab").then((m) => ({ default: m.PublicCommunicationTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Public Comm…</div> });
 const IncidentCasebookTab = dynamic(() => import("@/components/tabs/incident-casebook-tab").then((m) => ({ default: m.IncidentCasebookTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Incidents…</div> });
+const ScenarioTab = dynamic(() => import("@/components/tabs/scenario-tab").then((m) => ({ default: m.ScenarioTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Scenarios…</div> });
+const PredictiveTab = dynamic(() => import("@/components/tabs/predictive-tab").then((m) => ({ default: m.PredictiveTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Predictive…</div> });
+const InsightReportsTab = dynamic(() => import("@/components/tabs/insight-reports-tab").then((m) => ({ default: m.InsightReportsTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Insights…</div> });
+const AlertsTab = dynamic(() => import("@/components/tabs/alerts-tab").then((m) => ({ default: m.AlertsTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Alerts…</div> });
+const DualLayerTab = dynamic(() => import("@/components/tabs/dual-layer-tab").then((m) => ({ default: m.DualLayerTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Dual-Layer…</div> });
 
 const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -41,6 +46,11 @@ const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{
   { id: "s2d-360", label: "S2D 360", icon: Brain },
   { id: "public-comm", label: "Public Comm", icon: MessageSquare },
   { id: "incidents", label: "Incidents", icon: AlertTriangle },
+  { id: "scenarios", label: "Scenarios", icon: Layers3 },
+  { id: "predictive", label: "Predictive", icon: Sparkle },
+  { id: "insights", label: "Insights", icon: FileText },
+  { id: "alerts", label: "Alerts", icon: Bell },
+  { id: "dual-layer", label: "Dual-Layer", icon: Layers3 },
   { id: "governance", label: "Governance", icon: ShieldCheck },
 ];
 
@@ -133,6 +143,11 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "s2d-360" && <S2D360Tab />}
         {activeTab === "public-comm" && <PublicCommunicationTab />}
         {activeTab === "incidents" && <IncidentCasebookTab />}
+        {activeTab === "scenarios" && <ScenarioTab />}
+        {activeTab === "predictive" && <PredictiveTab />}
+        {activeTab === "insights" && <InsightReportsTab />}
+        {activeTab === "alerts" && <AlertsTab />}
+        {activeTab === "dual-layer" && <DualLayerTab />}
         {activeTab === "overview" && <OverviewTab />}
         {activeTab === "elections" && <ElectionsTab />}
         {activeTab === "demographics" && <DemographicsTab />}

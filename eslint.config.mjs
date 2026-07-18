@@ -89,7 +89,7 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "react/no-danger": "warn",
   },
 }, {
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills", "upload/**", "engine-staging/**", "engine/**", ".secrets/**", "pip-melaka-blueprint/**"]
+  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills", "upload/**", "engine-staging/**", "engine/**", "engine-archive/**", ".secrets/**", "pip-melaka-blueprint/**", "bp-tmp/**"]
 }];
 
 export default eslintConfig;

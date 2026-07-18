@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, Radar } from "lucide-react";
+import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, Radar, Search } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
@@ -19,6 +19,8 @@ import { GovernanceTab } from "@/components/tabs/governance-tab";
 import { AssistantPanel } from "@/components/shared/assistant-panel";
 import { SelectedDunDrawer } from "@/components/shared/selected-dun-drawer";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { CommandPalette } from "@/components/shared/command-palette";
+import { ShortcutCheatSheet } from "@/components/shared/shortcut-cheat-sheet";
 
 // Lazy-load map components (Leaflet + Three.js are heavy)
 const Map2DTab = dynamic(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab })), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 2D map…</div> });
@@ -95,6 +97,19 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                 <Users className="h-3 w-3 me-1" />
                 {TOTAL_VOTERS_P134.toLocaleString()}
               </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 gap-1.5 text-xs hidden lg:inline-flex"
+                onClick={() => {
+                  const ev = new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: false, bubbles: true });
+                  window.dispatchEvent(ev);
+                }}
+                aria-label="Open command palette (Cmd+K)"
+              >
+                <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-muted">⌘K</kbd>
+                <Search className="h-3.5 w-3.5" />
+              </Button>
               <ThemeToggle />
             </div>
           </div>
@@ -174,6 +189,8 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
       {/* Floating overlays — render last so they sit above all content */}
       <SelectedDunDrawer />
       <AssistantPanel />
+      <CommandPalette />
+      <ShortcutCheatSheet />
     </div>
   );
 }

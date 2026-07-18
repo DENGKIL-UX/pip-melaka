@@ -1,0 +1,12 @@
+{
+  "name": "PIP-MLK",
+  "short_name": "PIP-MLK",
+  "description": "Political Intelligence Platform — Melaka. Truth Above All.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#C77B2C",
+  "icons": [
+    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

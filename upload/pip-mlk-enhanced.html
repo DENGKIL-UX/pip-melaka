@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="PIP-MLK — Political Intelligence Platform for Melaka. Real DOSM kawasanku GeoJSON boundaries, build-time demographics, PDPA Akta 709 compliant.">
+<meta property="og:title" content="PIP-MLK · Political Intelligence Platform · Melaka">
+<meta property="og:description" content="Truth Above All. Real DOSM boundaries, zero PDPA exposure.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pip-melaka.ritz-analytics.workers.dev/">
+<meta name="twitter:card" content="summary_large_image">
+<title>PIP-MLK · Political Intelligence Platform · Melaka</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090b;
+    --bg-elevated: #0c0c0e;
+    --fg: #fafafa;
+    --fg-secondary: #a1a1aa;
+    --fg-muted: #71717a;
+    --fg-dim: #52525b;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(0,212,255,0.2);
+    --accent: #00d4ff;
+    --accent-dim: rgba(0,212,255,0.1);
+    --success: #22c55e;
+    --success-dim: rgba(34,197,94,0.1);
+    --warning: #f59e0b;
+    --warning-dim: rgba(245,158,11,0.1);
+    --error: #ef4444;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-mono { font-family: var(--font-mono); }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* ===== GLASS SYSTEM ===== */
+  .glass {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border);
+  }
+
+  .glass-hover {
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .glass-hover:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--border-hover);
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.1), 0 12px 40px rgba(0,0,0,0.5);
+    transform: translateY(-2px);
+  }
+
+  /* ===== SHADOW SYSTEM ===== */
+  .shadow-card {
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .shadow-card-hover {
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.15), 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .shadow-glow {
+    box-shadow: 0 0 40px rgba(0,212,255,0.15);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.1); }
+    50% { box-shadow: 0 0 40px rgba(0,212,255,0.2); }
+  }
+  @keyframes bgShift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(2%, -1%) scale(1.02); }
+    66% { transform: translate(-1%, 2%) scale(0.98); }
+  }
+  @keyframes borderFlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes barFill {
+    from { width: 0%; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+  }
+  .animate-slide-down {
+    animation: slideDown 0.3s ease forwards;
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  .animate-pulse-dot {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+  .animate-bg-shift {
+    animation: bgShift 20s ease-in-out infinite;
+  }
+
+  /* Stagger delays */
+  .stagger-1 { animation-delay: 0.04s; }
+  .stagger-2 { animation-delay: 0.08s; }
+  .stagger-3 { animation-delay: 0.12s; }
+  .stagger-4 { animation-delay: 0.16s; }
+  .stagger-5 { animation-delay: 0.20s; }
+  .stagger-6 { animation-delay: 0.24s; }
+  .stagger-7 { animation-delay: 0.28s; }
+  .stagger-8 { animation-delay: 0.32s; }
+  .stagger-9 { animation-delay: 0.36s; }
+  .stagger-10 { animation-delay: 0.40s; }
+  .stagger-11 { animation-delay: 0.44s; }
+  .stagger-12 { animation-delay: 0.48s; }
+
+  /* ===== CARD GLOW ===== */
+  .card-glow {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    filter: blur(8px);
+    z-index: 0;
+  }
+  .card-premium:hover .card-glow {
+    opacity: 1;
+  }
+
+  /* ===== GRADIENT TEXT ===== */
+  .text-gradient {
+    background: linear-gradient(135deg, #4de6ff, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-subtle {
+    background: linear-gradient(135deg, #a1a1aa, #71717a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ===== BADGES ===== */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge-success {
+    background: var(--success-dim);
+    color: var(--success);
+    border: 1px solid rgba(34,197,94,0.2);
+  }
+  .badge-warning {
+    background: var(--warning-dim);
+    color: var(--warning);
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+  .badge-accent {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(0,212,255,0.2);
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .progress-fill-success {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+  }
+  .progress-fill-warning {
+    background: linear-gradient(90deg, #d97706, #f59e0b);
+  }
+
+  /* ===== TOOLTIP ===== */
+  .tooltip-trigger {
+    position: relative;
+    cursor: help;
+  }
+  .tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 8px 12px;
+    background: #18181b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--fg-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .tooltip-trigger:hover .tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ===== SKELETON ===== */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  .custom-scroll::-webkit-scrollbar { width: 5px; }
+  .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+  .custom-scroll::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 999px; }
+  .custom-scroll::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+  /* ===== COMMAND PALETTE ===== */
+  .cmd-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .cmd-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .cmd-panel {
+    position: fixed;
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.96);
+    width: 100%;
+    max-width: 560px;
+    z-index: 101;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cmd-panel.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) scale(1);
+  }
+
+  .cmd-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-radius: 6px;
+    margin: 0 6px;
+  }
+  .cmd-item:hover, .cmd-item.selected {
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* ===== FOCUS STATES ===== */
+  *:focus-visible {
+    outline: 2px solid rgba(0,212,255,0.4);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* ===== REDUCED MOTION ===== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ===== MOBILE MENU ===== */
+  .mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+  .mobile-menu.open {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  /* ===== NAV ACTIVE STATE ===== */
+  .nav-link {
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-link:hover::after, .nav-link.active::after {
+    width: 60%;
+  }
+  .nav-link.active {
+    color: var(--fg);
+    background: rgba(255,255,255,0.06);
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<header class="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
+  <nav class="max-w-6xl mx-auto glass rounded-xl px-4 py-2.5 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-3 group">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--accent)] to-[#00a8cc] flex items-center justify-center shadow-glow transition-transform group-hover:scale-105">
+        <span class="font-mono font-bold text-xs text-[var(--bg)]">PIP</span>
+      </div>
+      <div class="hidden sm:block">
+        <div class="text-sm font-semibold text-white tracking-tight">PIP-MLK</div>
+        <div class="text-[10px] text-[var(--fg-muted)] -mt-0.5 tracking-wide">Political Intelligence Platform</div>
+      </div>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="hidden md:flex items-center gap-0.5">
+      <a href="#" class="nav-link active px-3 py-1.5 rounded-lg text-sm text-[var(--fg)] font-medium">Dashboard</a>
+      <a href="#parliaments" class="nav-link px-3 py-1.5 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-[var(--fg)]">Parliaments</a>
+      <a href="#" class="nav-link px-3 py-1.5 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-[var(--fg)]">DUN Map</a>
+      <a href="#" class="nav-link px-3 py-1.5 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-[var(--fg)]">Analytics</a>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-1.5">
+      <button onclick="toggleCommand()" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[var(--fg-muted)] text-sm hover:bg-white/[0.08] hover:border-white/[0.12] transition-all">
+        <i data-lucide="search" class="w-3.5 h-3.5"></i>
+        <span class="text-xs">Search</span>
+        <kbd class="ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-[var(--fg-dim)]">⌘K</kbd>
+      </button>
+
+      <button class="relative p-2 rounded-lg hover:bg-white/[0.08] transition-colors" aria-label="Notifications">
+        <i data-lucide="bell" class="w-4 h-4 text-[var(--fg-muted)]"></i>
+        <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-pulse-dot"></span>
+      </button>
+
+      <button onclick="toggleMobile()" class="md:hidden p-2 rounded-lg hover:bg-white/[0.08] transition-colors" aria-label="Menu">
+        <i data-lucide="menu" class="w-4 h-4 text-[var(--fg-muted)]" id="menu-icon"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu mt-2 max-w-6xl mx-auto rounded-xl glass p-2 md:hidden" id="mobile-menu">
+    <a href="#" class="block px-4 py-3 rounded-lg text-sm bg-white/[0.08] text-white font-medium">Dashboard</a>
+    <a href="#parliaments" class="block px-4 py-3 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-white hover:bg-white/[0.04] transition-colors">Parliaments</a>
+    <a href="#" class="block px-4 py-3 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-white hover:bg-white/[0.04] transition-colors">DUN Map</a>
+    <a href="#" class="block px-4 py-3 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-white hover:bg-white/[0.04] transition-colors">Analytics</a>
+    <a href="#" class="block px-4 py-3 rounded-lg text-sm text-[var(--fg-secondary)] hover:text-white hover:bg-white/[0.04] transition-colors">Settings</a>
+  </div>
+</header>
+
+<!-- ===== COMMAND PALETTE ===== -->
+<div class="cmd-overlay" id="cmd-overlay" onclick="toggleCommand()"></div>
+<div class="cmd-panel" id="cmd-panel">
+  <div class="rounded-xl bg-[#0c0c0e] border border-white/[0.08] shadow-2xl overflow-hidden">
+    <!-- Search Input -->
+    <div class="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.06]">
+      <i data-lucide="search" class="w-4 h-4 text-[var(--fg-dim)]"></i>
+      <input 
+        type="text" 
+        id="cmd-input" 
+        placeholder="Search parliaments, DUNs, or actions..." 
+        class="flex-1 bg-transparent text-sm text-white placeholder-[var(--fg-dim)] outline-none font-sans"
+        oninput="filterCommands(this.value)"
+        onkeydown="handleCmdKey(event)"
+        autocomplete="off"
+      >
+      <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] font-mono text-[var(--fg-dim)]">ESC</kbd>
+    </div>
+
+    <!-- Results -->
+    <div class="max-h-80 overflow-y-auto custom-scroll py-2" id="cmd-results"></div>
+
+    <!-- Footer -->
+    <div class="px-4 py-2.5 border-t border-white/[0.06] flex items-center gap-5 text-[10px] text-[var(--fg-dim)]">
+      <span class="flex items-center gap-1.5">
+        <kbd class="px-1 rounded bg-white/[0.06] font-mono">↑↓</kbd>
+        <span>Navigate</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <kbd class="px-1 rounded bg-white/[0.06] font-mono">↵</kbd>
+        <span>Select</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <kbd class="px-1 rounded bg-white/[0.06] font-mono">esc</kbd>
+        <span>Close</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HERO SECTION ===== -->
+<section class="relative pt-32 pb-20 px-4 overflow-hidden">
+  <!-- Animated background blobs -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-20 left-[10%] w-[500px] h-[500px] bg-[var(--accent)]/[0.02] rounded-full blur-[100px] animate-bg-shift"></div>
+    <div class="absolute top-40 right-[5%] w-[400px] h-[400px] bg-[var(--accent)]/[0.015] rounded-full blur-[80px] animate-bg-shift" style="animation-delay: -7s;"></div>
+    <div class="absolute bottom-20 left-[30%] w-[300px] h-[300px] bg-[#00a8cc]/[0.015] rounded-full blur-[60px] animate-bg-shift" style="animation-delay: -14s;"></div>
+  </div>
+
+  <div class="max-w-5xl mx-auto relative z-10">
+    <!-- Tagline -->
+    <div class="text-center mb-14 animate-fade-in-up">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent-dim)] border border-[var(--accent)]/20 mb-7">
+        <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse-dot"></span>
+        <span class="text-[11px] font-semibold text-[var(--accent)] tracking-widest uppercase">Live Dashboard</span>
+      </div>
+      <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-5">
+        <span class="text-white">Truth</span>
+        <span class="text-gradient"> Above All.</span>
+      </h1>
+      <p class="text-lg text-[var(--fg-secondary)] max-w-2xl mx-auto leading-relaxed">
+        Political Intelligence Platform for Melaka — real DOSM boundaries, 
+        build-time demographics, <span class="text-[var(--fg)]">zero PDPA exposure</span>.
+      </p>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center justify-center gap-3 mt-8">
+        <button class="px-5 py-2.5 rounded-lg bg-[var(--accent)] text-[var(--bg)] text-sm font-semibold hover:bg-[#33ddff] transition-colors shadow-glow flex items-center gap-2">
+          <i data-lucide="map" class="w-4 h-4"></i>
+          View Map
+        </button>
+        <button class="px-5 py-2.5 rounded-lg glass text-[var(--fg-secondary)] text-sm font-medium hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          Export Data
+        </button>
+        <button class="px-5 py-2.5 rounded-lg glass text-[var(--fg-secondary)] text-sm font-medium hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-2">
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          Share
+        </button>
+      </div>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Large Featured Card -->
+      <div class="md:col-span-2 md:row-span-2 relative overflow-hidden rounded-2xl
+        bg-gradient-to-br from-[var(--accent)]/[0.08] via-[var(--accent)]/[0.02] to-transparent
+        border border-[var(--accent)]/15 p-8 flex flex-col justify-between min-h-[300px]
+        animate-fade-in-up stagger-1 card-premium cursor-pointer group">
+
+        <div class="card-glow"></div>
+
+        <!-- Inner glow blobs -->
+        <div class="absolute inset-0 pointer-events-none opacity-40">
+          <div class="absolute -top-20 -right-20 w-64 h-64 bg-[var(--accent)]/10 rounded-full blur-3xl group-hover:bg-[var(--accent)]/15 transition-all duration-700"></div>
+          <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-[#00a8cc]/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-5">
+            <div class="w-8 h-8 rounded-lg bg-[var(--accent)]/10 flex items-center justify-center">
+              <i data-lucide="shield-check" class="w-4 h-4 text-[var(--accent)]"></i>
+            </div>
+            <span class="text-[11px] font-semibold text-[var(--accent)] tracking-widest uppercase">Verified Data</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+            DOSM kawasanku <span class="text-gradient">GeoJSON</span>
+          </h2>
+          <p class="text-[var(--fg-secondary)] text-sm max-w-md leading-relaxed">
+            Real boundary data from Department of Statistics Malaysia. 
+            2026 redelineation verified against official gazette.
+          </p>
+        </div>
+
+        <div class="relative z-10 flex items-end gap-6 mt-8 flex-wrap">
+          <div>
+            <div class="font-mono text-4xl md:text-5xl font-bold text-white tabular-nums" data-count="6">0</div>
+            <div class="text-xs text-[var(--fg-muted)] mt-1.5 font-medium">Parliaments</div>
+          </div>
+          <div class="w-px h-12 bg-white/[0.08]"></div>
+          <div>
+            <div class="font-mono text-4xl md:text-5xl font-bold text-white tabular-nums" data-count="28">0</div>
+            <div class="text-xs text-[var(--fg-muted)] mt-1.5 font-medium">DUN Seats</div>
+          </div>
+          <div class="w-px h-12 bg-white/[0.08]"></div>
+          <div>
+            <div class="font-mono text-4xl md:text-5xl font-bold text-white tabular-nums" data-count="3">0</div>
+            <div class="text-xs text-[var(--fg-muted)] mt-1.5 font-medium">Elections</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat Card: DUN Seats -->
+      <div class="glass rounded-xl p-6 shadow-card glass-hover card-premium relative overflow-hidden animate-fade-in-up stagger-2">
+        <div class="card-glow"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="badge badge-success">
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse-dot"></span>
+              Verified
+            </span>
+            <i data-lucide="layers" class="w-4 h-4 text-[var(--fg-dim)]"></i>
+          </div>
+          <div class="font-mono text-3xl font-bold text-white tabular-nums" data-count="28">0</div>
+          <div class="mt-2 text-sm font-medium text-[var(--fg-secondary)]">DUN Seats</div>
+          <div class="mt-1 text-xs text-[var(--fg-dim)]">N01–N28</div>
+        </div>
+      </div>
+
+      <!-- Stat Card: GeoJSON Layers -->
+      <div class="glass rounded-xl p-6 shadow-card glass-hover card-premium relative overflow-hidden animate-fade-in-up stagger-3">
+        <div class="card-glow"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="badge badge-success">
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse-dot"></span>
+              Verified
+            </span>
+            <i data-lucide="map" class="w-4 h-4 text-[var(--fg-dim)]"></i>
+          </div>
+          <div class="font-mono text-3xl font-bold text-white tabular-nums">18</div>
+          <div class="mt-2 text-sm font-medium text-[var(--fg-secondary)]">GeoJSON Layers</div>
+          <div class="mt-1 text-xs text-[var(--fg-dim)]">15 DUN + 3 Parlimen</div>
+        </div>
+      </div>
+
+      <!-- Stat Card: Voters -->
+      <div class="glass rounded-xl p-6 shadow-card glass-hover card-premium relative overflow-hidden animate-fade-in-up stagger-4">
+        <div class="card-glow"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="badge badge-success">
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse-dot"></span>
+              Verified
+            </span>
+            <i data-lucide="users" class="w-4 h-4 text-[var(--fg-dim)]"></i>
+          </div>
+          <div class="font-mono text-3xl font-bold text-white tabular-nums" data-count="31954">0</div>
+          <div class="mt-2 text-sm font-medium text-[var(--fg-secondary)]">Total Voters</div>
+          <div class="mt-1 text-xs text-[var(--fg-dim)]">P134 verified only</div>
+        </div>
+      </div>
+
+      <!-- Stat Card: S2D Loop -->
+      <div class="glass rounded-xl p-6 shadow-card glass-hover card-premium relative overflow-hidden animate-fade-in-up stagger-5 group">
+        <div class="card-glow"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="badge badge-accent">
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+              Active
+            </span>
+            <div class="tooltip-trigger">
+              <i data-lucide="help-circle" class="w-4 h-4 text-[var(--fg-dim)] hover:text-[var(--fg-secondary)] transition-colors"></i>
+              <div class="tooltip">
+                <div class="font-semibold text-white mb-1">S2D Loop</div>
+                <div class="space-y-0.5">
+                  <div>S1: Sensing (ingest)</div>
+                  <div>S2: Structuring (normalize)</div>
+                  <div>S3: Scoring (analytics)</div>
+                  <div>S4: Signaling (alerts)</div>
+                  <div>S5: Acting (deploy)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="font-mono text-3xl font-bold text-white tabular-nums">5</div>
+          <div class="mt-2 text-sm font-medium text-[var(--fg-secondary)]">S2D Loop</div>
+          <div class="mt-1 text-xs text-[var(--fg-dim)]">phases · sensing→acting</div>
+        </div>
+      </div>
+
+      <!-- Stat Card: Provenance -->
+      <div class="glass rounded-xl p-6 shadow-card glass-hover card-premium relative overflow-hidden animate-fade-in-up stagger-6 group">
+        <div class="card-glow"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="badge badge-warning">
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--warning)]"></span>
+              In Progress
+            </span>
+            <div class="tooltip-trigger">
+              <i data-lucide="help-circle" class="w-4 h-4 text-[var(--fg-dim)] hover:text-[var(--fg-secondary)] transition-colors"></i>
+              <div class="tooltip">
+                <div class="font-semibold text-white mb-1">Provenance Gates</div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-1.5"><span class="text-[var(--success)]">✓</span> Source acquired</div>
+                  <div class="flex items-center gap-1.5"><span class="text-[var(--success)]">✓</span> Schema validated</div>
+                  <div class="flex items-center gap-1.5"><span class="text-[var(--success)]">✓</span> Cross-ref checked</div>
+                  <div class="flex items-center gap-1.5"><span class="text-[var(--success)]">✓</span> PDPA scrubbed</div>
+                  <div class="flex items-center gap-1.5"><span class="text-[var(--warning)]">⏳</span> Public release</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="font-mono text-3xl font-bold text-white tabular-nums">4<span class="text-[var(--fg-dim)] text-2xl">/5</span></div>
+          <div class="mt-2 text-sm font-medium text-[var(--fg-secondary)]">Provenance</div>
+          <div class="mt-1 text-xs text-[var(--fg-dim)]">gates closed</div>
+
+          <!-- Mini progress -->
+          <div class="mt-3">
+            <div class="progress-bar">
+              <div class="progress-fill progress-fill-warning" style="width: 80%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Last Updated -->
+    <div class="flex items-center justify-center gap-6 mt-8 text-xs text-[var(--fg-dim)]">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+        Updated <span class="text-[var(--fg-secondary)]">2 hours ago</span>
+      </span>
+      <span class="w-1 h-1 rounded-full bg-[var(--fg-dim)]"></span>
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="clock" class="w-3 h-3"></i>
+        Next refresh in <span class="text-[var(--fg-secondary)]">6 hours</span>
+      </span>
+      <span class="w-1 h-1 rounded-full bg-[var(--fg-dim)]"></span>
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="database" class="w-3 h-3"></i>
+        Source: <span class="text-[var(--fg-secondary)]">DOSM kawasanku 2026</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PARLIAMENTS SECTION ===== -->
+<section class="py-20 px-4" id="parliaments">
+  <div class="max-w-5xl mx-auto">
+    <!-- Section Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4 animate-fade-in-up stagger-7">
+      <div>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Parliaments</h2>
+        <p class="text-sm text-[var(--fg-muted)] mt-2">6 constituencies · 3 districts · Verified against DOSM kawasanku GeoJSON (2026 redelineation)</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <!-- Filter/Sort -->
+        <div class="flex items-center gap-1.5 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+          <button class="px-3 py-1.5 rounded-md text-xs font-medium bg-white/[0.08] text-white">All</button>
+          <button class="px-3 py-1.5 rounded-md text-xs font-medium text-[var(--fg-muted)] hover:text-white hover:bg-white/[0.04] transition-colors">Verified</button>
+          <button class="px-3 py-1.5 rounded-md text-xs font-medium text-[var(--fg-muted)] hover:text-white hover:bg-white/[0.04] transition-colors">Pending</button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-[var(--fg-muted)] bg-white/[0.04] px-3 py-2 rounded-lg border border-white/[0.06]">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[var(--success)]"></i>
+          <span class="font-mono text-[var(--fg-secondary)]">1</span><span>/</span><span class="font-mono">6</span>
+          <span>verified</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parliament Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="parliament-grid">
+      <!-- Cards rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="py-10 px-4 border-t border-white/[0.06]">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-md bg-gradient-to-br from-[var(--accent)] to-[#00a8cc] flex items-center justify-center">
+          <span class="font-mono font-bold text-[10px] text-[var(--bg)]">PIP</span>
+        </div>
+        <div>
+          <div class="text-sm font-semibold text-white">PIP-MLK</div>
+          <div class="text-[10px] text-[var(--fg-dim)]">Political Intelligence Platform · Melaka</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6 text-xs text-[var(--fg-dim)]">
+        <a href="#" class="hover:text-[var(--fg-secondary)] transition-colors">Privacy</a>
+        <a href="#" class="hover:text-[var(--fg-secondary)] transition-colors">Terms</a>
+        <a href="#" class="hover:text-[var(--fg-secondary)] transition-colors">API</a>
+        <a href="#" class="hover:text-[var(--fg-secondary)] transition-colors">GitHub</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-[10px] text-[var(--fg-dim)] flex items-center gap-1.5">
+          <i data-lucide="shield" class="w-3 h-3 text-[var(--success)]"></i>
+          PDPA Akta 709 Compliant
+        </span>
+        <span class="font-mono text-[10px] text-[var(--fg-dim)]">v1.0.0</span>
+      </div>
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-white/[0.04] text-center">
+      <p class="text-[11px] text-[var(--fg-dim)]">
+        Real DOSM kawasanku GeoJSON · Leaflet 2D + Three.js 3D · Build-time demographics · No PDPA-sensitive data ever shipped
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+<script>
+// ===== DATA =====
+const parliaments = [
+  { code: 'P134', name: 'Masjid Tanah', district: 'Alor Gajah', dunCount: 5, voters: 31954, verified: true },
+  { code: 'P135', name: 'Alor Gajah', district: 'Alor Gajah', dunCount: 5, voters: null, verified: false },
+  { code: 'P136', name: 'Tangga Batu', district: 'Melaka Tengah', dunCount: 4, voters: null, verified: false },
+  { code: 'P137', name: 'Hang Tuah Jaya', district: 'Melaka Tengah', dunCount: 4, voters: null, verified: false },
+  { code: 'P138', name: 'Kota Melaka', district: 'Melaka Tengah', dunCount: 5, voters: null, verified: false },
+  { code: 'P139', name: 'Jasin', district: 'Jasin', dunCount: 5, voters: null, verified: false },
+];
+
+// ===== RENDER PARLIAMENT CARDS =====
+function renderParliamentCards() {
+  const grid = document.getElementById('parliament-grid');
+
+  grid.innerHTML = parliaments.map((p, i) => {
+    const completeness = p.verified ? 100 : 0;
+    const cardClass = p.verified ? 'border-t-2 border-t-[var(--success)]/40' : 'border-t-2 border-t-[var(--warning)]/30';
+
+    return `
+      <div class="glass rounded-xl p-5 shadow-card glass-hover card-premium relative overflow-hidden cursor-pointer animate-fade-in-up stagger-${i + 8} ${cardClass}"
+        onclick="selectParliament('${p.code}')"
+        role="button"
+        tabindex="0"
+        aria-label="${p.name} parliament, ${p.dunCount} DUN seats${p.voters ? ', ' + p.voters.toLocaleString() + ' voters' : ''}">
+
+        <div class="card-glow"></div>
+
+        <div class="relative z-10">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-mono text-xs font-bold text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-0.5 rounded-md tracking-tight">${p.code}</span>
+                ${p.verified 
+                  ? `<span class="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse-dot" aria-label="Verified"></span>`
+                  : `<span class="w-2 h-2 rounded-full bg-[var(--warning)]" aria-label="Pending"></span>`
+                }
+              </div>
+              <h3 class="text-base font-semibold text-white group-hover:text-[var(--accent)] transition-colors truncate">${p.name}</h3>
+              <p class="text-xs text-[var(--fg-dim)] flex items-center gap-1 mt-1">
+                <i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i>
+                <span class="truncate">${p.district}</span>
+              </p>
+            </div>
+            <div class="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center flex-shrink-0 ml-2 group-hover:bg-[var(--accent)]/10 transition-colors">
+              <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--fg-dim)] group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all"></i>
+            </div>
+          </div>
+
+          <!-- Data Completeness -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between text-[10px] text-[var(--fg-dim)] mb-1.5">
+              <span>Data completeness</span>
+              <span class="font-mono text-[var(--fg-secondary)]">${completeness}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill ${p.verified ? 'progress-fill-success' : 'progress-fill-warning'}" 
+                style="width: 0%; --target-width: ${completeness}%"
+                data-animate="true"></div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="building-2" class="w-3.5 h-3.5 text-[var(--fg-dim)]"></i>
+              <span class="font-mono text-sm text-[var(--fg-secondary)]">${p.dunCount}</span>
+              <span class="text-[10px] text-[var(--fg-dim)]">DUN</span>
+            </div>
+            <div class="w-px h-3 bg-white/[0.08]"></div>
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-[var(--fg-dim)]"></i>
+              ${p.voters 
+                ? `<span class="font-mono text-sm text-[var(--fg-secondary)]">${p.voters.toLocaleString()}</span>`
+                : `<span class="font-mono text-sm text-[var(--fg-dim)]">—</span>`
+              }
+              <span class="text-[10px] text-[var(--fg-dim)]">voters</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+
+  // Animate progress bars after render
+  setTimeout(() => {
+    document.querySelectorAll('[data-animate="true"]').forEach(bar => {
+      bar.style.width = bar.style.getPropertyValue('--target-width');
+    });
+  }, 100);
+}
+
+// ===== ANIMATED COUNTERS =====
+function animateCounters() {
+  const counters = document.querySelectorAll('[data-count]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.animated) {
+        entry.target.dataset.animated = 'true';
+        const target = parseInt(entry.target.dataset.count);
+        const duration = 2000;
+        const start = performance.now();
+
+        const tick = (now) => {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 4); // ease-out quart
+          entry.target.textContent = Math.floor(eased * target).toLocaleString();
+          if (progress < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  counters.forEach(c => observer.observe(c));
+}
+
+// ===== COMMAND PALETTE =====
+let cmdSelected = 0;
+let filteredCommands = [];
+
+const commands = [
+  { id: 'p134', title: 'P134 — Masjid Tanah', subtitle: 'Alor Gajah · 5 DUN · 31,954 voters', type: 'parliament', icon: 'building-2' },
+  { id: 'p135', title: 'P135 — Alor Gajah', subtitle: 'Alor Gajah · 5 DUN · pending', type: 'parliament', icon: 'building-2' },
+  { id: 'p136', title: 'P136 — Tangga Batu', subtitle: 'Melaka Tengah · 4 DUN · pending', type: 'parliament', icon: 'building-2' },
+  { id: 'p137', title: 'P137 — Hang Tuah Jaya', subtitle: 'Melaka Tengah · 4 DUN · pending', type: 'parliament', icon: 'building-2' },
+  { id: 'p138', title: 'P138 — Kota Melaka', subtitle: 'Melaka Tengah · 5 DUN · pending', type: 'parliament', icon: 'building-2' },
+  { id: 'p139', title: 'P139 — Jasin', subtitle: 'Jasin · 5 DUN · pending', type: 'parliament', icon: 'building-2' },
+  { id: 'map', title: 'Open Map View', subtitle: 'Interactive DUN boundary map', type: 'action', icon: 'map' },
+  { id: 'export', title: 'Export Data', subtitle: 'Download GeoJSON + CSV', type: 'action', icon: 'download' },
+  { id: 'share', title: 'Share Dashboard', subtitle: 'Generate public link', type: 'action', icon: 'share-2' },
+];
+
+function toggleCommand() {
+  const overlay = document.getElementById('cmd-overlay');
+  const panel = document.getElementById('cmd-panel');
+  const input = document.getElementById('cmd-input');
+
+  const isOpen = overlay.classList.contains('active');
+  if (isOpen) {
+    overlay.classList.remove('active');
+    panel.classList.remove('active');
+    document.body.style.overflow = '';
+  } else {
+    overlay.classList.add('active');
+    panel.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      input.focus();
+      input.value = '';
+      filterCommands('');
+    }, 100);
+  }
+}
+
+function filterCommands(query) {
+  const q = query.toLowerCase().trim();
+  filteredCommands = q === '' 
+    ? commands 
+    : commands.filter(c => 
+        c.title.toLowerCase().includes(q) ||
+        c.subtitle.toLowerCase().includes(q) ||
+        c.type.includes(q)
+      );
+  cmdSelected = 0;
+  renderCmdResults();
+}
+
+function renderCmdResults() {
+  const results = document.getElementById('cmd-results');
+
+  if (filteredCommands.length === 0) {
+    results.innerHTML = `
+      <div class="px-4 py-10 text-center">
+        <i data-lucide="search-x" class="w-8 h-8 text-[var(--fg-dim)] mx-auto mb-3"></i>
+        <p class="text-sm text-[var(--fg-dim)]">No results found</p>
+        <p class="text-xs text-[var(--fg-dim)] mt-1">Try a different search term</p>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  // Group by type
+  const parliaments = filteredCommands.filter(c => c.type === 'parliament');
+  const actions = filteredCommands.filter(c => c.type === 'action');
+
+  let html = '';
+
+  if (parliaments.length > 0) {
+    html += `<div class="px-4 py-2 text-[10px] font-semibold text-[var(--fg-dim)] uppercase tracking-wider">Parliaments</div>`;
+    html += parliaments.map((item, i) => renderCmdItem(item, i)).join('');
+  }
+
+  if (actions.length > 0) {
+    html += `<div class="px-4 py-2 text-[10px] font-semibold text-[var(--fg-dim)] uppercase tracking-wider mt-1">Actions</div>`;
+    html += actions.map((item, i) => renderCmdItem(item, parliaments.length + i)).join('');
+  }
+
+  results.innerHTML = html;
+  lucide.createIcons();
+}
+
+function renderCmdItem(item, index) {
+  const isSelected = index === cmdSelected;
+  return `
+    <div class="cmd-item ${isSelected ? 'selected' : ''}" 
+      onmouseenter="setCmdSelected(${index})"
+      onclick="executeCommand('${item.id}')">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.type === 'parliament' ? 'bg-[var(--accent)]/10' : 'bg-white/[0.06]'}">
+        <i data-lucide="${item.icon}" class="w-4 h-4 ${item.type === 'parliament' ? 'text-[var(--accent)]' : 'text-[var(--fg-dim)]'}"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-white truncate font-medium">${item.title}</div>
+        <div class="text-xs text-[var(--fg-dim)] truncate">${item.subtitle}</div>
+      </div>
+      ${isSelected ? '<i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--accent)] flex-shrink-0"></i>' : ''}
+    </div>
+  `;
+}
+
+function setCmdSelected(i) {
+  cmdSelected = i;
+  renderCmdResults();
+}
+
+function executeCommand(id) {
+  toggleCommand();
+  showToast(`Opening ${id}...`, 'info');
+}
+
+function handleCmdKey(e) {
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    cmdSelected = (cmdSelected + 1) % filteredCommands.length;
+    renderCmdResults();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    cmdSelected = (cmdSelected - 1 + filteredCommands.length) % filteredCommands.length;
+    renderCmdResults();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (filteredCommands[cmdSelected]) {
+      executeCommand(filteredCommands[cmdSelected].id);
+    }
+  }
+}
+
+// ===== MOBILE MENU =====
+function toggleMobile() {
+  const menu = document.getElementById('mobile-menu');
+  const icon = document.getElementById('menu-icon');
+  menu.classList.toggle('open');
+  const isOpen = menu.classList.contains('open');
+  icon.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+  lucide.createIcons();
+}
+
+// ===== TOAST NOTIFICATIONS =====
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+
+  const colors = {
+    info: 'border-[var(--accent)]/20 bg-[var(--accent)]/5 text-[var(--accent)]',
+    success: 'border-[var(--success)]/20 bg-[var(--success)]/5 text-[var(--success)]',
+    warning: 'border-[var(--warning)]/20 bg-[var(--warning)]/5 text-[var(--warning)]',
+  };
+
+  toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl border ${colors[type]} glass animate-slide-down text-sm`;
+  toast.innerHTML = `
+    <i data-lucide="${type === 'success' ? 'check-circle' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-4 h-4"></i>
+    <span>${message}</span>
+  `;
+
+  container.appendChild(toast);
+  lucide.createIcons();
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(8px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ===== PARLIAMENT SELECTION =====
+function selectParliament(code) {
+  showToast(`Loading ${code}...`, 'info');
+  // In real app: navigate to detail view
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    toggleCommand();
+  }
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('cmd-overlay');
+    if (overlay.classList.contains('active')) {
+      toggleCommand();
+    }
+  }
+});
+
+// ===== SCROLL OBSERVER FOR ANIMATIONS =====
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  renderParliamentCards();
+  animateCounters();
+
+  // Pause animations initially, let observer trigger them
+  document.querySelectorAll('.animate-fade-in-up').forEach(el => {
+    el.style.animationPlayState = 'paused';
+    scrollObserver.observe(el);
+  });
+});
+</script>
+
+</body>
+</html>

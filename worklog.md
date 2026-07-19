@@ -1458,3 +1458,74 @@ Successfully fetched and parsed both Parquet datasets using Python + pyarrow + p
 3. **GE14 DUN results** — The GE14 DUN results come from SE-14 in the DUN ballots dataset. The coalition mapping uses "ALONE" for independents which is mapped to "BEBAS" in our data. Some DUN seats in GE14 may have different coalition affiliations than PRN15/GE15 due to party switches (e.g., BERSATU was in PH in GE14 but moved to PN by GE15).
 
 4. **Push to git pending** — commit not yet made.
+
+---
+Task ID: LOGO-URL-FIX-R15
+Agent: main
+Task: Fix party/coalition logo URLs to use correct ElectionData.MY static image path
+
+## Current project status description/assessment
+
+User provided a live audit of ElectionData.MY confirming that the `/parties/{uid}/png` endpoint returns HTML pages (not images), while the actual PNG assets live at `/static/images/parties/{uid}.png` and `/static/images/coalitions/{uid}.png`. Our code was using the broken `/parties/{uid}/png` pattern, causing all 52+ party/coalition logos to fall back to colored text badges. The audit also confirmed: PAS UID is `004-PAS` (not `008-PAS`), coalition UIDs are string format (`001-BN`, `007-PH`, `011-PN` not integers), and MCA/MIC UIDs were swapped in our code.
+
+## Current goals/completed modifications/verification results
+
+### Fixes applied
+
+1. **`src/lib/party-metadata.ts`** — Logo URL pattern corrected:
+   - OLD: `https://electiondata.my/parties/{uid}/png` (returns HTML, not image)
+   - NEW (parties): `https://electiondata.my/static/images/parties/{uid}.png`
+   - NEW (coalitions): `https://electiondata.my/static/images/coalitions/{uid}.png`
+   - Updated header comment documenting verified UIDs and correct URL pattern
+   - Split `EDM_BASE` into `EDM_PARTY_LOGO_BASE` and `EDM_COALITION_LOGO_BASE`
+
+2. **`src/lib/party-metadata.ts`** — MCA/MIC UID swap fixed:
+   - MCA: `002-MCA` → `003-MCA` (correct per MECo dataset)
+   - MIC: `003-MIC` → `002-MIC` (correct per MECo dataset)
+   - Verified against real SE-15 data: N07 Gadek winner = MIC with uid `002-MIC`, N08 Machap Jaya winner = MCA with uid `003-MCA`
+
+### Verification (agent-browser + VLM)
+
+**URL verification (Python urllib with browser User-Agent):**
+- `https://electiondata.my/static/images/parties/001-UMNO.png` → 200 OK, image/png, 6273 bytes ✅
+- `https://electiondata.my/static/images/parties/021-DAP.png` → 200 OK, image/png, 4023 bytes ✅
+- `https://electiondata.my/static/images/parties/004-PAS.png` → 200 OK, image/png, 3483 bytes ✅
+- `https://electiondata.my/static/images/coalitions/001-BN.png` → 200 OK, image/png, 8481 bytes ✅
+- `https://electiondata.my/static/images/coalitions/007-PH.png` → 200 OK, image/png, 6613 bytes ✅
+
+**agent-browser DOM verification:**
+- 22 actual logo images loaded with real dimensions:
+  - 001-UMNO.png: 667×333px (11 instances across page)
+  - 003-MCA.png: 59×29px
+  - 002-MIC.png: 236×118px
+  - 021-DAP.png: 89×44px
+  - 046-AMANAH.png: 358×179px
+  - 107-BERSATU.png: loaded
+  - 001-BN.png: 118×59px (coalition logo)
+  - 007-PH.png: 667×333px (coalition logo)
+  - 011-PN.png: 384×192px (coalition logo)
+- 31 CoalitionBadge/PartyBadge colored pills (by design — these are coalition/winner pills in tables, not failed logos)
+
+**VLM (glm-4.6v) verification:**
+- ✅ UMNO: "small rectangular image with a distinct visual — appears to be the UMNO emblem"
+- ✅ MCA: "small rectangular image with a distinct visual — appears to be the MCA emblem"
+- ✅ MIC: "small rectangular image with a distinct visual — appears to be the MIC emblem"
+- ✅ DAP: "small rectangular image with a distinct visual — appears to be the DAP emblem"
+- ✅ AMANAH: "small rectangular image with a distinct visual — appears to be the AMANAH emblem"
+- VLM confirms: "thumbnails are small rectangular images with distinct visual content (party emblems/symbols), not just colored boxes with text"
+
+### Data integrity confirmed
+All real ElectionData.MY data from R14 is correct:
+- GE14: PH 4/6 parliament, BN 2/6. DUN: PH 15, BN 13
+- PRN15: BN 21/28 DUN (UMNO 18, MCA 2, MIC 1), PH 5 (DAP 4, AMANAH 1), PN 2 (BERSATU 2)
+- GE15: PN 3/6 (BERSATU, PAS×2), PH 3/6 (AMANAH, PKR, DAP), BN 0
+- Party UIDs: UMNO=001-UMNO, MCA=003-MCA, MIC=002-MIC, DAP=021-DAP, PKR=078-PKR, AMANAH=046-AMANAH, PAS=004-PAS, BERSATU=107-BERSATU, GERAKAN=026-GERAKAN
+- Coalition UIDs: BN=001-BN, PH=007-PH, PN=011-PN
+
+## Unresolved issues or risks
+
+1. **DPT Analysis tab still standalone** — Per user instruction, DPT data (SPR voter roll churn) is confined to the DPT Analysis tab only. No DPT data appears in Overview, Elections, or other tabs.
+
+2. **31 CoalitionBadge pills are by design** — The 31 "fallback badges" detected in the DOM are `CoalitionBadge` and `PartyBadge` components that intentionally render as colored pills with text (e.g., "BN 21", "PH 3"). These are NOT failed logo loads — they're the standard coalition/winner display in tables and summary cards. The `PartyLogo` component (which loads actual images) is only used in the `PartyBreakdownCard` where logos are appropriate.
+
+3. **Push to git pending** — commit not yet made.

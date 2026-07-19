@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cfChatCompletion, CF_MODELS, type CFChatMessage } from "@/lib/cloudflare-ai";
 import { withCORS } from "@/lib/cors";
+import { QUERY_TABLES } from "@/lib/query-tables-data";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,20 +46,9 @@ Rules:
 - Use single quotes for string literals
 - Do NOT use window functions, CTEs, or advanced features — keep it simple SELECT/FROM/WHERE/GROUP BY/ORDER BY/LIMIT`;
 
-let cachedTables: Record<string, Array<Record<string, unknown>>> | null = null;
-
-async function loadTables(req: NextRequest): Promise<Record<string, Array<Record<string, unknown>>>> {
-  if (cachedTables) return cachedTables;
-  // Use fetch with absolute URL — works on both local dev and Cloudflare Workers.
-  // On CF Workers, static assets are served via the ASSETS binding.
-  const baseUrl = new URL(req.url).origin;
-  const res = await fetch(`${baseUrl}/data/elections/query-tables.json`);
-  if (!res.ok) {
-    throw new Error(`Failed to load query tables: HTTP ${res.status}`);
-  }
-  cachedTables = await res.json() as Record<string, Array<Record<string, unknown>>>;
-  return cachedTables!;
-}
+// Tables are embedded directly via import — no fetch needed.
+// This works on both local dev and Cloudflare Workers (no self-referencing fetch).
+// To regenerate: python3 scripts that output to src/lib/query-tables-data.ts
 
 function extractSql(response: string): string {
   let sql = response.trim();
@@ -371,18 +361,8 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
     }, { status: 403 });
   }
 
-  // Step 2: Execute SQL
-  let tables: Record<string, Array<Record<string, unknown>>>;
-  try {
-    tables = await loadTables(req);
-  } catch {
-    return NextResponse.json({
-      error: "Failed to load election data tables",
-      generated_sql: generatedSql,
-      question,
-    }, { status: 500 });
-  }
-
+  // Step 2: Execute SQL against embedded tables
+  const tables = QUERY_TABLES as unknown as Record<string, Array<Record<string, unknown>>>;
   const result = executeQuery(generatedSql, tables);
 
   return NextResponse.json({

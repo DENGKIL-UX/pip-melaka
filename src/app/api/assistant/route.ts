@@ -93,8 +93,9 @@ function setDataBaseUrl(req: NextRequest) {
 
 async function readJsonlSafe(rel: string): Promise<unknown[]> {
   try {
+    if (!dataBaseUrl) return [];
     const url = `${dataBaseUrl}/data/${rel}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return [];
     const txt = await res.text();
     return txt
@@ -109,8 +110,9 @@ async function readJsonlSafe(rel: string): Promise<unknown[]> {
 
 async function readJsonSafe(rel: string): Promise<unknown | null> {
   try {
+    if (!dataBaseUrl) return null;
     const url = `${dataBaseUrl}/data/${rel}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json() as unknown;
   } catch {

@@ -364,7 +364,12 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
 
   // --- 3. Parse body ---
   let messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
-  let backend: "zai" | "cf" = "zai";
+  // Auto-detect environment: on Cloudflare Workers, default to CF Workers AI
+  // because z-ai-web-dev-sdk requires Node.js APIs not available in Workers.
+  // On local dev (Node.js), default to z-ai (GLM-4.6).
+  const isCloudflareWorkers = typeof (globalThis as { caches?: { default?: unknown } }).caches?.default !== "undefined"
+    || process.env.CF_WORKERS === "true";
+  let backend: "zai" | "cf" = (isCloudflareWorkers || isCFConfigured()) ? "cf" : "zai";
   let cfModel: string = CF_MODELS[0].id;
   try {
     const body = (await req.json()) as {
@@ -384,8 +389,10 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       .slice(-20) // Keep only last 20 messages
       .map((m) => ({ role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant", content: m.content.slice(0, 5000) }));
 
-    // Parse backend selection (default: zai, fallback to cf if requested)
-    if (body.backend === "cf" && isCFConfigured()) {
+    // Parse backend selection (client can override auto-detection)
+    if (body.backend === "zai" && !isCloudflareWorkers) {
+      backend = "zai";
+    } else if (body.backend === "cf" && isCFConfigured()) {
       backend = "cf";
     }
     // Parse CF model ID
@@ -421,26 +428,48 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       return result.response.trim();
     }
 
-    // === Default: z-ai-web-dev-sdk backend ===
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: "assistant", content: augmentedSystem },
-        ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
-      ],
-      thinking: { type: "disabled" },
-      temperature: 0.2,
-      max_tokens: 600,
-    });
-    return completion?.choices?.[0]?.message?.content?.trim() || "";
+    // === Default: z-ai-web-dev-sdk backend (Node.js only) ===
+    try {
+      const zai = await ZAI.create();
+      const completion = await zai.chat.completions.create({
+        messages: [
+          { role: "assistant", content: augmentedSystem },
+          ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        ],
+        thinking: { type: "disabled" },
+        temperature: 0.2,
+        max_tokens: 600,
+      });
+      return completion?.choices?.[0]?.message?.content?.trim() || "";
+    } catch (zaiErr) {
+      // z-ai failed (e.g., on Cloudflare Workers where Node.js APIs are missing)
+      // Try CF Workers AI as fallback if configured
+      if (isCFConfigured()) {
+        console.warn("[assistant] z-ai failed, falling back to CF Workers AI:", zaiErr instanceof Error ? zaiErr.message : String(zaiErr));
+        const cfMessages: CFChatMessage[] = [
+          { role: "system", content: augmentedSystem },
+          ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        ];
+        const result = await cfChatCompletion(cfMessages, cfModel);
+        return result.response.trim();
+      }
+      throw zaiErr; // re-throw if no CF fallback available
+    }
   });
 
   let responseText: string;
   let llmSource = backend === "cf" ? `cf:${cfModel}` : "zai";
+  // Track if we fell back to CF during execution
+  let usedCfFallback = false;
 
   try {
     const text = await circuitBreaker("llm-assistant", runLlm, ASSISTANT_CIRCUIT);
     responseText = text || staticFallback(lastUser?.content ?? "");
+    // If we started with zai but fell back to CF, update the source label
+    if (backend === "zai" && isCFConfigured() && !responseText.includes("Static fallback")) {
+      llmSource = `cf:${cfModel} (zai-failed)`;
+      usedCfFallback = true;
+    }
   } catch (err) {
     // CircuitOpenError = breaker is open OR a probe just failed. Log and fall
     // back to the static answer — the user still gets a verified response.

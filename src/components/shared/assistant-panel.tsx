@@ -78,7 +78,9 @@ export function AssistantPanel() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [backend, setBackend] = useState<"zai" | "cf">("zai");
+  // Default to CF Workers AI since it works on both Cloudflare and local.
+  // z-ai only works on local Node.js dev server.
+  const [backend, setBackend] = useState<"zai" | "cf">("cf");
   const [cfModel, setCfModel] = useState(CF_MODELS[0].id);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {

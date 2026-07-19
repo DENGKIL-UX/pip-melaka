@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TrendingUp, TrendingDown, PlusCircle, MinusCircle, Info, Star, WifiOff } from "lucide-react";
+import { TrendingUp, TrendingDown, PlusCircle, MinusCircle, Info, Star, WifiOff, Grid3x3 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { DPT_FALLBACK } from "@/lib/fallback-data";
 
@@ -17,6 +17,8 @@ interface DptData {
   months: string[];
   per_month: Array<{ month: string; additions: number; deletions: number; net: number; mom_delta: number }>;
   per_parliament: Array<{ parliament_code: string; parliament_name: string; additions: number; deletions: number; net: number }>;
+  per_dun?: Array<{ parliament_code: string; parliament_name: string; dun_code: string; dun_name: string; additions: number; deletions: number; net: number; voters: number; verified: boolean }>;
+  total_dun?: number;
 }
 
 function Kpi({ icon: Icon, label, value, color }: { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; label: string; value: string; color: string }) {
@@ -161,12 +163,68 @@ export function AnalysisTab() {
         </CardContent>
       </Card>
 
+      {/* Per-DUN churn table — NEW: DUN-level breakdown */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Grid3x3 className="h-4 w-4 text-mlk" /> Per-DUN churn (all 28 state constituencies)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.per_dun && data.per_dun.length > 0 ? (
+            <>
+              <div className="max-h-96 overflow-y-auto scrollbar-mlk">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-[10px]">DUN</TableHead>
+                      <TableHead className="text-[10px]">Parliament</TableHead>
+                      <TableHead className="text-[10px] text-right">Additions</TableHead>
+                      <TableHead className="text-[10px] text-right">Deletions</TableHead>
+                      <TableHead className="text-[10px] text-right">Net</TableHead>
+                      <TableHead className="text-[10px] text-right">Voters</TableHead>
+                      <TableHead className="text-[10px]">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.per_dun.map((d) => (
+                      <TableRow key={`${d.parliament_code}-${d.dun_code}`} className={d.verified ? "" : "opacity-70"}>
+                        <TableCell className="text-[10px]">
+                          <span className="font-medium">{d.dun_name}</span>{" "}
+                          <span className="font-mono text-muted-foreground">N{d.dun_code}</span>
+                        </TableCell>
+                        <TableCell className="text-[10px] text-muted-foreground">{d.parliament_name} P{d.parliament_code}</TableCell>
+                        <TableCell className="text-[10px] text-right text-emerald-600">+{d.additions.toLocaleString()}</TableCell>
+                        <TableCell className="text-[10px] text-right text-red-600">−{d.deletions.toLocaleString()}</TableCell>
+                        <TableCell className="text-[10px] text-right text-mlk font-semibold">+{d.net.toLocaleString()}</TableCell>
+                        <TableCell className="text-[10px] text-right font-mono">{d.voters > 0 ? d.voters.toLocaleString() : "—"}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`text-[9px] ${d.verified ? "border-emerald-500/40 text-emerald-600" : "border-amber-500/40 text-amber-600"}`}>
+                            {d.verified ? "Verified" : "Est."}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="text-[9px] text-muted-foreground mt-2 italic">
+                P134 DUN churn is weighted by verified voter counts. P135–P139 churn is distributed equally across DUNs (estimate pending raw SPR data). 5 verified / 23 estimated.
+              </div>
+            </>
+          ) : (
+            <div className="text-xs text-muted-foreground p-4">No per-DUN data available.</div>
+          )}
+        </CardContent>
+      </Card>
+
       <Card className="border-mlk/20">
         <CardContent className="p-3 text-[10px] text-muted-foreground flex items-start gap-2">
           <TrendingDown className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-mlk" />
           <div>
             <strong className="text-mlk">Why this matters:</strong> Continuous positive net churn in P137 Hang Tuah Jaya (highest net {data.per_parliament.find((p) => p.parliament_code === "137")?.net}) suggests
             urban in-migration; combined with the PRN15 BN landslide, indicates shifting voter base requiring re-canvass before GE16.
+            DUN-level churn data (above) enables targeted voter registration monitoring at the constituency level.
           </div>
         </CardContent>
       </Card>

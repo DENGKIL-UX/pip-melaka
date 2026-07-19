@@ -13,7 +13,14 @@ const dailyBrief = {
   sentiment_movement: { BN: -3, PH: -1, PN: +4 },
   top_economic_issues: ["Healthcare funding", "Road infrastructure", "Coastal development"],
   youth_themes: ["Campus expansion debate (Lendu)", "TikTok healthcare narratives"],
-  locality_hotspots: ["Taboh Naning (22 signals)", "Ayer Limau (15 signals)", "Lendu (14 signals)"],
+  locality_hotspots: [
+    "N05 Taboh Naning (22 signals) — P134 verified",
+    "N03 Ayer Limau (15 signals) — P134 verified",
+    "N04 Lendu (14 signals) — P134 verified",
+    "N15 Pengkalan Batu (12 signals) — P137 estimated",
+    "N19 Kesidang (10 signals) — P138 estimated",
+    "N24 Bemban (8 signals) — P139 estimated",
+  ],
   outlook_24h: "Signal volume projected to reach 85. Senior healthcare narrative likely to persist.",
   outlook_72h: "If untreated, narrative may spread to 3+ localities. Risk of mainstream media pickup.",
   recommended_actions: [

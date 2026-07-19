@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info } from "lucide-react";
+import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, ReferenceLine } from "recharts";
 import { PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
@@ -27,6 +27,11 @@ interface Election {
     winner_party?: string; vote_share: Record<string, number>;
   }>;
   party_breakdown?: Record<string, number>;
+  current_dun_composition?: Array<{
+    parliament_code: string; dun_code: string; winner: "PH" | "BN" | "PN";
+    winner_party?: string; vote_share: Record<string, number>;
+  }>;
+  dun_context_note?: string;
 }
 
 function partyHex(p: string) { return PARTY_COLORS[p as keyof typeof PARTY_COLORS] ?? PARTY_COLORS.OTH; }
@@ -426,6 +431,59 @@ function ElectionView({ el }: { el: Election }) {
 
       {/* Party breakdown card — NEW: shows component parties with logos */}
       <PartyBreakdownCard el={el} />
+
+      {/* DUN context card — for GE15 (parliament-only election), show current DUN composition from PRN15 */}
+      {el.current_dun_composition && el.current_dun_composition.length > 0 && (
+        <Card className="border-mlk/20 bg-mlk-radial">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Grid3x3 className="h-4 w-4 text-mlk" /> Current DUN composition (from PRN15 2021)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {el.dun_context_note && (
+              <div className="text-[10px] text-muted-foreground italic mb-3 flex items-start gap-1">
+                <Info className="h-3 w-3 flex-shrink-0 mt-0.5 text-mlk" />
+                <span>{el.dun_context_note}</span>
+              </div>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1.5">
+              {el.current_dun_composition.map((d) => {
+                const dunName = getDunName(d.parliament_code, d.dun_code);
+                return (
+                  <div
+                    key={`${d.parliament_code}-${d.dun_code}`}
+                    className="rounded-md border border-border/40 bg-background/60 p-1.5"
+                    title={`${dunName} (N${d.dun_code}) — ${d.winner}${d.winner_party ? ` / ${d.winner_party}` : ""}`}
+                  >
+                    <div className="text-[8px] font-mono text-muted-foreground">N{d.dun_code} · P{d.parliament_code}</div>
+                    <div className="text-[10px] font-semibold truncate">{dunName}</div>
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="inline-flex items-center rounded-full px-1 py-0.5 text-[8px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span>
+                      {d.winner_party && (
+                        <span className="text-[8px] text-muted-foreground truncate">{d.winner_party}</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {/* DUN summary by coalition */}
+            <div className="mt-3 flex gap-2 flex-wrap">
+              {(() => {
+                const counts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
+                el.current_dun_composition!.forEach((d) => { counts[d.winner] = (counts[d.winner] ?? 0) + 1; });
+                return (["BN", "PH", "PN"] as const).map((c) => counts[c] > 0 && (
+                  <span key={c} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: partyHex(c) }}>
+                    {c} {counts[c]}
+                  </span>
+                ));
+              })()}
+              <span className="text-[10px] text-muted-foreground self-center">/ {el.current_dun_composition.length} DUN</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Chart */}
       <Card className="border-mlk/20">

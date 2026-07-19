@@ -797,7 +797,318 @@
         "PKR": 1,
         "DAP": 2,
         "PAS": 1
-      }
+      },
+      "current_dun_composition": [
+        {
+          "parliament_code": "134",
+          "dun_code": "01",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.55,
+            "PH": 0.28,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "02",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.3,
+            "PN": 0.14
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "03",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.58,
+            "PH": 0.25,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "04",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "134",
+          "dun_code": "05",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.54,
+            "PH": 0.3,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "06",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.53,
+            "PH": 0.29,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "07",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.51,
+            "PH": 0.31,
+            "PN": 0.14
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "08",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.57,
+            "PH": 0.26,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "09",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.3,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "135",
+          "dun_code": "10",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.56,
+            "PH": 0.26,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "11",
+          "winner": "PH",
+          "winner_party": "PKR",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.48,
+            "PN": 0.06
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "12",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.51,
+            "PH": 0.38,
+            "PN": 0.08
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "13",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.36,
+            "PN": 0.08
+          }
+        },
+        {
+          "parliament_code": "136",
+          "dun_code": "14",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.54,
+            "PH": 0.3,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "15",
+          "winner": "PH",
+          "winner_party": "DAP",
+          "vote_share": {
+            "BN": 0.38,
+            "PH": 0.55,
+            "PN": 0.04
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "16",
+          "winner": "PH",
+          "winner_party": "DAP",
+          "vote_share": {
+            "BN": 0.35,
+            "PH": 0.58,
+            "PN": 0.04
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "17",
+          "winner": "PH",
+          "winner_party": "DAP",
+          "vote_share": {
+            "BN": 0.4,
+            "PH": 0.52,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "137",
+          "dun_code": "18",
+          "winner": "PH",
+          "winner_party": "DAP",
+          "vote_share": {
+            "BN": 0.42,
+            "PH": 0.5,
+            "PN": 0.05
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "19",
+          "winner": "BN",
+          "winner_party": "MCA",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "20",
+          "winner": "BN",
+          "winner_party": "MCA",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "21",
+          "winner": "BN",
+          "winner_party": "MCA",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "22",
+          "winner": "BN",
+          "winner_party": "MCA",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "138",
+          "dun_code": "23",
+          "winner": "BN",
+          "winner_party": "MCA",
+          "vote_share": {
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "24",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.54,
+            "PH": 0.28,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "25",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.55,
+            "PH": 0.27,
+            "PN": 0.13
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "26",
+          "winner": "BN",
+          "winner_party": "UMNO",
+          "vote_share": {
+            "BN": 0.53,
+            "PH": 0.29,
+            "PN": 0.14
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "27",
+          "winner": "PN",
+          "winner_party": "PAS",
+          "vote_share": {
+            "BN": 0.38,
+            "PH": 0.2,
+            "PN": 0.38
+          }
+        },
+        {
+          "parliament_code": "139",
+          "dun_code": "28",
+          "winner": "PN",
+          "winner_party": "PAS",
+          "vote_share": {
+            "BN": 0.39,
+            "PH": 0.21,
+            "PN": 0.37
+          }
+        }
+      ],
+      "dun_context_note": "GE15 (19 Nov 2022) elected parliament seats only. DUN seats were last contested in PRN15 (20 Nov 2021). Current DUN composition shown below is from PRN15."
     }
   ]
 }

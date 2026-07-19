@@ -4,20 +4,403 @@
   "total_additions": 8420,
   "total_deletions": 3180,
   "total_net": 5240,
-  "months": ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05"],
+  "months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05"
+  ],
   "per_month": [
-    { "month": "2026-01", "additions": 1820, "deletions": 580, "net": 1240, "mom_delta": 0 },
-    { "month": "2026-02", "additions": 1650, "deletions": 620, "net": 1030, "mom_delta": -210 },
-    { "month": "2026-03", "additions": 1740, "deletions": 690, "net": 1050, "mom_delta": 20 },
-    { "month": "2026-04", "additions": 1580, "deletions": 640, "net": 940, "mom_delta": -110 },
-    { "month": "2026-05", "additions": 1630, "deletions": 650, "net": 980, "mom_delta": 40 }
+    {
+      "month": "2026-01",
+      "additions": 1820,
+      "deletions": 580,
+      "net": 1240,
+      "mom_delta": 0
+    },
+    {
+      "month": "2026-02",
+      "additions": 1650,
+      "deletions": 620,
+      "net": 1030,
+      "mom_delta": -210
+    },
+    {
+      "month": "2026-03",
+      "additions": 1740,
+      "deletions": 690,
+      "net": 1050,
+      "mom_delta": 20
+    },
+    {
+      "month": "2026-04",
+      "additions": 1580,
+      "deletions": 640,
+      "net": 940,
+      "mom_delta": -110
+    },
+    {
+      "month": "2026-05",
+      "additions": 1630,
+      "deletions": 650,
+      "net": 980,
+      "mom_delta": 40
+    }
   ],
   "per_parliament": [
-    { "parliament_code": "134", "parliament_name": "Masjid Tanah", "additions": 1320, "deletions": 480, "net": 840 },
-    { "parliament_code": "135", "parliament_name": "Alor Gajah", "additions": 1180, "deletions": 420, "net": 760 },
-    { "parliament_code": "136", "parliament_name": "Tangga Batu", "additions": 1560, "deletions": 580, "net": 980 },
-    { "parliament_code": "137", "parliament_name": "Hang Tuah Jaya", "additions": 1820, "deletions": 720, "net": 1100 },
-    { "parliament_code": "138", "parliament_name": "Kota Melaka", "additions": 1240, "deletions": 470, "net": 770 },
-    { "parliament_code": "139", "parliament_name": "Jasin", "additions": 1300, "deletions": 510, "net": 790 }
-  ]
+    {
+      "parliament_code": "134",
+      "parliament_name": "Masjid Tanah",
+      "additions": 1320,
+      "deletions": 480,
+      "net": 840
+    },
+    {
+      "parliament_code": "135",
+      "parliament_name": "Alor Gajah",
+      "additions": 1180,
+      "deletions": 420,
+      "net": 760
+    },
+    {
+      "parliament_code": "136",
+      "parliament_name": "Tangga Batu",
+      "additions": 1560,
+      "deletions": 580,
+      "net": 980
+    },
+    {
+      "parliament_code": "137",
+      "parliament_name": "Hang Tuah Jaya",
+      "additions": 1820,
+      "deletions": 720,
+      "net": 1100
+    },
+    {
+      "parliament_code": "138",
+      "parliament_name": "Kota Melaka",
+      "additions": 1240,
+      "deletions": 470,
+      "net": 770
+    },
+    {
+      "parliament_code": "139",
+      "parliament_name": "Jasin",
+      "additions": 1300,
+      "deletions": 510,
+      "net": 790
+    }
+  ],
+  "per_dun": [
+    {
+      "parliament_code": "134",
+      "parliament_name": "Masjid Tanah",
+      "dun_code": "01",
+      "dun_name": "Kuala Linggi",
+      "additions": 283,
+      "deletions": 103,
+      "net": 180,
+      "voters": 15313,
+      "verified": true
+    },
+    {
+      "parliament_code": "134",
+      "parliament_name": "Masjid Tanah",
+      "dun_code": "02",
+      "dun_name": "Tanjung Bidara",
+      "additions": 259,
+      "deletions": 94,
+      "net": 165,
+      "voters": 14000,
+      "verified": true
+    },
+    {
+      "parliament_code": "134",
+      "parliament_name": "Masjid Tanah",
+      "dun_code": "03",
+      "dun_name": "Ayer Limau",
+      "additions": 250,
+      "deletions": 91,
+      "net": 159,
+      "voters": 13500,
+      "verified": true
+    },
+    {
+      "parliament_code": "134",
+      "parliament_name": "Masjid Tanah",
+      "dun_code": "04",
+      "dun_name": "Lendu",
+      "additions": 277,
+      "deletions": 101,
+      "net": 176,
+      "voters": 15000,
+      "verified": true
+    },
+    {
+      "parliament_code": "134",
+      "parliament_name": "Masjid Tanah",
+      "dun_code": "05",
+      "dun_name": "Taboh Naning",
+      "additions": 251,
+      "deletions": 91,
+      "net": 160,
+      "voters": 13602,
+      "verified": true
+    },
+    {
+      "parliament_code": "135",
+      "parliament_name": "Alor Gajah",
+      "dun_code": "06",
+      "dun_name": "Rembia",
+      "additions": 236,
+      "deletions": 84,
+      "net": 152,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "135",
+      "parliament_name": "Alor Gajah",
+      "dun_code": "07",
+      "dun_name": "Gadek",
+      "additions": 236,
+      "deletions": 84,
+      "net": 152,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "135",
+      "parliament_name": "Alor Gajah",
+      "dun_code": "08",
+      "dun_name": "Machap Jaya",
+      "additions": 236,
+      "deletions": 84,
+      "net": 152,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "135",
+      "parliament_name": "Alor Gajah",
+      "dun_code": "09",
+      "dun_name": "Durian Tunggal",
+      "additions": 236,
+      "deletions": 84,
+      "net": 152,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "135",
+      "parliament_name": "Alor Gajah",
+      "dun_code": "10",
+      "dun_name": "Asahan",
+      "additions": 236,
+      "deletions": 84,
+      "net": 152,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "136",
+      "parliament_name": "Tangga Batu",
+      "dun_code": "11",
+      "dun_name": "Sungai Udang",
+      "additions": 390,
+      "deletions": 145,
+      "net": 245,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "136",
+      "parliament_name": "Tangga Batu",
+      "dun_code": "12",
+      "dun_name": "Pantai Kundor",
+      "additions": 390,
+      "deletions": 145,
+      "net": 245,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "136",
+      "parliament_name": "Tangga Batu",
+      "dun_code": "13",
+      "dun_name": "Paya Rumput",
+      "additions": 390,
+      "deletions": 145,
+      "net": 245,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "136",
+      "parliament_name": "Tangga Batu",
+      "dun_code": "14",
+      "dun_name": "Kelebang",
+      "additions": 390,
+      "deletions": 145,
+      "net": 245,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "137",
+      "parliament_name": "Hang Tuah Jaya",
+      "dun_code": "15",
+      "dun_name": "Pengkalan Batu",
+      "additions": 455,
+      "deletions": 180,
+      "net": 275,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "137",
+      "parliament_name": "Hang Tuah Jaya",
+      "dun_code": "16",
+      "dun_name": "Ayer Keroh",
+      "additions": 455,
+      "deletions": 180,
+      "net": 275,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "137",
+      "parliament_name": "Hang Tuah Jaya",
+      "dun_code": "17",
+      "dun_name": "Bukit Katil",
+      "additions": 455,
+      "deletions": 180,
+      "net": 275,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "137",
+      "parliament_name": "Hang Tuah Jaya",
+      "dun_code": "18",
+      "dun_name": "Ayer Molek",
+      "additions": 455,
+      "deletions": 180,
+      "net": 275,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "138",
+      "parliament_name": "Kota Melaka",
+      "dun_code": "19",
+      "dun_name": "Kesidang",
+      "additions": 248,
+      "deletions": 94,
+      "net": 154,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "138",
+      "parliament_name": "Kota Melaka",
+      "dun_code": "20",
+      "dun_name": "Kota Laksamana",
+      "additions": 248,
+      "deletions": 94,
+      "net": 154,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "138",
+      "parliament_name": "Kota Melaka",
+      "dun_code": "21",
+      "dun_name": "Duyong",
+      "additions": 248,
+      "deletions": 94,
+      "net": 154,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "138",
+      "parliament_name": "Kota Melaka",
+      "dun_code": "22",
+      "dun_name": "Bandar Hilir",
+      "additions": 248,
+      "deletions": 94,
+      "net": 154,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "138",
+      "parliament_name": "Kota Melaka",
+      "dun_code": "23",
+      "dun_name": "Telok Mas",
+      "additions": 248,
+      "deletions": 94,
+      "net": 154,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "139",
+      "parliament_name": "Jasin",
+      "dun_code": "24",
+      "dun_name": "Bemban",
+      "additions": 260,
+      "deletions": 102,
+      "net": 158,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "139",
+      "parliament_name": "Jasin",
+      "dun_code": "25",
+      "dun_name": "Rim",
+      "additions": 260,
+      "deletions": 102,
+      "net": 158,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "139",
+      "parliament_name": "Jasin",
+      "dun_code": "26",
+      "dun_name": "Serkam",
+      "additions": 260,
+      "deletions": 102,
+      "net": 158,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "139",
+      "parliament_name": "Jasin",
+      "dun_code": "27",
+      "dun_name": "Merlimau",
+      "additions": 260,
+      "deletions": 102,
+      "net": 158,
+      "voters": 0,
+      "verified": false
+    },
+    {
+      "parliament_code": "139",
+      "parliament_name": "Jasin",
+      "dun_code": "28",
+      "dun_name": "Sungai Rambai",
+      "additions": 260,
+      "deletions": 102,
+      "net": 158,
+      "voters": 0,
+      "verified": false
+    }
+  ],
+  "total_dun": 28
 }

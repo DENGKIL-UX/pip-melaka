@@ -4,11 +4,25 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff } from "lucide-react";
-import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
+import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff, Grid3x3 } from "lucide-react";
+import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN, DUN_NAMES, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
 import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
+
+// Build full DUN list from PARLIAMENTS + DUN_NAMES
+const ALL_DUNS = PARLIAMENTS.flatMap((p) =>
+  p.dunCodes.map((dc) => ({
+    parliament_code: p.code,
+    parliament_name: p.name,
+    district: p.district,
+    dun_code: dc,
+    dun_name: getDunName(p.code, dc),
+    verified: p.code === "134",
+    voters: p.code === "134" ? p.totalVoters / p.dunCount : 0, // approximate per-DUN
+    ge15Winner: p.ge15Winner,
+  }))
+);
 
 interface OverviewData {
   overview: {
@@ -215,6 +229,34 @@ export function OverviewTab() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </div>
+
+      {/* DUN seats grid — all 28 DUN constituencies */}
+      <div>
+        <div className="text-sm font-semibold mb-2 flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> DUN seats — all 28 state constituencies</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+          {ALL_DUNS.map((d) => (
+            <Card key={`${d.parliament_code}-${d.dun_code}`} className={`border ${d.verified ? "border-emerald-500/30" : "border-mlk/15"} hover-lift`}>
+              <CardContent className="p-2.5">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[9px] font-mono text-muted-foreground">N{d.dun_code}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${d.verified ? "bg-emerald-500" : "bg-amber-500"}`} aria-label={d.verified ? "Verified" : "Pending"} />
+                </div>
+                <div className="text-xs font-semibold truncate" title={d.dun_name}>{d.dun_name}</div>
+                <div className="text-[9px] text-muted-foreground truncate">{d.district} · P{d.parliament_code}</div>
+                <div className="mt-1.5 flex items-center justify-between">
+                  <PartyBadge party={d.ge15Winner} />
+                  <span className="text-[8px] text-muted-foreground font-mono">{d.verified ? `${Math.round(d.voters).toLocaleString()}` : "—"}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="text-[10px] text-muted-foreground mt-2 flex items-center gap-3">
+          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> 5 verified (P134)</span>
+          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 23 pending (P135–P139)</span>
+          <span>· GE15 winner shown by parliament affiliation</span>
         </div>
       </div>
 

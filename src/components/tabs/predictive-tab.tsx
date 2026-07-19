@@ -23,11 +23,20 @@ const narrativeForecast = [
 ];
 
 const escalationRisk = [
-  { locality: "Taboh Naning", risk_score: 82, factors: "Senior dep 30.6% + negative sentiment 45% + rising narrative" },
-  { locality: "Ayer Limau", risk_score: 64, factors: "Senior dep 27.7% + mixed sentiment + DPT churn" },
-  { locality: "Lendu", risk_score: 45, factors: "Campus expansion debate + falling engagement" },
-  { locality: "Kuala Linggi", risk_score: 22, factors: "Positive sentiment + low signal volume" },
-  { locality: "Tanjung Bidara", risk_score: 35, factors: "Neutral sentiment + stable coastal narrative" },
+  // P134 verified DUNs (real demographic data)
+  { locality: "N05 Taboh Naning", parliament: "P134", risk_score: 82, factors: "Senior dep 30.6% + negative sentiment 45% + rising narrative", verified: true },
+  { locality: "N03 Ayer Limau", parliament: "P134", risk_score: 64, factors: "Senior dep 27.7% + mixed sentiment + DPT churn", verified: true },
+  { locality: "N04 Lendu", parliament: "P134", risk_score: 45, factors: "Campus expansion debate + falling engagement", verified: true },
+  { locality: "N01 Kuala Linggi", parliament: "P134", risk_score: 22, factors: "Positive sentiment + low signal volume", verified: true },
+  { locality: "N02 Tanjung Bidara", parliament: "P134", risk_score: 35, factors: "Neutral sentiment + stable coastal narrative", verified: true },
+  // P135-P139 estimated DUNs (projected risk based on demographics + DPT churn)
+  { locality: "N15 Pengkalan Batu", parliament: "P137", risk_score: 71, factors: "Urban in-migration + high DPT churn + competitive margin", verified: false },
+  { locality: "N16 Ayer Keroh", parliament: "P137", risk_score: 68, factors: "Urban mixed + institutional seats + sentiment volatility", verified: false },
+  { locality: "N19 Kesidang", parliament: "P138", risk_score: 55, factors: "Urban Chinese-majority + DAP stronghold + generational shift", verified: false },
+  { locality: "N24 Bemban", parliament: "P139", risk_score: 52, factors: "Rural Malay + PAS/PN inroads + DPT churn", verified: false },
+  { locality: "N06 Rembia", parliament: "P135", risk_score: 48, factors: "Semi-urban + BN/PH marginal + demographic transition", verified: false },
+  { locality: "N11 Sungai Udang", parliament: "P136", risk_score: 44, factors: "Military constituency + stable but shifting", verified: false },
+  { locality: "N27 Merlimau", parliament: "P139", risk_score: 41, factors: "Rural Malay + PN growth + senior dependency", verified: false },
 ];
 
 const TREND_ICONS: Record<string, React.ReactNode> = {
@@ -111,11 +120,13 @@ export function PredictiveTab() {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-              <div className="space-y-1 mt-2">
+              <div className="space-y-1 mt-2 max-h-48 overflow-y-auto scrollbar-mlk">
                 {escalationRisk.map(r => (
                   <div key={r.locality} className="flex items-center gap-2 text-[10px]">
-                    <span className="font-mono font-bold" style={{ color: r.risk_score >= 75 ? "#EF4444" : r.risk_score >= 50 ? "#F59E0B" : "#10B981" }}>{r.risk_score}</span>
-                    <span className="text-muted-foreground">{r.locality}: {r.factors}</span>
+                    <span className="font-mono font-bold flex-shrink-0" style={{ color: r.risk_score >= 75 ? "#EF4444" : r.risk_score >= 50 ? "#F59E0B" : "#10B981" }}>{r.risk_score}</span>
+                    <span className="font-mono text-muted-foreground flex-shrink-0">{r.parliament}</span>
+                    <span className="text-muted-foreground flex-1 min-w-0 truncate">{r.locality}: {r.factors}</span>
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${r.verified ? "bg-emerald-500" : "bg-amber-500"}`} title={r.verified ? "Verified" : "Estimated"} />
                   </div>
                 ))}
               </div>

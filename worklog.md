@@ -1278,3 +1278,99 @@ Workspace synced to commit 1e022c1 (VLM audit enhancements). The user provided E
 4. **GE14 summaries were corrected** — The original summary said "PH won 4/6 parliament + 15/28 DUN" but the actual results data showed PH won 5/6 + 22/28. Fixed summary to match results. The historical GE14 Melaka result was indeed a PH near-sweep (5/6 parliament, 22/28 DUN).
 
 5. **Push to git pending** — commit not yet made.
+
+---
+Task ID: DUN-OVERHAUL-R13
+Agent: main
+Task: Overhaul dashboard to surface DUN data across all modules — previously parliament-only
+
+## Current project status description/assessment
+
+The dashboard was parliament-centric: the Overview tab showed 6 parliament cards with no DUN grid; the DPT Analysis tab showed per-parliament churn with no per-DUN breakdown; the Elections GE15 view showed parliament results only with no DUN context; the Predictive tab showed only 5 P134 DUN localities; and the Insights tab mentioned only 5 P134 DUN hotspots. The user identified this as a systemic gap: "why the dashboard overall is only Parliamentary only and No DUN at all."
+
+Root cause: the engine only processed P134 (5 DUNs with real data), and P135-P139 have no raw SPR data yet. The existing tabs correctly showed verified P134 DUN data (Demographics, Risk, Maps) but the remaining tabs defaulted to parliament-level or hardcoded only the 5 P134 DUNs without showing the full 28-DUN picture.
+
+## Current goals/completed modifications/verification results
+
+### Data enhancements
+
+1. **DPT data** (`public/data/dpt/spr-dpt-pameran-summary.json`):
+   - Added `per_dun` array: 28 DUN records with parliament_code, dun_code, dun_name, additions, deletions, net, voters, verified
+   - P134 DUNs (N01-N05): weighted by real voter counts (15,313 / 14,000 / 13,500 / 15,000 / 13,602)
+   - P135-P139 DUNs: distributed equally across each parliament's DUNs (estimated, pending raw SPR)
+   - Added `total_dun: 28` field
+
+2. **Fallback DPT data** (`src/lib/fallback-data.ts`):
+   - Added `per_dun` field to `FallbackDptData` interface
+   - Added 28 DUN records matching the JSON structure
+
+3. **Elections data** (`public/data/elections/melaka-elections.json`):
+   - Added `current_dun_composition` to GE15: 28 DUN records from PRN15 (showing current DUN makeup as context)
+   - Added `dun_context_note`: "GE15 (19 Nov 2022) elected parliament seats only. DUN seats were last contested in PRN15 (20 Nov 2021)."
+
+### Tab overhauls
+
+4. **Overview tab** (`src/components/tabs/overview-tab.tsx`):
+   - Added `ALL_DUNS` constant: builds full 28-DUN list from PARLIAMENTS + DUN_NAMES
+   - New "DUN seats — all 28 state constituencies" section after parliament cards
+   - Responsive grid: 2 cols (mobile) → 7 cols (xl), each DUN card shows:
+     - N-code (N01-N28) + verified/pending status dot (emerald/amber)
+     - DUN name (Kuala Linggi, Rembia, Sungai Udang, etc.)
+     - District + parliament code (Alor Gajah · P134)
+     - GE15 coalition winner badge (PN/PH/BN by parliament affiliation)
+     - Voter count (for verified P134 DUNs) or "—" (pending)
+   - Legend: "5 verified (P134) · 23 pending (P135–P139) · GE15 winner shown by parliament affiliation"
+
+5. **DPT Analysis tab** (`src/components/tabs/analysis-tab.tsx`):
+   - Added `per_dun` to `DptData` interface
+   - New "Per-DUN churn (all 28 state constituencies)" card after per-parliament table
+   - Scrollable table (max-h-96 overflow-y-auto) with 7 columns: DUN, Parliament, Additions, Deletions, Net, Voters, Status
+   - Each row shows DUN name + N-code, parliament name + P-code, churn values, voter count, and Verified/Est. badge
+   - Disclaimer: "P134 DUN churn is weighted by verified voter counts. P135–P139 churn is distributed equally across DUNs (estimate pending raw SPR data). 5 verified / 23 estimated."
+
+6. **Elections tab** (`src/components/tabs/elections-tab.tsx`):
+   - Added `current_dun_composition` and `dun_context_note` to Election interface
+   - New "Current DUN composition (from PRN15 2021)" card for GE15
+   - Shows context note explaining GE15 was parliament-only
+   - 7-column grid of all 28 DUN seats with N-code, parliament, DUN name, coalition winner, and party
+   - DUN summary by coalition at bottom (BN 21 / PH 5 / PN 2 / 28 DUN)
+
+7. **Predictive tab** (`src/components/tabs/predictive-tab.tsx`):
+   - Expanded `escalationRisk` from 5 to 12 DUN localities across all 6 parliaments
+   - Added `parliament` and `verified` fields to each entry
+   - P134 verified DUNs: N05 Taboh Naning (82), N03 Ayer Limau (64), N04 Lendu (45), N01 Kuala Linggi (22), N02 Tanjung Bidara (35)
+   - P135-P139 estimated DUNs: N15 Pengkalan Batu (71), N16 Ayer Keroh (68), N19 Kesidang (55), N24 Bemban (52), N06 Rembia (48), N11 Sungai Udang (44), N27 Merlimau (41)
+   - Risk list now shows parliament code + verified/estimated dot indicator
+   - Scrollable risk list (max-h-48)
+
+8. **Insights tab** (`src/components/tabs/insight-reports-tab.tsx`):
+   - Expanded `locality_hotspots` from 3 to 6 DUN entries across 4 parliaments
+   - Each entry now includes N-code, DUN name, signal count, parliament, and verified/estimated status
+
+### Verification results (agent-browser + VLM)
+
+**agent-browser E2E:**
+- ✅ Overview tab: "DUN seats — all 28 state constituencies" section renders with all 28 DUN cards (N01-N28), verified/pending dots, coalition badges, voter counts
+- ✅ Overview legend: "5 verified (P134) · 23 pending (P135–P139)" visible
+- ✅ DPT Analysis: "Per-DUN churn (all 28 state constituencies)" table renders with 28 rows, 7 columns (DUN, Parliament, Additions, Deletions, Net, Voters, Status)
+- ✅ Elections GE15: "Current DUN composition (from PRN15 2021)" card renders with all 28 DUN seats + context note
+- ✅ Predictive: escalation risk list shows 12 DUNs across P134/P135/P136/P137/P138/P139 with parliament codes
+- ✅ Insights: locality hotspots show 6 DUNs with parliament + verified/estimated status
+- ✅ No runtime errors in dev.log
+- ✅ Lint: 0 errors, 2 pre-existing warnings
+
+**VLM (glm-4.6v) verification:**
+- ✅ Overview DUN grid: VLM confirmed "DUN seats — all 28 state constituencies" section with N-code cards, DUN names, parliament codes, coalition badges, green/amber dots
+- ✅ DPT per-DUN table: VLM confirmed table with columns DUN, Parliament, Additions, Deletions, Net, Voters, Status + DUN names (Kuala Linggi, Rembia, Sungai Udang) + Verified badges
+
+## Unresolved issues or risks
+
+1. **P135-P139 DUN data is estimated** — Voter counts, DPT churn, and risk scores for P135-P139 DUNs are synthetic estimates (distributed equally or projected from demographics). The UI clearly marks these with amber dots, "Est." badges, and "pending" labels. Real data requires raw SPR voter xlsx (Gate 9, still open).
+
+2. **GE15 DUN composition is from PRN15** — GE15 (Nov 2022) was a general election that only elected parliamentary seats. The DUN composition shown in the GE15 view is from PRN15 (Nov 2021), which is the most recent state election. This is clearly noted in the UI with the `dun_context_note` field.
+
+3. **Party assignments remain demographic-based** — The `seatToParty()` function in `party-metadata.ts` assigns winning parties based on seat demographics. For exact per-candidate data, the ElectionData.my data lake Parquet files would need to be fetched at build time.
+
+4. **7 tabs still have 0 DUN references** — alerts, incident-casebook, public-communication, s2d-console, s2d-360, scenario, scraper tabs don't have DUN-specific data sections. These tabs are operational/analytical tools (alert monitoring, incident tracking, social media scraping) rather than geographic data displays, so DUN-level data is less relevant. The S2D and Dual-Layer tabs do reference DUN localities in their signal data.
+
+5. **Push to git pending** — commit not yet made.

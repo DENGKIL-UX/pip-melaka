@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3, History, User } from "lucide-react";
+import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3, History, User, Database, Search, Code, Loader2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, ReferenceLine, LineChart, Line } from "recharts";
 import { PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
@@ -840,6 +840,182 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
   );
 }
 
+/**
+ * DataQueryCard — Natural language to SQL to DuckDB query interface.
+ *
+ * User types a question → CF Workers AI generates SQL → DuckDB executes
+ * against election data → results displayed in a table + SQL shown.
+ */
+function DataQueryCard() {
+  const [question, setQuestion] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{
+    question: string;
+    generated_sql: string;
+    rows: Array<Record<string, unknown>>;
+    columns: string[];
+    row_count: number;
+    error?: string;
+  } | null>(null);
+
+  const SUGGESTED_QUERIES = [
+    "How many DUN seats did BN win in PRN15?",
+    "Which DUN had the smallest margin in GE15?",
+    "Which candidates won in both GE14 and GE15?",
+    "What is the average BN vote percentage in DUN seats for PRN15?",
+    "Which party won the most seats across all elections?",
+    "List all DUN seats where PN won in PRN15",
+    "What was the total votes for the winner in P138 Kota Melaka in GE15?",
+    "Which parliament had the highest margin of victory in GE14?",
+  ];
+
+  const ask = async (q: string) => {
+    if (!q.trim() || loading) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setResult(data);
+    } catch (e) {
+      setResult({
+        question: q,
+        generated_sql: "",
+        rows: [],
+        columns: [],
+        row_count: 0,
+        error: e instanceof Error ? e.message : String(e),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="border-mlk/20 bg-mlk-radial">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Database className="h-4 w-4 text-mlk" /> Natural Language Data Query
+          <Badge className="text-[9px] bg-mlk text-white border-transparent ms-1">DuckDB + CF AI</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="text-[10px] text-muted-foreground">
+          Ask any question about Melaka election data in plain English. CF Workers AI (Llama 3.1 8B) generates SQL,
+          DuckDB executes it against real ElectionData.MY results (12 parliament + 56 DUN records).
+        </div>
+
+        {/* Suggested queries */}
+        <div className="flex flex-wrap gap-1.5">
+          {SUGGESTED_QUERIES.map((q) => (
+            <button
+              key={q}
+              onClick={() => { setQuestion(q); ask(q); }}
+              className="text-[9px] px-2 py-1 rounded-full border border-mlk/30 text-foreground hover:bg-mlk/10 hover:text-mlk hover:border-mlk transition-colors"
+              disabled={loading}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+
+        {/* Input */}
+        <form
+          onSubmit={(e) => { e.preventDefault(); ask(question); }}
+          className="flex items-center gap-1.5"
+        >
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask: Which DUN did PH win by the smallest margin?"
+              className="w-full h-9 pl-8 pr-3 text-xs rounded-md bg-background border border-mlk/20 focus:border-mlk focus:outline-none focus:ring-1 focus:ring-mlk/40 placeholder:text-muted-foreground"
+              disabled={loading}
+              aria-label="Natural language query"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading || !question.trim()}
+            className="h-9 px-3 rounded-md bg-mlk text-white text-xs font-medium hover:bg-mlk/90 disabled:opacity-50 flex items-center gap-1.5"
+          >
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
+            Query
+          </button>
+        </form>
+
+        {/* Results */}
+        {result && (
+          <div className="space-y-2">
+            {/* Generated SQL */}
+            {result.generated_sql && (
+              <div className="rounded-md border border-mlk/20 bg-background/60 p-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Code className="h-3 w-3 text-mlk" />
+                  <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wide">Generated SQL</span>
+                </div>
+                <pre className="text-[10px] font-mono text-foreground whitespace-pre-wrap break-words">{result.generated_sql}</pre>
+              </div>
+            )}
+
+            {/* Error */}
+            {result.error && (
+              <div className="rounded-md border border-red-500/40 bg-red-500/5 p-2 text-[10px] text-red-600 dark:text-red-300">
+                <strong>Error:</strong> {result.error}
+              </div>
+            )}
+
+            {/* Results table */}
+            {result.rows.length > 0 && (
+              <div className="rounded-md border border-mlk/20 overflow-hidden">
+                <div className="bg-mlk/5 px-2 py-1 text-[9px] text-muted-foreground flex items-center justify-between">
+                  <span>{result.row_count} row{result.row_count !== 1 ? "s" : ""} returned</span>
+                  <span className="font-mono">DuckDB in-memory</span>
+                </div>
+                <div className="max-h-80 overflow-auto scrollbar-mlk">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        {result.columns.map((col) => (
+                          <TableHead key={col} className="text-[9px] font-semibold">{col}</TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {result.rows.map((row, i) => (
+                        <TableRow key={i}>
+                          {result.columns.map((col) => (
+                            <TableCell key={col} className="text-[9px] font-mono">
+                              {String(row[col] ?? "")}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+
+            {result.rows.length === 0 && !result.error && (
+              <div className="text-[10px] text-muted-foreground text-center py-2">
+                Query returned 0 rows.
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ElectionsTab() {
   const [data, setData] = useState<Election[] | null>(null);
   const [offline, setOffline] = useState(false);
@@ -884,11 +1060,13 @@ export function ElectionsTab() {
         <TabsList className="w-full justify-start">
           {data.map((e) => <TabsTrigger key={e.id} value={e.id} className="text-xs">{e.id}</TabsTrigger>)}
           <TabsTrigger value="swing" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">Swing Analysis</TabsTrigger>
+          <TabsTrigger value="query" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">Data Query</TabsTrigger>
         </TabsList>
         {data.map((e) => (
           <TabsContent key={e.id} value={e.id}><ElectionView el={e} onSelectCandidate={handleSelectCandidate} /></TabsContent>
         ))}
         <TabsContent value="swing"><SwingAnalysis elections={data} onSelectCandidate={handleSelectCandidate} /></TabsContent>
+        <TabsContent value="query"><DataQueryCard /></TabsContent>
       </Tabs>
 
       {/* Candidate history dialog */}

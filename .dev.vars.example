@@ -18,3 +18,15 @@ CSRF_SECRET=your_csrf_secret_here
 
 # App origin for CORS
 NEXT_PUBLIC_APP_ORIGIN=http://localhost:3000
+
+# Cloudflare Workers AI (optional — alternative LLM backend for the AI Assistant)
+# Token from: Cloudflare Dashboard > My Profile > API Tokens > 'plain-breeze-2fe3' > Roll
+# Account ID: 20b9d9b232ee8f29aa3e626530f0da09
+# Token expires: 2026-07-30
+# Models: Llama 3.1 8B/70B, Mistral 7B, Qwen 1.5 14B
+CF_ACCOUNT_ID=20b9d9b232ee8f29aa3e626530f0da09
+CF_AI_TOKEN=your_cf_api_token_here
+
+# ElectionData.MY REST API (optional — for live candidate history queries)
+# Token expires: 30 days from issue
+ELECTIONDATA_API_TOKEN=your_edmy_api_token_here

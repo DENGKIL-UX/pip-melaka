@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, ShieldAlert, Heart, Info, WifiOff } from "lucide-react";
+import { Users, ShieldAlert, Heart, Info, WifiOff, Pyramid } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import { getDunName } from "@/lib/melaka-constants";
 import { MLK_ACCENT } from "@/lib/party-colors";
@@ -18,7 +18,23 @@ interface DunRecord {
     male_percent: number; female_percent: number;
     dominant_age_group: string; dominant_ethnicity_group: string;
   };
+  distributions?: {
+    age_band_counts?: Record<string, number>;
+    ethnicity_counts?: Record<string, number>;
+    profession_group_counts?: Record<string, number>;
+  };
 }
+
+// Age-band display labels + ordering for population pyramid
+const AGE_BANDS: Array<{ key: string; label: string }> = [
+  { key: "18_20", label: "18–20" },
+  { key: "21_29", label: "21–29" },
+  { key: "30_39", label: "30–39" },
+  { key: "40_49", label: "40–49" },
+  { key: "50_55", label: "50–55" },
+  { key: "56_64", label: "56–64" },
+  { key: "65_PLUS", label: "65+" },
+];
 
 function seniorColor(pct: number) {
   if (pct >= 30) return "#dc2626"; // red — critical
@@ -91,6 +107,34 @@ export function DemographicsTab() {
   const warningCount = duns.filter((d) => d.metrics.senior_dependency_percent >= 25 && d.metrics.senior_dependency_percent < 30).length;
   const totalVoters = duns.reduce((s, d) => s + d.metrics.total_voters, 0);
 
+  // Build aggregated population pyramid across all DUNs.
+  // The engine outputs age_band_counts (gender-agnostic). We split each band
+  // by the overall male/female ratio of the DUN to produce a synthetic pyramid.
+  // This is explicitly labeled as "estimated" — the underlying engine data is
+  // age × DUN, not age × gender (PDPA: no per-voter gender+age cross-tab).
+  const pyramidData = AGE_BANDS.map(({ key, label }) => {
+    let totalInBand = 0;
+    let malePool = 0;
+    let femalePool = 0;
+    duns.forEach((d) => {
+      const band = d.distributions?.age_band_counts?.[key] ?? 0;
+      totalInBand += band;
+      malePool += d.metrics.male_voters;
+      femalePool += d.metrics.female_voters;
+    });
+    const ratio = malePool + femalePool > 0 ? malePool / (malePool + femalePool) : 0.5;
+    const male = Math.round(totalInBand * ratio);
+    const female = Math.round(totalInBand * (1 - ratio));
+    return { label, male: -male, female, total: male + female };
+  }).reverse(); // reverse so 18-20 is at the bottom of the pyramid
+
+  const totalMaleVoters = duns.reduce((s, d) => s + d.metrics.male_voters, 0);
+  const totalFemaleVoters = duns.reduce((s, d) => s + d.metrics.female_voters, 0);
+  const youthVoters = pyramidData.filter((p) => p.label === "18–20" || p.label === "21–29").reduce((s, p) => s + p.total, 0);
+  const seniorVoters = pyramidData.filter((p) => p.label === "56–64" || p.label === "65+").reduce((s, p) => s + p.total, 0);
+  const youthPct = totalVoters > 0 ? (youthVoters / totalVoters) * 100 : 0;
+  const seniorPct = totalVoters > 0 ? (seniorVoters / totalVoters) * 100 : 0;
+
   return (
     <div className="space-y-4 fade-in-up">
       <Card className="border-mlk/20">
@@ -149,6 +193,69 @@ export function DemographicsTab() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Population pyramid */}
+      <Card className="border-mlk/20 bg-mlk-radial">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Pyramid className="h-4 w-4 text-mlk" /> Population pyramid — P134 aggregated
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-4">
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={pyramidData} layout="vertical" margin={{ top: 4, right: 8, bottom: 4, left: 8 }} stackOffset="sign">
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <XAxis
+                    type="number"
+                    tick={{ fontSize: 9 }}
+                    tickFormatter={(v: number) => Math.abs(v).toLocaleString()}
+                    domain={[-Math.max(...pyramidData.map((p) => Math.abs(p.male))) * 1.1, Math.max(...pyramidData.map((p) => p.female)) * 1.1]}
+                  />
+                  <YAxis type="category" dataKey="label" tick={{ fontSize: 10 }} width={50} />
+                  <Tooltip
+                    contentStyle={{ fontSize: 11 }}
+                    formatter={(v: number, k: string) => [Math.abs(v).toLocaleString(), k === "male" ? "Male (est.)" : "Female (est.)"]}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 10 }} formatter={(v) => (v === "male" ? "Male (est.)" : "Female (est.)")} />
+                  <Bar dataKey="male" name="male" fill="#0F7DC2" radius={[0, 0, 0, 3]} />
+                  <Bar dataKey="female" name="female" fill="#E22926" radius={[0, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex flex-col justify-center gap-3">
+              <div className="rounded-lg border border-mlk/20 bg-background/60 p-3">
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Total voters</div>
+                <div className="text-xl font-bold text-mlk">{totalVoters.toLocaleString()}</div>
+                <div className="text-[10px] text-muted-foreground">across {duns.length} DUNs</div>
+              </div>
+              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Male / Female</div>
+                <div className="text-sm font-semibold">
+                  <span className="text-blue-600 dark:text-blue-300">{totalMaleVoters.toLocaleString()}</span>
+                  <span className="text-muted-foreground mx-1">/</span>
+                  <span className="text-red-600 dark:text-red-300">{totalFemaleVoters.toLocaleString()}</span>
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  {totalVoters > 0 ? ((totalMaleVoters / totalVoters) * 100).toFixed(1) : "0"}% / {totalVoters > 0 ? ((totalFemaleVoters / totalVoters) * 100).toFixed(1) : "0"}%
+                </div>
+              </div>
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Youth (18–29)</div>
+                <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{youthVoters.toLocaleString()} <span className="text-[10px] text-muted-foreground">({youthPct.toFixed(1)}%)</span></div>
+              </div>
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Senior (56+)</div>
+                <div className="text-sm font-semibold text-amber-700 dark:text-amber-300">{seniorVoters.toLocaleString()} <span className="text-[10px] text-muted-foreground">({seniorPct.toFixed(1)}%)</span></div>
+              </div>
+            </div>
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2 italic">
+            Age bands from engine <code className="font-mono">age_band_counts</code>. Gender split within each band estimated using per-DUN male/female ratio (PDPA: no per-voter age × gender cross-tab shipped).
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Per-DUN table */}
       <Card className="border-mlk/20">

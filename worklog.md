@@ -929,3 +929,76 @@ Project synced to commit ea6bcc78. Dev server runs on port 3000. Lint passes wit
 1. Dev server OOM on 4GB sandbox (not a code issue)
 2. Theme toggle not visible in QA (likely hidden by responsive class — code is correct, verified import + usage)
 3. 2 enterprise features not implemented (360 Pipeline Test, Production/Deployment) — not needed for Free Tier
+
+---
+Task ID: QA-IMPROVE-R9
+Agent: main
+Task: Sync to ee61f40, QA test with agent-browser, add Swing Analysis + Population Pyramid + Export Brief + styling polish, push to git
+
+## Current project status description/assessment
+
+Workspace synced to commit ee61f40 ("fix: Correct GE15 Melaka parliament results — PN 3 / PH 3"). Git spurious diffs from file-mode changes (644↔755) silenced via `git config core.fileMode false`. Dev server running on port 3000 (Next.js 16.1.3 + Turbopack). Lint passes with 0 errors (2 pre-existing warnings only: react/no-danger on shadcn chart.tsx + unused eslint-disable on scenario-tab.tsx). GE15 data correction from previous task verified end-to-end via agent-browser: Overview, Elections GE15 sub-tab, and AI Assistant all return "PN 3 / PH 3 / BN 0" with correct per-seat winners (P134=PN, P135=PH, P136=PN, P137=PH, P138=PH, P139=PN).
+
+## Current goals/completed modifications/verification results
+
+### QA verification (agent-browser E2E)
+- ✅ Landing page renders (6 parliaments, 28 DUN, 71,415 voters, real GeoJSON headline)
+- ✅ Dashboard loads with all 19 tabs visible
+- ✅ GE15 data correct everywhere:
+  - Overview: "PN won 3 (P134, P136, P139), PH won 3 (P135, P137, P138), BN won 0"
+  - Elections GE15 sub-tab: parliament split PH 3 / PN 3 / 6
+  - AI Assistant (clicked "What was the GE15 result?"): returns full correct breakdown with RAG citation
+- ✅ 2D Map (Leaflet) renders with 4/6 layers + zoom controls
+- ✅ 3D Map (Three.js) renders with Play button
+- ✅ No runtime errors in dev.log (only pre-existing secrets-check warning)
+- ✅ All API routes return 200 (POST /api/assistant 4.5s)
+- ✅ Sticky footer: footer top=1909px at docHeight=1952px (pushed down naturally, no overlap)
+
+### New features added (Round 9)
+
+1. **Swing Analysis sub-tab** (`src/components/tabs/elections-tab.tsx`, +180 lines):
+   - 4th sub-tab in Elections (GE14 / PRN15 / GE15 / Swing Analysis)
+   - Header card with 4 KPI tiles: Seat Flips 4/6, Marginal 4/6, Competitive 2/6, Safe 0/6
+   - Scatter chart: GE14 margin % (x) vs GE15 margin % (y), each dot coloured by GE15 winner, with marginal threshold reference lines at 5%
+   - Vote % comparison bar chart: GE14 (grey) vs GE15 (party-coloured) side by side
+   - Seat-by-seat swing table: GE14 winner → GE15 winner, margin delta with TrendingUp/Down/Minus icons, MARGINAL/COMPETITIVE/SAFE tier badges
+   - Rows where winner flipped highlighted with amber background
+   - Verified: tab opens, all 4 KPI tiles render, scatter + bar charts visible, table shows all 6 parliaments ✅
+
+2. **Population Pyramid** (`src/components/tabs/demographics-tab.tsx`, +90 lines):
+   - New card in Demographics tab between charts and per-DUN table
+   - Horizontal bar chart (layout=vertical) with stackOffset="sign" for true pyramid shape
+   - 7 age bands from engine `age_band_counts`: 18–20, 21–29, 30–39, 40–49, 50–55, 56–64, 65+
+   - Gender split within each band estimated using per-DUN male/female ratio (PDPA-safe — no per-voter age×gender cross-tab)
+   - Side panel with 4 KPI tiles: Total voters (71,415), Male/Female split (34,827/36,588 = 48.8%/51.2%), Youth 18-29 (17,008 = 23.8%), Senior 56+ (19,146 = 26.8%)
+   - Methodology note explains the estimation explicitly
+   - Verified: all 7 bands render, numbers reconcile to 71,415 total ✅
+
+3. **Export Intelligence Brief** (`src/lib/export-brief.ts` + dashboard header button):
+   - New `buildBrief()` + `downloadBrief()` utilities in `src/lib/export-brief.ts`
+   - Produces `pip-mlk.brief.v1` schema JSON: timestamp, platform metadata, active tab, GE15 summary, key metrics, PDPA notes
+   - Download button added to dashboard header (Download icon, visible on all breakpoints)
+   - Verified via agent-browser eval: clicking button produces valid JSON blob with `schema=pip-mlk.brief.v1`, `active_tab=demographics`, `ge15={PN:3,PH:3,BN:0,total:6}` ✅
+
+4. **Styling polish** (`src/app/globals.css`, +110 lines):
+   - `.skeleton-mlk` — shimmer sweep loading placeholder
+   - `.card-mlk-pro` — animated gradient border that intensifies on hover (translateY + shadow)
+   - `.tab-slide-in` — 0.28s slide-in animation on tab content (applied via `<div key={activeTab}>` wrapper)
+   - `.pulse-dot` — animated pulsing ring for live S2D signal indicator (added to header S2D badge)
+   - `.bg-grid-mlk` — denser dotted background grid (16px)
+   - `.stagger-1` through `.stagger-6` — animation-delay helpers for staggered card entrances
+   - `.tabular` — font-variant-numeric: tabular-nums for stable number layouts
+   - `.focus-mlk` — accessible focus ring
+   - `prefers-reduced-motion` guard — disables all animations for users who request reduced motion
+
+## Unresolved issues or risks
+
+1. **`pyramidData` `male` value is negative** (for sign-offset pyramid rendering) — the Tooltip uses `Math.abs(v)` to display positive counts, and the XAxis `tickFormatter` does the same. This is the standard recharts pattern for population pyramids but may confuse a future maintainer. Documented in code comment.
+
+2. **Scatter chart ZAxis range `[200, 200]`** — fixed dot size. Could be made proportional to total voters, but all 6 parliaments have similar voter pools so fixed size is fine.
+
+3. **Export brief is client-side only** — no audit trail on the server. For production, consider also POSTing the brief to `/api/audit` (already wired via the observability stack from RESEARCH-ALL-PATTERNS-01). Left as future work.
+
+4. **Swing Analysis uses GE14 + GE15 only** — PRN15 is a state election (DUN-only), so it's correctly excluded from the parliament-level swing view. If future requirements need DUN-level swing, the `dun_results` arrays support it but the chart would need a parliament selector.
+
+5. **Dev server OOM on 4GB sandbox** — pre-existing, not a code issue. All fetch failures fall back to inline ELECTIONS_FALLBACK / DUN_FALLBACK so tabs always render.

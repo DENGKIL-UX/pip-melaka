@@ -5,10 +5,11 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, Radar, Search } from "lucide-react";
+import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, Radar, Search, Download } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
+import { buildBrief, downloadBrief } from "@/lib/export-brief";
 import { OverviewTab } from "@/components/tabs/overview-tab";
 import { ElectionsTab } from "@/components/tabs/elections-tab";
 import { DemographicsTab } from "@/components/tabs/demographics-tab";
@@ -88,8 +89,9 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] hidden md:inline-flex" aria-label={`S2D loop: ${loopStatus}, ${signalsCount} signals`}>
-                <Activity className="h-3 w-3 me-1" aria-hidden="true" />
+              <Badge variant="outline" className="text-[10px] hidden md:inline-flex items-center gap-1.5" aria-label={`S2D loop: ${loopStatus}, ${signalsCount} signals`}>
+                <span className="pulse-dot" aria-hidden="true" />
+                <Activity className="h-3 w-3" aria-hidden="true" />
                 S2D: {loopStatus} · {signalsCount}
               </Badge>
               <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-700 dark:text-amber-300">Provenance: 8/9</Badge>
@@ -109,6 +111,25 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
               >
                 <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-muted">⌘K</kbd>
                 <Search className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 gap-1.5 text-xs"
+                onClick={() => {
+                  const brief = buildBrief({
+                    activeTab: activeTab,
+                    totalVoters: TOTAL_VOTERS_P134,
+                    dunCount: TOTAL_DUN,
+                    s2dSignals: signalsCount,
+                  });
+                  downloadBrief(brief);
+                }}
+                aria-label="Export intelligence brief as JSON"
+                title="Export intelligence brief (JSON)"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline">Export</span>
               </Button>
               <ThemeToggle />
             </div>
@@ -154,6 +175,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         </nav>
 
         {/* Tab content */}
+        <div key={activeTab} className="tab-slide-in">
         {activeTab === "map-2d" && <Map2DTab />}
         {activeTab === "map-3d" && <Map3DTab />}
         {activeTab === "s2d" && <S2DConsoleTab />}
@@ -173,6 +195,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "risk" && <RiskSocioeconomicTab />}
         {activeTab === "compare" && <CompareTab />}
         {activeTab === "governance" && <GovernanceTab />}
+        </div>
       </main>
 
       {/* Footer */}

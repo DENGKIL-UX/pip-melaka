@@ -257,4 +257,114 @@
   .shadow-mlk {
     box-shadow: 0 4px 14px rgba(199, 123, 44, 0.12);
   }
+
+  /* === Round 9 styling additions — denser detail, micro-interactions === */
+
+  /* Skeleton shimmer for loading placeholders */
+  .skeleton-mlk {
+    position: relative;
+    overflow: hidden;
+    background: rgba(199, 123, 44, 0.06);
+  }
+  .skeleton-mlk::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(199, 123, 44, 0.15), transparent);
+    animation: skeleton-sweep 1.6s ease-in-out infinite;
+  }
+  @keyframes skeleton-sweep {
+    100% { transform: translateX(100%); }
+  }
+
+  /* Card with animated gradient border that intensifies on hover */
+  .card-mlk-pro {
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .card-mlk-pro::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(199, 123, 44, 0.35) 0%, rgba(232, 155, 69, 0.15) 50%, rgba(199, 123, 44, 0.35) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    opacity: 0.6;
+  }
+  .card-mlk-pro:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px -10px rgba(199, 123, 44, 0.28);
+  }
+  .card-mlk-pro:hover::before {
+    opacity: 1;
+  }
+
+  /* Tab content slide-in for smoother tab switching */
+  .tab-slide-in {
+    animation: tab-slide 0.28s ease-out both;
+  }
+  @keyframes tab-slide {
+    from { opacity: 0; transform: translateX(6px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Animated pulse dot — used for live S2D signal indicators */
+  .pulse-dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #C77B2C;
+  }
+  .pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(199, 123, 44, 0.5);
+    animation: pulse-ring 1.6s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+
+  /* Subtle dotted background grid for hero/header areas */
+  .bg-grid-mlk {
+    background-image: radial-gradient(circle, rgba(199, 123, 44, 0.08) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* Stagger helper for list/card entrance animations */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.10s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.20s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.30s; }
+
+  /* Number ticker — monospace + tabular-nums for stable layout */
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  /* Focus ring for interactive cards (accessibility + polish) */
+  .focus-mlk:focus-visible {
+    outline: 2px solid #C77B2C;
+    outline-offset: 2px;
+  }
+
+  /* Reduced-motion guard */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in-up, .fade-in, .slide-up, .tab-slide-in, .shimmer-text,
+    .text-gradient-mlk, .animate-pulse-slow, .animate-fade-in,
+    .animate-slide-in-right, .skeleton-mlk::after, .pulse-dot::after {
+      animation: none !important;
+    }
+  }
 }

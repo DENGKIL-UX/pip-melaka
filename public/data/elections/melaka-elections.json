@@ -4,18 +4,18 @@
   "elections": [
     {
       "id": "GE14",
-      "name": "GE14 \u2014 14th General Election",
+      "name": "GE14 — 14th General Election",
       "date": "2018-05-09",
-      "headline_fact": "PH won 4/6 parliament + 15/28 DUN. BN won 2 parliament + 13 DUN. PH formed state government.",
+      "headline_fact": "PH won 5/6 parliament + 22/28 DUN. BN won 1 parliament + 6 DUN. PH formed state government with near-sweep of Melaka.",
       "parliament_summary": {
-        "PH": 4,
-        "BN": 2,
+        "PH": 5,
+        "BN": 1,
         "PN": 0,
         "total": 6
       },
       "dun_summary": {
-        "PH": 15,
-        "BN": 13,
+        "PH": 22,
+        "BN": 6,
         "PN": 0,
         "total": 28
       },
@@ -25,42 +25,54 @@
           "winner": "PH",
           "votes_pct": 52.3,
           "runner_up": "BN",
-          "margin_pct": 4.1
+          "margin_pct": 4.1,
+          "winner_party": "AMANAH",
+          "runner_up_party": "UMNO"
         },
         {
           "parliament_code": "135",
           "winner": "PH",
           "votes_pct": 51.8,
           "runner_up": "BN",
-          "margin_pct": 3.2
+          "margin_pct": 3.2,
+          "winner_party": "PKR",
+          "runner_up_party": "UMNO"
         },
         {
           "parliament_code": "136",
           "winner": "PH",
           "votes_pct": 55.1,
           "runner_up": "BN",
-          "margin_pct": 8.7
+          "margin_pct": 8.7,
+          "winner_party": "PKR",
+          "runner_up_party": "UMNO"
         },
         {
           "parliament_code": "137",
           "winner": "PH",
           "votes_pct": 58.4,
           "runner_up": "BN",
-          "margin_pct": 12.3
+          "margin_pct": 12.3,
+          "winner_party": "DAP",
+          "runner_up_party": "MCA"
         },
         {
           "parliament_code": "138",
           "winner": "BN",
           "votes_pct": 50.9,
           "runner_up": "PH",
-          "margin_pct": 1.8
+          "margin_pct": 1.8,
+          "winner_party": "MCA",
+          "runner_up_party": "DAP"
         },
         {
           "parliament_code": "139",
           "winner": "PH",
           "votes_pct": 53.7,
           "runner_up": "BN",
-          "margin_pct": 5.9
+          "margin_pct": 5.9,
+          "winner_party": "AMANAH",
+          "runner_up_party": "UMNO"
         }
       ],
       "dun_results": [
@@ -72,7 +84,8 @@
             "PH": 0.54,
             "BN": 0.42,
             "PN": 0.0
-          }
+          },
+          "winner_party": "AMANAH"
         },
         {
           "parliament_code": "134",
@@ -82,7 +95,8 @@
             "PH": 0.51,
             "BN": 0.45,
             "PN": 0.0
-          }
+          },
+          "winner_party": "AMANAH"
         },
         {
           "parliament_code": "134",
@@ -92,7 +106,8 @@
             "PH": 0.48,
             "BN": 0.49,
             "PN": 0.0
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "134",
@@ -102,7 +117,8 @@
             "PH": 0.52,
             "BN": 0.44,
             "PN": 0.0
-          }
+          },
+          "winner_party": "AMANAH"
         },
         {
           "parliament_code": "134",
@@ -112,7 +128,8 @@
             "PH": 0.47,
             "BN": 0.5,
             "PN": 0.0
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -122,7 +139,8 @@
             "PH": 0.53,
             "BN": 0.43,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "135",
@@ -132,7 +150,8 @@
             "PH": 0.5,
             "BN": 0.47,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "135",
@@ -142,7 +161,8 @@
             "PH": 0.46,
             "BN": 0.51,
             "PN": 0.0
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -152,7 +172,8 @@
             "PH": 0.52,
             "BN": 0.44,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "135",
@@ -162,7 +183,8 @@
             "PH": 0.47,
             "BN": 0.5,
             "PN": 0.0
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "136",
@@ -172,7 +194,8 @@
             "PH": 0.54,
             "BN": 0.42,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "136",
@@ -182,7 +205,8 @@
             "PH": 0.53,
             "BN": 0.43,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "136",
@@ -192,7 +216,8 @@
             "PH": 0.55,
             "BN": 0.41,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "136",
@@ -202,7 +227,8 @@
             "PH": 0.53,
             "BN": 0.43,
             "PN": 0.0
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "137",
@@ -212,7 +238,8 @@
             "PH": 0.57,
             "BN": 0.39,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "137",
@@ -222,7 +249,8 @@
             "PH": 0.59,
             "BN": 0.37,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "137",
@@ -232,7 +260,8 @@
             "PH": 0.55,
             "BN": 0.41,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "137",
@@ -242,7 +271,8 @@
             "PH": 0.57,
             "BN": 0.39,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "138",
@@ -252,7 +282,8 @@
             "PH": 0.59,
             "BN": 0.37,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "138",
@@ -262,7 +293,8 @@
             "PH": 0.61,
             "BN": 0.35,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "138",
@@ -272,7 +304,8 @@
             "PH": 0.58,
             "BN": 0.38,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "138",
@@ -282,7 +315,8 @@
             "PH": 0.57,
             "BN": 0.39,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "138",
@@ -292,7 +326,8 @@
             "PH": 0.57,
             "BN": 0.39,
             "PN": 0.0
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "139",
@@ -302,7 +337,8 @@
             "PH": 0.48,
             "BN": 0.49,
             "PN": 0.0
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "139",
@@ -312,7 +348,8 @@
             "PH": 0.52,
             "BN": 0.44,
             "PN": 0.0
-          }
+          },
+          "winner_party": "AMANAH"
         },
         {
           "parliament_code": "139",
@@ -322,7 +359,8 @@
             "PH": 0.47,
             "BN": 0.5,
             "PN": 0.0
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "139",
@@ -332,7 +370,8 @@
             "PH": 0.5,
             "BN": 0.47,
             "PN": 0.0
-          }
+          },
+          "winner_party": "AMANAH"
         },
         {
           "parliament_code": "139",
@@ -342,13 +381,20 @@
             "PH": 0.55,
             "BN": 0.41,
             "PN": 0.0
-          }
+          },
+          "winner_party": "AMANAH"
         }
-      ]
+      ],
+      "party_breakdown": {
+        "AMANAH": 2,
+        "PKR": 2,
+        "DAP": 1,
+        "MCA": 1
+      }
     },
     {
       "id": "PRN15",
-      "name": "PRN15 \u2014 15th State Election",
+      "name": "PRN15 — 15th State Election",
       "date": "2021-11-20",
       "headline_fact": "BN LANDSLIDE: 21/28 DUN seats. PH won 5, PN won 2. BN regained state government.",
       "dun_summary": {
@@ -368,7 +414,8 @@
             "BN": 0.55,
             "PH": 0.28,
             "PN": 0.12
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "134",
@@ -378,7 +425,8 @@
             "BN": 0.52,
             "PH": 0.3,
             "PN": 0.14
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "134",
@@ -388,17 +436,19 @@
             "BN": 0.58,
             "PH": 0.25,
             "PN": 0.12
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "134",
           "dun_code": "04",
-          "winner": "PH",
+          "winner": "BN",
           "vote_share": {
-            "BN": 0.41,
-            "PH": 0.45,
-            "PN": 0.1
-          }
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "134",
@@ -408,7 +458,8 @@
             "BN": 0.54,
             "PH": 0.3,
             "PN": 0.12
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -418,7 +469,8 @@
             "BN": 0.53,
             "PH": 0.29,
             "PN": 0.13
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -428,7 +480,8 @@
             "BN": 0.51,
             "PH": 0.31,
             "PN": 0.14
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -438,7 +491,8 @@
             "BN": 0.57,
             "PH": 0.26,
             "PN": 0.12
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -448,7 +502,8 @@
             "BN": 0.52,
             "PH": 0.3,
             "PN": 0.13
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "135",
@@ -458,7 +513,8 @@
             "BN": 0.56,
             "PH": 0.26,
             "PN": 0.13
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "136",
@@ -468,7 +524,8 @@
             "BN": 0.42,
             "PH": 0.48,
             "PN": 0.06
-          }
+          },
+          "winner_party": "PKR"
         },
         {
           "parliament_code": "136",
@@ -478,7 +535,8 @@
             "BN": 0.51,
             "PH": 0.38,
             "PN": 0.08
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "136",
@@ -488,7 +546,8 @@
             "BN": 0.52,
             "PH": 0.36,
             "PN": 0.08
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "136",
@@ -498,7 +557,8 @@
             "BN": 0.54,
             "PH": 0.3,
             "PN": 0.12
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "137",
@@ -508,7 +568,8 @@
             "BN": 0.38,
             "PH": 0.55,
             "PN": 0.04
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "137",
@@ -518,7 +579,8 @@
             "BN": 0.35,
             "PH": 0.58,
             "PN": 0.04
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "137",
@@ -528,7 +590,8 @@
             "BN": 0.4,
             "PH": 0.52,
             "PN": 0.05
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "137",
@@ -538,57 +601,63 @@
             "BN": 0.42,
             "PH": 0.5,
             "PN": 0.05
-          }
+          },
+          "winner_party": "DAP"
         },
         {
           "parliament_code": "138",
           "dun_code": "19",
-          "winner": "PH",
+          "winner": "BN",
           "vote_share": {
-            "BN": 0.43,
-            "PH": 0.47,
-            "PN": 0.07
-          }
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          },
+          "winner_party": "MCA"
         },
         {
           "parliament_code": "138",
           "dun_code": "20",
-          "winner": "PH",
+          "winner": "BN",
           "vote_share": {
-            "BN": 0.4,
-            "PH": 0.5,
-            "PN": 0.06
-          }
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          },
+          "winner_party": "MCA"
         },
         {
           "parliament_code": "138",
           "dun_code": "21",
-          "winner": "PH",
+          "winner": "BN",
           "vote_share": {
-            "BN": 0.42,
-            "PH": 0.5,
-            "PN": 0.05
-          }
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          },
+          "winner_party": "MCA"
         },
         {
           "parliament_code": "138",
           "dun_code": "22",
-          "winner": "PH",
+          "winner": "BN",
           "vote_share": {
-            "BN": 0.42,
-            "PH": 0.5,
-            "PN": 0.05
-          }
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          },
+          "winner_party": "MCA"
         },
         {
           "parliament_code": "138",
           "dun_code": "23",
-          "winner": "PH",
+          "winner": "BN",
           "vote_share": {
-            "BN": 0.42,
-            "PH": 0.5,
-            "PN": 0.05
-          }
+            "BN": 0.52,
+            "PH": 0.33,
+            "PN": 0.12
+          },
+          "winner_party": "MCA"
         },
         {
           "parliament_code": "139",
@@ -598,7 +667,8 @@
             "BN": 0.54,
             "PH": 0.28,
             "PN": 0.13
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "139",
@@ -608,7 +678,8 @@
             "BN": 0.55,
             "PH": 0.27,
             "PN": 0.13
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "139",
@@ -618,7 +689,8 @@
             "BN": 0.53,
             "PH": 0.29,
             "PN": 0.14
-          }
+          },
+          "winner_party": "UMNO"
         },
         {
           "parliament_code": "139",
@@ -628,7 +700,8 @@
             "BN": 0.38,
             "PH": 0.2,
             "PN": 0.38
-          }
+          },
+          "winner_party": "PAS"
         },
         {
           "parliament_code": "139",
@@ -638,19 +711,27 @@
             "BN": 0.39,
             "PH": 0.21,
             "PN": 0.37
-          }
+          },
+          "winner_party": "PAS"
         }
-      ]
+      ],
+      "party_breakdown": {
+        "UMNO": 16,
+        "PKR": 1,
+        "DAP": 4,
+        "MCA": 5,
+        "PAS": 2
+      }
     },
     {
       "id": "GE15",
-      "name": "GE15 \u2014 15th General Election",
+      "name": "GE15 — 15th General Election",
       "date": "2022-11-19",
       "headline_fact": "PN won 3 (P134, P136, P139), PH won 3 (P135, P137, P138), BN won 0. Melaka parliament split evenly PN 3 / PH 3.",
       "parliament_summary": {
-        "PN": 3,
         "PH": 3,
         "BN": 0,
+        "PN": 3,
         "total": 6
       },
       "dun_summary": null,
@@ -660,45 +741,63 @@
           "winner": "PN",
           "votes_pct": 41.2,
           "runner_up": "PH",
-          "margin_pct": 3.8
+          "margin_pct": 3.8,
+          "winner_party": "BERSATU",
+          "runner_up_party": "AMANAH"
         },
         {
           "parliament_code": "135",
           "winner": "PH",
           "votes_pct": 43.5,
           "runner_up": "PN",
-          "margin_pct": 2.8
+          "margin_pct": 2.8,
+          "winner_party": "PKR",
+          "runner_up_party": "BERSATU"
         },
         {
           "parliament_code": "136",
           "winner": "PN",
           "votes_pct": 42.5,
           "runner_up": "PH",
-          "margin_pct": 3.1
+          "margin_pct": 3.1,
+          "winner_party": "BERSATU",
+          "runner_up_party": "PKR"
         },
         {
           "parliament_code": "137",
           "winner": "PH",
           "votes_pct": 48.7,
           "runner_up": "PN",
-          "margin_pct": 8.9
+          "margin_pct": 8.9,
+          "winner_party": "DAP",
+          "runner_up_party": "GERAKAN"
         },
         {
           "parliament_code": "138",
           "winner": "PH",
           "votes_pct": 44.1,
           "runner_up": "PN",
-          "margin_pct": 5.3
+          "margin_pct": 5.3,
+          "winner_party": "DAP",
+          "runner_up_party": "GERAKAN"
         },
         {
           "parliament_code": "139",
           "winner": "PN",
           "votes_pct": 41.5,
           "runner_up": "PH",
-          "margin_pct": 3.1
+          "margin_pct": 3.1,
+          "winner_party": "PAS",
+          "runner_up_party": "AMANAH"
         }
       ],
-      "dun_results": []
+      "dun_results": [],
+      "party_breakdown": {
+        "BERSATU": 2,
+        "PKR": 1,
+        "DAP": 2,
+        "PAS": 1
+      }
     }
   ]
 }

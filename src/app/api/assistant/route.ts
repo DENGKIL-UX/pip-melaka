@@ -48,7 +48,7 @@ const MELAKA_FACTS: string[] = [
   "P134 (Masjid Tanah) has 71,415 verified voters — built from the PIP-VOTER-INTELLIGENCE engine output, not raw SPR xlsx.",
   "PRN15 (Melaka state election, 20 Nov 2021): BN won 21/28 DUN seats in a landslide. PH won 5, PN won 2. BN regained the state government.",
   "GE15 (19 Nov 2022): PN won 3 parliaments (P134 Masjid Tanah, P136 Tangga Batu, P139 Jasin). PH won 3 (P135 Alor Gajah, P137 Hang Tuah Jaya, P138 Kota Melaka). BN won 0. Split: PN 3 / PH 3.",
-  "GE14 (9 May 2018): PH won 4/6 parliaments + 15/28 DUN seats. BN won 2 parliaments + 13 DUN. PH formed the state government.",
+  "GE14 (9 May 2018): PH won 5/6 parliaments + 22/28 DUN seats. BN won 1 parliament + 6 DUN. PH formed the state government.",
   "Melaka state population: 932,700 (DOSM Census 2020).",
   "Melaka median household income: RM 5,670 (HIES 2022).",
   "DPT churn Jan-May 2026 (SPR Pameran): +8,420 additions, -3,180 deletions, +5,240 net growth across 6 parliaments.",

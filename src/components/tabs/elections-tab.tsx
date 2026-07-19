@@ -5,18 +5,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight } from "lucide-react";
+import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, ReferenceLine } from "recharts";
 import { PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { ELECTIONS_FALLBACK } from "@/lib/fallback-data";
+import { PARTIES, COALITIONS, partyLogoUrl, coalitionLogoUrl, type PartyCode, type CoalitionCode } from "@/lib/party-metadata";
+import { PartyLogo, CoalitionBadge } from "@/components/shared/party-logo";
 
 interface Election {
   id: string; name: string; date: string; headline_fact: string;
   parliament_summary: { PH: number; BN: number; PN: number; total: number } | null;
   dun_summary: { PH: number; BN: number; PN: number; total: number } | null;
-  parliament_results: Array<{ parliament_code: string; winner: "PH" | "BN" | "PN"; votes_pct: number; runner_up: string; margin_pct: number }>;
-  dun_results: Array<{ parliament_code: string; dun_code: string; winner: "PH" | "BN" | "PN"; vote_share: Record<string, number> }>;
+  parliament_results: Array<{
+    parliament_code: string; winner: "PH" | "BN" | "PN";
+    winner_party?: string; runner_up_party?: string | null;
+    votes_pct: number; runner_up: string; margin_pct: number;
+  }>;
+  dun_results: Array<{
+    parliament_code: string; dun_code: string; winner: "PH" | "BN" | "PN";
+    winner_party?: string; vote_share: Record<string, number>;
+  }>;
+  party_breakdown?: Record<string, number>;
 }
 
 function partyHex(p: string) { return PARTY_COLORS[p as keyof typeof PARTY_COLORS] ?? PARTY_COLORS.OTH; }
@@ -41,6 +51,103 @@ function marginTier(margin: number): { label: "MARGINAL" | "COMPETITIVE" | "SAFE
   return { label: "SAFE", color: "#16a34a", bg: "bg-emerald-500/10 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" };
 }
 
+/**
+ * PartyBreakdownCard — shows which PARTIES won seats, grouped by coalition.
+ *
+ * This is the key enhancement: previously the tab only showed coalition-level
+ * results (BN/PH/PN). Now it shows the component parties (UMNO, DAP, PAS, etc.)
+ * with their ElectionData.my logos, grouped under their parent coalition.
+ */
+function PartyBreakdownCard({ el }: { el: Election }) {
+  const breakdown = el.party_breakdown ?? {};
+  const hasPartyData = Object.keys(breakdown).length > 0;
+
+  if (!hasPartyData) {
+    return (
+      <Card className="border-mlk/20">
+        <CardContent className="p-4 text-xs text-muted-foreground">
+          No party-level breakdown available for this election.
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Group parties by coalition
+  const coalitions: CoalitionCode[] = ["BN", "PH", "PN", "BEBAS"];
+  const totalSeats = Object.values(breakdown).reduce((a, b) => a + b, 0);
+
+  return (
+    <Card className="border-mlk/20 bg-mlk-radial">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Users2 className="h-4 w-4 text-mlk" />
+          Party breakdown — component parties that won seats
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {coalitions.map((coal) => {
+          const coalMeta = COALITIONS[coal];
+          const memberParties = coalMeta.memberParties;
+          // Show parties from this coalition that actually won seats
+          const wonParties = memberParties.filter((p) => breakdown[p] > 0);
+          if (wonParties.length === 0) return null;
+
+          const coalSeats = wonParties.reduce((s, p) => s + (breakdown[p] ?? 0), 0);
+          const coalPct = totalSeats > 0 ? (coalSeats / totalSeats) * 100 : 0;
+
+          return (
+            <div key={coal} className="rounded-lg border border-mlk/10 bg-card/50 p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <CoalitionBadge coalition={coal} size="sm" showLogo />
+                  <span className="text-xs text-muted-foreground">{coalMeta.fullName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-sm font-bold">{coalSeats}</span>
+                  <span className="text-[10px] text-muted-foreground">seats · {coalPct.toFixed(0)}%</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {wonParties.map((partyCode) => {
+                  const partyMeta = PARTIES[partyCode];
+                  const seats = breakdown[partyCode] ?? 0;
+                  const seatPct = coalSeats > 0 ? (seats / coalSeats) * 100 : 0;
+                  return (
+                    <div
+                      key={partyCode}
+                      className="flex items-center gap-2 rounded-md border border-border/40 bg-background/60 p-2"
+                    >
+                      <PartyLogo party={partyCode} size="sm" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-semibold truncate">{partyMeta.name}</div>
+                        <div className="text-[9px] text-muted-foreground truncate">{partyMeta.fullName}</div>
+                      </div>
+                      <div className="text-end">
+                        <div className="font-mono text-sm font-bold">{seats}</div>
+                        <div className="text-[8px] text-muted-foreground">{seatPct.toFixed(0)}% of {coal}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+        <div className="text-[9px] text-muted-foreground italic flex items-start gap-1">
+          <Info className="h-3 w-3 flex-shrink-0 mt-0.5" />
+          <span>
+            Party assignments are derived from seat demographics (urban Chinese-majority → DAP/MCA/GERAKAN;
+            rural Malay-majority → UMNO/AMANAH/PAS-BERSATU). For exact per-candidate data, see the
+            ElectionData.my data lake (<code className="font-mono">headline_ballots_state_mlk.parquet</code>).
+            Logos from <code className="font-mono">electiondata.my/parties/&#123;uid&#125;/png</code>.
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function SwingAnalysis({ elections }: { elections: Election[] }) {
   const ge14 = elections.find((e) => e.id === "GE14");
   const ge15 = elections.find((e) => e.id === "GE15");
@@ -60,6 +167,8 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
       name: p.name,
       winner14: r14.winner,
       winner15: r15.winner,
+      winnerParty14: r14.winner_party,
+      winnerParty15: r15.winner_party,
       winnerChanged,
       votes14: r14.votes_pct,
       votes15: r15.votes_pct,
@@ -69,12 +178,13 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
       tier,
     };
   }).filter(Boolean) as Array<{
-    code: string; name: string; winner14: string; winner15: string; winnerChanged: boolean;
+    code: string; name: string; winner14: string; winner15: string;
+    winnerParty14?: string; winnerParty15?: string;
+    winnerChanged: boolean;
     votes14: number; votes15: number; margin14: number; margin15: number; marginDelta: number;
     tier: { label: string; color: string; bg: string };
   }>;
 
-  // Dumbbell chart data: GE14 vote% vs GE15 vote% per parliament
   const dumbbellData = rows.map((r) => ({
     name: r.name,
     ge14: r.votes14,
@@ -82,7 +192,6 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
     winner15: r.winner15,
   }));
 
-  // Scatter for margin GE14 → GE15
   const scatterData = rows.map((r) => ({
     name: `P${r.code} ${r.name}`,
     x: r.margin14,
@@ -98,7 +207,6 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
 
   return (
     <div className="space-y-3 fade-in-up">
-      {/* Swing header */}
       <Card className="border-mlk/30 bg-mlk-radial">
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -107,7 +215,7 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
             <Badge className="text-[9px] bg-mlk text-white border-transparent ms-auto">SWING ANALYSIS</Badge>
           </div>
           <div className="text-sm font-medium leading-snug mb-3">
-            Between GE14 and GE15, Melaka&apos;s 6 parliamentary seats swung dramatically from PH (4 seats) to a PN/PH tie (3 each). BN collapsed from 2 seats to 0.
+            Between GE14 and GE15, Melaka&apos;s 6 parliamentary seats swung dramatically from PH (5 seats) to a PN/PH tie (3 each). BN collapsed from 1 seat to 0.
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <div className="rounded-lg border border-mlk/20 bg-background/60 p-2">
@@ -134,7 +242,6 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
         </CardContent>
       </Card>
 
-      {/* Dumbbell chart */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -183,7 +290,6 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
         </CardContent>
       </Card>
 
-      {/* Vote % comparison bar */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">Winner&apos;s vote % — GE14 vs GE15</CardTitle>
@@ -207,7 +313,6 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
         </CardContent>
       </Card>
 
-      {/* Swing table */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -239,7 +344,14 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
                       <span className="font-medium">{r.name}</span> <span className="font-mono text-muted-foreground">P{r.code}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner14) }}>{r.winner14}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner14) }}>{r.winner14}</span>
+                        {r.winnerParty14 && (
+                          <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground">
+                            <PartyLogo party={r.winnerParty14 as PartyCode} size="xs" />
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
                       {r.winnerChanged ? (
@@ -249,7 +361,14 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner15) }}>{r.winner15}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner15) }}>{r.winner15}</span>
+                        {r.winnerParty15 && (
+                          <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground">
+                            <PartyLogo party={r.winnerParty15 as PartyCode} size="xs" />
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-[10px] text-right font-mono">{r.margin14.toFixed(1)}%</TableCell>
                     <TableCell className="text-[10px] text-right font-mono">{r.margin15.toFixed(1)}%</TableCell>
@@ -305,6 +424,9 @@ function ElectionView({ el }: { el: Election }) {
         </CardContent>
       </Card>
 
+      {/* Party breakdown card — NEW: shows component parties with logos */}
+      <PartyBreakdownCard el={el} />
+
       {/* Chart */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2"><CardTitle className="text-sm">{el.parliament_results.length > 0 ? "Parliament vote %" : "DUN seats by parliament"}</CardTitle></CardHeader>
@@ -338,7 +460,7 @@ function ElectionView({ el }: { el: Election }) {
         </CardContent>
       </Card>
 
-      {/* Results table */}
+      {/* Results table — now includes party column */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> Results table</CardTitle></CardHeader>
         <CardContent>
@@ -348,7 +470,8 @@ function ElectionView({ el }: { el: Election }) {
                 <TableRow>
                   <TableHead className="text-[10px]">Parliament</TableHead>
                   <TableHead className="text-[10px]">DUN</TableHead>
-                  <TableHead className="text-[10px]">Winner</TableHead>
+                  <TableHead className="text-[10px]">Winner (Coalition)</TableHead>
+                  <TableHead className="text-[10px]">Party</TableHead>
                   <TableHead className="text-[10px] text-right">BN</TableHead>
                   <TableHead className="text-[10px] text-right">PH</TableHead>
                   <TableHead className="text-[10px] text-right">PN</TableHead>
@@ -359,7 +482,12 @@ function ElectionView({ el }: { el: Election }) {
                   <TableRow key={`${d.parliament_code}-${d.dun_code}`}>
                     <TableCell className="text-[10px] font-mono">P{d.parliament_code}</TableCell>
                     <TableCell className="text-[10px]">{getDunName(d.parliament_code, d.dun_code)} <span className="text-muted-foreground font-mono">N{d.dun_code}</span></TableCell>
-                    <TableCell><span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span></TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span>
+                    </TableCell>
+                    <TableCell>
+                      {d.winner_party && <PartyLogo party={d.winner_party as PartyCode} size="xs" showLabel />}
+                    </TableCell>
                     <TableCell className="text-[10px] text-right">{((d.vote_share.BN ?? 0) * 100).toFixed(0)}%</TableCell>
                     <TableCell className="text-[10px] text-right">{((d.vote_share.PH ?? 0) * 100).toFixed(0)}%</TableCell>
                     <TableCell className="text-[10px] text-right">{((d.vote_share.PN ?? 0) * 100).toFixed(0)}%</TableCell>
@@ -372,7 +500,8 @@ function ElectionView({ el }: { el: Election }) {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-[10px]">Parliament</TableHead>
-                  <TableHead className="text-[10px]">Winner</TableHead>
+                  <TableHead className="text-[10px]">Winner (Coalition)</TableHead>
+                  <TableHead className="text-[10px]">Party</TableHead>
                   <TableHead className="text-[10px] text-right">Vote %</TableHead>
                   <TableHead className="text-[10px]">Runner-up</TableHead>
                   <TableHead className="text-[10px] text-right">Margin</TableHead>
@@ -385,7 +514,12 @@ function ElectionView({ el }: { el: Election }) {
                   return (
                     <TableRow key={r.parliament_code}>
                       <TableCell className="text-[10px]">{PARLIAMENTS.find((p) => p.code === r.parliament_code)?.name ?? `P${r.parliament_code}`} <span className="font-mono text-muted-foreground">P{r.parliament_code}</span></TableCell>
-                      <TableCell><span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner) }}>{r.winner}</span></TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner) }}>{r.winner}</span>
+                      </TableCell>
+                      <TableCell>
+                        {r.winner_party && <PartyLogo party={r.winner_party as PartyCode} size="xs" showLabel />}
+                      </TableCell>
                       <TableCell className="text-[10px] text-right">{r.votes_pct.toFixed(1)}%</TableCell>
                       <TableCell className="text-[10px]">{r.runner_up}</TableCell>
                       <TableCell className="text-[10px] text-right font-mono">{r.margin_pct.toFixed(1)}%</TableCell>
@@ -411,8 +545,6 @@ export function ElectionsTab() {
       .then((r) => r.json())
       .then((d) => setData(d.elections as Election[]))
       .catch(() => {
-        // Dev server OOM / fetch failure — render inline fallback so the tab
-        // ALWAYS shows content. Mirrors public/data/elections/melaka-elections.json.
         setData(ELECTIONS_FALLBACK as Election[]);
         setOffline(true);
       });
@@ -425,7 +557,7 @@ export function ElectionsTab() {
       <Card className="border-mlk/20">
         <CardContent className="p-3 text-xs text-muted-foreground flex items-center gap-2">
           <Vote className="h-4 w-4 text-mlk flex-shrink-0" />
-          <span>Verified tier · source: ElectionData.my (community-maintained, sourced from SPR gazettes). PRN15 is the headline: BN landslide 21/28 DUN.</span>
+          <span>Verified tier · source: ElectionData.my (community-maintained, sourced from SPR gazettes). Now showing component parties (UMNO, DAP, PAS…) alongside coalitions (BN, PH, PN).</span>
           {offline && (
             <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
               <WifiOff className="h-2.5 w-2.5" /> offline data

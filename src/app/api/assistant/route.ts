@@ -1,4 +1,4 @@
-// PIP-MLK AI Assistant API route — RAG-enhanced chat with z-ai-web-dev-sdk.
+// PIP-MLK AI Assistant API route — RAG-enhanced chat with Cloudflare Workers AI.
 // Truth Above All: every response is grounded in verified Melaka data.
 //
 // Resilience stack (see src/lib/* + docs/RESEARCH-RESILIENCE.md):
@@ -10,13 +10,12 @@
 //   3. `assessBackpressure()` sheds load (429 + Retry-After) when the
 //      in-process queue is overwhelmed even before the per-IP limit fires.
 //   4. `circuitBreaker("llm-assistant", ...)` opens after 5 consecutive
-//      ZAI failures so subsequent requests fail-fast into the static fallback
-//      instead of queuing behind doomed calls.
+//      CF Workers AI failures so subsequent requests fail-fast into the
+//      static fallback instead of queuing behind doomed calls.
 
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import ZAI from "z-ai-web-dev-sdk";
 import { rateLimit, assessBackpressure, withInflight, getClientIdentifier } from "@/lib/rate-limiter";
 import { circuitBreaker, CircuitOpenError } from "@/lib/circuit-breaker";
 import { withIdempotency } from "@/lib/idempotency";
@@ -285,7 +284,7 @@ async function buildRagContext(question: string): Promise<RagResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Static fallback — used when ZAI fails or env is unset.
+// Static fallback — used when CF Workers AI fails or env is unset.
 // ---------------------------------------------------------------------------
 function staticFallback(question: string): string {
   const q = question.toLowerCase();
@@ -316,7 +315,7 @@ function staticFallback(question: string): string {
 //   1. rateLimit() — 5 req/min per IP (per task spec for LLM routes)
 //   2. assessBackpressure() — 429 + Retry-After if the queue is overflowing
 //   3. parse body, build RAG context (no breaker — local fs reads rarely fail)
-//   4. circuitBreaker("llm-assistant", ...) around the ZAI call so 5
+//   4. circuitBreaker("llm-assistant", ...) around the CF Workers AI call so 5
 //      consecutive LLM failures open the circuit and we fail-fast into the
 //      static fallback. The static fallback is ALWAYS returned (never a 5xx)
 //      so end users never see a hard error — the resilience primitives are
@@ -325,7 +324,7 @@ function staticFallback(question: string): string {
 
 async function handlePost(req: NextRequest): Promise<NextResponse> {
   // --- 1. Rate limit (5 req/min per IP) ---
-  // Security-01: rate-limit every LLM call to protect the ZAI budget and to
+  // Security-01: rate-limit every LLM call to protect the CF Workers AI budget and to
   // blunt brute-force prompt-injection attempts. Uses the shared
   // rate-limiter (`@/lib/rate-limiter`) so middleware and route-level limits
   // share a single in-memory bucket store.
@@ -364,17 +363,10 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
 
   // --- 3. Parse body ---
   let messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
-  // Auto-detect environment: on Cloudflare Workers, default to CF Workers AI
-  // because z-ai-web-dev-sdk requires Node.js APIs not available in Workers.
-  // On local dev (Node.js), default to z-ai (GLM-4.6).
-  const isCloudflareWorkers = typeof (globalThis as { caches?: { default?: unknown } }).caches?.default !== "undefined"
-    || process.env.CF_WORKERS === "true";
-  let backend: "zai" | "cf" = (isCloudflareWorkers || isCFConfigured()) ? "cf" : "zai";
   let cfModel: string = CF_MODELS[0].id;
   try {
     const body = (await req.json()) as {
       messages?: Array<{ role: string; content: string }>;
-      backend?: string;
       model?: string;
     };
     if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
@@ -389,13 +381,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       .slice(-20) // Keep only last 20 messages
       .map((m) => ({ role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant", content: m.content.slice(0, 5000) }));
 
-    // Parse backend selection (client can override auto-detection)
-    if (body.backend === "zai" && !isCloudflareWorkers) {
-      backend = "zai";
-    } else if (body.backend === "cf" && isCFConfigured()) {
-      backend = "cf";
-    }
-    // Parse CF model ID
+    // Parse CF model ID (optional — defaults to Llama 3.1 8B)
     if (body.model && CF_MODELS.some((m) => m.id === body.model)) {
       cfModel = body.model!;
     }
@@ -410,66 +396,27 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
   const augmentedSystem = SYSTEM_PROMPT + (rag.context ? `\n\nRAG CONTEXT (verified, use these exact figures):\n${rag.context}\n` : "");
 
   // --- 4. Call the LLM through the circuit breaker + inflight tracker ---
-  // Supports two backends:
-  //   - "zai" (default): z-ai-web-dev-sdk (GLM-4.6, built-in to the platform)
-  //   - "cf": Cloudflare Workers AI (Llama 3.1, Mistral, Qwen — requires CF_AI_TOKEN)
+  // Uses Cloudflare Workers AI exclusively (Llama 3.1, Mistral, Qwen).
+  // No z-ai dependency — works identically on local dev and Cloudflare Workers.
   //
   // `withInflight` ensures backpressure's `inflight` count is accurate even
   // if the LLM call hangs or throws. `circuitBreaker` opens after 5
   // consecutive failures so subsequent requests fail-fast.
   const runLlm = withInflight(async () => {
-    if (backend === "cf") {
-      // === Cloudflare Workers AI backend ===
-      const cfMessages: CFChatMessage[] = [
-        { role: "system", content: augmentedSystem },
-        ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
-      ];
-      const result = await cfChatCompletion(cfMessages, cfModel);
-      return result.response.trim();
-    }
-
-    // === Default: z-ai-web-dev-sdk backend (Node.js only) ===
-    try {
-      const zai = await ZAI.create();
-      const completion = await zai.chat.completions.create({
-        messages: [
-          { role: "assistant", content: augmentedSystem },
-          ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
-        ],
-        thinking: { type: "disabled" },
-        temperature: 0.2,
-        max_tokens: 600,
-      });
-      return completion?.choices?.[0]?.message?.content?.trim() || "";
-    } catch (zaiErr) {
-      // z-ai failed (e.g., on Cloudflare Workers where Node.js APIs are missing)
-      // Try CF Workers AI as fallback if configured
-      if (isCFConfigured()) {
-        console.warn("[assistant] z-ai failed, falling back to CF Workers AI:", zaiErr instanceof Error ? zaiErr.message : String(zaiErr));
-        const cfMessages: CFChatMessage[] = [
-          { role: "system", content: augmentedSystem },
-          ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
-        ];
-        const result = await cfChatCompletion(cfMessages, cfModel);
-        return result.response.trim();
-      }
-      throw zaiErr; // re-throw if no CF fallback available
-    }
+    const cfMessages: CFChatMessage[] = [
+      { role: "system", content: augmentedSystem },
+      ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+    ];
+    const result = await cfChatCompletion(cfMessages, cfModel);
+    return result.response.trim();
   });
 
   let responseText: string;
-  let llmSource = backend === "cf" ? `cf:${cfModel}` : "zai";
-  // Track if we fell back to CF during execution
-  let usedCfFallback = false;
+  let llmSource = `cf:${cfModel}`;
 
   try {
     const text = await circuitBreaker("llm-assistant", runLlm, ASSISTANT_CIRCUIT);
     responseText = text || staticFallback(lastUser?.content ?? "");
-    // If we started with zai but fell back to CF, update the source label
-    if (backend === "zai" && isCFConfigured() && !responseText.includes("Static fallback")) {
-      llmSource = `cf:${cfModel} (zai-failed)`;
-      usedCfFallback = true;
-    }
   } catch (err) {
     // CircuitOpenError = breaker is open OR a probe just failed. Log and fall
     // back to the static answer — the user still gets a verified response.
@@ -477,7 +424,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       console.warn("[assistant] circuit open:", err.message);
       llmSource = "circuit-open-fallback";
     } else {
-      console.error(`[assistant] ${backend} error:`, err instanceof Error ? err.message : String(err));
+      console.error(`[assistant] CF Workers AI error:`, err instanceof Error ? err.message : String(err));
       llmSource = "static-fallback";
     }
     responseText = staticFallback(lastUser?.content ?? "");

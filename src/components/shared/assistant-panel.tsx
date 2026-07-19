@@ -78,15 +78,12 @@ export function AssistantPanel() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  // Default to CF Workers AI since it works on both Cloudflare and local.
-  // z-ai only works on local Node.js dev server.
-  const [backend, setBackend] = useState<"zai" | "cf">("cf");
   const [cfModel, setCfModel] = useState(CF_MODELS[0].id);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content:
-        "Selamat datang. I'm the PIP-MLK AI Assistant — grounded in 12 verified Melaka facts with RAG over P134 engine data, elections, DPT, and DOSM. Ask me anything about Melaka political intelligence.",
+        "Selamat datang. I'm the PIP-MLK AI Assistant — powered by Cloudflare Workers AI (Llama 3.1 8B) with RAG over verified Melaka election data, P134 demographics, DPT churn, and DOSM indicators. Ask me anything about Melaka political intelligence.",
       rag_used: false,
       evidence_tier: "Verified",
       source: "system-facts",
@@ -116,8 +113,7 @@ export function AssistantPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
-          backend,
-          model: backend === "cf" ? cfModel : undefined,
+          model: cfModel,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -241,32 +237,21 @@ export function AssistantPanel() {
               </div>
             )}
 
-            {/* Backend selector + Input */}
+            {/* Model selector + Input */}
             <div className="px-2 pt-1.5 pb-1 border-t border-mlk/20 bg-background/95 flex items-center gap-1.5">
               <Cpu className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              <span className="text-[9px] text-muted-foreground">CF AI</span>
               <select
-                value={backend}
-                onChange={(e) => setBackend(e.target.value as "zai" | "cf")}
-                className="text-[9px] h-6 px-1 rounded bg-background border border-mlk/20 focus:border-mlk focus:outline-none text-muted-foreground"
-                aria-label="LLM backend"
+                value={cfModel}
+                onChange={(e) => setCfModel(e.target.value)}
+                className="text-[9px] h-6 px-1 rounded bg-background border border-mlk/20 focus:border-mlk focus:outline-none text-muted-foreground flex-1 min-w-0"
+                aria-label="AI model"
                 disabled={loading}
               >
-                <option value="zai">Z.ai (GLM-4.6)</option>
-                <option value="cf">CF Workers AI</option>
+                {CF_MODELS.map((m) => (
+                  <option key={m.id} value={m.id}>{m.label}</option>
+                ))}
               </select>
-              {backend === "cf" && (
-                <select
-                  value={cfModel}
-                  onChange={(e) => setCfModel(e.target.value)}
-                  className="text-[9px] h-6 px-1 rounded bg-background border border-mlk/20 focus:border-mlk focus:outline-none text-muted-foreground flex-1 min-w-0"
-                  aria-label="CF model"
-                  disabled={loading}
-                >
-                  {CF_MODELS.map((m) => (
-                    <option key={m.id} value={m.id}>{m.label}</option>
-                  ))}
-                </select>
-              )}
             </div>
             <form
               onSubmit={(e) => {

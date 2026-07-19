@@ -1,0 +1,2382 @@
+{
+  "source": "ElectionData.MY REST API (api.electiondata.my/v1)",
+  "fetched_at": "2026-07-19",
+  "candidates": {
+    "Nor Azman bin Hassan": {
+      "uid": "R664G",
+      "name": "Nor Azman bin Hassan",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Nor Azman bin Hassan",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.12 Pantai Kundor",
+          "state": "Melaka",
+          "party": "AMANAH",
+          "party_uid": "046-AMANAH",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 2799,
+          "votes_perc": 28.29559239789729,
+          "result": "lost"
+        },
+        {
+          "name": "Nor Azman bin Hassan",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.12 Pantai Kundor",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5773,
+          "votes_perc": 45.420928402832416,
+          "result": "won"
+        }
+      ]
+    },
+    "Mohd Rafiq bin Naizamohideen": {
+      "uid": "5WYDM",
+      "name": "Mohd Rafiq bin Naizamohideen",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Mohd Rafiq bin Naizamohideen",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.23 Telok Mas",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 3976,
+          "votes_perc": 28.254690164866403,
+          "result": "lost"
+        },
+        {
+          "name": "Mohd Rafiq bin Naizamohideen",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.13 Paya Rumput",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 12102,
+          "votes_perc": 56.29622738056474,
+          "result": "won"
+        }
+      ]
+    },
+    "Gue Teck": {
+      "uid": "CRAJ6",
+      "name": "Gue Teck",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Gue Teck",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.14 Kelebang",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 4152,
+          "votes_perc": 31.78199632578077,
+          "result": "lost"
+        },
+        {
+          "name": "Gue Teck",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.14 Kelebang",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 7648,
+          "votes_perc": 45.58078550569164,
+          "result": "won"
+        }
+      ]
+    },
+    "Mohd Noor Helmy bin Abdul Halem": {
+      "uid": "DCKTN",
+      "name": "Mohd Noor Helmy bin Abdul Halem",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Mohd Noor Helmy bin Abdul Halem",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.21 Duyong",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4684,
+          "votes_perc": 38.358856768487435,
+          "result": "won"
+        }
+      ]
+    },
+    "Leng Chau Yen": {
+      "uid": "QNP1G",
+      "name": "Leng Chau Yen",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Leng Chau Yen",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.22 Bandar Hilir",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 9091,
+          "votes_perc": 81.19139055104046,
+          "result": "won"
+        }
+      ]
+    },
+    "Mohd Sofi bin Abdul Wahab (Sofi Wahab)": {
+      "uid": "AFDVC",
+      "name": "Mohd Sofi bin Abdul Wahab (Sofi Wahab)",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Mohd Sofi bin Abdul Wahab (Sofi Wahab)",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.09 Durian Tunggal",
+          "state": "Melaka",
+          "party": "AMANAH",
+          "party_uid": "046-AMANAH",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 3104,
+          "votes_perc": 34.36289161961696,
+          "result": "lost"
+        },
+        {
+          "name": "Mohd Sofi bin Abdul Wahab (Sofi Wahab)",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.09 Durian Tunggal",
+          "state": "Melaka",
+          "party": "AMANAH",
+          "party_uid": "046-AMANAH",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 5213,
+          "votes_perc": 47.15939931246608,
+          "result": "won"
+        }
+      ]
+    },
+    "Seah Shoo Chin (Allex Seah)": {
+      "uid": "JEXB9",
+      "name": "Seah Shoo Chin (Allex Seah)",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Seah Shoo Chin (Allex Seah)",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.19 Kesidang",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 14769,
+          "votes_perc": 65.85953177257525,
+          "result": "won"
+        },
+        {
+          "name": "Seah Shoo Chin (Allex Seah)",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.19 Kesidang",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 22880,
+          "votes_perc": 72.64183890529256,
+          "result": "won"
+        }
+      ]
+    },
+    "Khaidhirah binti Abu Zahar": {
+      "uid": "FNGHF",
+      "name": "Khaidhirah binti Abu Zahar",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Khaidhirah binti Abu Zahar",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.25 Rim",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4037,
+          "votes_perc": 45.308641975308646,
+          "result": "won"
+        }
+      ]
+    },
+    "Abdul Razak bin Abdul Rahman": {
+      "uid": "05NMD",
+      "name": "Abdul Razak bin Abdul Rahman",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Abdul Razak bin Abdul Rahman",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.23 Telok Mas",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6052,
+          "votes_perc": 43.007390562819786,
+          "result": "won"
+        },
+        {
+          "name": "Abdul Razak bin Abdul Rahman",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.23 Telok Mas",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6406,
+          "votes_perc": 37.106116774791474,
+          "result": "lost"
+        }
+      ]
+    },
+    "Hameed bin Mytheen Kunju Basheer": {
+      "uid": "QQ21R",
+      "name": "Hameed bin Mytheen Kunju Basheer",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Hameed bin Mytheen Kunju Basheer",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.03 Ayer Limau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3838,
+          "votes_perc": 51.94207605900664,
+          "result": "won"
+        }
+      ]
+    },
+    "Muhamad Akmal bin Saleh": {
+      "uid": "XC8TK",
+      "name": "Muhamad Akmal bin Saleh",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Muhamad Akmal bin Saleh",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.27 Merlimau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5633,
+          "votes_perc": 58.433609958506224,
+          "result": "won"
+        }
+      ]
+    },
+    "Latipah binti Omar": {
+      "uid": "5GJ1T",
+      "name": "Latipah binti Omar",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Latipah binti Omar",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.05 Taboh Naning",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3329,
+          "votes_perc": 47.36093327642623,
+          "result": "won"
+        },
+        {
+          "name": "Latipah binti Omar",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.05 Taboh Naning",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4520,
+          "votes_perc": 67.61406133133882,
+          "result": "won"
+        },
+        {
+          "name": "Latipah binti Omar",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.05 Taboh Naning",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3873,
+          "votes_perc": 70.43098745226405,
+          "result": "won"
+        }
+      ]
+    },
+    "Noor Effandi bin Ahmad": {
+      "uid": "3KBPP",
+      "name": "Noor Effandi bin Ahmad",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Noor Effandi bin Ahmad",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.23 Telok Mas",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 7694,
+          "votes_perc": 44.566728452270624,
+          "result": "won"
+        }
+      ]
+    },
+    "Ismail bin Othman": {
+      "uid": "MC3PD",
+      "name": "Ismail bin Othman",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Ismail bin Othman",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.01 Kuala Linggi",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4812,
+          "votes_perc": 52.344174915696726,
+          "result": "won"
+        },
+        {
+          "name": "Ismail bin Othman",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.01 Kuala Linggi",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5521,
+          "votes_perc": 64.11566600859366,
+          "result": "won"
+        },
+        {
+          "name": "Ismail bin Othman",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.01 Kuala Linggi",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4468,
+          "votes_perc": 64.20462710159505,
+          "result": "won"
+        }
+      ]
+    },
+    "Tuminah binti Kadi": {
+      "uid": "YHR66",
+      "name": "Tuminah binti Kadi",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Tuminah binti Kadi",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.12 Pantai Kundor",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3960,
+          "votes_perc": 40.03234937323089,
+          "result": "won"
+        }
+      ]
+    },
+    "Mohd Aleef bin Yusof": {
+      "uid": "M8NZB",
+      "name": "Mohd Aleef bin Yusof",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Mohd Aleef bin Yusof",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.11 Sungai Udang",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 6789,
+          "votes_perc": 43.64793622219365,
+          "result": "won"
+        }
+      ]
+    },
+    "Rosli bin Abdullah": {
+      "uid": "6JKPB",
+      "name": "Rosli bin Abdullah",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Rosli bin Abdullah",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.01 Kuala Linggi",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3554,
+          "votes_perc": 51.00459242250287,
+          "result": "won"
+        }
+      ]
+    },
+    "Adly bin Zahari": {
+      "uid": "03YFA",
+      "name": "Adly bin Zahari",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Adly bin Zahari",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.135 Alor Gajah",
+          "state": "Melaka",
+          "party": "AMANAH",
+          "party_uid": "046-AMANAH",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 28178,
+          "votes_perc": 38.6,
+          "result": "won"
+        },
+        {
+          "name": "Adly bin Zahari",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.17 Bukit Katil",
+          "state": "Melaka",
+          "party": "AMANAH",
+          "party_uid": "046-AMANAH",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 6805,
+          "votes_perc": 41.552176833363866,
+          "result": "won"
+        },
+        {
+          "name": "Adly bin Zahari",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.17 Bukit Katil",
+          "state": "Melaka",
+          "party": "AMANAH",
+          "party_uid": "046-AMANAH",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 11226,
+          "votes_perc": 52.14119832791454,
+          "result": "won"
+        },
+        {
+          "name": "Adly bin Zahari",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.09 Durian Tunggal",
+          "state": "Melaka",
+          "party": "PAS",
+          "party_uid": "004-PAS",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 4329,
+          "votes_perc": 43.402847403248444,
+          "result": "lost"
+        }
+      ]
+    },
+    "Ab Rauf bin Yusoh": {
+      "uid": "M9BZF",
+      "name": "Ab Rauf bin Yusoh",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Ab Rauf bin Yusoh",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.02 Tanjung Bidara",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3559,
+          "votes_perc": 49.137097887615624,
+          "result": "won"
+        }
+      ]
+    },
+    "Siti Faizah binti Abdul Azis": {
+      "uid": "B313Q",
+      "name": "Siti Faizah binti Abdul Azis",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Siti Faizah binti Abdul Azis",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.28 Sungai Rambai",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3801,
+          "votes_perc": 48.08349146110057,
+          "result": "won"
+        }
+      ]
+    },
+    "Fairul Nizam bin Roslan": {
+      "uid": "347KY",
+      "name": "Fairul Nizam bin Roslan",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Fairul Nizam bin Roslan",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.10 Asahan",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5659,
+          "votes_perc": 56.77166934189406,
+          "result": "won"
+        }
+      ]
+    },
+    "Abdul Ghafar bin Atan": {
+      "uid": "TNYK0",
+      "name": "Abdul Ghafar bin Atan",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Abdul Ghafar bin Atan",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.10 Asahan",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5942,
+          "votes_perc": 45.79929088947125,
+          "result": "won"
+        },
+        {
+          "name": "Abdul Ghafar bin Atan",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.10 Asahan",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 8257,
+          "votes_perc": 65.23662795291143,
+          "result": "won"
+        },
+        {
+          "name": "Abdul Ghafar bin Atan",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.07 Gadek",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5326,
+          "votes_perc": 69.74855945521216,
+          "result": "won"
+        },
+        {
+          "name": "Abdul Ghafar bin Atan",
+          "election_name": "SE-11",
+          "type": "dun",
+          "date": "2004-03-21",
+          "seat": "N.07 Gadek",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5871,
+          "votes_perc": 77.98884165781084,
+          "result": "won"
+        }
+      ]
+    },
+    "Wong Fort Pin": {
+      "uid": "AEQV8",
+      "name": "Wong Fort Pin",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Wong Fort Pin",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.24 Bemban",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 6998,
+          "votes_perc": 45.40323103873354,
+          "result": "won"
+        }
+      ]
+    },
+    "Mohd Yadzil bin Yaakub": {
+      "uid": "8T4CX",
+      "name": "Mohd Yadzil bin Yaakub",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Mohd Yadzil bin Yaakub",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.24 Bemban",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 4211,
+          "votes_perc": 34.60432245870655,
+          "result": "won"
+        }
+      ]
+    },
+    "Rusnah binti Aluai": {
+      "uid": "EZG3X",
+      "name": "Rusnah binti Aluai",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Rusnah binti Aluai",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 28557,
+          "votes_perc": 31.03111043498104,
+          "result": "lost"
+        },
+        {
+          "name": "Rusnah binti Aluai",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 32420,
+          "votes_perc": 46.889011020797774,
+          "result": "won"
+        },
+        {
+          "name": "Rusnah binti Aluai",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.06 Rembia",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 4521,
+          "votes_perc": 39.6578947368421,
+          "result": "lost"
+        }
+      ]
+    },
+    "Kalsom binti Noordin": {
+      "uid": "XCYTQ",
+      "name": "Kalsom binti Noordin",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Kalsom binti Noordin",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.15 Pengkalan Batu",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4839,
+          "votes_perc": 35.7702542874039,
+          "result": "won"
+        }
+      ]
+    },
+    "Mas Ermieyati binti Samsudin": {
+      "uid": "QE3PJ",
+      "name": "Mas Ermieyati binti Samsudin",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Mas Ermieyati binti Samsudin",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.134 Masjid Tanah",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 25604,
+          "votes_perc": 46.76615097992657,
+          "result": "won"
+        },
+        {
+          "name": "Mas Ermieyati binti Samsudin",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.02 Tanjung Bidara",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 3195,
+          "votes_perc": 44.111555985089055,
+          "result": "lost"
+        },
+        {
+          "name": "Mas Ermieyati binti Samsudin",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.134 Masjid Tanah",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 22898,
+          "votes_perc": 54.100413467217955,
+          "result": "won"
+        },
+        {
+          "name": "Mas Ermieyati binti Samsudin",
+          "election_name": "GE-13",
+          "type": "parlimen",
+          "date": "2013-05-05",
+          "seat": "P.134 Masjid Tanah",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 27688,
+          "votes_perc": 70.67592403512354,
+          "result": "won"
+        }
+      ]
+    },
+    "Zaidi bin Attan": {
+      "uid": "TCNP3",
+      "name": "Zaidi bin Attan",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Zaidi bin Attan",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.26 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5038,
+          "votes_perc": 43.31527813601582,
+          "result": "won"
+        },
+        {
+          "name": "Zaidi bin Attan",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.26 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6401,
+          "votes_perc": 47.45699881376038,
+          "result": "won"
+        },
+        {
+          "name": "Zaidi bin Attan",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.26 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 8715,
+          "votes_perc": 63.015184381778745,
+          "result": "won"
+        }
+      ]
+    },
+    "Saminathan a/l Ganesan (G. Saminathan)": {
+      "uid": "3M1PT",
+      "name": "Saminathan a/l Ganesan (G. Saminathan)",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Saminathan a/l Ganesan (G. Saminathan)",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.07 Gadek",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 2463,
+          "votes_perc": 32.082844861273934,
+          "result": "lost"
+        },
+        {
+          "name": "Saminathan a/l Ganesan (G. Saminathan)",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.07 Gadek",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 4392,
+          "votes_perc": 42.467607812802164,
+          "result": "won"
+        }
+      ]
+    },
+    "Sulaiman bin Md Ali": {
+      "uid": "843ZB",
+      "name": "Sulaiman bin Md Ali",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Sulaiman bin Md Ali",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.04 Lendu",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4486,
+          "votes_perc": 63.87583653709241,
+          "result": "won"
+        },
+        {
+          "name": "Sulaiman bin Md Ali",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.04 Lendu",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4016,
+          "votes_perc": 46.87208216619981,
+          "result": "won"
+        },
+        {
+          "name": "Sulaiman bin Md Ali",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.04 Lendu",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5009,
+          "votes_perc": 66.65335994677312,
+          "result": "won"
+        }
+      ]
+    },
+    "Hasan bin Abd Rahman": {
+      "uid": "QS3RJ",
+      "name": "Hasan bin Abd Rahman",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Hasan bin Abd Rahman",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.28 Sungai Rambai",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5088,
+          "votes_perc": 51.3317191283293,
+          "result": "won"
+        },
+        {
+          "name": "Hasan bin Abd Rahman",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.28 Sungai Rambai",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5709,
+          "votes_perc": 63.04803975704031,
+          "result": "won"
+        },
+        {
+          "name": "Hasan bin Abd Rahman",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.28 Sungai Rambai",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4872,
+          "votes_perc": 65.15110992243916,
+          "result": "won"
+        }
+      ]
+    },
+    "Kerk Chee Yee": {
+      "uid": "TF2VA",
+      "name": "Kerk Chee Yee",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Kerk Chee Yee",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.16 Ayer Keroh",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 9459,
+          "votes_perc": 59.96956824954035,
+          "result": "won"
+        },
+        {
+          "name": "Kerk Chee Yee",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.16 Ayer Keroh",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 14279,
+          "votes_perc": 65.30826930113427,
+          "result": "won"
+        }
+      ]
+    },
+    "Khoo Poay Tiong": {
+      "uid": "B74TX",
+      "name": "Khoo Poay Tiong",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Khoo Poay Tiong",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.138 Kota Melaka",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 73995,
+          "votes_perc": 60.07014068728132,
+          "result": "won"
+        },
+        {
+          "name": "Khoo Poay Tiong",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.138 Kota Melaka",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 76518,
+          "votes_perc": 72.68323264561724,
+          "result": "won"
+        },
+        {
+          "name": "Khoo Poay Tiong",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.16 Ayer Keroh",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 18934,
+          "votes_perc": 63.271512113617376,
+          "result": "won"
+        },
+        {
+          "name": "Khoo Poay Tiong",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.16 Ayer Keroh",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 11309,
+          "votes_perc": 58.25477772626591,
+          "result": "won"
+        }
+      ]
+    },
+    "Shanmugam a/l V.Pitchay (VP Shan)": {
+      "uid": "PJ8P9",
+      "name": "Shanmugam a/l V.Pitchay (VP Shan)",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Shanmugam a/l V.Pitchay (VP Shan)",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.07 Gadek",
+          "state": "Melaka",
+          "party": "MIC",
+          "party_uid": "002-MIC",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3022,
+          "votes_perc": 39.36433502670314,
+          "result": "won"
+        }
+      ]
+    },
+    "Shamsul Iskandar bin Mohd Akin": {
+      "uid": "6ET7A",
+      "name": "Shamsul Iskandar bin Mohd Akin",
+      "total_contests": 7,
+      "melaka_contests": 5,
+      "history": [
+        {
+          "name": "Shamsul Iskandar bin Mohd Akin",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.13 Paya Rumput",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 6201,
+          "votes_perc": 36.02928359769915,
+          "result": "lost"
+        },
+        {
+          "name": "Shamsul Iskandar bin Mohd Akin",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.137 Hang Tuah Jaya",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 39067,
+          "votes_perc": 51.0126268231853,
+          "result": "won"
+        },
+        {
+          "name": "Shamsul Iskandar bin Mohd Akin",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.25 Rim",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 4765,
+          "votes_perc": 42.06391242937853,
+          "result": "lost"
+        },
+        {
+          "name": "Shamsul Iskandar bin Mohd Akin",
+          "election_name": "GE-13",
+          "type": "parlimen",
+          "date": "2013-05-05",
+          "seat": "P.137 Bukit Katil",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 46357,
+          "votes_perc": 53.29554730343409,
+          "result": "won"
+        },
+        {
+          "name": "Shamsul Iskandar bin Mohd Akin",
+          "election_name": "GE-11",
+          "type": "parlimen",
+          "date": "2004-03-21",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "BA",
+          "coalition_uid": "007-BA",
+          "votes": 8595,
+          "votes_perc": 20.6441850410722,
+          "result": "lost"
+        }
+      ]
+    },
+    "Adam Adli bin Abd Halim": {
+      "uid": "G93ST",
+      "name": "Adam Adli bin Abd Halim",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Adam Adli bin Abd Halim",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.137 Hang Tuah Jaya",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 39418,
+          "votes_perc": 41.718349808437225,
+          "result": "won"
+        }
+      ]
+    },
+    "Ahmad bin Hamzah": {
+      "uid": "3SW9H",
+      "name": "Ahmad bin Hamzah",
+      "total_contests": 6,
+      "melaka_contests": 6,
+      "history": [
+        {
+          "name": "Ahmad bin Hamzah",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.139 Jasin",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 26560,
+          "votes_perc": 43.004485031006624,
+          "result": "won"
+        },
+        {
+          "name": "Ahmad bin Hamzah",
+          "election_name": "GE-13",
+          "type": "parlimen",
+          "date": "2013-05-05",
+          "seat": "P.139 Jasin",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 33736,
+          "votes_perc": 60.557540074314744,
+          "result": "won"
+        },
+        {
+          "name": "Ahmad bin Hamzah",
+          "election_name": "GE-12",
+          "type": "parlimen",
+          "date": "2008-03-08",
+          "seat": "P.139 Jasin",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 28101,
+          "votes_perc": 64.63863458618945,
+          "result": "won"
+        },
+        {
+          "name": "Ahmad bin Hamzah",
+          "election_name": "SE-11",
+          "type": "dun",
+          "date": "2004-03-21",
+          "seat": "N.26 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 7344,
+          "votes_perc": 71.01827676240208,
+          "result": "won"
+        },
+        {
+          "name": "Ahmad bin Hamzah",
+          "election_name": "SE-10",
+          "type": "dun",
+          "date": "1999-11-29",
+          "seat": "N.24 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5902,
+          "votes_perc": 59.525970751386794,
+          "result": "won"
+        },
+        {
+          "name": "Ahmad bin Hamzah",
+          "election_name": "SE-09",
+          "type": "dun",
+          "date": "1995-04-24",
+          "seat": "N.24 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6594,
+          "votes_perc": 72.69319810384742,
+          "result": "won"
+        }
+      ]
+    },
+    "Bakri bin Jamaluddin": {
+      "uid": "FP6HK",
+      "name": "Bakri bin Jamaluddin",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Bakri bin Jamaluddin",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "PAS",
+          "party_uid": "004-PAS",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 37406,
+          "votes_perc": 40.64676670976996,
+          "result": "won"
+        },
+        {
+          "name": "Bakri bin Jamaluddin",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.14 Kelebang",
+          "state": "Melaka",
+          "party": "PAS",
+          "party_uid": "004-PAS",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 3884,
+          "votes_perc": 29.730557256582973,
+          "result": "lost"
+        }
+      ]
+    },
+    "Ngwe Hee Sem": {
+      "uid": "7PQ1P",
+      "name": "Ngwe Hee Sem",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Ngwe Hee Sem",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.08 Machap Jaya",
+          "state": "Melaka",
+          "party": "MCA",
+          "party_uid": "003-MCA",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3732,
+          "votes_perc": 46.673336668334166,
+          "result": "won"
+        }
+      ]
+    },
+    "Amirudin Yusof": {
+      "uid": "YN5X8",
+      "name": "Amirudin Yusof",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Amirudin Yusof",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.03 Ayer Limau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4704,
+          "votes_perc": 51.601579640193066,
+          "result": "won"
+        },
+        {
+          "name": "Amirudin Yusof",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.03 Ayer Limau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6552,
+          "votes_perc": 76.76625659050967,
+          "result": "won"
+        },
+        {
+          "name": "Amirudin Yusof",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.03 Ayer Limau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4948,
+          "votes_perc": 75.97113465376938,
+          "result": "won"
+        }
+      ]
+    },
+    "Norhizam bin Hassan Baktee": {
+      "uid": "G60MF",
+      "name": "Norhizam bin Hassan Baktee",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Norhizam bin Hassan Baktee",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.15 Pengkalan Batu",
+          "state": "Melaka",
+          "party": "BEBAS",
+          "party_uid": "000-BEBAS",
+          "coalition": "ALONE",
+          "coalition_uid": "000-ALONE",
+          "votes": 1218,
+          "votes_perc": 9.00354819633353,
+          "result": "lost_deposit"
+        },
+        {
+          "name": "Norhizam bin Hassan Baktee",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.15 Pengkalan Batu",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 9227,
+          "votes_perc": 51.46697902721999,
+          "result": "won"
+        }
+      ]
+    },
+    "Low Chee Leong": {
+      "uid": "NWKDJ",
+      "name": "Low Chee Leong",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Low Chee Leong",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.20 Kota Laksamana",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 13508,
+          "votes_perc": 80.82814743896601,
+          "result": "won"
+        },
+        {
+          "name": "Low Chee Leong",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.20 Kota Laksamana",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 20181,
+          "votes_perc": 81.68461102566178,
+          "result": "won"
+        }
+      ]
+    },
+    "Md Rawi bin Mahmud": {
+      "uid": "18QTS",
+      "name": "Md Rawi bin Mahmud",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Md Rawi bin Mahmud",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.02 Tanjung Bidara",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4865,
+          "votes_perc": 58.14509382096331,
+          "result": "won"
+        },
+        {
+          "name": "Md Rawi bin Mahmud",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.02 Tanjung Bidara",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6014,
+          "votes_perc": 77.22136620441705,
+          "result": "won"
+        }
+      ]
+    },
+    "Mohd Redzuan bin Md Yusof": {
+      "uid": "ZNGCP",
+      "name": "Mohd Redzuan bin Md Yusof",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Mohd Redzuan bin Md Yusof",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.135 Alor Gajah",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 17211,
+          "votes_perc": 23.576712328767123,
+          "result": "lost"
+        },
+        {
+          "name": "Mohd Redzuan bin Md Yusof",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.135 Alor Gajah",
+          "state": "Melaka",
+          "party": "BERSATU",
+          "party_uid": "107-BERSATU",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 29330,
+          "votes_perc": 50.73077920954769,
+          "result": "won"
+        }
+      ]
+    },
+    "Ghazale bin Muhamad": {
+      "uid": "GXQM0",
+      "name": "Ghazale bin Muhamad",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Ghazale bin Muhamad",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.25 Rim",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5301,
+          "votes_perc": 46.795550847457626,
+          "result": "won"
+        },
+        {
+          "name": "Ghazale bin Muhamad",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.25 Rim",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4821,
+          "votes_perc": 56.577866447600044,
+          "result": "won"
+        },
+        {
+          "name": "Ghazale bin Muhamad",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.26 Serkam",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6997,
+          "votes_perc": 62.61297539149888,
+          "result": "won"
+        }
+      ]
+    },
+    "Idris bin Haron": {
+      "uid": "9WG9K",
+      "name": "Idris bin Haron",
+      "total_contests": 5,
+      "melaka_contests": 5,
+      "history": [
+        {
+          "name": "Idris bin Haron",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.10 Asahan",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 2666,
+          "votes_perc": 26.74558587479936,
+          "result": "lost"
+        },
+        {
+          "name": "Idris bin Haron",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.11 Sungai Udang",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 10073,
+          "votes_perc": 56.220349388848575,
+          "result": "won"
+        },
+        {
+          "name": "Idris bin Haron",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.11 Sungai Udang",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 12145,
+          "votes_perc": 80.14385640754917,
+          "result": "won"
+        },
+        {
+          "name": "Idris bin Haron",
+          "election_name": "GE-12",
+          "type": "parlimen",
+          "date": "2008-03-08",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 30460,
+          "votes_perc": 65.61826798793624,
+          "result": "won"
+        },
+        {
+          "name": "Idris bin Haron",
+          "election_name": "GE-11",
+          "type": "parlimen",
+          "date": "2004-03-21",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 33039,
+          "votes_perc": 79.3558149589278,
+          "result": "won"
+        }
+      ]
+    },
+    "Roslan bin Ahmad": {
+      "uid": "K2GA2",
+      "name": "Roslan bin Ahmad",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Roslan bin Ahmad",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.139 Jasin",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 27571,
+          "votes_perc": 35.53055491120905,
+          "result": "lost"
+        },
+        {
+          "name": "Roslan bin Ahmad",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.27 Merlimau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5290,
+          "votes_perc": 45.37656544861897,
+          "result": "won"
+        },
+        {
+          "name": "Roslan bin Ahmad",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.27 Merlimau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6736,
+          "votes_perc": 61.89469815308279,
+          "result": "won"
+        },
+        {
+          "name": "Roslan bin Ahmad",
+          "election_name": "By-Election",
+          "type": "dun",
+          "date": "2011-03-06",
+          "seat": "N.27 Merlimau",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5962,
+          "votes_perc": 71.99613573239947,
+          "result": "won"
+        }
+      ]
+    },
+    "Zahari bin Abd Kalil": {
+      "uid": "RV5D3",
+      "name": "Zahari bin Abd Kalil",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Zahari bin Abd Kalil",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.09 Durian Tunggal",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3663,
+          "votes_perc": 40.55131185652607,
+          "result": "won"
+        }
+      ]
+    },
+    "Rahmad bin Mariman": {
+      "uid": "BKH6Q",
+      "name": "Rahmad bin Mariman",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Rahmad bin Mariman",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.18 Ayer Molek",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6348,
+          "votes_perc": 51.0699919549477,
+          "result": "won"
+        },
+        {
+          "name": "Rahmad bin Mariman",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.18 Ayer Molek",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6951,
+          "votes_perc": 45.55642941407786,
+          "result": "won"
+        }
+      ]
+    },
+    "Muhammad Jailani bin Khamis": {
+      "uid": "NX9DP",
+      "name": "Muhammad Jailani bin Khamis",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Muhammad Jailani bin Khamis",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.06 Rembia",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 4224,
+          "votes_perc": 41.60756501182033,
+          "result": "won"
+        },
+        {
+          "name": "Muhammad Jailani bin Khamis",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.06 Rembia",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 6773,
+          "votes_perc": 52.37395607794618,
+          "result": "won"
+        }
+      ]
+    },
+    "Rais bin Yasin": {
+      "uid": "1ZE8F",
+      "name": "Rais bin Yasin",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Rais bin Yasin",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.13 Paya Rumput",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6830,
+          "votes_perc": 39.683923072453666,
+          "result": "won"
+        }
+      ]
+    },
+    "Lim Ban Hong": {
+      "uid": "H8CTQ",
+      "name": "Lim Ban Hong",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Lim Ban Hong",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "MCA",
+          "party_uid": "003-MCA",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 25095,
+          "votes_perc": 27.269171004161823,
+          "result": "lost"
+        },
+        {
+          "name": "Lim Ban Hong",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.14 Kelebang",
+          "state": "Melaka",
+          "party": "MCA",
+          "party_uid": "003-MCA",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 5028,
+          "votes_perc": 38.48744641763625,
+          "result": "won"
+        },
+        {
+          "name": "Lim Ban Hong",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.14 Kelebang",
+          "state": "Melaka",
+          "party": "MCA",
+          "party_uid": "003-MCA",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 6859,
+          "votes_perc": 40.878479051194944,
+          "result": "lost"
+        },
+        {
+          "name": "Lim Ban Hong",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.14 Kelebang",
+          "state": "Melaka",
+          "party": "MCA",
+          "party_uid": "003-MCA",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 9171,
+          "votes_perc": 56.45429362880886,
+          "result": "won"
+        }
+      ]
+    },
+    "Zulkiflee bin Mohd Zin": {
+      "uid": "8VGD5",
+      "name": "Zulkiflee bin Mohd Zin",
+      "total_contests": 1,
+      "melaka_contests": 1,
+      "history": [
+        {
+          "name": "Zulkiflee bin Mohd Zin",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.05 Taboh Naning",
+          "state": "Melaka",
+          "party": "UMNO",
+          "party_uid": "001-UMNO",
+          "coalition": "BN",
+          "coalition_uid": "001-BN",
+          "votes": 3170,
+          "votes_perc": 57.23054703014985,
+          "result": "won"
+        }
+      ]
+    },
+    "Ginie Lim Siew Lin": {
+      "uid": "PN0D7",
+      "name": "Ginie Lim Siew Lin",
+      "total_contests": 3,
+      "melaka_contests": 3,
+      "history": [
+        {
+          "name": "Ginie Lim Siew Lin",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.08 Machap Jaya",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 5550,
+          "votes_perc": 52.66154284087674,
+          "result": "won"
+        },
+        {
+          "name": "Ginie Lim Siew Lin",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.08 Machap",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 4851,
+          "votes_perc": 48.92586989409985,
+          "result": "lost"
+        },
+        {
+          "name": "Ginie Lim Siew Lin",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.08 Machap",
+          "state": "Melaka",
+          "party": "PKR",
+          "party_uid": "078-PKR",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 3068,
+          "votes_perc": 39.459807073954984,
+          "result": "lost"
+        }
+      ]
+    },
+    "Tey Kok Kiew": {
+      "uid": "ZS98K",
+      "name": "Tey Kok Kiew",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Tey Kok Kiew",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.24 Bemban",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 3095,
+          "votes_perc": 25.4334785109705,
+          "result": "lost"
+        },
+        {
+          "name": "Tey Kok Kiew",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.22 Bandar Hilir",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 14038,
+          "votes_perc": 83.04543303360151,
+          "result": "won"
+        },
+        {
+          "name": "Tey Kok Kiew",
+          "election_name": "SE-13",
+          "type": "dun",
+          "date": "2013-05-05",
+          "seat": "N.22 Bandar Hilir",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 11754,
+          "votes_perc": 75.55926973515042,
+          "result": "won"
+        },
+        {
+          "name": "Tey Kok Kiew",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.22 Bandar Hilir",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 9591,
+          "votes_perc": 67.21093202522775,
+          "result": "won"
+        }
+      ]
+    },
+    "Zulkifli bin Ismail": {
+      "uid": "6GWH8",
+      "name": "Zulkifli bin Ismail",
+      "total_contests": 2,
+      "melaka_contests": 2,
+      "history": [
+        {
+          "name": "Zulkifli bin Ismail",
+          "election_name": "GE-15",
+          "type": "parlimen",
+          "date": "2022-11-19",
+          "seat": "P.139 Jasin",
+          "state": "Melaka",
+          "party": "PAS",
+          "party_uid": "004-PAS",
+          "coalition": "PN",
+          "coalition_uid": "011-PN",
+          "votes": 27893,
+          "votes_perc": 35.94551405964071,
+          "result": "won"
+        },
+        {
+          "name": "Zulkifli bin Ismail",
+          "election_name": "GE-14",
+          "type": "parlimen",
+          "date": "2018-05-09",
+          "seat": "P.136 Tangga Batu",
+          "state": "Melaka",
+          "party": "PAS",
+          "party_uid": "004-PAS",
+          "coalition": "GS",
+          "coalition_uid": "008-GS",
+          "votes": 8961,
+          "votes_perc": 12.960284631627664,
+          "result": "lost"
+        }
+      ]
+    },
+    "Damian Yeo Shen Li": {
+      "uid": "WBK6A",
+      "name": "Damian Yeo Shen Li",
+      "total_contests": 4,
+      "melaka_contests": 4,
+      "history": [
+        {
+          "name": "Damian Yeo Shen Li",
+          "election_name": "SE-15",
+          "type": "dun",
+          "date": "2021-11-20",
+          "seat": "N.21 Duyong",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 4484,
+          "votes_perc": 36.720989271967895,
+          "result": "lost"
+        },
+        {
+          "name": "Damian Yeo Shen Li",
+          "election_name": "SE-14",
+          "type": "dun",
+          "date": "2018-05-09",
+          "seat": "N.21 Duyong",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PH",
+          "coalition_uid": "007-PH",
+          "votes": 7642,
+          "votes_perc": 49.65884722853986,
+          "result": "won"
+        },
+        {
+          "name": "Damian Yeo Shen Li",
+          "election_name": "GE-13",
+          "type": "parlimen",
+          "date": "2013-05-05",
+          "seat": "P.135 Alor Gajah",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 20997,
+          "votes_perc": 39.18008620850516,
+          "result": "lost"
+        },
+        {
+          "name": "Damian Yeo Shen Li",
+          "election_name": "SE-12",
+          "type": "dun",
+          "date": "2008-03-08",
+          "seat": "N.21 Duyong",
+          "state": "Melaka",
+          "party": "DAP",
+          "party_uid": "021-DAP",
+          "coalition": "PR",
+          "coalition_uid": "007-PR",
+          "votes": 5636,
+          "votes_perc": 46.663354860076176,
+          "result": "lost"
+        }
+      ]
+    }
+  }
+}

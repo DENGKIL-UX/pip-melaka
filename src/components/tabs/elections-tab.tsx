@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, ReferenceLine } from "recharts";
+import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3, History, User } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, ReferenceLine, LineChart, Line } from "recharts";
 import { PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { ELECTIONS_FALLBACK } from "@/lib/fallback-data";
 import { PARTIES, COALITIONS, partyLogoUrl, coalitionLogoUrl, type PartyCode, type CoalitionCode } from "@/lib/party-metadata";
 import { PartyLogo, CoalitionBadge } from "@/components/shared/party-logo";
+import { CandidateHistoryDialog } from "@/components/shared/candidate-history-dialog";
 
 interface Election {
   id: string; name: string; date: string; headline_fact: string;
@@ -396,7 +397,108 @@ function SwingAnalysis({ elections }: { elections: Election[] }) {
   );
 }
 
-function ElectionView({ el }: { el: Election }) {
+/**
+ * HistoricalTrendsCard — shows coalition vote % trends across multiple elections.
+ *
+ * Uses the ElectionData.MY REST API (via pre-fetched coalition-trends.json)
+ * to show how BN/PH/PN vote share has changed over time (GE11→GE15 for
+ * parliament, SE11→SE15 for DUN).
+ */
+function HistoricalTrendsCard() {
+  const [trends, setTrends] = useState<{ parlimen: Record<string, Array<{ election: string; date: string; seats_won: number; seats_total: number; votes_perc: number }>>; dun: Record<string, Array<{ election: string; date: string; seats_won: number; seats_total: number; votes_perc: number }>> } | null>(null);
+
+  useEffect(() => {
+    fetch("/data/elections/coalition-trends.json")
+      .then((r) => r.json())
+      .then((d) => setTrends(d.trends))
+      .catch(() => {});
+  }, []);
+
+  if (!trends) return null;
+
+  // Build chart data for parliament (reverse chronological → chronological)
+  const parlElections = trends.parlimen.BN?.map((b) => b.election).reverse() ?? [];
+  const parlData = parlElections.map((el) => {
+    const entry: Record<string, number | string> = { election: el.replace("GE-", "GE") };
+    ["BN", "PH", "PN"].forEach((coal) => {
+      const found = trends.parlimen[coal]?.find((t) => t.election === el);
+      if (found) entry[coal] = found.votes_perc;
+    });
+    return entry;
+  }).filter((d) => d.BN !== undefined || d.PH !== undefined);
+
+  const dunElections = trends.dun.BN?.map((b) => b.election).reverse() ?? [];
+  const dunData = dunElections.map((el) => {
+    const entry: Record<string, number | string> = { election: el.replace("SE-", "SE") };
+    ["BN", "PH", "PN"].forEach((coal) => {
+      const found = trends.dun[coal]?.find((t) => t.election === el);
+      if (found) entry[coal] = found.votes_perc;
+    });
+    return entry;
+  }).filter((d) => d.BN !== undefined || d.PH !== undefined);
+
+  if (parlData.length === 0 && dunData.length === 0) return null;
+
+  return (
+    <Card className="border-mlk/20 bg-mlk-radial">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <History className="h-4 w-4 text-mlk" /> Historical coalition trends (Melaka)
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {parlData.length > 0 && (
+          <div>
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Parliament vote % (GE11–GE15)</div>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={parlData} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <XAxis dataKey="election" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} domain={[0, 80]} />
+                  <Tooltip contentStyle={{ fontSize: 10 }} />
+                  <Legend wrapperStyle={{ fontSize: 9 }} />
+                  <Line type="monotone" dataKey="BN" stroke={PARTY_COLORS.BN} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                  <Line type="monotone" dataKey="PH" stroke={PARTY_COLORS.PH} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                  <Line type="monotone" dataKey="PN" stroke={PARTY_COLORS.PN} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+        {dunData.length > 0 && (
+          <div>
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">DUN vote % (SE11–SE15)</div>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dunData} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <XAxis dataKey="election" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} domain={[0, 80]} />
+                  <Tooltip contentStyle={{ fontSize: 10 }} />
+                  <Legend wrapperStyle={{ fontSize: 9 }} />
+                  <Line type="monotone" dataKey="BN" stroke={PARTY_COLORS.BN} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                  <Line type="monotone" dataKey="PH" stroke={PARTY_COLORS.PH} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                  <Line type="monotone" dataKey="PN" stroke={PARTY_COLORS.PN} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+        <div className="text-[9px] text-muted-foreground italic flex items-start gap-1">
+          <Info className="h-3 w-3 flex-shrink-0 mt-0.5 text-mlk" />
+          <span>
+            Real coalition vote-share trends from ElectionData.MY REST API (api.electiondata.my/v1/parties/results).
+            BN dominated 2004 (71.6% parl, 69.3% DUN) but collapsed to 29.6% by GE15. PH peaked in GE14 (52.9%) then fell to 38.7%.
+            PN first contested Melaka in SE15/GE15.
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandidate: (name: string) => void }) {
   const isPRN = el.id === "PRN15";
   const parlData = el.parliament_results.map((r) => {
     const p = PARLIAMENTS.find((x) => x.code === r.parliament_code);
@@ -517,9 +619,9 @@ function ElectionView({ el }: { el: Election }) {
         </CardContent>
       </Card>
 
-      {/* Results table — now includes party column */}
+      {/* Results table — now includes party column + clickable candidate names */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> Results table</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> Results table <span className="text-[9px] text-muted-foreground font-normal">· Click winner name for full election history</span></CardTitle></CardHeader>
         <CardContent>
           {showDunBars ? (
             <Table>
@@ -540,7 +642,19 @@ function ElectionView({ el }: { el: Election }) {
                     <TableCell className="text-[10px] font-mono">P{d.parliament_code}</TableCell>
                     <TableCell className="text-[10px]">{getDunName(d.parliament_code, d.dun_code)} <span className="text-muted-foreground font-mono">N{d.dun_code}</span></TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span>
+                        {d.winner_candidate && (
+                          <button
+                            className="text-[9px] text-mlk hover:underline flex items-center gap-0.5 focus-mlk rounded"
+                            onClick={() => onSelectCandidate(d.winner_candidate!)}
+                            title="View full election history"
+                          >
+                            <User className="h-2.5 w-2.5" />
+                            {d.winner_candidate.length > 20 ? d.winner_candidate.substring(0, 18) + "…" : d.winner_candidate}
+                          </button>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {d.winner_party && <PartyLogo party={d.winner_party as PartyCode} size="xs" showLabel />}
@@ -572,7 +686,19 @@ function ElectionView({ el }: { el: Election }) {
                     <TableRow key={r.parliament_code}>
                       <TableCell className="text-[10px]">{PARLIAMENTS.find((p) => p.code === r.parliament_code)?.name ?? `P${r.parliament_code}`} <span className="font-mono text-muted-foreground">P{r.parliament_code}</span></TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner) }}>{r.winner}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner) }}>{r.winner}</span>
+                          {r.winner_candidate && (
+                            <button
+                              className="text-[9px] text-mlk hover:underline flex items-center gap-0.5 focus-mlk rounded"
+                              onClick={() => onSelectCandidate(r.winner_candidate!)}
+                              title="View full election history"
+                            >
+                              <User className="h-2.5 w-2.5" />
+                              {r.winner_candidate.length > 20 ? r.winner_candidate.substring(0, 18) + "…" : r.winner_candidate}
+                            </button>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         {r.winner_party && <PartyLogo party={r.winner_party as PartyCode} size="xs" showLabel />}
@@ -596,6 +722,8 @@ function ElectionView({ el }: { el: Election }) {
 export function ElectionsTab() {
   const [data, setData] = useState<Election[] | null>(null);
   const [offline, setOffline] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   useEffect(() => {
     fetch("/data/elections/melaka-elections.json")
@@ -607,6 +735,11 @@ export function ElectionsTab() {
       });
   }, []);
 
+  const handleSelectCandidate = (name: string) => {
+    setSelectedCandidate(name);
+    setHistoryOpen(true);
+  };
+
   if (!data) return <Card className="border-mlk/20"><CardContent className="p-8 animate-pulse bg-muted/30 text-muted-foreground text-sm">Loading elections…</CardContent></Card>;
 
   return (
@@ -614,7 +747,7 @@ export function ElectionsTab() {
       <Card className="border-mlk/20">
         <CardContent className="p-3 text-xs text-muted-foreground flex items-center gap-2">
           <Vote className="h-4 w-4 text-mlk flex-shrink-0" />
-          <span>Verified tier · source: ElectionData.my (community-maintained, sourced from SPR gazettes). Now showing component parties (UMNO, DAP, PAS…) alongside coalitions (BN, PH, PN).</span>
+          <span>Verified tier · source: ElectionData.my data lake + REST API. Real per-candidate data from lake.electiondata.my. Click any winner name for full election history (party switches visible).</span>
           {offline && (
             <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
               <WifiOff className="h-2.5 w-2.5" /> offline data
@@ -622,16 +755,27 @@ export function ElectionsTab() {
           )}
         </CardContent>
       </Card>
+
+      {/* Historical trends card — always visible at top */}
+      <HistoricalTrendsCard />
+
       <Tabs defaultValue="PRN15">
         <TabsList className="w-full justify-start">
           {data.map((e) => <TabsTrigger key={e.id} value={e.id} className="text-xs">{e.id}</TabsTrigger>)}
           <TabsTrigger value="swing" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">Swing Analysis</TabsTrigger>
         </TabsList>
         {data.map((e) => (
-          <TabsContent key={e.id} value={e.id}><ElectionView el={e} /></TabsContent>
+          <TabsContent key={e.id} value={e.id}><ElectionView el={e} onSelectCandidate={handleSelectCandidate} /></TabsContent>
         ))}
         <TabsContent value="swing"><SwingAnalysis elections={data} /></TabsContent>
       </Tabs>
+
+      {/* Candidate history dialog */}
+      <CandidateHistoryDialog
+        candidateName={selectedCandidate}
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+      />
     </div>
   );
 }

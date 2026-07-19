@@ -1,0 +1,158 @@
+{
+  "total": 15,
+  "valid": 15,
+  "unique": 15,
+  "rag": 14,
+  "results": [
+    {
+      "q": 1,
+      "question": "What was the GE15 result for Melaka?",
+      "response": "GE15 (19 Nov 2022): PN won 3 parliaments (P134 Masjid Tanah, P136 Tangga Batu, P139 Jasin). PH won 3 (P135 Alor Gajah, P137 Hang Tuah Jaya, P138 Kota Melaka). BN won 0. Split: PN 3 / PH 3. [ElectionData.my]",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 206
+    },
+    {
+      "q": 2,
+      "question": "Who won P134 Masjid Tanah in GE15?",
+      "response": "According to the verified RAG context, PN won the P134 Masjid Tanah parliament seat in GE15 (2022-11-19). \n\nParliament: {\"PN\":3,\"PH\":3,\"BN\":0,\"total\":6}",
+      "source": "elections/melaka-elections.json, p134/dun-intelligence.jsonl",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 152
+    },
+    {
+      "q": 6,
+      "question": "Which party won N07 Gadek in PRN15?",
+      "response": "Not in verified dataset — see Governance tab for known gaps.",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 60
+    },
+    {
+      "q": 7,
+      "question": "Compare GE14 and GE15 results for Melaka",
+      "response": "Based on verified data, here's a comparison of GE14 and GE15 results for Melaka:\n\n**Parliamentary Seats:**\n\n* GE14 (2018): PH won 4/6 parliaments, BN won 2, PN won 0. \n* GE15 (2022): PN won 3 parliaments (P134, P136, P139), PH won 3 (P135, P137, P138), BN won 0.\n\n**DUN Seats:**\n\n* GE14 (2018): PH won 15/28 DUN seats, BN won 13, PN won 0.\n* GE15 (2022): Not in verified dataset — see Governance tab ",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 633
+    },
+    {
+      "q": 8,
+      "question": "What is the DPT churn for Melaka in 2026?",
+      "response": "According to the RAG context, the DPT (Voter Registration) churn for Melaka in 2026 (Jan-May) is:\n\n- Total additions: 8,420\n- Total deletions: 3,180\n- Total net growth: 5,240\n\nHere's a breakdown by parliament:\n\n- P134 Masjid Tanah: +1,320 additions / -480 deletions / +840 net\n- P135 Alor Gajah: +1,180 additions / -420 deletions / +760 net\n- P136 Tangga Batu: +1,560 additions / -580 deletions / +98",
+      "source": "dpt/spr-dpt-pameran-summary.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 614
+    },
+    {
+      "q": 11,
+      "question": "Which coalition is DAP part of?",
+      "response": "DAP (Democratic Action Party) is part of the Pakatan Harapan (PH) coalition.",
+      "source": "cf:@cf/meta/llama-3.1-8b-instruct",
+      "rag": false,
+      "unique": true,
+      "valid": true,
+      "len": 76
+    },
+    {
+      "q": 12,
+      "question": "What is the margin of victory for P135 in GE15?",
+      "response": "I'm not able to determine the margin of victory for P135 in GE15. The verified dataset only shows the number of seats won by PH (P135 Alor Gajah) but does not provide the margin of victory.",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 189
+    },
+    {
+      "q": 13,
+      "question": "How many DUN seats did BN win in PRN15?",
+      "response": "According to the verified RAG context, BN won 21 DUN seats in PRN15 (Melaka state election, 20 Nov 2021). \n\nSource: DUN: {\"BN\":21,\"PH\":5,\"PN\":2,\"total\":28} [ElectionData.my]",
+      "source": "elections/melaka-elections.json, p134/dun-intelligence.jsonl",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 173
+    },
+    {
+      "q": 14,
+      "question": "What is the gender balance score for P134?",
+      "response": "The gender balance score for P134 is 97.53, indicating a female-skewed demographic. \n\nSource: [P134 engine]",
+      "source": "p134/dun-intelligence.jsonl",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 107
+    },
+    {
+      "q": 15,
+      "question": "Who won P138 Kota Melaka in GE15?",
+      "response": "PH won P138 Kota Melaka in GE15. \n\nSource: [ElectionData.my]\n\nParliament: {\"PN\":3,\"PH\":3,\"BN\":0,\"total\":6}",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 106
+    },
+    {
+      "q": 16,
+      "question": "What is the total population of Melaka?",
+      "response": "The total population of Melaka is 932,700, as per the DOSM Census 2020. \n\n[Source: DOSM 2020]",
+      "source": "socioeconomic/melaka-dosm.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 93
+    },
+    {
+      "q": 17,
+      "question": "How many parliament seats did PH win in GE14?",
+      "response": "PH won 4 parliament seats in GE14. \n\nSource: [ElectionData.my]",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 62
+    },
+    {
+      "q": 18,
+      "question": "Which party won N16 Ayer Keroh in PRN15?",
+      "response": "Not in verified dataset — see Governance tab for known gaps.",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 60
+    },
+    {
+      "q": 19,
+      "question": "What is the senior dependency for Taboh Naning?",
+      "response": "According to the verified demographics for Taboh Naning (DUN N05), the senior dependency is 30.6% [RAG context].",
+      "source": "p134/dun-intelligence.jsonl",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 112
+    },
+    {
+      "q": 20,
+      "question": "When was GE15 held?",
+      "response": "GE15 was held on 19 November 2022. \n\n[GE15, ElectionData.my]",
+      "source": "elections/melaka-elections.json",
+      "rag": true,
+      "unique": true,
+      "valid": true,
+      "len": 60
+    }
+  ]
+}

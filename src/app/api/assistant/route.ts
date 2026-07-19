@@ -21,6 +21,7 @@ import { rateLimit, assessBackpressure, withInflight, getClientIdentifier } from
 import { circuitBreaker, CircuitOpenError } from "@/lib/circuit-breaker";
 import { withIdempotency } from "@/lib/idempotency";
 import { withCORS } from "@/lib/cors";
+import { cfChatCompletion, isCFConfigured, CF_MODELS, type CFChatMessage } from "@/lib/cloudflare-ai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -363,8 +364,14 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
 
   // --- 3. Parse body ---
   let messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
+  let backend: "zai" | "cf" = "zai";
+  let cfModel: string = CF_MODELS[0].id;
   try {
-    const body = (await req.json()) as { messages?: Array<{ role: string; content: string }> };
+    const body = (await req.json()) as {
+      messages?: Array<{ role: string; content: string }>;
+      backend?: string;
+      model?: string;
+    };
     if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
       return NextResponse.json({ error: "messages[] required" }, { status: 400 });
     }
@@ -376,6 +383,15 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       .filter((m) => typeof m.content === "string" && m.content.length <= 5000)
       .slice(-20) // Keep only last 20 messages
       .map((m) => ({ role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant", content: m.content.slice(0, 5000) }));
+
+    // Parse backend selection (default: zai, fallback to cf if requested)
+    if (body.backend === "cf" && isCFConfigured()) {
+      backend = "cf";
+    }
+    // Parse CF model ID
+    if (body.model && CF_MODELS.some((m) => m.id === body.model)) {
+      cfModel = body.model!;
+    }
   } catch {
     return NextResponse.json({ error: "invalid JSON body" }, { status: 400 });
   }
@@ -387,10 +403,25 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
   const augmentedSystem = SYSTEM_PROMPT + (rag.context ? `\n\nRAG CONTEXT (verified, use these exact figures):\n${rag.context}\n` : "");
 
   // --- 4. Call the LLM through the circuit breaker + inflight tracker ---
+  // Supports two backends:
+  //   - "zai" (default): z-ai-web-dev-sdk (GLM-4.6, built-in to the platform)
+  //   - "cf": Cloudflare Workers AI (Llama 3.1, Mistral, Qwen — requires CF_AI_TOKEN)
+  //
   // `withInflight` ensures backpressure's `inflight` count is accurate even
   // if the LLM call hangs or throws. `circuitBreaker` opens after 5
-  // consecutive ZAI failures so subsequent requests fail-fast.
+  // consecutive failures so subsequent requests fail-fast.
   const runLlm = withInflight(async () => {
+    if (backend === "cf") {
+      // === Cloudflare Workers AI backend ===
+      const cfMessages: CFChatMessage[] = [
+        { role: "system", content: augmentedSystem },
+        ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+      ];
+      const result = await cfChatCompletion(cfMessages, cfModel);
+      return result.response.trim();
+    }
+
+    // === Default: z-ai-web-dev-sdk backend ===
     const zai = await ZAI.create();
     const completion = await zai.chat.completions.create({
       messages: [
@@ -405,7 +436,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
   });
 
   let responseText: string;
-  let llmSource = "zai";
+  let llmSource = backend === "cf" ? `cf:${cfModel}` : "zai";
 
   try {
     const text = await circuitBreaker("llm-assistant", runLlm, ASSISTANT_CIRCUIT);
@@ -417,7 +448,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
       console.warn("[assistant] circuit open:", err.message);
       llmSource = "circuit-open-fallback";
     } else {
-      console.error("[assistant] ZAI error:", err instanceof Error ? err.message : String(err));
+      console.error(`[assistant] ${backend} error:`, err instanceof Error ? err.message : String(err));
       llmSource = "static-fallback";
     }
     responseText = staticFallback(lastUser?.content ?? "");

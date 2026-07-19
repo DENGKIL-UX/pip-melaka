@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Send, BookOpen, ShieldCheck, Database, Loader2 } from "lucide-react";
+import { Sparkles, X, Send, BookOpen, ShieldCheck, Database, Loader2, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { CF_MODELS } from "@/lib/cloudflare-ai";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -77,6 +78,8 @@ export function AssistantPanel() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [backend, setBackend] = useState<"zai" | "cf">("zai");
+  const [cfModel, setCfModel] = useState(CF_MODELS[0].id);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
@@ -111,6 +114,8 @@ export function AssistantPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
+          backend,
+          model: backend === "cf" ? cfModel : undefined,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -234,7 +239,33 @@ export function AssistantPanel() {
               </div>
             )}
 
-            {/* Input */}
+            {/* Backend selector + Input */}
+            <div className="px-2 pt-1.5 pb-1 border-t border-mlk/20 bg-background/95 flex items-center gap-1.5">
+              <Cpu className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              <select
+                value={backend}
+                onChange={(e) => setBackend(e.target.value as "zai" | "cf")}
+                className="text-[9px] h-6 px-1 rounded bg-background border border-mlk/20 focus:border-mlk focus:outline-none text-muted-foreground"
+                aria-label="LLM backend"
+                disabled={loading}
+              >
+                <option value="zai">Z.ai (GLM-4.6)</option>
+                <option value="cf">CF Workers AI</option>
+              </select>
+              {backend === "cf" && (
+                <select
+                  value={cfModel}
+                  onChange={(e) => setCfModel(e.target.value)}
+                  className="text-[9px] h-6 px-1 rounded bg-background border border-mlk/20 focus:border-mlk focus:outline-none text-muted-foreground flex-1 min-w-0"
+                  aria-label="CF model"
+                  disabled={loading}
+                >
+                  {CF_MODELS.map((m) => (
+                    <option key={m.id} value={m.id}>{m.label}</option>
+                  ))}
+                </select>
+              )}
+            </div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();

@@ -210,6 +210,17 @@
     background: rgba(20, 20, 22, 0.55);
     border: 1px solid rgba(232, 155, 69, 0.22);
   }
+  /* Stronger glass for premium overlay surfaces (command palette, dialogs) */
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(199, 123, 44, 0.22);
+  }
+  .dark .glass-strong {
+    background: rgba(15, 15, 18, 0.82);
+    border: 1px solid rgba(232, 155, 69, 0.26);
+  }
 
   /* Round 8 styling improvements */
   .card-glow {

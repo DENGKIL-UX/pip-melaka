@@ -1002,3 +1002,103 @@ Workspace synced to commit ee61f40 ("fix: Correct GE15 Melaka parliament results
 4. **Swing Analysis uses GE14 + GE15 only** — PRN15 is a state election (DUN-only), so it's correctly excluded from the parliament-level swing view. If future requirements need DUN-level swing, the `dun_results` arrays support it but the chart would need a parliament selector.
 
 5. **Dev server OOM on 4GB sandbox** — pre-existing, not a code issue. All fetch failures fall back to inline ELECTIONS_FALLBACK / DUN_FALLBACK so tabs always render.
+
+---
+Task ID: PREMIUM-SAAS-R10
+Agent: main
+Task: Unzip uploaded premium design package, research applicable enhancements, implement premium SaaS transformation
+
+## Current project status description/assessment
+
+User uploaded `tailwind.config.zip` (12.6 KB) containing 9 files from a premium SaaS design system: tailwind.config.js, globals.css, BentoHero.tsx, CommandPalette.tsx, Navigation.tsx, ParliamentCard.tsx, SkeletonCard.tsx, StatCard.tsx, page.tsx. Unzipped to /tmp/premium-design/ and studied each file. The uploaded design uses a cyan accent (#00d4ff) on a zinc dark palette — per user instructions ("Z.ai avoids using indigo or blue colors unless specified"), I adapted the STRUCTURAL patterns (bento layout, animated counters, completeness bars, glass morphism, arrow-key command palette) while keeping the established MLK amber (#C77B2C) brand identity. Tailwind v4 (PIP-MLK's stack) doesn't use `tailwind.config.js` or `@tailwind base/components/utilities` directives, so the uploaded config was used as a design reference rather than a drop-in replacement.
+
+## Current goals/completed modifications/verification results
+
+### Applicable patterns identified from the uploaded design
+1. ✅ **Animated number count-up** (from StatCard.tsx) — IntersectionObserver + ease-out cubic, fires when scrolled into view
+2. ✅ **Bento hero grid** (from BentoHero.tsx) — asymmetric layout: large featured tile (2×2) + 4 summary tiles
+3. ✅ **Parliament card completeness bar** (from ParliamentCard.tsx) — gradient progress bar + verified/pending status dot + hover lift
+4. ✅ **Structured skeleton loader** (from SkeletonCard.tsx) — badge + number + lines + progress bar shapes
+5. ✅ **Arrow-key command palette** (from CommandPalette.tsx) — ↑↓ navigation + Enter select + categorized sections
+6. ✅ **Glass-morphism refinements** — stronger glass variant for overlay surfaces
+7. ❌ **Cyan accent color** — NOT applied (would violate "no indigo/blue" rule); kept MLK amber
+8. ❌ **Full dark-mode-first palette swap** — NOT applied (would break existing light/dark theme toggle); kept OKLCH-based dual theme
+
+### New files created
+
+1. **`src/components/shared/animated-counter.tsx`** (105 lines):
+   - `AnimatedCounter` component with IntersectionObserver trigger
+   - Props: value, duration (ms), delay, decimals, prefix, suffix, groupSeparator
+   - Ease-out cubic animation curve (1 - (1-t)³)
+   - Respects `prefers-reduced-motion` — snaps to final value instantly
+   - Defers setState to rAF to comply with react-hooks/set-state-in-effect rule
+   - Uses `font-mono tabular-nums` for stable number layout
+
+2. **`src/components/shared/skeleton-card.tsx`** (74 lines):
+   - `SkeletonCard` component — structured shimmer loading state
+   - Props: lines (count), showBar, showBadge, className
+   - Uses `skeleton-mlk` CSS class from globals.css (amber shimmer sweep)
+   - Includes `role="status"` + `aria-live="polite"` + sr-only "Loading…" for a11y
+   - Also exports `SkeletonGrid` for rendering N cards in a responsive grid
+
+### Files enhanced
+
+3. **`src/components/landing-page.tsx`** (rewritten, 310 lines):
+   - **BentoHero** component: asymmetric bento grid (2×2 featured tile + 4 summary tiles)
+     - Featured tile: "Verified Data" badge, "DOSM kawasanku GeoJSON" heading with shimmer-text accent, animated background blobs, 3 animated counters (6 Parliaments, 28 DUN Seats, 3 Elections)
+     - 4 summary tiles: GeoJSON layers (28+6), Voters (71,415), S2D Loop (9 phases), Provenance (8/9 gates) — each with animated counter + icon + hover-lift
+   - **PremiumParliamentCard** component: hover-lift card with
+     - Top gradient line (emerald for verified, amber for pending)
+     - P-code badge in MLK amber + status dot (pulsing emerald for verified, static amber for pending)
+     - Data completeness bar (0% or 100%) with gradient fill
+     - Monospace stats row (DUN count + voters)
+     - ChevronRight that translates on hover
+     - Click-to-enter dashboard (sets selectedParliament + lands + switches to overview tab)
+     - Full keyboard accessibility (`focus-mlk` ring, aria-label)
+   - Parliament section header: flex layout with "1/6 verified" indicator
+   - Footer: sticky to bottom (`mt-auto`), MLK amber border-top
+
+4. **`src/components/shared/command-palette.tsx`** (rewritten, 303 lines):
+   - **Arrow-key navigation**: ↑↓ moves selection, Enter activates, Esc closes
+   - **Categorized sections**: "Navigation (19)" + "Parliaments (6)" headers
+   - **Parliament shortcuts**: all 6 parliaments listed with subtitle (district · DUN count · voters)
+   - **Search filters** across label + keywords + subtitle
+   - **Scroll-into-view**: selected item auto-scrolls when navigating with arrow keys
+   - **Proper ARIA**: `role="dialog"`, `role="combobox"` on input, `role="listbox"` on results, `role="option"` + `aria-selected` on items, `aria-activedescendant` tracks selected
+   - **Auto-focus** input on open (deferred via setTimeout to ensure mount)
+   - Selecting a parliament sets `selectedParliament` in store + lands + switches to overview tab
+
+5. **`src/app/globals.css`** (+12 lines):
+   - `.glass-strong` utility — stronger frosted glass for overlay surfaces (command palette, dialogs)
+     - Light: `rgba(255,255,255,0.78)` + blur(20px) saturate(160%)
+     - Dark: `rgba(15,15,18,0.82)` + blur(20px) saturate(160%)
+     - MLK amber border at 0.22/0.26 opacity
+
+### Verification results (agent-browser E2E)
+- ✅ Landing page renders with bento hero grid
+- ✅ Animated counters fire after scroll into view: 6 Parliaments, 28 DUN Seats, 3 Elections, 28+6 GeoJSON, 71,415 voters, 9 S2D phases, 8/9 gates
+- ✅ All 6 parliament cards render with completeness bars (P134=100%, P135-P139=0%)
+- ✅ Verified/pending status dots render (emerald pulse for P134, amber static for others)
+- ✅ Clicking P134 card enters dashboard → Overview tab
+- ✅ Command palette opens with Cmd+K → shows "Navigation (19)" + "Parliaments (6)" sections
+- ✅ Arrow-down navigation moves selection (Demographics → Risk + Socioeconomic)
+- ✅ Search "p134" filters to 1 result (P134 — Masjid Tanah)
+- ✅ Escape closes palette
+- ✅ No runtime errors in dev.log
+- ✅ Lint: 0 errors, 2 pre-existing warnings only
+
+## Unresolved issues or risks
+
+1. **AnimatedCounter requires viewport entry** — the IntersectionObserver fires at 40% threshold. In agent-browser's 577px viewport, hero counters below the fold start at 0 and only animate after scroll. This is by design (premium SaaS pattern) but a user who never scrolls won't see the animation. Mitigation: the Enter Dashboard button + heading are above the fold, so the hero is immediately useful even before counters fire.
+
+2. **Command palette `commands` useMemo dependency** — depends on `landed` so that the `if (!landed) setLanded(true)` guard works correctly when invoking from the landing page. The store setters (`setActiveTab`, `setSelectedParliament`, `setLanded`) are stable Zustand references so don't cause re-creation. Verified no infinite re-render.
+
+3. **SkeletonCard not yet wired into tabs** — created as a reusable component but existing tabs still use their inline `animate-pulse bg-muted/30` loading states. Future work: replace those with `<SkeletonCard />` for visual consistency. Low priority — current loading states work.
+
+4. **No font swap to Geist/Inter** — the uploaded design recommended Geist Sans + Geist Mono. PIP-MLK uses the default Tailwind sans stack + Geist Mono is already configured via `--font-geist-mono`. A full font swap would require adding `geist` package + wrapping layout in `<GeistSans />`. Deferred — current typography is clean and the mono numbers already look premium.
+
+5. **Particle network canvas** — kept as-is from previous landing. Could be replaced with the uploaded design's "animated background blobs" (radial gradient blurs) for a more modern look, but the particle network is on-brand for a "political intelligence" platform (nodes = constituencies, edges = relationships). Kept.
+
+6. **Cyan accent NOT applied** — the uploaded design's `pip-500: #00d4ff` cyan was deliberately not used. MLK amber (#C77B2C) is the established brand and user instructions prohibit blue/indigo unless explicitly requested. All structural patterns were adapted to amber.
+
+7. **Push to git pending** — commit not yet made. Will push after worklog update.

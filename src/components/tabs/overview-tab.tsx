@@ -40,9 +40,10 @@ interface OverviewData {
 
 interface ElectionSummary { id: string; name: string; date: string; headline_fact: string;
   parliament_summary: { PH: number; BN: number; PN: number; total: number } | null;
-  dun_summary: { PH: number; BN: number; PN: number; total: number } | null; }
-
-interface DptSummary { total_additions: number; total_deletions: number; total_net: number; }
+  dun_summary: { PH: number; BN: number; PN: number; total: number } | null;
+  dun_results?: Array<{ parliament_code: string; dun_code: string; dun_name?: string; winner: "PH" | "BN" | "PN"; winner_party?: string; winner_candidate?: string; votes_pct?: number }>;
+  current_dun_composition?: Array<{ parliament_code: string; dun_code: string; dun_name?: string; winner: "PH" | "BN" | "PN"; winner_party?: string; winner_candidate?: string }>;
+}
 
 function PartyBadge({ party }: { party: "PH" | "BN" | "PN" }) {
   return (
@@ -74,27 +75,23 @@ export function OverviewTab() {
   const setActiveTab = useDashboardStore((s) => s.setActiveTab);
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [elections, setElections] = useState<ElectionSummary[]>([]);
-  const [dpt, setDpt] = useState<DptSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const [ov, el, dp] = await Promise.all([
+        const [ov, el] = await Promise.all([
           fetch("/data/p134/dashboard-overview.json").then((r) => r.json()),
           fetch("/data/elections/melaka-elections.json").then((r) => r.json()),
-          fetch("/data/dpt/spr-dpt-pameran-summary.json").then((r) => r.json()),
         ]);
         setOverview(ov as OverviewData);
         setElections((el.elections ?? []) as ElectionSummary[]);
-        setDpt({ total_additions: dp.total_additions, total_deletions: dp.total_deletions, total_net: dp.total_net });
       } catch {
         // Dev server OOM / fetch failure — render inline fallback so the tab
         // ALWAYS shows content. Same data as public/data/*.json.
         setOverview(OVERVIEW_FALLBACK);
         setElections(ELECTIONS_SUMMARY_FALLBACK);
-        setDpt({ total_additions: 8420, total_deletions: 3180, total_net: 5240 });
         setOffline(true);
       } finally {
         setLoading(false);
@@ -158,10 +155,10 @@ export function OverviewTab() {
         <KpiCard icon={MapPin} label="Localities" value={String(gc.localities)} sub="P134 localities" />
       </div>
 
-      {/* Elections + DPT churn */}
+      {/* Elections history + DUN composition */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <Card className="border-mlk/20 hover-lift">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Vote className="h-4 w-4 text-mlk" /> Election history</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Vote className="h-4 w-4 text-mlk" /> Election history (real ElectionData.MY)</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {elections.map((e) => (
               <div key={e.id} className="flex items-center justify-between gap-2 text-xs">
@@ -183,30 +180,41 @@ export function OverviewTab() {
                 </div>
               </div>
             ))}
+            <div className="text-[9px] text-muted-foreground italic mt-1">Source: lake.electiondata.my · CC0 1.0 · Thevananthan, T. (2025) MECo</div>
             <Button size="sm" variant="ghost" className="text-mlk text-xs w-full" onClick={() => setActiveTab("elections")}>Open Elections →</Button>
           </CardContent>
         </Card>
 
+        {/* Current DUN composition from PRN15 (real data) */}
         <Card className="border-mlk/20 hover-lift">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> DPT churn (Jan–May 2026)</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> Current DUN composition (PRN15 2021)</CardTitle></CardHeader>
           <CardContent>
-            {dpt && (
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-md border border-emerald-500/30 p-2">
-                  <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">+{dpt.total_additions.toLocaleString()}</div>
-                  <div className="text-[10px] text-muted-foreground">Additions</div>
-                </div>
-                <div className="rounded-md border border-red-500/30 p-2">
-                  <div className="text-lg font-bold text-red-600 dark:text-red-400">−{dpt.total_deletions.toLocaleString()}</div>
-                  <div className="text-[10px] text-muted-foreground">Deletions</div>
-                </div>
-                <div className="rounded-md border border-mlk/40 p-2">
-                  <div className="text-lg font-bold text-mlk">+{dpt.total_net.toLocaleString()}</div>
-                  <div className="text-[10px] text-muted-foreground">Net</div>
-                </div>
-              </div>
-            )}
-            <Button size="sm" variant="ghost" className="text-mlk text-xs w-full mt-2" onClick={() => setActiveTab("analysis")}>Open DPT Analysis →</Button>
+            {(() => {
+              const prn15 = elections.find((e) => e.id === "PRN15");
+              const dunData = prn15?.dun_results ?? [];
+              const counts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
+              dunData.forEach((d) => { counts[d.winner] = (counts[d.winner] ?? 0) + 1; });
+              return (
+                <>
+                  <div className="grid grid-cols-3 gap-2 text-center mb-3">
+                    <div className="rounded-md border p-2" style={{ borderColor: PARTY_COLORS.BN + "60" }}>
+                      <div className="text-lg font-bold" style={{ color: PARTY_COLORS.BN }}>{counts.BN}</div>
+                      <div className="text-[10px] text-muted-foreground">BN</div>
+                    </div>
+                    <div className="rounded-md border p-2" style={{ borderColor: PARTY_COLORS.PH + "60" }}>
+                      <div className="text-lg font-bold" style={{ color: PARTY_COLORS.PH }}>{counts.PH}</div>
+                      <div className="text-[10px] text-muted-foreground">PH</div>
+                    </div>
+                    <div className="rounded-md border p-2" style={{ borderColor: PARTY_COLORS.PN + "60" }}>
+                      <div className="text-lg font-bold" style={{ color: PARTY_COLORS.PN }}>{counts.PN}</div>
+                      <div className="text-[10px] text-muted-foreground">PN</div>
+                    </div>
+                  </div>
+                  <div className="text-[9px] text-muted-foreground">28 DUN seats · BN landslide 21/28 · Real per-candidate data from ElectionData.MY</div>
+                  <Button size="sm" variant="ghost" className="text-mlk text-xs w-full mt-2" onClick={() => setActiveTab("elections")}>Open Elections →</Button>
+                </>
+              );
+            })()}
           </CardContent>
         </Card>
       </div>
@@ -232,31 +240,46 @@ export function OverviewTab() {
         </div>
       </div>
 
-      {/* DUN seats grid — all 28 DUN constituencies */}
+      {/* DUN seats grid — all 28 DUN constituencies with real PRN15 winners */}
       <div>
-        <div className="text-sm font-semibold mb-2 flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> DUN seats — all 28 state constituencies</div>
+        <div className="text-sm font-semibold mb-2 flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> DUN seats — all 28 state constituencies (PRN15 2021 real winners)</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
-          {ALL_DUNS.map((d) => (
-            <Card key={`${d.parliament_code}-${d.dun_code}`} className={`border ${d.verified ? "border-emerald-500/30" : "border-mlk/15"} hover-lift`}>
-              <CardContent className="p-2.5">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[9px] font-mono text-muted-foreground">N{d.dun_code}</span>
-                  <span className={`w-1.5 h-1.5 rounded-full ${d.verified ? "bg-emerald-500" : "bg-amber-500"}`} aria-label={d.verified ? "Verified" : "Pending"} />
-                </div>
-                <div className="text-xs font-semibold truncate" title={d.dun_name}>{d.dun_name}</div>
-                <div className="text-[9px] text-muted-foreground truncate">{d.district} · P{d.parliament_code}</div>
-                <div className="mt-1.5 flex items-center justify-between">
-                  <PartyBadge party={d.ge15Winner} />
-                  <span className="text-[8px] text-muted-foreground font-mono">{d.verified ? `${Math.round(d.voters).toLocaleString()}` : "—"}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {(() => {
+            const prn15 = elections.find((e) => e.id === "PRN15");
+            const dunResults = prn15?.dun_results ?? [];
+            // Merge ALL_DUNS with real PRN15 results
+            return ALL_DUNS.map((d) => {
+              const realResult = dunResults.find((r) => r.dun_code === d.dun_code);
+              const winner = (realResult?.winner ?? d.ge15Winner) as "PH" | "BN" | "PN";
+              const winnerParty = realResult?.winner_party;
+              const winnerCandidate = realResult?.winner_candidate;
+              const votesPct = realResult?.votes_pct;
+              return (
+                <Card key={`${d.parliament_code}-${d.dun_code}`} className={`border ${d.verified ? "border-emerald-500/30" : "border-mlk/15"} hover-lift`}>
+                  <CardContent className="p-2.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] font-mono text-muted-foreground">N{d.dun_code}</span>
+                      <span className={`w-1.5 h-1.5 rounded-full ${d.verified ? "bg-emerald-500" : "bg-amber-500"}`} aria-label={d.verified ? "Verified" : "Pending"} />
+                    </div>
+                    <div className="text-xs font-semibold truncate" title={d.dun_name}>{d.dun_name}</div>
+                    <div className="text-[9px] text-muted-foreground truncate">{d.district} · P{d.parliament_code}</div>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <PartyBadge party={winner} />
+                      <span className="text-[8px] text-muted-foreground font-mono">{votesPct ? `${votesPct.toFixed(0)}%` : (d.verified ? `${Math.round(d.voters).toLocaleString()}` : "—")}</span>
+                    </div>
+                    {winnerParty && (
+                      <div className="text-[8px] text-muted-foreground mt-0.5 truncate" title={winnerCandidate}>{winnerParty}</div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            });
+          })()}
         </div>
         <div className="text-[10px] text-muted-foreground mt-2 flex items-center gap-3">
           <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> 5 verified (P134)</span>
           <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 23 pending (P135–P139)</span>
-          <span>· GE15 winner shown by parliament affiliation</span>
+          <span>· PRN15 2021 real winners from ElectionData.MY</span>
         </div>
       </div>
 

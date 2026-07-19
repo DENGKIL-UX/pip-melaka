@@ -55,7 +55,7 @@ export const COALITIONS: Record<CoalitionCode, CoalitionMeta> = {
     code: "BN",
     name: "BN",
     fullName: "Barisan Nasional",
-    uid: "1",
+    uid: "001-BN",
     color: "#0F7DC2",
     memberParties: ["UMNO", "MCA", "MIC"],
   },
@@ -63,7 +63,7 @@ export const COALITIONS: Record<CoalitionCode, CoalitionMeta> = {
     code: "PH",
     name: "PH",
     fullName: "Pakatan Harapan",
-    uid: "2",
+    uid: "007-PH",
     color: "#E22926",
     memberParties: ["DAP", "PKR", "AMANAH"],
   },
@@ -71,7 +71,7 @@ export const COALITIONS: Record<CoalitionCode, CoalitionMeta> = {
     code: "PN",
     name: "PN",
     fullName: "Perikatan Nasional",
-    uid: "3",
+    uid: "011-PN",
     color: "#019C2D",
     memberParties: ["PAS", "BERSATU", "GERAKAN"],
   },
@@ -152,7 +152,7 @@ export const PARTIES: Record<PartyCode, PartyMeta> = {
     name: "PAS",
     fullName: "Malaysian Islamic Party",
     coalition: "PN",
-    uid: "008-PAS",
+    uid: "004-PAS",
     color: "#15803D",
     formed: 1951,
   },
@@ -161,7 +161,7 @@ export const PARTIES: Record<PartyCode, PartyMeta> = {
     name: "BERSATU",
     fullName: "Malaysian United Indigenous Party",
     coalition: "PN",
-    uid: "079-BERSATU",
+    uid: "107-BERSATU",
     color: "#16A34A",
     formed: 2016,
   },
@@ -170,7 +170,7 @@ export const PARTIES: Record<PartyCode, PartyMeta> = {
     name: "GERAKAN",
     fullName: "Malaysian People's Movement Party",
     coalition: "PN",
-    uid: "007-GERAKAN",
+    uid: "026-GERAKAN",
     color: "#15803D",
     formed: 1968,
   },
@@ -230,66 +230,9 @@ export function partiesInCoalition(coalition: CoalitionCode): PartyCode[] {
 }
 
 /**
- * Map a Melaka parliament/DUN seat to the most likely winning party
- * for a given coalition, based on seat demographics.
- *
- * This is a best-effort assignment since the current dataset tracks
- * coalition-level results. The assignment uses:
- *   - Urban Chinese-majority seats (P137, P138, N19-N23) → DAP (PH), MCA (BN)
- *   - Urban mixed seats → PKR (PH), GERAKAN (PN)
- *   - Rural Malay-majority seats → UMNO (BN), AMANAH (PH), PAS/BERSATU (PN)
- *
- * In a production build, this would be replaced by actual per-candidate
- * data fetched from the ElectionData.my data lake (headline_ballots.parquet).
+ * NOTE: seatToParty() has been removed. Party assignments now come directly
+ * from the real ElectionData.MY dataset (headline_ballots_state_mlk.parquet
+ * and headline_ballots.parquet) which includes the actual winning party
+ * for every seat. See public/data/elections/melaka-elections.json for the
+ * real per-seat party data.
  */
-export function seatToParty(
-  parliamentCode: string,
-  dunCode: string | null,
-  coalition: CoalitionCode
-): PartyCode {
-  // Urban Chinese-majority seats → DAP (PH) / MCA (BN) / GERAKAN (PN)
-  const urbanChinese = ["137", "138"]; // Hang Tuah Jaya, Kota Melaka
-  const urbanChineseDun = ["15", "16", "17", "18", "19", "20", "21", "22", "23"];
-
-  // Rural Malay-majority seats → UMNO (BN) / AMANAH (PH) / PAS (PN)
-  const ruralMalay = ["134", "139"]; // Masjid Tanah, Jasin
-  const ruralMalayDun = ["01", "02", "03", "04", "05", "24", "25", "26", "27", "28"];
-
-  const isUrbanChinese = urbanChinese.includes(parliamentCode) ||
-    (dunCode && urbanChineseDun.includes(dunCode));
-  const isRuralMalay = ruralMalay.includes(parliamentCode) ||
-    (dunCode && ruralMalayDun.includes(dunCode));
-
-  if (coalition === "PH") {
-    if (isUrbanChinese) return "DAP";
-    if (isRuralMalay) return "AMANAH";
-    return "PKR"; // semi-urban mixed
-  }
-  if (coalition === "BN") {
-    if (isUrbanChinese) return "MCA";
-    return "UMNO"; // UMNO dominates BN in Melaka
-  }
-  if (coalition === "PN") {
-    if (isRuralMalay && (parliamentCode === "139" || (dunCode && ["24", "25", "26"].includes(dunCode)))) {
-      return "PAS"; // PAS stronger in Jasin rural
-    }
-    if (isUrbanChinese) return "GERAKAN";
-    return "BERSATU"; // BERSATU leads PN in most seats
-  }
-  return "BEBAS";
-}
-
-/**
- * Get a human-readable description of which party typically contests
- * a seat for a given coalition.
- */
-export function seatPartyContext(parliamentCode: string, dunCode: string | null): string {
-  const urbanChinese = ["137", "138"];
-  const ruralMalay = ["134", "139"];
-  const isUrbanChinese = urbanChinese.includes(parliamentCode);
-  const isRuralMalay = ruralMalay.includes(parliamentCode);
-
-  if (isUrbanChinese) return "Urban Chinese-majority → DAP/MCA/GERAKAN";
-  if (isRuralMalay) return "Rural Malay-majority → UMNO/AMANAH/PAS-BERSATU";
-  return "Semi-urban mixed → PKR/UMNO/BERSATU";
-}

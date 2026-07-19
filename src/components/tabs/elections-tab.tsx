@@ -142,9 +142,8 @@ function PartyBreakdownCard({ el }: { el: Election }) {
         <div className="text-[9px] text-muted-foreground italic flex items-start gap-1">
           <Info className="h-3 w-3 flex-shrink-0 mt-0.5" />
           <span>
-            Party assignments are derived from seat demographics (urban Chinese-majority → DAP/MCA/GERAKAN;
-            rural Malay-majority → UMNO/AMANAH/PAS-BERSATU). For exact per-candidate data, see the
-            ElectionData.my data lake (<code className="font-mono">headline_ballots_state_mlk.parquet</code>).
+            Real per-candidate data from ElectionData.MY data lake (<code className="font-mono">lake.electiondata.my/results_headline/</code>).
+            Party and coalition UIDs are verbatim from the MECo dataset (Thevananthan, T. 2025).
             Logos from <code className="font-mono">electiondata.my/parties/&#123;uid&#125;/png</code>.
           </span>
         </div>

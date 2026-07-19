@@ -1374,3 +1374,87 @@ Root cause: the engine only processed P134 (5 DUNs with real data), and P135-P13
 4. **7 tabs still have 0 DUN references** — alerts, incident-casebook, public-communication, s2d-console, s2d-360, scenario, scraper tabs don't have DUN-specific data sections. These tabs are operational/analytical tools (alert monitoring, incident tracking, social media scraping) rather than geographic data displays, so DUN-level data is less relevant. The S2D and Dual-Layer tabs do reference DUN localities in their signal data.
 
 5. **Push to git pending** — commit not yet made.
+
+---
+Task ID: REAL-ELECTIONDATA-R14
+Agent: main
+Task: Replace all election data with real ElectionData.MY Parquet datasets, remove DPT from non-DPT tabs
+
+## Current project status description/assessment
+
+User identified two critical issues: (1) The dashboard was using synthetic/estimated election data instead of the real ElectionData.MY datasets that the user provided documentation for. (2) DPT data (SPR voter roll churn scraped from PDFs) was being used in the Overview and other tabs when it should only appear in the standalone DPT Analysis tab. The user provided the real data lake URLs: `lake.electiondata.my/results_headline/headline_ballots_state_mlk.parquet` (890 rows, Melaka DUN 1959-present) and `headline_ballots.parquet` (26,965 rows, all federal parliament).
+
+## Current goals/completed modifications/verification results
+
+### Real data fetched from ElectionData.MY
+
+Successfully fetched and parsed both Parquet datasets using Python + pyarrow + pandas:
+
+1. **DUN Ballots** (`headline_ballots_state_mlk.parquet`): 890 rows, 20 columns, covering SE-01 through SE-15
+2. **Federal Ballots** (`headline_ballots.parquet`): 26,965 rows, filtered to Melaka (1,099 rows), covering GE-00 through GE-15
+
+**Real winners extracted:**
+- **GE14 (2018)**: PH 4/6 parliament (P135 BERSATU, P136 PKR, P137 PKR, P138 DAP), BN 2/6 (P134 UMNO, P139 UMNO). GE14 DUN: PH 15, BN 13.
+- **PRN15 (2021)**: BN 21/28 DUN (UMNO 18, MCA 2, MIC 1), PH 5 (DAP 4, AMANAH 1), PN 2 (BERSATU 2). Real candidate names: Rosli bin Abdullah (N01), Ab Rauf bin Yusoh (N02), etc.
+- **GE15 (2022)**: PN 3/6 (P134 BERSATU/Mas Ermieyati, P136 PAS/Bakri Jamaluddin, P139 PAS/Zulkifli), PH 3/6 (P135 AMANAH/Adly Zahari, P137 PKR/Adam Adli, P138 DAP/Khoo Poay Tiong), BN 0.
+
+### Files updated with real data
+
+1. **`public/data/elections/melaka-elections.json`** — completely rebuilt from real Parquet data:
+   - GE14: 6 parliament results with real winner_party, winner_candidate, winner_votes, runner_up details
+   - GE14: 28 DUN results with real vote_share per coalition
+   - PRN15: 28 DUN results with real per-candidate data (winner_candidate, winner_votes, votes_pct, runner_up details)
+   - GE15: 6 parliament results with real per-candidate data
+   - GE15: current_dun_composition from PRN15 (28 DUN seats)
+   - Added `data_lake_urls` field documenting the source URLs
+   - Updated `source` field: "ElectionData.my data lake (lake.electiondata.my) — CC0 1.0 Universal"
+
+2. **`src/lib/fallback-data.ts`** — ELECTIONS_SUMMARY_FALLBACK and ELECTIONS_FALLBACK replaced with real data matching the JSON
+
+3. **`src/lib/melaka-constants.ts`** — Fixed ge14Winner for P134 (BN, not PH) and P139 (BN, not PH) to match real GE14 results
+
+4. **`src/lib/party-metadata.ts`** — Updated with real UIDs from ElectionData.MY:
+   - Coalition UIDs: BN=001-BN, PH=007-PH, PN=011-PN (were "1", "2", "3")
+   - Party UIDs: BERSATU=107-BERSATU (was 079), PAS=004-PAS (was 008), GERAKAN=026-GERAKAN (was 007)
+   - Removed `seatToParty()` function (no longer needed — real party data comes from the dataset)
+
+5. **`src/app/api/assistant/route.ts`** — Fixed GE14 fact: "PH won 4/6 parliaments + 15/28 DUN seats. BN won 2 parliaments + 13 DUN."
+
+### DPT removed from non-DPT tabs
+
+6. **`src/components/tabs/overview-tab.tsx`** — Major overhaul:
+   - **Removed**: DPT fetch from `/data/dpt/spr-dpt-pameran-summary.json`, `DptSummary` interface, `dpt` state, DPT churn card (additions/deletions/net)
+   - **Added**: "Election history (real ElectionData.MY)" card with source attribution "lake.electiondata.my · CC0 1.0 · Thevananthan, T. (2025) MECo"
+   - **Added**: "Current DUN composition (PRN15 2021)" card showing BN 21 / PH 5 / PN 2 from real data
+   - **Updated**: DUN grid now shows real PRN15 winners with actual party (UMNO, MIC, MCA, DAP, BERSATU, AMANAH) and vote %, instead of the DPT-based voter count approximation
+   - **Updated**: DUN grid legend now says "PRN15 2021 real winners from ElectionData.MY"
+
+7. **`src/components/tabs/elections-tab.tsx`** — Updated disclaimer from "Party assignments are derived from seat demographics" to "Real per-candidate data from ElectionData.MY data lake"
+
+### Verification results (agent-browser + VLM)
+
+**agent-browser E2E:**
+- ✅ Overview: "Election history (real ElectionData.MY)" card renders with GE14/PRN15/GE15 + source attribution
+- ✅ Overview: "Current DUN composition (PRN15 2021)" card shows BN 21, PH 5, PN 2
+- ✅ Overview: DPT churn card is **gone** (removed from Overview)
+- ✅ Overview: DUN grid shows real PRN15 winners with actual parties (N01 BN UMNO 51%, N07 BN MIC 39%, etc.)
+- ✅ Elections GE15: results table shows real candidate data (BERSATU 46.8% P134, AMANAH 38.6% P135, PAS 40.6% P136, PKR 41.7% P137, DAP 60.1% P138, PAS 35.9% P139)
+- ✅ Elections: party breakdown shows real component parties (UMNO 18, DAP 4, MCA 2, BERSATU 2, MIC 1, AMANAH 1 for PRN15)
+- ✅ No runtime errors in dev.log
+- ✅ Lint: 0 errors, 2 pre-existing warnings
+
+**VLM (glm-4.6v) verification:**
+- ✅ Overview: "Election history (real ElectionData.MY)" card visible — VLM confirmed
+- ✅ Overview: "Current DUN composition (PRN15 2021)" card visible — VLM confirmed
+- ✅ Overview: Coalition seat numbers BN 21, PH 5, PN 2 visible — VLM confirmed
+- ✅ Overview: DPT churn card is gone — VLM confirmed
+
+## Unresolved issues or risks
+
+1. **DPT Analysis tab still has per-DUN data** — The DPT Analysis tab (`analysis-tab.tsx`) still shows per-DUN churn data which is synthetic/estimated for P135-P139. This is correct behavior per user instruction: DPT should be a standalone module. The DPT data is only shown in the DPT Analysis tab, not in other tabs.
+
+2. **PRN15 DUN results have real data but P135-P139 demographics are still estimated** — The election results (winners, parties, vote counts) are real from ElectionData.MY. However, the voter demographics (age, gender, ethnicity) for P135-P139 DUNs are still synthetic since the PIP-VOTER-INTELLIGENCE engine only processed P134. This is clearly marked in the Demographics and Risk tabs with "verified/pending" indicators.
+
+3. **GE14 DUN results** — The GE14 DUN results come from SE-14 in the DUN ballots dataset. The coalition mapping uses "ALONE" for independents which is mapped to "BEBAS" in our data. Some DUN seats in GE14 may have different coalition affiliations than PRN15/GE15 due to party switches (e.g., BERSATU was in PH in GE14 but moved to PN by GE15).
+
+4. **Push to git pending** — commit not yet made.

@@ -14,8 +14,6 @@
 //      static fallback instead of queuing behind doomed calls.
 
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { rateLimit, assessBackpressure, withInflight, getClientIdentifier } from "@/lib/rate-limiter";
 import { circuitBreaker, CircuitOpenError } from "@/lib/circuit-breaker";
 import { withIdempotency } from "@/lib/idempotency";
@@ -84,11 +82,21 @@ interface RagResult {
   evidence_tier: "Verified" | "Proxy" | "Partial";
 }
 
-const DATA_DIR = path.join(process.cwd(), "public", "data");
+// Base URL for fetching static data files — set per-request from the request URL.
+let dataBaseUrl: string | null = null;
+
+function setDataBaseUrl(req: NextRequest) {
+  if (!dataBaseUrl) {
+    dataBaseUrl = new URL(req.url).origin;
+  }
+}
 
 async function readJsonlSafe(rel: string): Promise<unknown[]> {
   try {
-    const txt = await fs.readFile(path.join(DATA_DIR, rel), "utf8");
+    const url = `${dataBaseUrl}/data/${rel}`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const txt = await res.text();
     return txt
       .trim()
       .split("\n")
@@ -101,8 +109,10 @@ async function readJsonlSafe(rel: string): Promise<unknown[]> {
 
 async function readJsonSafe(rel: string): Promise<unknown | null> {
   try {
-    const txt = await fs.readFile(path.join(DATA_DIR, rel), "utf8");
-    return JSON.parse(txt) as unknown;
+    const url = `${dataBaseUrl}/data/${rel}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json() as unknown;
   } catch {
     return null;
   }
@@ -323,6 +333,9 @@ function staticFallback(question: string): string {
 // ---------------------------------------------------------------------------
 
 async function handlePost(req: NextRequest): Promise<NextResponse> {
+  // Set base URL for fetching static data files (RAG context)
+  setDataBaseUrl(req);
+
   // --- 1. Rate limit (5 req/min per IP) ---
   // Security-01: rate-limit every LLM call to protect the CF Workers AI budget and to
   // blunt brute-force prompt-injection attempts. Uses the shared

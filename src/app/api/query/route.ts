@@ -7,8 +7,6 @@
 // Flow: NL question → CF AI generates SQL → in-memory executor → JSON results
 
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { cfChatCompletion, CF_MODELS, type CFChatMessage } from "@/lib/cloudflare-ai";
 import { withCORS } from "@/lib/cors";
 
@@ -49,11 +47,16 @@ Rules:
 
 let cachedTables: Record<string, Array<Record<string, unknown>>> | null = null;
 
-async function loadTables(): Promise<Record<string, Array<Record<string, unknown>>>> {
+async function loadTables(req: NextRequest): Promise<Record<string, Array<Record<string, unknown>>>> {
   if (cachedTables) return cachedTables;
-  const tablesPath = path.join(process.cwd(), "public", "data", "elections", "query-tables.json");
-  const raw = await fs.readFile(tablesPath, "utf-8");
-  cachedTables = JSON.parse(raw);
+  // Use fetch with absolute URL — works on both local dev and Cloudflare Workers.
+  // On CF Workers, static assets are served via the ASSETS binding.
+  const baseUrl = new URL(req.url).origin;
+  const res = await fetch(`${baseUrl}/data/elections/query-tables.json`);
+  if (!res.ok) {
+    throw new Error(`Failed to load query tables: HTTP ${res.status}`);
+  }
+  cachedTables = await res.json() as Record<string, Array<Record<string, unknown>>>;
   return cachedTables!;
 }
 
@@ -371,7 +374,7 @@ async function handlePost(req: NextRequest): Promise<NextResponse> {
   // Step 2: Execute SQL
   let tables: Record<string, Array<Record<string, unknown>>>;
   try {
-    tables = await loadTables();
+    tables = await loadTables(req);
   } catch {
     return NextResponse.json({
       error: "Failed to load election data tables",

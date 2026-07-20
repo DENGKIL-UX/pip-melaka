@@ -23,8 +23,25 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { ShortcutCheatSheet } from "@/components/shared/shortcut-cheat-sheet";
 
-// Lazy-load map components (Leaflet + Three.js are heavy)
-const Map2DTab = dynamic(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab })), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 2D map…</div> });
+/**
+ * Retry wrapper for next/dynamic — retries the chunk load up to 5 times with
+ * a 2s delay between attempts. This handles transient ChunkLoadError when the
+ * Turbopack dev server briefly OOMs during on-demand chunk compilation.
+ */
+function withRetry<T>(importFn: () => Promise<T>, retries = 5): Promise<T> {
+  return importFn().catch((err) => {
+    if (retries > 0) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(withRetry(importFn, retries - 1)), 2000);
+      });
+    }
+    throw err;
+  });
+}
+
+// Lazy-load map components (Leaflet + Three.js are heavy — ssr: false because
+// they reference window during module evaluation)
+const Map2DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab }))), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 2D map…</div> });
 const Map3DTab = dynamic(() => import("@/components/tabs/map-3d-tab").then((m) => ({ default: m.Map3DTab })), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 3D map…</div> });
 const S2DConsoleTab = dynamic(() => import("@/components/tabs/s2d-console-tab").then((m) => ({ default: m.S2DConsoleTab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D console…</div> });
 const S2D360Tab = dynamic(() => import("@/components/tabs/s2d-360-tab").then((m) => ({ default: m.S2D360Tab })), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D 360…</div> });

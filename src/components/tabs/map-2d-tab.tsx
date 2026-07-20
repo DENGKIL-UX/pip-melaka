@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Map as MapIcon, Layers, ChevronDown, ChevronUp, MousePointer2 } from "lucide-react";
+import { Map as MapIcon, Layers, ChevronDown, ChevronUp, MousePointer2, RefreshCw } from "lucide-react";
 import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
-import { MLK_CENTER, MLK_DEFAULT_ZOOM, PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
+import { MLK_CENTER, MLK_DEFAULT_ZOOM, PARLIAMENTS } from "@/lib/melaka-constants";
+import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
 import { useDashboardStore } from "@/stores/dashboard-store";
+
+// ─── Types ─────────────────────────────────────────────────────────────────
 
 interface GeoJSONFeature {
   type: "Feature";
@@ -23,8 +26,36 @@ interface GeoJSONCollection {
 interface ElectionDoc {
   elections: Array<{
     id: string;
-    dun_results?: Array<{ parliament_code: string; dun_code: string; winner: string; vote_share?: Record<string, number> }>;
-    parliament_results?: Array<{ parliament_code: string; winner: string }>;
+    dun_results?: Array<{
+      parliament_code: string;
+      dun_code: string;
+      dun_name?: string;
+      winner: string;
+      winner_party?: string;
+      winner_candidate?: string;
+      winner_votes?: number;
+      votes_pct?: number;
+      margin_pct?: number;
+      runner_up?: string;
+      runner_up_party?: string;
+      runner_up_candidate?: string;
+      runner_up_votes?: number;
+      vote_share?: Record<string, number>;
+    }>;
+    parliament_results?: Array<{
+      parliament_code: string;
+      parliament_name?: string;
+      winner: string;
+      winner_party?: string;
+      winner_candidate?: string;
+      winner_votes?: number;
+      votes_pct?: number;
+      margin_pct?: number;
+      runner_up?: string;
+      runner_up_party?: string;
+      runner_up_candidate?: string;
+      runner_up_votes?: number;
+    }>;
   }>;
 }
 
@@ -38,181 +69,99 @@ interface LayerDef {
 
 const LAYERS: LayerDef[] = [
   { id: "adm1", label: "State outline", group: "boundary", defaultOn: true, color: "#0ea5e9" },
-  { id: "adm2", label: "Districts (3)", group: "boundary", defaultOn: false, color: "#7dd3fc" },
+  { id: "adm2", label: "Districts (3)", group: "boundary", defaultOn: true, color: "#7dd3fc" },
   { id: "par", label: "Parlimen (6)", group: "electoral", defaultOn: true, color: "#f59e0b" },
   { id: "dun", label: "DUN (28)", group: "electoral", defaultOn: true, color: "#38bdf8" },
-  { id: "choropleth", label: "PRN15 choropleth", group: "data", defaultOn: true, color: "#0F7DC2" },
-  { id: "ge15", label: "GE15 parliament", group: "data", defaultOn: false, color: "#019C2D" },
+  { id: "choropleth", label: "Winner choropleth", group: "data", defaultOn: true, color: "#0F7DC2" },
+  { id: "ge15", label: "GE15 parlimen", group: "data", defaultOn: false, color: "#019C2D" },
 ];
 
 const SCENARIOS = ["PRN15", "GE14", "GE15"] as const;
+type Scenario = (typeof SCENARIOS)[number];
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+/** Extract the 2-digit DUN code from a property like "N.01" → "01". */
+function extractDunCode(raw: unknown): string {
+  const s = String(raw ?? "");
+  // Match "N.01", "N01", "01", or "N. 01"
+  const m = s.match(/N\.?\s*(\d+)/i);
+  return m ? m[1].padStart(2, "0") : s.replace(/\D/g, "");
+}
+
+/** Extract the 3-digit parlimen code from a property like "P.134" → "134". */
+function extractParlCode(raw: unknown): string {
+  const s = String(raw ?? "");
+  const m = s.match(/P\.?\s*(\d+)/i);
+  return m ? m[1] : s.replace(/\D/g, "");
+}
+
+/** Extract a clean DUN name from "N.01 Kuala Linggi" → "Kuala Linggi". */
+function extractDunName(raw: unknown): string {
+  const s = String(raw ?? "");
+  return s.replace(/^N\.?\s*\d+\s*/i, "").trim() || s;
+}
+
+/** Get the DUN winner object from the election doc. */
+function getDunResult(
+  elDoc: ElectionDoc,
+  parlCode: string,
+  dunCode: string,
+  scenario: Scenario,
+): ElectionDoc["elections"][0]["dun_results"] extends (infer T)[] | undefined ? T | undefined : never {
+  const election = elDoc.elections.find((e) => e.id === scenario);
+  return election?.dun_results?.find(
+    (r) => r.parliament_code === parlCode && r.dun_code === dunCode,
+  ) as any;
+}
+
+/** Get the parlimen winner object from the election doc. */
+function getParlResult(elDoc: ElectionDoc, parlCode: string, scenario: Scenario) {
+  if (scenario === "GE15") {
+    const ge15 = elDoc.elections.find((e) => e.id === "GE15");
+    return ge15?.parliament_results?.find((r) => r.parliament_code === parlCode);
+  }
+  // For GE14 / PRN15, derive from DUN winners in that parliament
+  const election = elDoc.elections.find((e) => e.id === scenario);
+  const dunResults = election?.dun_results?.filter((r) => r.parliament_code === parlCode) ?? [];
+  const tally: Record<string, number> = {};
+  for (const r of dunResults) {
+    tally[r.winner] = (tally[r.winner] ?? 0) + 1;
+  }
+  const winner = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+  if (!winner) return undefined;
+  return {
+    parliament_code: parlCode,
+    winner: winner[0],
+    seatCount: winner[1],
+    totalDun: dunResults.length,
+  };
+}
+
+/** Coalition color or fallback grey. */
+function coalitionColor(coalition: string | null | undefined): string {
+  if (!coalition) return "#94A3B8";
+  return PARTY_COLORS[coalition as keyof typeof PARTY_COLORS] ?? "#6B7280";
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
 
 export function Map2DTab() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const layerRefs = useRef<Record<string, any>>({});
   const [layers, setLayers] = useState<Record<string, boolean>>(
-    Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn]))
+    Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn])),
   );
   const [panelOpen, setPanelOpen] = useState(true);
-  const [scenario, setScenario] = useState<typeof SCENARIOS[number]>("PRN15");
+  const [scenario, setScenario] = useState<Scenario>("PRN15");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const { setSelectedParliament, setSelectedDun } = useDashboardStore();
 
-  // Initialize Leaflet map
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const L = (await import("leaflet")).default;
-        // @ts-ignore — CSS import for Leaflet
-        await import("leaflet/dist/leaflet.css");
-        if (cancelled || !containerRef.current) return;
-
-        const map = L.map(containerRef.current, {
-          center: MLK_CENTER,
-          zoom: MLK_DEFAULT_ZOOM,
-          zoomControl: false,
-          preferCanvas: true,
-        });
-        L.control.zoom({ position: "bottomright" }).addTo(map);
-        L.control.scale({ position: "bottomleft", metric: true, imperial: false }).addTo(map);
-        mapRef.current = map;
-
-        // Tile layer (CARTO light)
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-          attribution: '&copy; OpenStreetMap &copy; CARTO',
-          subdomains: "abcd",
-          maxZoom: 19,
-        }).addTo(map);
-
-        // Fetch GeoJSON + elections data
-        const [adm1Res, adm2Res, dunRes, parRes, elRes] = await Promise.all([
-          fetch("/data/boundaries/mlk-adm1-geo.json"),
-          fetch("/data/boundaries/mlk-adm2-geo.json"),
-          fetch("/data/boundaries/mlk-dun-geo.json"),
-          fetch("/data/boundaries/mlk-parlimen-geo.json"),
-          fetch("/data/elections/melaka-elections.json"),
-        ]);
-
-        const adm1Data: GeoJSONCollection = await adm1Res.json();
-        const adm2Data: GeoJSONCollection = await adm2Res.json();
-        const dunData: GeoJSONCollection = await dunRes.json();
-        const parData: GeoJSONCollection = await parRes.json();
-        const elDoc: ElectionDoc = await elRes.json();
-
-        // Store elections data for choropleth
-        (map as any)._elections = elDoc;
-        (map as any)._dunData = dunData;
-
-        // ADM1 — state outline
-        const adm1Layer = L.geoJSON(adm1Data as any, {
-          style: { color: "#0ea5e9", weight: 3, fillOpacity: 0.05, dashArray: "5,5" },
-        });
-        layerRefs.current.adm1 = adm1Layer;
-
-        // ADM2 — districts
-        const adm2Layer = L.geoJSON(adm2Data as any, {
-          style: { color: "#7dd3fc", weight: 2, fillOpacity: 0.03, dashArray: "3,3" },
-          onEachFeature: (feat, lyr) => {
-            lyr.bindTooltip(String(feat.properties?.name ?? "District"), { sticky: true });
-          },
-        });
-        layerRefs.current.adm2 = adm2Layer;
-
-        // Parlimen
-        const parLayer = L.geoJSON(parData as any, {
-          style: { color: "#f59e0b", weight: 2, fillOpacity: 0.05 },
-          onEachFeature: (feat, lyr) => {
-            const name = String(feat.properties?.parlimen ?? "");
-            lyr.bindTooltip(name, { sticky: true });
-          },
-        });
-        layerRefs.current.par = parLayer;
-
-        // DUN — with choropleth
-        const dunLayer = L.geoJSON(dunData as any, {
-          style: (feat) => {
-            const code = String(feat?.properties?.code_dun ?? "").replace("N.", "");
-            const parlCode = String(feat?.properties?.code_parlimen ?? "").replace("P.", "");
-            const winner = getDunWinner(elDoc, parlCode, code, scenario);
-            const color = winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] ?? "#6B7280" : "#94A3B8";
-            return {
-              color: "#1e293b",
-              weight: 1,
-              fillColor: layers.choropleth ? color : "#38bdf8",
-              fillOpacity: layers.choropleth ? 0.6 : 0.15,
-            };
-          },
-          onEachFeature: (feat, lyr) => {
-            const code = String(feat.properties?.code_dun ?? "").replace("N.", "");
-            const parlCode = String(feat.properties?.code_parlimen ?? "").replace("P.", "");
-            const name = String(feat.properties?.dun ?? "").replace(/N\.\d+\s/, "");
-            const parlName = String(feat.properties?.parlimen ?? "");
-            const winner = getDunWinner(elDoc, parlCode, code, scenario);
-
-            lyr.bindTooltip(
-              `<div style="font-size:12px;min-width:150px">
-                <strong style="color:${MLK_ACCENT}">N${code}</strong> ${name}<br/>
-                <span style="color:#64748b">${parlName}</span><br/>
-                <span style="color:${winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] : "#64748b"}">Winner: ${winner ?? "no data"}</span>
-              </div>`,
-              { sticky: true }
-            );
-
-            lyr.on("click", () => {
-              setSelectedParliament(parlCode);
-              setSelectedDun({ parliament: parlCode, dun: code, name });
-            });
-
-            lyr.on("mouseover", () => setHovered(`${parlCode}-${code}`));
-            lyr.on("mouseout", () => setHovered(null));
-          },
-        });
-        layerRefs.current.dun = dunLayer;
-        layerRefs.current.choropleth = dunLayer; // same layer, choropleth is a style toggle
-
-        // GE15 parliament layer
-        const ge15Layer = L.geoJSON(parData as any, {
-          style: (feat) => {
-            const parlCode = String(feat?.properties?.code_parlimen ?? "").replace("P.", "");
-            const ge15 = elDoc.elections.find((e) => e.id === "GE15");
-            const winner = ge15?.parliament_results?.find((r) => r.parliament_code === parlCode)?.winner;
-            const color = winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] ?? "#6B7280" : "#94A3B8";
-            return { color: "#1e293b", weight: 2, fillColor: color, fillOpacity: 0.5 };
-          },
-          onEachFeature: (feat, lyr) => {
-            const parlCode = String(feat?.properties?.code_parlimen ?? "").replace("P.", "");
-            const ge15 = elDoc.elections.find((e) => e.id === "GE15");
-            const winner = ge15?.parliament_results?.find((r) => r.parliament_code === parlCode)?.winner;
-            lyr.bindTooltip(`${feat.properties?.parlimen} — GE15: ${winner ?? "?"}`, { sticky: true });
-          },
-        });
-        layerRefs.current.ge15 = ge15Layer;
-
-        // Apply initial layer visibility
-        applyLayerVisibility();
-
-        setLoading(false);
-      } catch (e) {
-        console.error("Map init error:", e);
-        setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
-
-  // Apply layer visibility
-  const applyLayerVisibility = () => {
+  // Stable callback for applying layer visibility
+  const applyLayerVisibility = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
     for (const layer of LAYERS) {
@@ -223,26 +172,333 @@ export function Map2DTab() {
       if (wantOn && !isOnMap) ref.addTo(map);
       else if (!wantOn && isOnMap) map.removeLayer(ref);
     }
-  };
+  }, [layers]);
+
+  // ─── Initialize Leaflet map (runs once) ────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        if (cancelled || !containerRef.current) return;
+
+        // Dynamic import of Leaflet — with retry to handle transient ChunkLoadError
+        // (dev server may briefly OOM during on-demand chunk compilation)
+        let L: any;
+        let leafletAttempts = 0;
+        for (;;) {
+          leafletAttempts++;
+          try {
+            const Lmod = await import("leaflet");
+            L = (Lmod as any).default ?? Lmod;
+            // @ts-ignore — CSS import for Leaflet (no type declarations)
+            await import("leaflet/dist/leaflet.css");
+            break;
+          } catch (chunkErr: any) {
+            if (leafletAttempts >= 5) throw chunkErr;
+            // Wait 2s before retrying — the dev server may have briefly OOM'd
+            await new Promise((r) => setTimeout(r, 2000));
+          }
+        }
+
+        if (cancelled || !containerRef.current) return;
+
+        // Guard: if map already initialized on this container, Leaflet throws
+        if ((containerRef.current as any)._leaflet_id) {
+          (containerRef.current as any)._leaflet_id = null;
+        }
+
+        const map = L.map(containerRef.current, {
+          center: MLK_CENTER,
+          zoom: MLK_DEFAULT_ZOOM,
+          zoomControl: false,
+          preferCanvas: true,
+          minZoom: 8,
+          maxZoom: 17,
+        });
+        L.control.zoom({ position: "bottomright" }).addTo(map);
+        L.control.scale({ position: "bottomleft", metric: true, imperial: false }).addTo(map);
+        mapRef.current = map;
+
+        // Tile layer (CARTO Voyager — better contrast for boundaries)
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+          attribution: "&copy; OpenStreetMap &copy; CARTO",
+          subdomains: "abcd",
+          maxZoom: 19,
+        }).addTo(map);
+
+        // Fetch GeoJSON + elections data in parallel
+        const [adm1Res, adm2Res, dunRes, parRes, elRes] = await Promise.all([
+          fetch("/data/boundaries/mlk-adm1-geo.json"),
+          fetch("/data/boundaries/mlk-adm2-geo.json"),
+          fetch("/data/boundaries/mlk-dun-geo.json"),
+          fetch("/data/boundaries/mlk-parlimen-geo.json"),
+          fetch("/data/elections/melaka-elections.json"),
+        ]);
+
+        if (!adm1Res.ok || !dunRes.ok || !parRes.ok || !elRes.ok) {
+          throw new Error(`Boundary fetch failed: adm1=${adm1Res.status}, dun=${dunRes.status}, par=${parRes.status}, el=${elRes.status}`);
+        }
+
+        const adm1Data: GeoJSONCollection = await adm1Res.json();
+        const adm2Data: GeoJSONCollection = await adm2Res.json();
+        const dunData: GeoJSONCollection = await dunRes.json();
+        const parData: GeoJSONCollection = await parRes.json();
+        const elDoc: ElectionDoc = await elRes.json();
+
+        // Store on map instance for later access
+        (map as any)._elections = elDoc;
+        (map as any)._dunData = dunData;
+        (map as any)._parData = parData;
+
+        // ─── ADM1 — state outline ──────────────────────────────────────────
+        const adm1Layer = L.geoJSON(adm1Data as any, {
+          style: { color: "#0ea5e9", weight: 4, fillOpacity: 0.02, dashArray: "8,6" },
+          onEachFeature: (_feat, lyr) => {
+            lyr.bindTooltip(
+              `<div style="font-size:13px;font-weight:600;color:#0ea5e9">Melaka (State)</div>
+               <div style="font-size:10px;color:#64748b">ADM1 · State outline · 6 parlimen · 28 DUN</div>`,
+              { sticky: true, className: "mlk-map-tooltip" },
+            );
+          },
+        });
+        layerRefs.current.adm1 = adm1Layer;
+
+        // ─── ADM2 — districts (3) ──────────────────────────────────────────
+        const adm2Layer = L.geoJSON(adm2Data as any, {
+          style: { color: "#7dd3fc", weight: 2.5, fillOpacity: 0.04, dashArray: "4,4" },
+          onEachFeature: (feat, lyr) => {
+            const name = String(feat.properties?.name ?? "District");
+            const dunCount = feat.properties?.dun_count ?? "?";
+            lyr.bindTooltip(
+              `<div style="font-size:12px;font-weight:600;color:#0284c7">${name} District</div>
+               <div style="font-size:10px;color:#64748b">ADM2 · ${dunCount} DUN seats</div>`,
+              { sticky: true, className: "mlk-map-tooltip" },
+            );
+          },
+        });
+        layerRefs.current.adm2 = adm2Layer;
+
+        // ─── Parlimen (6) ──────────────────────────────────────────────────
+        const buildParlTooltip = (feat: GeoJSONFeature, scen: Scenario): string => {
+          const parlCode = extractParlCode(feat.properties?.code_parlimen);
+          const parlName = String(feat.properties?.parlimen ?? "").replace(/^P\.\d+\s*/, "");
+          const ge15 = elDoc.elections.find((e) => e.id === "GE15");
+          const ge14 = elDoc.elections.find((e) => e.id === "GE14");
+          const ge15r = ge15?.parliament_results?.find((r) => r.parliament_code === parlCode);
+          const ge14r = getParlResult(elDoc, parlCode, "GE14");
+
+          const row = (label: string, r?: any) => {
+            if (!r) return `<div style="font-size:10px;color:#94a3b8">${label}: —</div>`;
+            const c = coalitionColor(r.winner);
+            const party = r.winner_party ? ` <span style="color:#475569">(${r.winner_party})</span>` : "";
+            const cand = r.winner_candidate ? `<div style="font-size:9px;color:#64748b">${r.winner_candidate}</div>` : "";
+            const pct = r.votes_pct != null ? ` · ${r.votes_pct.toFixed(1)}%` : "";
+            return `<div style="font-size:10px"><span style="color:${c};font-weight:600">${label}: ${r.winner}${party}${pct}</span></div>${cand}`;
+          };
+
+          return `<div style="font-size:12px;min-width:180px">
+            <div style="font-weight:700;color:${MLK_ACCENT}">P${parlCode} · ${parlName}</div>
+            <div style="font-size:9px;color:#94a3b8;margin-bottom:4px">Parliamentary constituency</div>
+            ${row("GE15", ge15r)}
+            ${row("GE14", ge14r)}
+          </div>`;
+        };
+
+        const parLayer = L.geoJSON(parData as any, {
+          style: { color: "#f59e0b", weight: 3, fillOpacity: 0.05 },
+          onEachFeature: (feat, lyr) => {
+            lyr.bindTooltip(() => buildParlTooltip(feat as GeoJSONFeature, scenario), {
+              sticky: true,
+              className: "mlk-map-tooltip",
+            });
+            lyr.on("click", () => {
+              const code = extractParlCode(feat.properties?.code_parlimen);
+              setSelectedParliament(code);
+            });
+            lyr.on("mouseover", () => {
+              const code = extractParlCode(feat.properties?.code_parlimen);
+              setHovered(`P${code}`);
+            });
+            lyr.on("mouseout", () => setHovered(null));
+          },
+        });
+        layerRefs.current.par = parLayer;
+
+        // ─── DUN (28) with choropleth ──────────────────────────────────────
+        const buildDunTooltip = (feat: GeoJSONFeature, scen: Scenario): string => {
+          const code = extractDunCode(feat.properties?.code_dun);
+          const parlCode = extractParlCode(feat.properties?.code_parlimen);
+          const name = extractDunName(feat.properties?.dun);
+          const parlName = String(feat.properties?.parlimen ?? "").replace(/^P\.\d+\s*/, "");
+
+          // Use DUN_SUMMARY for PRN15 (richer data with candidate + votes)
+          const dunSum = getDunByCode(code);
+          const prn15r = dunSum?.prn15;
+          const ge14r = dunSum?.ge14;
+
+          // GE15 — no DUN election, show parliament winner
+          const ge15 = elDoc.elections.find((e) => e.id === "GE15");
+          const ge15Parl = ge15?.parliament_results?.find((r) => r.parliament_code === parlCode);
+
+          const winnerRow = (label: string, winner?: string, party?: string, cand?: string, votes?: number, pct?: number, margin?: number) => {
+            if (!winner) return `<div style="font-size:10px;color:#94a3b8">${label}: —</div>`;
+            const c = coalitionColor(winner);
+            const partyStr = party ? ` <span style="color:#475569">(${party})</span>` : "";
+            const candStr = cand ? `<div style="font-size:9px;color:#64748b">${cand}</div>` : "";
+            const stats = votes != null ? ` · ${votes.toLocaleString()}v` : "";
+            const pctStr = pct != null ? ` · ${pct.toFixed(1)}%` : "";
+            const marginStr = margin != null ? ` · margin ${margin.toFixed(1)}pp` : "";
+            return `<div style="font-size:10px"><span style="color:${c};font-weight:600">${label}: ${winner}${partyStr}${stats}${pctStr}${marginStr}</span></div>${candStr}`;
+          };
+
+          if (scen === "GE15") {
+            return `<div style="font-size:12px;min-width:200px">
+              <div style="font-weight:700;color:${MLK_ACCENT}">N${code} · ${name}</div>
+              <div style="font-size:9px;color:#94a3b8;margin-bottom:4px">${parlName} · P${parlCode}</div>
+              <div style="font-size:9px;color:#f59e0b;margin-bottom:4px">⚠ GE15 = federal only — no DUN ballot. Showing parliament result.</div>
+              ${winnerRow("GE15 Parlimen", ge15Parl?.winner, ge15Parl?.winner_party, ge15Parl?.winner_candidate, ge15Parl?.winner_votes, ge15Parl?.votes_pct, ge15Parl?.margin_pct)}
+              ${winnerRow("PRN15 DUN", prn15r?.coalition, prn15r?.party, prn15r?.candidate, prn15r?.votes, prn15r?.votesPct, prn15r?.marginPct)}
+              ${winnerRow("GE14 DUN", ge14r?.coalition, ge14r?.party, ge14r?.candidate, ge14r?.votes, ge14r?.votesPct, ge14r?.marginPct)}
+            </div>`;
+          }
+
+          const current = scen === "PRN15" ? prn15r : ge14r;
+          const prev = scen === "PRN15" ? ge14r : prn15r;
+          const swing = current && prev && current.coalition !== prev.coalition;
+
+          return `<div style="font-size:12px;min-width:200px">
+            <div style="font-weight:700;color:${MLK_ACCENT}">N${code} · ${name}</div>
+            <div style="font-size:9px;color:#94a3b8;margin-bottom:4px">${parlName} · P${parlCode}</div>
+            ${winnerRow(scen, current?.coalition, current?.party, current?.candidate, current?.votes, current?.votesPct, current?.marginPct)}
+            ${swing ? `<div style="font-size:9px;color:${MLK_ACCENT};font-weight:600;margin-top:2px">⟳ Swing: ${prev?.coalition} → ${current?.coalition}</div>` : ""}
+            <div style="font-size:9px;color:#94a3b8;margin-top:3px;border-top:1px solid #e2e8f0;padding-top:2px">
+              ${winnerRow(scen === "PRN15" ? "GE14" : "PRN15", prev?.coalition, prev?.party, prev?.candidate, prev?.votes, prev?.votesPct, prev?.marginPct)}
+            </div>
+          </div>`;
+        };
+
+        const dunLayer = L.geoJSON(dunData as any, {
+          style: (feat) => {
+            const code = extractDunCode(feat?.properties?.code_dun);
+            const dunSum = getDunByCode(code);
+            const winner =
+              scenario === "PRN15" ? dunSum?.prn15.coalition :
+              scenario === "GE14" ? dunSum?.ge14.coalition :
+              null; // GE15 has no DUN
+            const color = layers.choropleth ? coalitionColor(winner) : "#38bdf8";
+            return {
+              color: "#1e293b",
+              weight: 1,
+              fillColor: color,
+              fillOpacity: layers.choropleth ? 0.7 : 0.2,
+            };
+          },
+          onEachFeature: (feat, lyr) => {
+            lyr.bindTooltip(() => buildDunTooltip(feat as GeoJSONFeature, scenario), {
+              sticky: true,
+              className: "mlk-map-tooltip",
+            });
+            lyr.on("click", () => {
+              const code = extractDunCode(feat.properties?.code_dun);
+              const parlCode = extractParlCode(feat.properties?.code_parlimen);
+              const name = extractDunName(feat.properties?.dun);
+              setSelectedParliament(parlCode);
+              setSelectedDun({ parliament: parlCode, dun: code, name });
+            });
+            lyr.on("mouseover", () => {
+              const code = extractDunCode(feat.properties?.code_dun);
+              const parlCode = extractParlCode(feat.properties?.code_parlimen);
+              setHovered(`${parlCode}-${code}`);
+            });
+            lyr.on("mouseout", () => setHovered(null));
+          },
+        });
+        layerRefs.current.dun = dunLayer;
+        layerRefs.current.choropleth = dunLayer; // same layer, choropleth is a style toggle
+
+        // ─── GE15 parlimen layer (separate overlay) ───────────────────────
+        const ge15Layer = L.geoJSON(parData as any, {
+          style: (feat) => {
+            const parlCode = extractParlCode(feat?.properties?.code_parlimen);
+            const ge15 = elDoc.elections.find((e) => e.id === "GE15");
+            const r = ge15?.parliament_results?.find((rr) => rr.parliament_code === parlCode);
+            return {
+              color: "#1e293b",
+              weight: 2.5,
+              fillColor: coalitionColor(r?.winner),
+              fillOpacity: 0.6,
+            };
+          },
+          onEachFeature: (feat, lyr) => {
+            const parlCode = extractParlCode(feat.properties?.code_parlimen);
+            const ge15 = elDoc.elections.find((e) => e.id === "GE15");
+            const r = ge15?.parliament_results?.find((rr) => rr.parliament_code === parlCode);
+            const parlName = String(feat.properties?.parlimen ?? "").replace(/^P\.\d+\s*/, "");
+            lyr.bindTooltip(
+              `<div style="font-size:12px;min-width:180px">
+                <div style="font-weight:700;color:${MLK_ACCENT}">P${parlCode} · ${parlName}</div>
+                <div style="font-size:9px;color:#94a3b8;margin-bottom:4px">GE15 Parlimen result</div>
+                <div style="font-size:10px"><span style="color:${coalitionColor(r?.winner)};font-weight:600">Winner: ${r?.winner ?? "?"}</span> <span style="color:#475569">(${r?.winner_party ?? "?"})</span></div>
+                <div style="font-size:9px;color:#64748b">${r?.winner_candidate ?? "—"}</div>
+                <div style="font-size:9px;color:#64748b">${r?.winner_votes?.toLocaleString() ?? "—"} votes · ${r?.votes_pct?.toFixed(1) ?? "—"}%</div>
+                ${r?.margin_pct != null ? `<div style="font-size:9px;color:#64748b">Margin: ${r.margin_pct.toFixed(1)}pp</div>` : ""}
+              </div>`,
+              { sticky: true, className: "mlk-map-tooltip" },
+            );
+          },
+        });
+        layerRefs.current.ge15 = ge15Layer;
+
+        // Fit bounds to Melaka
+        const bounds = dunLayer.getBounds();
+        map.fitBounds(bounds, { padding: [20, 20] });
+
+        // Apply initial layer visibility
+        applyLayerVisibility();
+
+        setLoading(false);
+      } catch (e: any) {
+        console.error("[Map2DTab] init error:", e);
+        setLoadError(e?.message ?? String(e));
+        setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      try {
+        if (mapRef.current) {
+          mapRef.current.remove();
+          mapRef.current = null;
+        }
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
 
   // Re-apply when layers change
   useEffect(() => {
     applyLayerVisibility();
-  }, [layers]);
+  }, [applyLayerVisibility]);
 
-  // Update choropleth when scenario changes
+  // Update DUN choropleth + tooltips when scenario or choropleth toggle changes
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !map._elections || !layerRefs.current.dun) return;
-    const elDoc = map._elections as ElectionDoc;
-    layerRefs.current.dun.setStyle((feat: GeoJSONFeature) => {
-      const code = String(feat.properties?.code_dun ?? "").replace("N.", "");
-      const parlCode = String(feat.properties?.code_parlimen ?? "").replace("P.", "");
-      const winner = getDunWinner(elDoc, parlCode, code, scenario);
-      const color = winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] ?? "#6B7280" : "#94A3B8";
+    const dunLayer = layerRefs.current.dun;
+    if (!dunLayer) return;
+
+    dunLayer.setStyle((feat: GeoJSONFeature) => {
+      const code = extractDunCode(feat.properties?.code_dun);
+      const dunSum = getDunByCode(code);
+      const winner =
+        scenario === "PRN15" ? dunSum?.prn15.coalition :
+        scenario === "GE14" ? dunSum?.ge14.coalition :
+        null;
+      const color = layers.choropleth ? coalitionColor(winner) : "#38bdf8";
       return {
-        fillColor: layers.choropleth ? color : "#38bdf8",
-        fillOpacity: layers.choropleth ? 0.6 : 0.15,
+        fillColor: color,
+        fillOpacity: layers.choropleth ? 0.7 : 0.2,
       };
     });
   }, [scenario, layers.choropleth]);
@@ -253,13 +509,44 @@ export function Map2DTab() {
 
   const activeCount = Object.values(layers).filter(Boolean).length;
 
-  // Seat counts for current scenario
-  const seatCounts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
-  // This is computed in the render — we'd need the elections data here
-  // For now, show a placeholder based on known results
-  if (scenario === "PRN15") { seatCounts.BN = 21; seatCounts.PH = 5; seatCounts.PN = 2; }
-  else if (scenario === "GE14") { seatCounts.PH = 15; seatCounts.BN = 13; seatCounts.PN = 0; }
-  else if (scenario === "GE15") { seatCounts.PN = 3; seatCounts.PH = 3; seatCounts.BN = 0; }
+  // Seat counts for current scenario (from DUN_SUMMARY)
+  const seatCounts = useMemo(() => {
+    const counts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
+    if (scenario === "PRN15") {
+      DUN_SUMMARY.forEach((d) => { counts[d.prn15.coalition]++; });
+    } else if (scenario === "GE14") {
+      DUN_SUMMARY.forEach((d) => { counts[d.ge14.coalition]++; });
+    } else if (scenario === "GE15") {
+      // GE15 is parlimen-level — use known results
+      counts.PN = 3; counts.PH = 3; counts.BN = 0;
+    }
+    return counts;
+  }, [scenario]);
+
+  // Hovered DUN/parlimen info for the bottom hover bar
+  const hoveredInfo = useMemo(() => {
+    if (!hovered) return null;
+    if (hovered.startsWith("P") && !hovered.includes("-")) {
+      // Parliament hover
+      const code = hovered.slice(1);
+      const parl = PARLIAMENTS.find((p) => p.code === code);
+      return parl ? { type: "parlimen", code: `P${code}`, name: parl.name, district: parl.district } : null;
+    }
+    const [parlCode, dunCode] = hovered.split("-");
+    const dun = getDunByCode(dunCode);
+    return dun
+      ? { type: "dun", code: `N${dunCode}`, name: dun.dunName, district: dun.district, parliament: dun.parliamentName }
+      : null;
+  }, [hovered]);
+
+  const handleRetry = () => {
+    setLoadError(null);
+    setLoading(true);
+    // Force a full remount by toggling the key in the parent — simplest: reload
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
+  };
 
   return (
     <Card className="border-mlk/20" role="region" aria-label="2D Map module — Leaflet with real Melaka GeoJSON">
@@ -269,7 +556,9 @@ export function Map2DTab() {
             <MapIcon className="h-5 w-5 text-mlk" />
             <div>
               <CardTitle className="text-base">2D Map — Leaflet ({scenario})</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">Real DOSM kawasanku GeoJSON · 28 DUN + 6 parlimen boundaries · Click DUN to open drawer</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Real DOSM kawasanku GeoJSON · 28 DUN + 6 parlimen + 3 districts · Hover for election results
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -298,19 +587,33 @@ export function Map2DTab() {
             </span>
           ))}
           <span className="text-muted-foreground ml-auto flex items-center gap-1">
-            <MousePointer2 className="h-3 w-3" /> Hover for details · Click to open drawer
+            <MousePointer2 className="h-3 w-3" /> Hover any boundary for results · Click to select
           </span>
         </div>
 
         {/* Map container */}
-        <div className="relative rounded-lg border border-border overflow-hidden" style={{ height: 500 }}>
+        <div className="relative rounded-lg border border-border overflow-hidden" style={{ height: 540 }}>
           <div ref={containerRef} className="w-full h-full" style={{ background: "#e5e7eb" }} />
 
+          {/* Loading overlay */}
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-950/30 backdrop-blur-sm z-[500]">
               <div className="flex items-center gap-2 rounded-md bg-card px-3 py-2 text-sm shadow-md">
                 <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-mlk border-t-transparent" />
                 <span>Loading 2D map…</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error overlay */}
+          {loadError && !loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm z-[500] p-4">
+              <div className="rounded-lg bg-card border border-red-500/30 p-4 text-sm shadow-lg max-w-md">
+                <div className="font-semibold text-red-600 dark:text-red-400 mb-1">Map failed to load</div>
+                <div className="text-xs text-muted-foreground mb-3 font-mono break-all">{loadError}</div>
+                <Button size="sm" onClick={handleRetry} className="h-7 text-xs">
+                  <RefreshCw className="h-3 w-3 me-1" /> Reload page
+                </Button>
               </div>
             </div>
           )}
@@ -355,19 +658,22 @@ export function Map2DTab() {
                       <Badge variant="outline" className="text-[8px]">{layer.group}</Badge>
                     </label>
                   ))}
+                  <div className="mt-2 pt-2 border-t border-border text-[9px] text-muted-foreground">
+                    Tip: toggle <strong className="text-mlk">Winner choropleth</strong> to color DUN by coalition
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Seat summary — bottom */}
+          {/* Seat summary — bottom-left */}
           <div className="absolute bottom-3 left-3 z-[1000]">
             <div className="rounded-lg border border-mlk/30 bg-card/95 px-3 py-2 shadow-lg backdrop-blur">
-              <div className="text-[10px] text-muted-foreground uppercase mb-1">{scenario} seats</div>
+              <div className="text-[10px] text-muted-foreground uppercase mb-1">{scenario} {scenario === "GE15" ? "parlimen" : "DUN"} seats</div>
               <div className="flex gap-3">
                 {Object.entries(seatCounts).map(([party, count]) => (
                   <div key={party} className="text-center">
-                    <div className="text-lg font-bold" style={{ color: PARTY_COLORS[party as keyof typeof PARTY_COLORS] }}>{count}</div>
+                    <div className="text-lg font-bold" style={{ color: coalitionColor(party) }}>{count}</div>
                     <div className="text-[9px] text-muted-foreground">{party}</div>
                   </div>
                 ))}
@@ -376,28 +682,35 @@ export function Map2DTab() {
           </div>
         </div>
 
-        {/* Hover info */}
-        {hovered && (
-          <div className="mt-2 text-xs text-muted-foreground">
-            Hovering: <span className="font-mono text-mlk">N{hovered.split("-")[1]}</span>
-          </div>
-        )}
+        {/* Hover info bar */}
+        <div className="mt-2 min-h-[28px] flex items-center">
+          {hoveredInfo ? (
+            <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[9px] font-mono">
+                {hoveredInfo.type === "dun" ? hoveredInfo.code : hoveredInfo.code}
+              </Badge>
+              <span className="font-medium text-foreground">{hoveredInfo.name}</span>
+              <span className="text-muted-foreground">·</span>
+              <span>{hoveredInfo.district}</span>
+              {hoveredInfo.type === "dun" && hoveredInfo.parliament && (
+                <>
+                  <span className="text-muted-foreground">·</span>
+                  <span className="text-muted-foreground">{hoveredInfo.parliament}</span>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="text-xs text-muted-foreground/60">
+              Hover over any boundary on the map to see election results…
+            </div>
+          )}
+        </div>
 
-        <p className="text-[10px] text-muted-foreground/70 mt-3 text-center">
-          Leaflet 1.9 + CARTO light tiles · Real DOSM kawasanku GeoJSON (28 DUN + 6 parlimen) ·
-          geoBoundaries ADM1/ADM2 · 6 toggleable layers · PRN15 choropleth (BN blue 21/28 DUN)
+        <p className="text-[10px] text-muted-foreground/70 mt-2 text-center">
+          Leaflet 1.9 + CARTO Voyager tiles · DOSM kawasanku GeoJSON (28 DUN + 6 parlimen + 3 districts) ·
+          {scenario === "GE15" ? " GE15 parlimen choropleth" : ` ${scenario} DUN choropleth`} · 6 toggleable layers
         </p>
       </CardContent>
     </Card>
   );
-}
-
-function getDunWinner(elDoc: ElectionDoc, parlCode: string, dunCode: string, scenario: string): string | null {
-  if (scenario === "GE15") {
-    const ge15 = elDoc.elections.find((e) => e.id === "GE15");
-    return ge15?.parliament_results?.find((r) => r.parliament_code === parlCode)?.winner ?? null;
-  }
-  const election = elDoc.elections.find((e) => e.id === scenario);
-  const result = election?.dun_results?.find((r) => r.parliament_code === parlCode && r.dun_code === dunCode);
-  return result?.winner ?? null;
 }

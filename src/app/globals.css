@@ -378,4 +378,45 @@
       animation: none !important;
     }
   }
+
+  /* ─── Leaflet map overrides ──────────────────────────────────────────── */
+  /* Ensure Leaflet panes render above card content */
+  .leaflet-pane,
+  .leaflet-top,
+  .leaflet-bottom {
+    z-index: 0;
+  }
+
+  /* Premium tooltip styling — MLK branded */
+  .leaflet-tooltip.mlk-map-tooltip {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(199, 123, 44, 0.35);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(199, 123, 44, 0.15);
+    padding: 8px 10px;
+    color: #0f172a;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    max-width: 280px;
+    white-space: normal;
+  }
+  .leaflet-tooltip.mlk-map-tooltip::before {
+    border-top-color: rgba(199, 123, 44, 0.35);
+  }
+
+  /* Dark mode tooltips */
+  .dark .leaflet-tooltip.mlk-map-tooltip {
+    background: rgba(15, 23, 42, 0.98);
+    border-color: rgba(199, 123, 44, 0.4);
+    color: #f1f5f9;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(199, 123, 44, 0.2);
+  }
+  .dark .leaflet-tooltip.mlk-map-tooltip::before {
+    border-top-color: rgba(199, 123, 44, 0.4);
+  }
+
+  /* Layer control panel should sit above tooltips */
+  .leaflet-control-zoom,
+  .leaflet-control-scale {
+    z-index: 500 !important;
+  }
 }

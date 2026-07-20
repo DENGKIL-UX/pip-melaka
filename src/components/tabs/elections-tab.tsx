@@ -860,7 +860,7 @@ function DataQueryCard() {
 
   const SUGGESTED_QUERIES = [
     "How many DUN seats did BN win in PRN15?",
-    "Which DUN had the smallest margin in GE15?",
+    "Which parliament had the smallest margin in GE15?",
     "Which candidates won in both GE14 and GE15?",
     "What is the average BN vote percentage in DUN seats for PRN15?",
     "Which party won the most seats across all elections?",

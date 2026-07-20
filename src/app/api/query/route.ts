@@ -16,35 +16,42 @@ export const dynamic = "force-dynamic";
 
 const SCHEMA_PROMPT = `You are a SQL query generator for a Melaka election database. Generate ONLY a valid SQL query (no explanation, no markdown, no backticks).
 
+IMPORTANT: This is a SIMPLE SQL engine. Only use these syntax: SELECT, FROM, WHERE, AND, OR, IN, GROUP BY, ORDER BY, ASC, DESC, LIMIT, COUNT, SUM, AVG, MAX, MIN, AS. Do NOT use JOIN, subqueries, window functions, CTEs, or CASE.
+
 Available tables:
 
-1. elections (3 rows — GE14, PRN15, GE15)
-   Columns: id (TEXT), name (TEXT), date (TEXT), headline (TEXT), parl_bn (INT), parl_ph (INT), parl_pn (INT), parl_total (INT), dun_bn (INT), dun_ph (INT), dun_pn (INT), dun_total (INT)
+1. elections (3 rows)
+   Columns: id, name, date, headline, parl_bn, parl_ph, parl_pn, parl_total, dun_bn, dun_ph, dun_pn, dun_total
+   Election IDs: 'GE14', 'PRN15', 'GE15'
+   GE14 = 2018 general election (parliament + DUN)
+   PRN15 = 2021 state election (DUN only, no parliament results)
+   GE15 = 2022 general election (parliament only, no DUN results)
 
-2. parliament_results (12 rows — 6 seats x 2 elections with parliament data)
-   Columns: election_id (TEXT), election_date (TEXT), parliament_code (TEXT), parliament_name (TEXT), winner_coalition (TEXT), winner_party (TEXT), winner_candidate (TEXT), winner_votes (INT), votes_pct (REAL), runner_up_coalition (TEXT), runner_up_party (TEXT), runner_up_candidate (TEXT), runner_up_votes (INT), margin_pct (REAL)
+2. parliament_results (12 rows — 6 seats x 2 elections: GE14 and GE15)
+   Columns: election_id, election_date, parliament_code, parliament_name, winner_coalition, winner_party, winner_candidate, winner_votes, votes_pct, runner_up_coalition, runner_up_party, runner_up_candidate, runner_up_votes, margin_pct
+   Parliament codes: '134', '135', '136', '137', '138', '139'
+   GE14 has 6 rows, GE15 has 6 rows. PRN15 has NO parliament_results.
 
-3. dun_results (56 rows — 28 DUN seats x 2 elections with DUN data)
-   Columns: election_id (TEXT), election_date (TEXT), parliament_code (TEXT), dun_code (TEXT), dun_name (TEXT), winner_coalition (TEXT), winner_party (TEXT), winner_candidate (TEXT), winner_votes (INT), bn_pct (REAL), ph_pct (REAL), pn_pct (REAL)
+3. dun_results (56 rows — 28 seats x 2 elections: GE14 and PRN15)
+   Columns: election_id, election_date, parliament_code, dun_code, dun_name, winner_coalition, winner_party, winner_candidate, winner_votes, bn_pct, ph_pct, pn_pct
+   DUN codes: '01' through '28'
+   GE14 has 28 rows, PRN15 has 28 rows. GE15 has NO dun_results.
 
-4. party_breakdown (15 rows — party seats per election)
-   Columns: election_id (TEXT), party (TEXT), seats_won (INT)
-   Note: party contains component party names (UMNO, MCA, MIC, DAP, PKR, AMANAH, PAS, BERSATU), NOT coalition names.
-   BN parties: UMNO, MCA, MIC. PH parties: DAP, PKR, AMANAH. PN parties: PAS, BERSATU.
+4. party_breakdown (15 rows — component party seats per election)
+   Columns: election_id, party, seats_won
+   Party names are COMPONENT parties (not coalitions): UMNO, MCA, MIC, DAP, PKR, AMANAH, PAS, BERSATU
+   BN = UMNO + MCA + MIC. PH = DAP + PKR + AMANAH. PN = PAS + BERSATU.
    To count BN seats: SELECT SUM(seats_won) FROM party_breakdown WHERE party IN ('UMNO', 'MCA', 'MIC')
 
 Rules:
-- Output ONLY the SQL query, nothing else — no markdown, no backticks, no explanation
-- Use standard SQLite-compatible SQL
-- Table and column names are case-sensitive — use exactly as shown above
-- Winner coalitions are: 'BN', 'PH', 'PN'
-- Election IDs are: 'GE14', 'PRN15', 'GE15'
-- Parliament codes are: '134', '135', '136', '137', '138', '139'
-- DUN codes are: '01' through '28'
+- Output ONLY the SQL query — no markdown, no backticks, no explanation
+- Do NOT use double quotes around column names — use plain column names
+- Use single quotes for string literals: winner_coalition = 'BN'
+- If question asks about "DUN in GE15" — explain that GE15 has no DUN data, use parliament_results instead
+- If question asks about "parliament in PRN15" — explain that PRN15 has no parliament data, use dun_results instead
 - If the question cannot be answered from these tables, return: SELECT 'Cannot answer from available data' AS error
 - Limit results to 50 rows max (add LIMIT 50)
-- Use single quotes for string literals
-- Do NOT use window functions, CTEs, or advanced features — keep it simple SELECT/FROM/WHERE/GROUP BY/ORDER BY/LIMIT`;
+- Keep it simple: SELECT, FROM, WHERE, GROUP BY, ORDER BY, LIMIT`;
 
 // Tables are embedded directly via import — no fetch needed.
 // This works on both local dev and Cloudflare Workers (no self-referencing fetch).
@@ -162,9 +169,26 @@ function evalOrCondition(row: Record<string, unknown>, condition: string): boole
 }
 
 function evalSimpleCondition(row: Record<string, unknown>, condition: string): boolean {
+  // Handle IN operator: col IN ('val1', 'val2', 'val3')
+  const inMatch = condition.match(/^"?(\w+)"?\s+IN\s*\((.+)\)$/i);
+  if (inMatch) {
+    const col = inMatch[1];
+    const rowVal = row[col];
+    const valuesStr = inMatch[2];
+    // Parse the values: 'val1', 'val2', 'val3'
+    const values = valuesStr.split(",").map((v) => {
+      v = v.trim();
+      if (v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1);
+      if (v.startsWith('"') && v.endsWith('"')) return v.slice(1, -1);
+      return v;
+    });
+    return values.includes(String(rowVal));
+  }
+
   // Match column operator value
   // e.g., winner_coalition = 'BN', margin_pct > 10, election_id = 'GE15'
-  const match = condition.match(/^(\w+)\s*(=|!=|<>|<=|>=|<|>|LIKE)\s*(.+)$/i);
+  // Also handle double-quoted column names: "winner_coalition" = 'BN'
+  const match = condition.match(/^"?(\w+)"?\s*(=|!=|<>|<=|>=|<|>|LIKE)\s*(.+)$/i);
   if (!match) return true; // Can't parse — allow the row
 
   const [, col, op, valStr] = match;

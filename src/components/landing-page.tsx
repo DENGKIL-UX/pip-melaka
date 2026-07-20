@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Building2, Layers3, Activity, ShieldAlert, RefreshCw, Clock, Database, CheckCircle2, Info, Landmark, Repeat2, AlertTriangle, TrendingDown, Trophy } from "lucide-react";
 import { PARLIAMENTS, TOTAL_DUN, TOTAL_VOTERS_P134, DISTRICTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, DUN_COALITION_COUNTS, DUN_DISTRICT_COUNTS, type DunSummary } from "@/lib/dun-summary";
+import { PARTY_COLORS } from "@/lib/party-colors";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { Segmented } from "@/components/ui/segmented";

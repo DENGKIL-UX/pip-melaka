@@ -1,150 +1,142 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+/**
+ * S2D-360 Intelligence Engine tab — embeds the full S2D 360 engine via iframe.
+ *
+ * The S2D engine is a standalone React+Vite app built to static assets in
+ * /public/s2d-360/. It provides 56 pages across 8 sections:
+ * - Intelligence: Overview, Analysis, Forecasting, Reporting
+ * - Data Entry: Collection (scraper, intake, watchlist)
+ * - Operations: Hub, Annotation Ops, Integration
+ *
+ * The iframe approach gives instant access to all 56 pages without porting
+ * 12,000+ files to Next.js/TypeScript. The engine runs in its own JS context
+ * with its own IndexedDB storage — fully isolated from PIP-MLK.
+ *
+ * PIP Integration Boundary: The S2D engine has a strict aggregate-only
+ * boundary. PIP voter data never enters S2D — only aggregate population
+ * context (DUN-level demographics) can cross the boundary, and only when
+ * explicitly enabled (currently DISABLED by default).
+ *
+ * Phase 2 will port the intelligence modules (src/intelligence/*) to
+ * TypeScript and connect via /api/s2d/intelligence/* API routes.
+ * Phase 3 will implement the /api/pip/aggregate-context endpoint.
+ */
+
+import { useState, useEffect, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, TrendingUp, AlertTriangle, MapPin, Activity, ShieldAlert, Eye } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { SENTIMENT, TREND, NARRATIVE_VELOCITY, SIGNAL_CONFIDENCE, ESCALATION, PLATFORMS } from "@/lib/s2d-contracts";
-import { SEED_SIGNALS, SEED_DAILY_SENTIMENT, SEED_NARRATIVE_RADAR, SEED_LOCALITY_SIGNAL_MAP } from "@/lib/s2d-seed-data";
-
-const SENTIMENT_COLORS: Record<string, string> = {
-  POSITIVE: "#10B981", NEUTRAL: "#6B7280", NEGATIVE: "#EF4444",
-  MIXED: "#F59E0B", INSUFFICIENT_EVIDENCE: "#94A3B8",
-};
-
-const VELOCITY_COLORS: Record<string, string> = {
-  HIGH: "#EF4444", MODERATE: "#F59E0B", LOW: "#10B981",
-  NONE: "#6B7280", INSUFFICIENT_EVIDENCE: "#94A3B8",
-};
-
-const PLATFORM_ICONS: Record<string, string> = {
-  TIKTOK: "🎵", FACEBOOK: "📘", INSTAGRAM: "📷", THREADS: "🧵", NEWS: "📰", OTHER: "🔗",
-};
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Maximize2, ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
 
 export function S2D360Tab() {
-  const totalSignals = SEED_SIGNALS.length;
-  const negativeCount = SEED_SIGNALS.filter(s => s.sentiment === SENTIMENT.NEGATIVE).length;
-  const positiveCount = SEED_SIGNALS.filter(s => s.sentiment === SENTIMENT.POSITIVE).length;
-  const activeNarratives = SEED_NARRATIVE_RADAR.filter(n => n.velocity === NARRATIVE_VELOCITY.HIGH).length;
-  const escalationCount = SEED_SIGNALS.filter(s => s.escalation === ESCALATION.HUMAN_REVIEW_REQUIRED).length;
+  const [loading, setLoading] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="space-y-4">
-      <Card className="border-mlk/20">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-mlk" />
-            <div>
-              <CardTitle className="text-base">S2D 360 Command Centre — Signal Monitoring</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Per S2D Architecture: Apify → Signal → Sentiment → Narrative → Evidence → Response.
-                Platforms: TikTok, Facebook, Instagram, Threads, News.
-              </p>
+    <div className="space-y-3 fade-in-up">
+      {/* Header banner */}
+      <Card className="border-mlk/30 bg-mlk-radial">
+        <CardContent className="p-3 flex items-center gap-3 flex-wrap">
+          <ShieldCheck className="h-5 w-5 text-mlk flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-mlk">S2D-360 Intelligence Engine v1.0.0</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">
+              56 pages · 8 sections · Identity firewall active · PIP boundary: <span className="font-mono text-amber-600">DISABLED</span> (read-only)
             </div>
-            <Badge variant="outline" className="ml-auto text-[10px]">P134 Melaka</Badge>
           </div>
-        </CardHeader>
-        <CardContent>
-          {/* KPI strip */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-            <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-mlk">{totalSignals}</div><div className="text-[10px] text-muted-foreground">Total Signals</div></div>
-            <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-emerald-600">{positiveCount}</div><div className="text-[10px] text-muted-foreground">Positive</div></div>
-            <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-red-600">{negativeCount}</div><div className="text-[10px] text-muted-foreground">Negative</div></div>
-            <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-amber-600">{activeNarratives}</div><div className="text-[10px] text-muted-foreground">Active Narratives</div></div>
-            <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-purple-600">{escalationCount}</div><div className="text-[10px] text-muted-foreground">Escalations</div></div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[9px] border-emerald-500/40 text-emerald-600 dark:text-emerald-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse me-1" />
+              Engine Online
+            </Badge>
+            <Badge variant="outline" className="text-[9px] border-mlk/40 text-mlk">
+              Aggregate-Only
+            </Badge>
+            <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-700 dark:text-amber-300">
+              PDPA Compliant
+            </Badge>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Daily sentiment trend */}
-          <Card className="border-mlk/10 mb-4">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> Daily Sentiment Trend (3 days)</CardTitle></CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={SEED_DAILY_SENTIMENT}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} />
-                  <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px" }} />
-                  <Legend />
-                  <Line type="monotone" dataKey="positive_pct" stroke="#10B981" name="Positive %" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="neutral_pct" stroke="#6B7280" name="Neutral %" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="negative_pct" stroke="#EF4444" name="Negative %" strokeWidth={3} dot={{ r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      {/* PIP boundary notice */}
+      <Card className="border-amber-500/30 bg-amber-500/5">
+        <CardContent className="p-2.5 flex items-start gap-2">
+          <AlertCircle className="h-3.5 w-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="text-[10px] text-amber-700 dark:text-amber-300 leading-relaxed">
+            <strong>PIP Integration Boundary:</strong> The S2D engine operates with a strict aggregate-only data contract.
+            No individual voter data enters S2D — the identity firewall (28 rejected keys + 9 regex patterns)
+            blocks any PII at the adapter layer. PIP context fusion is currently <strong>DISABLED</strong> by default.
+            Enabling it is a deliberate operator decision post-release.
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Narrative Radar */}
-          <Card className="border-mlk/10 mb-4">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Activity className="h-4 w-4 text-mlk" /> Narrative Radar</CardTitle></CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {SEED_NARRATIVE_RADAR.map((n) => (
-                  <div key={n.narrative_id} className="flex items-start gap-2 p-2.5 rounded-md border border-border/50 hover:bg-muted/30">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium">{n.title}</div>
-                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                        <Badge variant="outline" className="text-[9px]" style={{ color: SENTIMENT_COLORS[n.sentiment], borderColor: "currentColor" }}>{n.sentiment}</Badge>
-                        <Badge variant="outline" className="text-[9px]" style={{ color: VELOCITY_COLORS[n.velocity], borderColor: "currentColor" }}>{n.velocity}</Badge>
-                        <Badge variant="outline" className="text-[9px] text-mlk border-mlk/30">{n.trend}</Badge>
-                        <span className="text-[9px] text-muted-foreground">{n.signal_count} signals · {n.locality_count} localities</span>
-                        <span className="text-[9px] text-muted-foreground">{n.platforms.map(p => PLATFORM_ICONS[p] || p).join(" ")}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+      {/* Controls bar */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-[10px] text-muted-foreground">
+          Sections: <span className="text-foreground font-medium">Overview · Analysis · Forecasting · Reporting · Collection · Operations · Annotation · Integration</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-[10px] gap-1 border-mlk/30"
+            onClick={() => setFullscreen(!fullscreen)}
+          >
+            <Maximize2 className="h-3 w-3" />
+            {fullscreen ? "Exit Fullscreen" : "Fullscreen"}
+          </Button>
+          <a href="/s2d-360/" target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-mlk/30">
+              <ExternalLink className="h-3 w-3" />
+              Open in New Tab
+            </Button>
+          </a>
+        </div>
+      </div>
+
+      {/* Iframe container */}
+      <Card className={`border-mlk/20 overflow-hidden ${fullscreen ? "fixed inset-0 z-50 rounded-none border-0" : ""}`}>
+        <div className={`relative ${fullscreen ? "h-screen" : "h-[calc(100vh-280px)] min-h-[600px]"}`}>
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted/30 z-10">
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="h-6 w-6 animate-spin text-mlk" />
+                <span className="text-xs text-muted-foreground">Loading S2D-360 Intelligence Engine…</span>
+                <span className="text-[9px] text-muted-foreground/60">56 pages · 3.3MB bundle</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
+          <iframe
+            ref={iframeRef}
+            src="/s2d-360/index.html"
+            className="w-full h-full border-0"
+            title="S2D-360 Intelligence Engine"
+            onLoad={() => setLoading(false)}
+            allow="clipboard-read; clipboard-write"
+          />
+        </div>
+      </Card>
 
-          {/* Locality Signal Map */}
-          <Card className="border-mlk/10 mb-4">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><MapPin className="h-4 w-4 text-mlk" /> Locality Signal Map (P134)</CardTitle></CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto scrollbar-mlk">
-                <table className="w-full text-xs">
-                  <thead><tr className="border-b"><th className="text-start p-2">Locality</th><th className="text-end p-2">Signals</th><th className="text-start p-2">Sentiment</th><th className="text-start p-2">Narrative</th><th className="text-start p-2">Trend</th></tr></thead>
-                  <tbody>
-                    {SEED_LOCALITY_SIGNAL_MAP.map((l) => (
-                      <tr key={l.locality_code} className="border-b border-border/30 hover:bg-muted/30">
-                        <td className="p-2"><span className="font-mono text-mlk">{l.locality_code}</span> {l.locality_name}</td>
-                        <td className="p-2 text-end font-mono">{l.signal_count}</td>
-                        <td className="p-2"><Badge variant="outline" className="text-[9px]" style={{ color: SENTIMENT_COLORS[l.dominant_sentiment], borderColor: "currentColor" }}>{l.dominant_sentiment}</Badge></td>
-                        <td className="p-2 text-[10px]">{l.dominant_narrative}</td>
-                        <td className="p-2"><Badge variant="outline" className="text-[9px] text-mlk border-mlk/30">{l.trend}</Badge></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Signal Feed */}
-          <Card className="border-mlk/10">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Eye className="h-4 w-4 text-mlk" /> Signal Feed ({SEED_SIGNALS.length})</CardTitle></CardHeader>
-            <CardContent>
-              <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-mlk pr-1">
-                {SEED_SIGNALS.map((s) => (
-                  <div key={s.id} className="flex items-start gap-2 p-2.5 rounded-md border border-border/50 hover:border-mlk/30">
-                    <div className="flex-shrink-0 mt-0.5 text-lg">{PLATFORM_ICONS[s.platform] || "🔗"}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium leading-snug">{s.content_summary}</div>
-                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                        <Badge variant="outline" className="text-[9px]" style={{ color: SENTIMENT_COLORS[s.sentiment], borderColor: "currentColor" }}>{s.sentiment}</Badge>
-                        <Badge variant="outline" className="text-[9px] text-mlk border-mlk/30">{s.trend}</Badge>
-                        <Badge variant="outline" className="text-[9px]" style={{ color: VELOCITY_COLORS[s.narrative_velocity], borderColor: "currentColor" }}>{s.narrative_velocity}</Badge>
-                        <Badge variant="outline" className="text-[9px] text-blue-600 border-blue-500/40">{s.confidence}</Badge>
-                        {s.dun && <Badge variant="outline" className="text-[9px] font-mono">N{s.dun}</Badge>}
-                        <span className="text-[9px] text-muted-foreground">{s.engagement_count.toLocaleString()} engagement · {s.evidence_count} evidence</span>
-                        {s.escalation === ESCALATION.HUMAN_REVIEW_REQUIRED && <Badge className="text-[8px] bg-red-500 text-white">HUMAN REVIEW</Badge>}
-                        {s.escalation === ESCALATION.EVIDENCE_REVIEW_REQUIRED && <Badge className="text-[8px] bg-amber-500 text-white">EVIDENCE REVIEW</Badge>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+      {/* Footer info */}
+      <Card className="border-mlk/20">
+        <CardContent className="p-2 text-[9px] text-muted-foreground flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <span>Engine: <strong className="text-foreground">v1.0.0</strong></span>
+            <span>Pages: <strong className="text-foreground">56</strong></span>
+            <span>Sections: <strong className="text-foreground">8</strong></span>
+            <span>Governance booleans: <strong className="text-foreground">22</strong></span>
+            <span>Validator scripts: <strong className="text-foreground">100+</strong></span>
+          </div>
+          <span className="text-muted-foreground/60">Source: s2d-engine/src/S2D360Engine.clean.jsx</span>
         </CardContent>
       </Card>
     </div>

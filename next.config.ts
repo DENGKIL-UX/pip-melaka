@@ -4,8 +4,19 @@ const config: NextConfig = {
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
   reactStrictMode: false,
+  // Allow the S2D-360 engine static assets to be served from /s2d-360/
+  // and embedded in an iframe on the same origin.
   async headers() {
     return [
+      {
+        // S2D-360 iframe: allow same-origin framing + inline scripts
+        source: "/s2d-360/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'self';" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

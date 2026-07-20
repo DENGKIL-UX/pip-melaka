@@ -25,3 +25,4 @@ tsconfig.tsbuildinfo
 .open-next/
 .wrangler/
 .zscripts/
+s2d-engine/

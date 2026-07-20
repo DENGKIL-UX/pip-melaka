@@ -4,6 +4,10 @@ const config: NextConfig = {
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
   reactStrictMode: false,
+  // Inject build timestamp at build time for the "Updated Xh ago" freshness indicator
+  env: {
+    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+  },
   // Allow the S2D-360 engine static assets to be served from /s2d-360/
   // and embedded in an iframe on the same origin.
   async headers() {

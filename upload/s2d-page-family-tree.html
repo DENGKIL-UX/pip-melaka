@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>S2D 360 — Page Family Tree &amp; Process Flow</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    background: #0b0f14; color: #dbe4ee; font-family: -apple-system, "Segoe UI", sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; color: #f2f6fb; }
+  p.sub { color: #8ba0b8; font-size: 13.5px; margin: 0 0 22px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+  .legend span {
+    font-size: 11.5px; padding: 4px 10px; border-radius: 20px; border: 1px solid;
+  }
+  .stage-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .stage-tabs button {
+    background: #131a22; border: 1px solid #253345; color: #9fb2c6; font-size: 12.5px;
+    padding: 7px 14px; border-radius: 8px; cursor: pointer; font-family: inherit;
+  }
+  .stage-tabs button.active { background: #1c2a3a; border-color: #4d9fd6; color: #eaf4ff; }
+  .diagram-card {
+    background: #10151c; border: 1px solid #1f2a37; border-radius: 14px; padding: 18px;
+    margin-bottom: 22px; overflow-x: auto;
+  }
+  .diagram-card h2 { font-size: 14.5px; font-weight: 600; margin: 0 0 12px; color: #eaf4ff; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  footer { color: #6b7d90; font-size: 11.5px; margin-top: 10px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<h1>S2D 360 — full page family tree &amp; process flow</h1>
+<p class="sub">All 54 pages across the 9 sidebar sections, wired along the actual signal pipeline. Click a tab to switch views.</p>
+
+<div class="legend">
+  <span style="border-color:#3b6fa0;color:#8fc0ef;background:#122335">Input · collection</span>
+  <span style="border-color:#8a5c1f;color:#f0b862;background:#2a1f0e">Human gate</span>
+  <span style="border-color:#4a7a3b;color:#a8dc93;background:#152a10">Process · engine</span>
+  <span style="border-color:#7a4a8a;color:#d3a8e6;background:#221029">Output · report</span>
+  <span style="border-color:#6b7280;color:#c3c8d0;background:#1a1d22">Cross-cutting / ops</span>
+  <span style="border-color:#a04a4a;color:#f0a0a0;background:#2a1414">Integration boundary</span>
+</div>
+
+<div class="stage-tabs">
+  <button class="active" data-panel="p0">Overview map</button>
+  <button data-panel="p1">Input → Process → Output flow</button>
+  <button data-panel="p2">Full page family tree (all 54)</button>
+</div>
+
+<div class="panel active" id="p0">
+  <div class="diagram-card"><div class="mermaid" id="m0"></div></div>
+  <footer>
+    Nine sidebar sections. Intelligence (Overview, Analysis, Forecasting, Reporting) holds the core pipeline.
+    Data Entry feeds it. Operations (Hub, Annotation Ops, Integration) supports and gates it.
+  </footer>
+</div>
+
+<div class="panel" id="p1">
+  <div class="diagram-card"><div class="mermaid" id="m1"></div></div>
+  <footer>
+    Every real record crosses the amber human-review gate before it can reach engine analysis —
+    unreviewed signals produce governed empty states on every downstream page, by design.
+  </footer>
+</div>
+
+<div class="panel" id="p2">
+  <div class="diagram-card"><div class="mermaid" id="m2"></div></div>
+  <footer>
+    Grouped exactly as the live sidebar groups them. Solid arrows are direct data hand-offs;
+    the dashed arrow is the read-only, currently-disabled PIP boundary.
+  </footer>
+</div>
+
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  flowchart: { curve: 'basis', htmlLabels: true, nodeSpacing: 34, rankSpacing: 46 },
+  themeVariables: {
+    fontFamily: '-apple-system, "Segoe UI", sans-serif',
+    fontSize: '13px',
+    primaryColor: '#141b24',
+    primaryBorderColor: '#2c3b4d',
+    primaryTextColor: '#dbe4ee',
+    lineColor: '#4a5b6e',
+    clusterBkg: '#0d1218',
+    clusterBorder: '#22303f',
+  },
+});
+
+const classDefs = `
+classDef input fill:#122335,stroke:#3b6fa0,color:#8fc0ef;
+classDef gate fill:#2a1f0e,stroke:#8a5c1f,color:#f0b862;
+classDef process fill:#152a10,stroke:#4a7a3b,color:#a8dc93;
+classDef output fill:#221029,stroke:#7a4a8a,color:#d3a8e6;
+classDef ops fill:#1a1d22,stroke:#6b7280,color:#c3c8d0;
+classDef integ fill:#2a1414,stroke:#a04a4a,color:#f0a0a0;
+`;
+
+const m0 = `flowchart TB
+${classDefs}
+DE["Data Entry\\nCollection · 5 pages"]:::input
+OV["Intelligence · Overview\\n7 pages"]:::process
+AN["Intelligence · Analysis\\n8 pages"]:::process
+FC["Intelligence · Forecasting\\n9 pages"]:::process
+RP["Intelligence · Reporting\\n6 pages"]:::output
+OH["Operations · Hub\\n10 pages"]:::ops
+AO["Operations · Annotation Ops\\n6 pages"]:::gate
+IG["Operations · Integration\\n5 pages"]:::integ
+
+DE --> OV --> AN --> FC --> RP
+AO -. gates .-> AN
+OH -. supports .-> OV
+OH -. supports .-> DE
+IG -. read-only, disabled .-> RP
+`;
+
+const m1 = `flowchart LR
+${classDefs}
+subgraph INPUT["INPUT"]
+  direction TB
+  SC["Social Scraper"]:::input
+  LC["Listening Crawler"]:::input
+  SI["Signal Intake"]:::input
+  WL["Watchlist"]:::input
+  LL["Link Library"]:::input
+end
+
+FEED["Signal Feed\\nDraft"]:::process
+GATE["Annotation Workbench\\n+ Acceptance"]:::gate
+
+subgraph PROCESS["PROCESS"]
+  direction TB
+  CPD["Change-Point Detection"]:::process
+  DRV["Driver Decomposition"]:::process
+  DIAG["Diagnostic Cases"]:::process
+  PROP["Propagation Graph"]:::process
+  LSP["Local Signal Profiles"]:::process
+  FT["Forecast Targets → ... → Decision Console"]:::process
+end
+
+subgraph OUTPUT["OUTPUT"]
+  direction TB
+  DIB["Daily Intelligence Brief"]:::output
+  CIR["Constituency Intelligence"]:::output
+  WDR["Weekly Diagnostic Report"]:::output
+  AAE["After-Action Effectiveness"]:::output
+end
+
+SC --> FEED
+LC --> FEED
+SI --> FEED
+WL -.-> SC
+LL -.-> SI
+FEED --> GATE
+GATE --> CPD --> DRV --> DIAG --> PROP
+GATE --> LSP
+DIAG --> FT
+PROP --> FT
+LSP --> FT
+FT --> DIB
+FT --> CIR
+FT --> WDR
+CIR --> AAE
+`;
+
+const m2 = `flowchart TB
+${classDefs}
+
+subgraph SEC_OV["Intelligence · Overview"]
+  tower["Command Tower"]:::process
+  snap["Daily Snapshots"]:::process
+  feed["Signal Feed"]:::process
+  echo["Echo Tracker"]:::process
+  narr["Narrative Echo"]:::process
+  asst["Assistant Console"]:::process
+  link["Link Recall"]:::process
+end
+
+subgraph SEC_AN["Intelligence · Analysis"]
+  lsp["Local Signal Profiles"]:::process
+  cpd["Change-Point Detection"]:::process
+  drv["Driver Decomposition"]:::process
+  prop["Propagation Graph"]:::process
+  diag["Diagnostic Cases"]:::process
+  comb["Combined Sentiment"]:::process
+  loc["Locality Intel"]:::process
+  brain["Digital Brain"]:::process
+end
+
+subgraph SEC_FC["Intelligence · Forecasting"]
+  ftg["Forecast Targets"]:::process
+  bfc["Baseline Forecasting"]:::process
+  feng["Feature Engineering"]:::process
+  mtr["Model Training"]:::process
+  btc["Backtesting & Calibration"]:::process
+  dpe["Decision Policy"]:::process
+  rsc["Recommendation Scoring"]:::process
+  rju["Recommendation Justification"]:::process
+  dec["Decision Console"]:::gate
+end
+
+subgraph SEC_RP["Intelligence · Reporting"]
+  adr["Descriptive Reports"]:::output
+  ncb["Narrative Content Brief"]:::output
+  dib["Daily Intelligence Brief"]:::output
+  wdr["Weekly Diagnostic Report"]:::output
+  cir["Constituency Intelligence"]:::output
+  aae["After-Action Effectiveness"]:::output
+end
+
+subgraph SEC_DE["Data Entry · Collection"]
+  intake["Signal Intake"]:::input
+  watch["Watchlist"]:::input
+  scr["Social Scraper"]:::input
+  crawl["Listening Crawler"]:::input
+  lml["Link Library"]:::input
+end
+
+subgraph SEC_OH["Operations · Hub"]
+  live["Live Monitoring"]:::ops
+  famt["Engine Family Tree"]:::ops
+  notif["Notification Center"]:::ops
+  audit["Audit Log"]:::ops
+  back["Backend Integration"]:::ops
+  mvp["MVP Readiness"]:::ops
+  monp["Monitoring Profiles"]:::ops
+  ingq["Ingestion Queue"]:::ops
+  diagn["Engine Diagnostics"]:::ops
+  jmp["Johor Model Pack"]:::ops
+end
+
+subgraph SEC_AO["Operations · Annotation Ops"]
+  awb["Annotation Workbench"]:::gate
+  aac["Annotation Acceptance"]:::gate
+  jcg["Johor Corpus Governance"]:::gate
+  jcs["Johor Corpus Staging"]:::gate
+  jda["Johor Dual Annotation"]:::gate
+  jca["Johor Corpus Acceptance"]:::gate
+end
+
+subgraph SEC_IG["Operations · Integration"]
+  sls["State Learning Separation"]:::integ
+  dad["Domain Adaptation"]:::integ
+  psc["PIP Shared Contracts"]:::integ
+  pia["Intelligence API"]:::integ
+  pcf["PIP Context Fusion"]:::integ
+end
+
+scr --> intake
+crawl --> intake
+watch -.-> scr
+lml -.-> intake
+intake --> feed
+feed --> awb --> aac
+aac --> lsp
+aac --> cpd --> drv --> prop
+aac --> diag
+lsp --> ftg
+cpd --> ftg
+ftg --> bfc --> feng --> mtr --> btc --> dpe --> rsc --> rju --> dec
+dec --> dib
+dec --> cir
+dec --> wdr
+dec --> adr
+dec --> ncb
+cir --> aae
+ingq -.-> feed
+diagn -.-> mtr
+jmp -.-> dad
+jcg --> jcs --> jda --> jca
+jca -.-> dad
+sls -.-> dad
+dad -.-> pcf
+psc -.-> pia -.-> pcf
+pcf -. read-only, disabled .-> cir
+`;
+
+const targets = [['m0', m0], ['m1', m1], ['m2', m2]];
+for (const [id, code] of targets) {
+  const { svg } = await mermaid.render(id + '-svg', code);
+  document.getElementById(id).innerHTML = svg;
+}
+
+document.querySelectorAll('.stage-tabs button').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.stage-tabs button').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

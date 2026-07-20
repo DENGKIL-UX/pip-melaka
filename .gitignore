@@ -25,4 +25,5 @@ tsconfig.tsbuildinfo
 .open-next/
 .wrangler/
 .zscripts/
-s2d-engine/
+# s2d-engine source archive (not the ported TypeScript modules)
+/s2d-engine/

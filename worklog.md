@@ -1626,3 +1626,70 @@ User provided a 30-day API token for ElectionData.MY (`edmy_b513...`). The REST 
 3. **57 candidate histories pre-fetched** — All 57 Melaka winners from GE14/PRN15/GE15 have their full election histories pre-fetched. Candidates not in the winner list (runner-ups, historical candidates) are not pre-fetched but can be queried live via the API proxy if needed.
 
 4. **Push to git pending** — commit not yet made.
+
+---
+Task ID: DUN-LANDING-1
+Agent: main (Z.ai Code)
+Task: Add DUN seats view to the PIP-MLK landing page — the landing previously only showed the 6 parliaments (P134–P139); user requested DUN seats be surfaced as well.
+
+Work Log:
+- Read existing worklog tail (last session: candidate-history-dialog + coalition-trends, commit pending).
+- Read `/home/z/my-project/src/components/landing-page.tsx` (647 lines) — confirmed the "Parliament list" section only rendered `PremiumParliamentCard` for the 6 parliaments.
+- Read `/home/z/my-project/src/lib/melaka-constants.ts` — `PARLIAMENTS` has `dunCodes` per parliament and `DUN_NAMES` maps `"134-01"` → `"Kuala Linggi"` etc.
+- Read `/home/z/my-project/public/data/elections/melaka-elections.json` (1,676 lines) — extracted full PRN15 (2021) `dun_results` (28 seats) and GE14 (2018) `dun_results` (28 seats) with winner coalition/party/candidate/votes/margin/vote_share.
+- Cross-referenced PRN15 vs GE14 winners to identify 11 swing seats (changed hands): N06 Rembia, N07 Gadek, N08 Machap Jaya, N09 Durian Tunggal, N11 Sungai Udang, N13 Paya Rumput, N14 Kelebang, N15 Pengkalan Batu, N21 Duyong, N23 Telok Mas, N24 Bemban.
+- Computed marginal (<5pp margin): 6 seats — N11, N13, N15, N21, N24, N26. Safe (>20pp): 10 seats.
+
+Implementation:
+- Created `/home/z/my-project/src/lib/dun-summary.ts` (new, ~320 lines):
+  - `DunSummary` interface with PRN15 + GE14 results, swing flag, swingDirection, isMarginal, isSafe, incumbentCandidate.
+  - `DUN_SUMMARY` array — all 28 DUN seats with real ElectionData.MY ballot counts.
+  - `DUN_COALITION_COUNTS` — BN:21, PH:5, PN:2, swing:11, marginal:6, safe:10.
+  - `DUN_DISTRICT_COUNTS` — Alor Gajah:10, Melaka Tengah:13, Jasin:5.
+  - `getDunByCode()` and `getDunsForParliament()` helpers.
+
+- Updated `/home/z/my-project/src/components/landing-page.tsx`:
+  - Added imports: `Segmented`, `PartyTag`, `DUN_SUMMARY`, `DUN_COALITION_COUNTS`, `DUN_DISTRICT_COUNTS`, `Landmark`/`Repeat2`/`AlertTriangle`/`TrendingDown`/`Trophy` icons, `DISTRICTS`.
+  - Added new types: `SeatsView`, `DunCoalitionFilter`, `DistrictFilter`.
+  - New `PremiumDunCard` component: DUN code badge (N01–N28), parent parliament code, swing/marginal badges, incumbent row (candidate + party + votes + vote %), margin-of-victory bar (color-coded red/amber/green), GE14→PRN15 swing indicator or "Held by X since GE14" retention note. Top-border tinted by winning coalition (BN=sky, PH=red, PN=emerald).
+  - New `DunCoalitionFilterTabs` — All/BN/PH/PN/Swing with live counts.
+  - New `DistrictFilterTabs` — All Districts/Alor Gajah/Melaka Tengah/Jasin with live counts.
+  - New `DunCompositionStrip` — animated horizontal seat-composition bar (BN/PH/PN segments) with legend.
+  - Refactored the seats section to use a `Segmented<SeatsView>` toggle ("Parliaments (6)" / "DUN (28)") at the top-right of the header. Header title/icon/subtitle swap dynamically.
+  - DUN view shows an additional composition strip card (seat split + swing/marginal/safe quick-stats) above the filter row.
+  - Filter row swaps between ParliamentFilterTabs (parliament view) and DunCoalitionFilterTabs + DistrictFilterTabs (DUN view).
+  - Grid animates between views with AnimatePresence + popLayout. DUN grid is 4-col on lg (vs 3-col for parliament) since the cards are more compact.
+  - Empty-state for DUN filters with a reset button.
+  - `handleDunClick` shows a toast with DUN name + parent parliament then enters the dashboard.
+
+Verification (agent-browser E2E):
+- ✅ Dev server compiled `/` in 3.0s (no errors). HTTP 200, ~26KB initial HTML.
+- ✅ Default Parliament view renders 6 cards (P134 Masjid Tanah verified, P135–P139 pending).
+- ✅ Segmented control visible: "Parliaments (6)" [selected] | "DUN (28)".
+- ✅ Clicking "DUN (28)" switches the header to "28 DUN seats · PRN15 (2021)" with Landmark icon.
+- ✅ Seat Composition strip renders: BN 21 | PH 5 | PN 2 (animated width bars).
+- ✅ Quick-stats show: 11 swing seats, 6 marginal (<5pp), 10 safe (>20pp).
+- ✅ Coalition filter tabs: All 28 | BN 21 | PH 5 | PN 2 | Swing 11.
+- ✅ District filter tabs: All Districts 28 | Melaka Tengah 13 | Alor Gajah 10 | Jasin 5.
+- ✅ "Showing 28 of 28 DUN seats" counter.
+- ✅ DUN cards render with correct: DUN code (N01–N28), parent parliament (P134–P139), DUN name, district + parliament name, PartyTag (BN/PH/PN).
+- ✅ Incumbent row shows candidate name, party, vote count, vote % (e.g., "Rosli bin Abdullah, UMNO · 3,554 votes (51.0%)").
+- ✅ Margin-of-victory bar with color coding (red <5pp, amber 5–15pp, green >15pp) and numeric label (e.g., "26.3pp").
+- ✅ Swing seats show "Swing" badge + "GE14 PH→PRN15 BN" indicator (verified N06 Rembia, N07 Gadek, N08 Machap Jaya, N09 Durian Tunggal, N11 Sungai Udang [BN→PN], N13 Paya Rumput, N14 Kelebang, N15 Pengkalan Batu, N21 Duyong).
+- ✅ Marginal seats show "Marginal" badge (N11, N13, N15, N21, N24, N26).
+- ✅ Retained seats show "Held by BN since GE14" with shield icon.
+- ✅ Swing filter: shows 11 of 28 DUN seats (all swing seats).
+- ✅ Jasin district filter: shows 5 of 28 DUN seats (N24 Bemban, N25 Rim, N26 Serkam, N27 Merlimau, N28 Sungai Rambai — all P139).
+- ✅ No runtime errors in dev.log (only pre-existing secrets warning).
+
+Stage Summary:
+- The landing page now surfaces both parliamentary (6) and DUN (28) seats via a premium Segmented toggle, with real ElectionData.MY PRN15 ballot data, swing analysis, marginal-seat flagging, and district/coalition filtering.
+- New file: `/home/z/my-project/src/lib/dun-summary.ts` — static, self-contained DUN dataset (no fetch needed, keeps landing page fast).
+- Modified file: `/home/z/my-project/src/components/landing-page.tsx` — added ~270 lines (PremiumDunCard, DunCoalitionFilterTabs, DistrictFilterTabs, DunCompositionStrip, and the refactored seats section with Segmented control).
+- All existing parliament functionality preserved; the change is purely additive (new view + toggle).
+- Commit pending (same as previous session — git push not yet made).
+
+Unresolved issues or risks:
+1. Dev server OOM kills — The Next.js 16 dev server with Turbopack uses ~2GB during compilation on this 4GB sandbox. The next-server process gets OOM-killed after a few minutes of idle. This is an environment constraint, not a code issue. Workaround: restart with `NODE_OPTIONS="--max-old-space-size=1536"` and fetch quickly. Production build on Cloudflare Workers is unaffected (compiles fine — confirmed by the CF build log in the user's paste).
+2. The DUN section is only on the landing page. The dashboard's Elections tab already has DUN results (verified in the previous session's worklog), so the data is consistent end-to-end.
+3. Next logical enhancement: clicking a DUN card currently just enters the dashboard (same as parliament click). A future improvement could deep-link to the Elections tab with the specific DUN pre-selected in the SelectedDunDrawer.

@@ -4,14 +4,20 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Building2, Layers3, Activity, ShieldAlert, RefreshCw, Clock, Database, CheckCircle2, Info } from "lucide-react";
-import { PARLIAMENTS, TOTAL_DUN, TOTAL_VOTERS_P134 } from "@/lib/melaka-constants";
+import { ChevronRight, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Building2, Layers3, Activity, ShieldAlert, RefreshCw, Clock, Database, CheckCircle2, Info, Landmark, Repeat2, AlertTriangle, TrendingDown, Trophy } from "lucide-react";
+import { PARLIAMENTS, TOTAL_DUN, TOTAL_VOTERS_P134, DISTRICTS } from "@/lib/melaka-constants";
+import { DUN_SUMMARY, DUN_COALITION_COUNTS, DUN_DISTRICT_COUNTS, type DunSummary } from "@/lib/dun-summary";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
+import { Segmented } from "@/components/ui/segmented";
+import { PartyTag } from "@/components/ui/party-tag";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type FilterKind = "all" | "verified" | "pending";
+type SeatsView = "parliament" | "dun";
+type DunCoalitionFilter = "all" | "BN" | "PH" | "PN" | "swing";
+type DistrictFilter = "all" | (typeof DISTRICTS)[number];
 
 /**
  * Premium parliament card — adapted from uploaded premium-design
@@ -138,6 +144,293 @@ function PremiumParliamentCard({
         </div>
       </div>
     </motion.button>
+  );
+}
+
+/**
+ * PremiumDunCard — DUN seat card (28 total) for the landing page.
+ *
+ * Shows the latest PRN15 winner (coalition + party + candidate),
+ * the GE14→PRN15 swing indicator (if hands changed), a margin-of-victory
+ * bar, and the parent parliament/district. Designed to live next to
+ * PremiumParliamentCard so the two views feel visually consistent.
+ */
+function PremiumDunCard({
+  dun,
+  delay,
+  onClick,
+}: {
+  dun: DunSummary;
+  delay: number;
+  onClick: () => void;
+}) {
+  const { prn15, ge14 } = dun;
+  const coalition = prn15.coalition;
+  const swing = dun.swing;
+
+  // Margin-of-victory bar — scaled to 50pp max (anything > 30pp is "fortress").
+  const marginPct = Math.max(0, Math.min(prn15.marginPct, 50));
+  const marginFillPct = (marginPct / 50) * 100;
+  const marginColor =
+    prn15.marginPct < 5 ? "#ef4444" : prn15.marginPct < 15 ? "#f59e0b" : "#10b981";
+
+  return (
+    <motion.button
+      type="button"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -2 }}
+      onClick={onClick}
+      className={cn(
+        "group relative w-full text-left cursor-pointer",
+        "rounded-xl overflow-hidden",
+        "bg-card border",
+        coalition === "BN" && "border-t-2 border-t-sky-500/50 border-x-mlk/10 border-b-mlk/10",
+        coalition === "PH" && "border-t-2 border-t-red-500/50 border-x-mlk/10 border-b-mlk/10",
+        coalition === "PN" && "border-t-2 border-t-emerald-500/50 border-x-mlk/10 border-b-mlk/10",
+        "hover:border-mlk/30",
+        "transition-all duration-300",
+        "shadow-sm hover:shadow-mlk",
+        "p-4 focus-mlk",
+      )}
+      aria-label={`Enter dashboard — ${dun.dunName} (${dun.dunCodeLabel})`}
+    >
+      {/* Hover glow */}
+      <div
+        className="absolute -inset-px bg-gradient-to-r from-mlk/0 via-mlk/5 to-mlk/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 pointer-events-none"
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10">
+        {/* Header — DUN code + parent parliament + winner tag */}
+        <div className="flex items-start justify-between mb-3 gap-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-mono text-[10px] font-bold text-mlk bg-mlk/10 px-1.5 py-0.5 rounded">
+                {dun.dunCodeLabel}
+              </span>
+              <span className="font-mono text-[9px] text-muted-foreground">
+                P{dun.parliamentCode}
+              </span>
+              {swing && (
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-mlk bg-mlk/10 px-1.5 py-0.5 rounded-full">
+                  <Repeat2 className="w-2.5 h-2.5" aria-hidden="true" />
+                  Swing
+                </span>
+              )}
+              {dun.isMarginal && (
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-red-600 dark:text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded-full">
+                  <AlertTriangle className="w-2.5 h-2.5" aria-hidden="true" />
+                  Marginal
+                </span>
+              )}
+            </div>
+            <h3 className="mt-1.5 text-sm font-semibold group-hover:text-mlk transition-colors truncate">
+              {dun.dunName}
+            </h3>
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+              <MapPin className="w-2.5 h-2.5" aria-hidden="true" />
+              {dun.district} · {dun.parliamentName}
+            </p>
+          </div>
+          <PartyTag coalition={coalition} size="xs" />
+        </div>
+
+        {/* Incumbent row */}
+        <div className="mb-3 flex items-start gap-1.5">
+          <Trophy className="w-3 h-3 text-muted-foreground mt-0.5 flex-shrink-0" aria-hidden="true" />
+          <div className="min-w-0 flex-1">
+            <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Incumbent (PRN15 · 2021)</div>
+            <div className="text-xs font-medium truncate" title={prn15.candidate}>
+              {prn15.candidate}
+            </div>
+            <div className="text-[10px] text-muted-foreground">
+              <span className="font-mono">{prn15.party}</span> · {prn15.votes.toLocaleString()} votes ({prn15.votesPct.toFixed(1)}%)
+            </div>
+          </div>
+        </div>
+
+        {/* Margin bar */}
+        <div className="mb-2">
+          <div className="flex items-center justify-between text-[9px] text-muted-foreground mb-1">
+            <span>Margin of victory</span>
+            <span className="font-mono" style={{ color: marginColor }}>
+              {prn15.marginPct.toFixed(1)}pp
+            </span>
+          </div>
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${marginFillPct}%` }}
+              transition={{ duration: 1, delay: delay + 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full rounded-full"
+              style={{ backgroundColor: marginColor }}
+            />
+          </div>
+        </div>
+
+        {/* Swing indicator (GE14 → PRN15) */}
+        {swing ? (
+          <div className="flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-md bg-mlk/5 border border-mlk/20">
+            <TrendingDown className="w-3 h-3 text-mlk" aria-hidden="true" />
+            <span className="text-muted-foreground">
+              <span className="font-mono">GE14</span>{" "}
+              <span className="font-semibold text-foreground">{ge14.coalition}</span>
+              <span className="text-mlk mx-1">→</span>
+              <span className="font-mono">PRN15</span>{" "}
+              <span className="font-semibold text-foreground">{prn15.coalition}</span>
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+            <ShieldCheck className="w-3 h-3 text-emerald-500" aria-hidden="true" />
+            <span>
+              Held by <span className="font-semibold text-foreground">{prn15.coalition}</span> since GE14
+            </span>
+          </div>
+        )}
+      </div>
+    </motion.button>
+  );
+}
+
+/**
+ * DunCoalitionFilterTabs — All / BN / PH / PN / Swing segmented filter
+ * for the DUN view. Each tab shows live counts.
+ */
+function DunCoalitionFilterTabs({
+  filter,
+  setFilter,
+}: {
+  filter: DunCoalitionFilter;
+  setFilter: (f: DunCoalitionFilter) => void;
+}) {
+  const tabs: Array<{ id: DunCoalitionFilter; label: string; count: number }> = [
+    { id: "all", label: "All", count: DUN_SUMMARY.length },
+    { id: "BN", label: "BN", count: DUN_COALITION_COUNTS.BN },
+    { id: "PH", label: "PH", count: DUN_COALITION_COUNTS.PH },
+    { id: "PN", label: "PN", count: DUN_COALITION_COUNTS.PN },
+    { id: "swing", label: "Swing", count: DUN_COALITION_COUNTS.swing },
+  ];
+
+  return (
+    <div
+      className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-mlk/10"
+      role="tablist"
+      aria-label="Filter DUN seats by coalition winner"
+    >
+      {tabs.map((tab) => {
+        const isActive = filter === tab.id;
+        return (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => setFilter(tab.id)}
+            className={cn(
+              "px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-mlk",
+              isActive
+                ? tab.id === "swing"
+                  ? "bg-mlk text-white shadow-sm"
+                  : "bg-mlk text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+            )}
+          >
+            {tab.label}
+            <span className={cn("ms-1.5 font-mono text-[10px]", isActive ? "text-white/80" : "text-muted-foreground/70")}>
+              {tab.count}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * DistrictFilterTabs — All / Alor Gajah / Melaka Tengah / Jasin
+ * for the DUN view. Each tab shows live counts.
+ */
+function DistrictFilterTabs({
+  filter,
+  setFilter,
+}: {
+  filter: DistrictFilter;
+  setFilter: (f: DistrictFilter) => void;
+}) {
+  const tabs: Array<{ id: DistrictFilter; label: string; count: number }> = [
+    { id: "all", label: "All Districts", count: DUN_SUMMARY.length },
+    ...DISTRICTS.map((d) => ({
+      id: d as DistrictFilter,
+      label: d,
+      count: DUN_DISTRICT_COUNTS[d as keyof typeof DUN_DISTRICT_COUNTS],
+    })),
+  ];
+
+  return (
+    <div className="flex items-center gap-1 flex-wrap" role="tablist" aria-label="Filter DUN seats by district">
+      {tabs.map((tab) => {
+        const isActive = filter === tab.id;
+        return (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => setFilter(tab.id)}
+            className={cn(
+              "px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all focus-mlk",
+              isActive
+                ? "border-mlk/40 bg-mlk/10 text-mlk"
+                : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+            )}
+          >
+            {tab.label}
+            <span className="ms-1 font-mono text-[9px] opacity-70">{tab.count}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * DunCompositionStrip — small visual seat-composition bar (BN/PH/PN).
+ * Mirrors the look of a parliament seating chart.
+ */
+function DunCompositionStrip() {
+  const segments = [
+    { code: "BN" as const, count: DUN_COALITION_COUNTS.BN, color: "#0F7DC2" },
+    { code: "PH" as const, count: DUN_COALITION_COUNTS.PH, color: "#E22926" },
+    { code: "PN" as const, count: DUN_COALITION_COUNTS.PN, color: "#019C2D" },
+  ];
+  const total = segments.reduce((s, x) => s + x.count, 0);
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex h-2 rounded-full overflow-hidden border border-border/60 w-48">
+        {segments.map((seg) => (
+          <motion.div
+            key={seg.code}
+            initial={{ width: 0 }}
+            animate={{ width: `${(seg.count / total) * 100}%` }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ backgroundColor: seg.color }}
+            title={`${seg.code}: ${seg.count} seats`}
+            aria-label={`${seg.code} ${seg.count} seats`}
+          />
+        ))}
+      </div>
+      <div className="flex items-center gap-3 text-[10px]">
+        {segments.map((seg) => (
+          <div key={seg.code} className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-sm" style={{ backgroundColor: seg.color }} aria-hidden="true" />
+            <span className="font-mono text-muted-foreground">{seg.code}</span>
+            <span className="font-semibold text-foreground">{seg.count}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -461,6 +754,9 @@ function ParliamentFilterTabs({
 export function LandingPage({ onEnter }: { onEnter: () => void }) {
   const [showHero, setShowHero] = useState(false);
   const [filter, setFilter] = useState<FilterKind>("all");
+  const [seatsView, setSeatsView] = useState<SeatsView>("parliament");
+  const [dunCoalition, setDunCoalition] = useState<DunCoalitionFilter>("all");
+  const [district, setDistrict] = useState<DistrictFilter>("all");
   const particleCanvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
@@ -533,6 +829,19 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
     return PARLIAMENTS.filter((p) => p.code !== "134");
   }, [filter]);
 
+  // DUN filter — coalition winner + district (independent, both apply)
+  const filteredDuns = useMemo(() => {
+    return DUN_SUMMARY.filter((d) => {
+      if (dunCoalition === "swing") {
+        if (!d.swing) return false;
+      } else if (dunCoalition !== "all") {
+        if (d.prn15.coalition !== dunCoalition) return false;
+      }
+      if (district !== "all" && d.district !== district) return false;
+      return true;
+    });
+  }, [dunCoalition, district]);
+
   const handleEnter = () => {
     toast({
       title: "Entering dashboard",
@@ -545,6 +854,14 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
     toast({
       title: `Opening ${name}`,
       description: `P${code} · Entering dashboard…`,
+    });
+    onEnter();
+  };
+
+  const handleDunClick = (dun: DunSummary) => {
+    toast({
+      title: `Opening ${dun.dunName}`,
+      description: `${dun.dunCodeLabel} · ${dun.parliamentName} · Entering dashboard…`,
     });
     onEnter();
   };
@@ -591,47 +908,165 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
           <DataFreshnessStrip />
         </section>
 
-        {/* Parliament list */}
-        <section className="mb-12 md:mb-16" aria-labelledby="parl-h">
-          <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+        {/* Seats section — Parliament / DUN segmented toggle */}
+        <section className="mb-12 md:mb-16" aria-labelledby="seats-h">
+          {/* Header — title + segmented toggle */}
+          <div className="flex items-end justify-between mb-4 flex-wrap gap-3">
             <div>
-              <h2 id="parl-h" className="text-2xl md:text-3xl font-semibold">6 parliaments · 3 districts</h2>
-              <p className="text-sm text-muted-foreground mt-1">Verified against DOSM kawasanku GeoJSON (2026 redelineation).</p>
+              <h2 id="seats-h" className="text-2xl md:text-3xl font-semibold flex items-center gap-2">
+                {seatsView === "parliament" ? (
+                  <>
+                    <Building2 className="w-6 h-6 text-mlk" aria-hidden="true" />
+                    6 parliaments · 3 districts
+                  </>
+                ) : (
+                  <>
+                    <Landmark className="w-6 h-6 text-mlk" aria-hidden="true" />
+                    28 DUN seats · PRN15 (2021)
+                  </>
+                )}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {seatsView === "parliament"
+                  ? "Verified against DOSM kawasanku GeoJSON (2026 redelineation)."
+                  : "Melaka State Legislative Assembly composition. Real ElectionData.MY ballot counts."}
+              </p>
             </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <ParliamentFilterTabs filter={filter} setFilter={setFilter} counts={counts} />
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
-                <span className="font-mono">{counts.verified}</span>
-                <span>/</span>
-                <span className="font-mono">{counts.all}</span>
-                <span>verified</span>
-              </div>
-            </div>
+            <Segmented<SeatsView>
+              value={seatsView}
+              onChange={(v) => setSeatsView(v)}
+              size="md"
+              variant="mlk"
+              options={[
+                { value: "parliament", label: "Parliaments (6)", icon: Building2 },
+                { value: "dun", label: "DUN (28)", icon: Landmark },
+              ]}
+            />
           </div>
+
+          {/* DUN-only — composition strip */}
+          <AnimatePresence>
+            {seatsView === "dun" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="mb-4 overflow-hidden"
+              >
+                <div className="flex items-center gap-4 flex-wrap p-3 rounded-xl border border-mlk/15 bg-mlk/5">
+                  <div className="flex items-center gap-2">
+                    <Vote className="w-4 h-4 text-mlk" aria-hidden="true" />
+                    <span className="text-xs font-medium text-mlk uppercase tracking-wide">Seat Composition</span>
+                  </div>
+                  <DunCompositionStrip />
+                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground ms-auto">
+                    <div className="flex items-center gap-1">
+                      <Repeat2 className="w-3 h-3 text-mlk" aria-hidden="true" />
+                      <span className="font-mono text-mlk">{DUN_COALITION_COUNTS.swing}</span>
+                      <span>swing seats</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3 text-red-500" aria-hidden="true" />
+                      <span className="font-mono text-red-500">{DUN_COALITION_COUNTS.marginal}</span>
+                      <span>marginal (&lt;5pp)</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3 text-emerald-500" aria-hidden="true" />
+                      <span className="font-mono text-emerald-500">{DUN_COALITION_COUNTS.safe}</span>
+                      <span>safe (&gt;20pp)</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Filter row — switches between parliament/dun filters */}
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            {seatsView === "parliament" ? (
+              <>
+                <ParliamentFilterTabs filter={filter} setFilter={setFilter} counts={counts} />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                  <span className="font-mono">{counts.verified}</span>
+                  <span>/</span>
+                  <span className="font-mono">{counts.all}</span>
+                  <span>verified</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <DunCoalitionFilterTabs filter={dunCoalition} setFilter={setDunCoalition} />
+                <DistrictFilterTabs filter={district} setFilter={setDistrict} />
+              </>
+            )}
+          </div>
+
+          {/* Grid — animates between parliament and DUN views */}
           <AnimatePresence mode="popLayout">
-            <motion.div
-              key={filter}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
-            >
-              {filteredParliaments.map((p, i) => (
-                <PremiumParliamentCard
-                  key={p.code}
-                  code={p.code}
-                  name={p.name}
-                  district={p.district}
-                  dunCount={p.dunCount}
-                  voters={p.totalVoters > 0 ? p.totalVoters : null}
-                  verified={p.code === "134"}
-                  delay={i * 0.05}
-                  onClick={() => handleParliamentClick(p.code, p.name)}
-                />
-              ))}
-            </motion.div>
+            {seatsView === "parliament" ? (
+              <motion.div
+                key={`parl-${filter}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+              >
+                {filteredParliaments.map((p, i) => (
+                  <PremiumParliamentCard
+                    key={p.code}
+                    code={p.code}
+                    name={p.name}
+                    district={p.district}
+                    dunCount={p.dunCount}
+                    voters={p.totalVoters > 0 ? p.totalVoters : null}
+                    verified={p.code === "134"}
+                    delay={i * 0.05}
+                    onClick={() => handleParliamentClick(p.code, p.name)}
+                  />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`dun-${dunCoalition}-${district}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+              >
+                {filteredDuns.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Landmark className="w-10 h-10 mx-auto mb-3 opacity-40" aria-hidden="true" />
+                    <p className="text-sm">No DUN seats match the current filters.</p>
+                    <button
+                      onClick={() => { setDunCoalition("all"); setDistrict("all"); }}
+                      className="mt-3 text-xs text-mlk hover:underline focus-mlk rounded"
+                    >
+                      Reset filters
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-3 text-xs text-muted-foreground">
+                      Showing <span className="font-mono text-foreground font-semibold">{filteredDuns.length}</span> of{" "}
+                      <span className="font-mono">{DUN_SUMMARY.length}</span> DUN seats
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {filteredDuns.map((d, i) => (
+                        <PremiumDunCard
+                          key={d.dunCode}
+                          dun={d}
+                          delay={i * 0.03}
+                          onClick={() => handleDunClick(d)}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            )}
           </AnimatePresence>
         </section>
       </main>

@@ -12,6 +12,8 @@ import { PARTY_COLORS } from "@/lib/party-colors";
 import { ELECTIONS_FALLBACK } from "@/lib/fallback-data";
 import { PARTIES, COALITIONS, partyLogoUrl, coalitionLogoUrl, type PartyCode, type CoalitionCode } from "@/lib/party-metadata";
 import { PartyLogo, CoalitionBadge } from "@/components/shared/party-logo";
+import { Segmented } from "@/components/ui/segmented";
+import { PartyTag, CheckableTag, StatusTag, CoalitionFilterBar } from "@/components/ui/party-tag";
 import { CandidateHistoryDialog } from "@/components/shared/candidate-history-dialog";
 
 interface Election {
@@ -43,13 +45,13 @@ function partyHex(p: string) { return PARTY_COLORS[p as keyof typeof PARTY_COLOR
 function SeatCount({ summary }: { summary: { PH: number; BN: number; PN: number; total: number } | null }) {
   if (!summary) return null;
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex gap-2 flex-wrap items-center">
       {(["BN", "PH", "PN"] as const).map((p) => summary[p] > 0 && (
-        <span key={p} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: partyHex(p) }}>
+        <PartyTag key={p} coalition={p as CoalitionCode} size="sm">
           {p} {summary[p]}
-        </span>
+        </PartyTag>
       ))}
-      <span className="text-[10px] text-muted-foreground self-center">/ {summary.total}</span>
+      <span className="text-[10px] text-muted-foreground">/ {summary.total}</span>
     </div>
   );
 }
@@ -295,25 +297,15 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
 
   return (
     <div className="space-y-3 fade-in-up">
-      {/* View toggle */}
-      <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-mlk/10 w-fit" role="tablist" aria-label="Swing analysis view">
-        <button
-          role="tab"
-          aria-selected={view === "parliament"}
-          onClick={() => setView("parliament")}
-          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-mlk ${view === "parliament" ? "bg-mlk text-white shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"}`}
-        >
-          Parliament (6 seats)
-        </button>
-        <button
-          role="tab"
-          aria-selected={view === "dun"}
-          onClick={() => setView("dun")}
-          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-mlk ${view === "dun" ? "bg-mlk text-white shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"}`}
-        >
-          DUN (28 seats)
-        </button>
-      </div>
+      {/* View toggle — Segmented control */}
+      <Segmented
+        value={view}
+        onChange={(v) => setView(v)}
+        options={[
+          { value: "parliament" as const, label: "Parliament (6 seats)" },
+          { value: "dun" as const, label: "DUN (28 seats)" },
+        ]}
+      />
 
       <Card className="border-mlk/30 bg-mlk-radial">
         <CardContent className="p-4">
@@ -460,7 +452,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner14) }}>{r.winner14}</span>
+                          <PartyTag coalition={r.winner14 as CoalitionCode} size="xs" />
                           {r.winnerParty14 && (
                             <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground">
                               <PartyLogo party={r.winnerParty14 as PartyCode} size="xs" />
@@ -477,7 +469,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner15) }}>{r.winner15}</span>
+                          <PartyTag coalition={r.winner15 as CoalitionCode} size="xs" />
                           {r.winnerParty15 && (
                             <span className="inline-flex items-center gap-0.5 text-[9px] text-muted-foreground">
                               <PartyLogo party={r.winnerParty15 as PartyCode} size="xs" />
@@ -681,7 +673,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                     <div className="text-[8px] font-mono text-muted-foreground">N{d.dun_code} · P{d.parliament_code}</div>
                     <div className="text-[10px] font-semibold truncate">{dunName}</div>
                     <div className="flex items-center gap-1 mt-1">
-                      <span className="inline-flex items-center rounded-full px-1 py-0.5 text-[8px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span>
+                      <PartyTag coalition={d.winner as CoalitionCode} size="xs" />
                       {d.winner_party && (
                         <span className="text-[8px] text-muted-foreground truncate">{d.winner_party}</span>
                       )}
@@ -696,9 +688,9 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                 const counts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
                 el.current_dun_composition!.forEach((d) => { counts[d.winner] = (counts[d.winner] ?? 0) + 1; });
                 return (["BN", "PH", "PN"] as const).map((c) => counts[c] > 0 && (
-                  <span key={c} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: partyHex(c) }}>
+                  <PartyTag key={c} coalition={c as CoalitionCode} size="sm">
                     {c} {counts[c]}
-                  </span>
+                  </PartyTag>
                 ));
               })()}
               <span className="text-[10px] text-muted-foreground self-center">/ {el.current_dun_composition.length} DUN</span>
@@ -764,7 +756,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                     <TableCell className="text-[10px]">{getDunName(d.parliament_code, d.dun_code)} <span className="text-muted-foreground font-mono">N{d.dun_code}</span></TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(d.winner) }}>{d.winner}</span>
+                        <PartyTag coalition={d.winner as CoalitionCode} size="xs" />
                         {d.winner_candidate && (
                           <button
                             className="text-[9px] text-mlk hover:underline flex items-center gap-0.5 focus-mlk rounded"
@@ -808,7 +800,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                       <TableCell className="text-[10px]">{PARLIAMENTS.find((p) => p.code === r.parliament_code)?.name ?? `P${r.parliament_code}`} <span className="font-mono text-muted-foreground">P{r.parliament_code}</span></TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: partyHex(r.winner) }}>{r.winner}</span>
+                          <PartyTag coalition={r.winner as CoalitionCode} size="xs" />
                           {r.winner_candidate && (
                             <button
                               className="text-[9px] text-mlk hover:underline flex items-center gap-0.5 focus-mlk rounded"

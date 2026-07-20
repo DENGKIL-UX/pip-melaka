@@ -9,6 +9,8 @@ import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN, DUN_NAMES, getDunName } from
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
 import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
+import { PartyTag, StatusTag } from "@/components/ui/party-tag";
+import type { CoalitionCode } from "@/lib/party-metadata";
 
 // Build full DUN list from PARLIAMENTS + DUN_NAMES
 const ALL_DUNS = PARLIAMENTS.flatMap((p) =>
@@ -46,14 +48,7 @@ interface ElectionSummary { id: string; name: string; date: string; headline_fac
 }
 
 function PartyBadge({ party }: { party: "PH" | "BN" | "PN" }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-      style={{ backgroundColor: PARTY_COLORS[party] }}
-    >
-      {party}
-    </span>
-  );
+  return <PartyTag coalition={party as CoalitionCode} size="sm" />;
 }
 
 function KpiCard({ icon: Icon, label, value, sub, accent }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub?: string; accent?: boolean }) {

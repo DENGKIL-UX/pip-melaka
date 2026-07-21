@@ -14,6 +14,7 @@ import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { PartyLogo } from "@/components/shared/party-logo";
 import { TrustSection } from "@/components/landing/trust-section";
 import { SiteFooter } from "@/components/landing/site-footer";
+import { MetricsStrip } from "@/components/landing/metrics-strip";
 import { Segmented } from "@/components/ui/segmented";
 import { PartyTag } from "@/components/ui/party-tag";
 import { useToast } from "@/hooks/use-toast";
@@ -768,6 +769,9 @@ function MarginalSeatsWatchlist({ onEnter }: { onEnter: () => void }) {
           const marginColor = dun.prn15.marginPct < 1 ? "#dc2626" : dun.prn15.marginPct < 3 ? "#f59e0b" : "#eab308";
           const winnerColor = dun.prn15.coalition === "BN" ? PARTY_COLORS.BN : dun.prn15.coalition === "PH" ? PARTY_COLORS.PH : PARTY_COLORS.PN;
           const runnerUpColor = dun.prn15.runnerUpCoalition === "BN" ? PARTY_COLORS.BN : dun.prn15.runnerUpCoalition === "PH" ? PARTY_COLORS.PH : PARTY_COLORS.PN;
+          // Risk score: tighter margin + swing = higher risk
+          const riskScore = dun.prn15.marginPct < 1 ? "Critical" : dun.prn15.marginPct < 2 ? "High" : dun.prn15.marginPct < 3.5 ? "Medium" : "Low";
+          const riskColor = riskScore === "Critical" ? "#dc2626" : riskScore === "High" ? "#ea580c" : riskScore === "Medium" ? "#f59e0b" : "#eab308";
           return (
             <motion.button
               key={dun.dunCode}
@@ -794,12 +798,20 @@ function MarginalSeatsWatchlist({ onEnter }: { onEnter: () => void }) {
                   </h4>
                   <p className="text-[10px] text-muted-foreground">{dun.parliamentName} · {dun.district}</p>
                 </div>
-                <span
-                  className="font-mono text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap"
-                  style={{ color: marginColor, backgroundColor: `${marginColor}15` }}
-                >
-                  {dun.prn15.marginPct.toFixed(1)}pp
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                  <span
+                    className="font-mono text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap"
+                    style={{ color: marginColor, backgroundColor: `${marginColor}15` }}
+                  >
+                    {dun.prn15.marginPct.toFixed(1)}pp
+                  </span>
+                  <span
+                    className="text-[8px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap uppercase tracking-wide"
+                    style={{ color: riskColor, backgroundColor: `${riskColor}15` }}
+                  >
+                    {riskScore} Risk
+                  </span>
+                </div>
               </div>
 
               {/* Vote share bar — winner vs runner-up */}
@@ -1081,6 +1093,9 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
         <section className="mb-6 md:mb-8" aria-label="Headline statistics">
           <BentoHero onEnter={onEnter} />
         </section>
+
+        {/* Metrics strip — animated counters */}
+        <MetricsStrip />
 
         {/* Data freshness strip */}
         <section className="mb-8 md:mb-10">

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
+import { QuickActions } from "@/components/dashboard/quick-actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -192,6 +193,9 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
             );
           })}
         </nav>
+
+        {/* Quick action toolbar */}
+        <QuickActions tab={activeTab} />
 
         {/* Tab content — animated transitions */}
         <AnimatePresence mode="wait">

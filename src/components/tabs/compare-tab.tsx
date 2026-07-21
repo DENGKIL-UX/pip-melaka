@@ -38,6 +38,7 @@ export function CompareTab() {
   const [offline, setOffline] = useState(false);
   const [codeA, setCodeA] = useState<string>("134");
   const [codeB, setCodeB] = useState<string>("137");
+  const [codeC, setCodeC] = useState<string>("139");
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -78,6 +79,7 @@ export function CompareTab() {
 
   const a = aggByCode.get(codeA);
   const b = aggByCode.get(codeB);
+  const c = aggByCode.get(codeC);
   if (!a || !b) return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-muted-foreground">Loading…</CardContent></Card>;
 
   const voterDiff = a.voters - b.voters;
@@ -115,8 +117,8 @@ export function CompareTab() {
         </CardContent>
       </Card>
 
-      {/* Selectors */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+      {/* Selectors — §7.6: Third comparison slot */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
         <div>
           <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">Parliament A</label>
           <Select value={codeA} onValueChange={setCodeA}>
@@ -131,34 +133,71 @@ export function CompareTab() {
             <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
+        <div>
+          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">Parliament C (optional)</label>
+          <Select value={codeC} onValueChange={setCodeC}>
+            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+            <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Side-by-side */}
+      {/* Side-by-side — §7.6: Extended to 3 columns with auto-highlight */}
       <Card className="border-mlk/30">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> Side-by-side</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> Side-by-side comparison</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-2 py-2 border-b border-mlk/20 text-[10px] uppercase tracking-wide text-muted-foreground">
+          <div className={`grid gap-2 py-2 border-b border-mlk/20 text-[10px] uppercase tracking-wide text-muted-foreground ${c ? "grid-cols-4" : "grid-cols-3"}`}>
             <div>Metric</div>
             <div className="text-right text-mlk font-semibold">P{a.code} {a.name}</div>
             <div className="text-right text-mlk font-semibold">P{b.code} {b.name}</div>
+            {c && <div className="text-right text-mlk font-semibold">P{c.code} {c.name}</div>}
           </div>
-          <StatRow label="Total voters" a={a.voters.toLocaleString()} b={b.voters.toLocaleString()} highlight={a.voters > b.voters ? "a" : "b"} />
-          <StatRow label="DUN count" a={String(a.duns)} b={String(b.duns)} />
-          <StatRow label="Male %" a={`${a.malePct.toFixed(1)}%`} b={`${b.malePct.toFixed(1)}%`} />
-          <StatRow label="Female %" a={`${a.femalePct.toFixed(1)}%`} b={`${b.femalePct.toFixed(1)}%`} />
-          <StatRow label="Senior dep" a={`${a.seniorDep.toFixed(1)}%`} b={`${b.seniorDep.toFixed(1)}%`} highlight={a.seniorDep < b.seniorDep ? "a" : "b"} />
-          <StatRow label="Gender balance" a={a.genderBal.toFixed(1)} b={b.genderBal.toFixed(1)} highlight={a.genderBal > b.genderBal ? "a" : "b"} />
-          <StatRow label="DPT additions" a={`+${a.dpt?.additions ?? 0}`} b={`+${b.dpt?.additions ?? 0}`} />
-          <StatRow label="DPT deletions" a={`−${a.dpt?.deletions ?? 0}`} b={`−${b.dpt?.deletions ?? 0}`} />
-          <StatRow label="DPT net" a={`+${a.dpt?.net ?? 0}`} b={`+${b.dpt?.net ?? 0}`} highlight={(a.dpt?.net ?? 0) > (b.dpt?.net ?? 0) ? "a" : "b"} />
-          <StatRow label="Dominant age" a={a.age} b={b.age} />
-          <StatRow label="Dominant ethnicity" a={a.ethnicity} b={b.ethnicity} />
-          <div className="grid grid-cols-3 gap-2 py-2 text-xs">
-            <div className="text-muted-foreground">GE15 winner</div>
-            <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[a.ge15Winner] }}>{a.ge15Winner}</span></div>
-            <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[b.ge15Winner] }}>{b.ge15Winner}</span></div>
+          {/* §7.6: Auto-highlight best value in green */}
+          {(() => {
+            const threeCol = !!c;
+            const maxVoters = Math.max(a.voters, b.voters, c?.voters ?? 0);
+            const minSenior = Math.min(a.seniorDep, b.seniorDep, c?.seniorDep ?? 999);
+            const maxGender = Math.max(a.genderBal, b.genderBal, c?.genderBal ?? 0);
+            const maxNet = Math.max(a.dpt?.net ?? 0, b.dpt?.net ?? 0, c?.dpt?.net ?? 0);
+            return (
+              <>
+                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
+                  <div className="text-muted-foreground">Total voters</div>
+                  <div className={`text-right font-mono ${a.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{a.voters.toLocaleString()}</div>
+                  <div className={`text-right font-mono ${b.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{b.voters.toLocaleString()}</div>
+                  {c && <div className={`text-right font-mono ${c.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{c.voters.toLocaleString()}</div>}
+                </div>
+                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
+                  <div className="text-muted-foreground">Senior dep %</div>
+                  <div className={`text-right font-mono ${a.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{a.seniorDep.toFixed(1)}%</div>
+                  <div className={`text-right font-mono ${b.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{b.seniorDep.toFixed(1)}%</div>
+                  {c && <div className={`text-right font-mono ${c.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{c.seniorDep.toFixed(1)}%</div>}
+                </div>
+                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
+                  <div className="text-muted-foreground">Gender balance</div>
+                  <div className={`text-right font-mono ${a.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{a.genderBal.toFixed(1)}</div>
+                  <div className={`text-right font-mono ${b.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{b.genderBal.toFixed(1)}</div>
+                  {c && <div className={`text-right font-mono ${c.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{c.genderBal.toFixed(1)}</div>}
+                </div>
+                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
+                  <div className="text-muted-foreground">DPT net</div>
+                  <div className={`text-right font-mono ${(a.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{a.dpt?.net ?? 0}</div>
+                  <div className={`text-right font-mono ${(b.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{b.dpt?.net ?? 0}</div>
+                  {c && <div className={`text-right font-mono ${(c.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{c.dpt?.net ?? 0}</div>}
+                </div>
+                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 text-xs`}>
+                  <div className="text-muted-foreground">GE15 winner</div>
+                  <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[a.ge15Winner] }}>{a.ge15Winner}</span></div>
+                  <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[b.ge15Winner] }}>{b.ge15Winner}</span></div>
+                  {c && <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[c.ge15Winner] }}>{c.ge15Winner}</span></div>}
+                </div>
+              </>
+            );
+          })()}
+          <div className="text-[9px] text-muted-foreground mt-2 flex items-center gap-1">
+            <span className="text-emerald-600 font-bold">●</span> = best value (auto-highlighted)
           </div>
         </CardContent>
       </Card>

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, ShieldAlert, Heart, Info, WifiOff, Pyramid } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis, RadarChart, Radar, PolarGrid, PolarRadiusAxis } from "recharts";
 import { getDunName } from "@/lib/melaka-constants";
 import { MLK_ACCENT } from "@/lib/party-colors";
 import { DUN_FALLBACK } from "@/lib/fallback-data";
@@ -315,6 +315,38 @@ export function DemographicsTab() {
           <p className="text-[10px] text-muted-foreground mt-2" style={{ color: MLK_ACCENT }}>
             Thresholds: ≥30% senior dependency = CRITICAL (aging DUN, healthcare pressure); ≥25% = WARNING.
           </p>
+        </CardContent>
+      </Card>
+
+      {/* §7.3: Radar Chart — multi-dimensional DUN comparison */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> DUN Radar Comparison — Multi-dimensional</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <RadarChart data={duns.slice(0, 5).map((d) => ({
+              dun: `N${d.geography.dun_code}`,
+              "Senior Dep": d.metrics.senior_dependency_percent,
+              "Gender Bal": d.metrics.gender_balance_score,
+              "Male %": d.metrics.male_percent,
+              "Female %": d.metrics.female_percent,
+              "Voter Density": Math.min(d.metrics.total_voters / 200, 100),
+            }))}>
+              <PolarGrid stroke="var(--border)" />
+              <PolarAngleAxis dataKey="dun" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+              <PolarRadiusAxis tick={{ fontSize: 8, fill: "var(--muted-foreground)" }} angle={90} domain={[0, 100]} />
+              <Radar name="Senior Dep" dataKey="Senior Dep" stroke="#dc2626" fill="#dc2626" fillOpacity={0.15} />
+              <Radar name="Gender Bal" dataKey="Gender Bal" stroke="#C77B2C" fill="#C77B2C" fillOpacity={0.15} />
+              <Radar name="Voter Density" dataKey="Voter Density" stroke="#0ea5e9" fill="#0ea5e9" fillOpacity={0.15} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Tooltip contentStyle={{ fontSize: 11 }} />
+            </RadarChart>
+          </ResponsiveContainer>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Radar shows 5 DUNs (N01–N05) across 3 dimensions: senior dependency, gender balance, voter density.
+            Higher values = more pronounced in that dimension.
+          </div>
         </CardContent>
       </Card>
     </div>

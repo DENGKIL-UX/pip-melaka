@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Lock, Database, FileSpreadsheet, GitBranch, Eye, FileCheck2, Cpu, AlertTriangle, CheckCircle2, Circle, FileWarning } from "lucide-react";
+import { ShieldCheck, Lock, Database, FileSpreadsheet, GitBranch, Eye, FileCheck2, Cpu, AlertTriangle, CheckCircle2, Circle, FileWarning, Info } from "lucide-react";
 
 const GATES: Array<{ id: number; icon: React.ComponentType<{ className?: string }>; label: string; description: string; status: "CLOSED" | "OPEN" }> = [
   { id: 1, icon: FileSpreadsheet, label: "Source contract", description: "PIP voter source contract accepted (41-field pseudonymised schema).", status: "CLOSED" },
@@ -119,6 +119,55 @@ export function GovernanceTab() {
           <div className="text-[10px] text-muted-foreground mt-3 flex items-center gap-2">
             <ShieldCheck className="h-3 w-3 text-mlk" />
             <span>Personal Data Protection Act 2010 (Act 709) · Section 6 (consent), Section 7 (notice), Section 11 (disclosure). Build-time only — no runtime PII exposure.</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* §7.17: Data Lineage Visualization — DAG showing data flow */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><GitBranch className="h-4 w-4 text-mlk" /> Data Lineage — Source to Display</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-1">
+            {[
+              { stage: "SPR Voter Rolls", desc: "Raw xlsx from Suruhanjaya Pilihan Raya", status: "pending", icon: FileWarning },
+              { stage: "Engine: Profiler v1.1", desc: "41-field schema detection, pseudonymisation", status: "done", icon: Cpu },
+              { stage: "Engine: Cleanser v1.1", desc: "PDPA HIGHLY_SENSITIVE_FIELDS scrub", status: "done", icon: Lock },
+              { stage: "Engine: Transformer v1.0", desc: "Aggregation to DUN/DM/Locality level", status: "done", icon: FileCheck2 },
+              { stage: "Build: JSONL Artifacts", desc: "71,415 records → 5 DUN intelligence files", status: "done", icon: Database },
+              { stage: "Build: Dashboard JSON", desc: "Static JSON served from /data/", status: "done", icon: FileCheck2 },
+              { stage: "Runtime: Client Display", desc: "Aggregate-only, no PII at runtime", status: "done", icon: Eye },
+            ].map((node, i) => {
+              const Icon = node.icon;
+              const isDone = node.status === "done";
+              return (
+                <div key={i} className="flex items-center gap-3">
+                  {/* Connector line */}
+                  {i > 0 && <div className={`w-0.5 h-4 ml-[15px] ${isDone ? "bg-emerald-500/40" : "bg-amber-500/40"}`} />}
+                  {/* Node */}
+                  <div className="flex items-center gap-2 flex-1 p-2 rounded-md border" style={{
+                    borderColor: isDone ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)",
+                    backgroundColor: isDone ? "rgba(16,185,129,0.05)" : "rgba(245,158,11,0.05)",
+                  }}>
+                    <Icon className={`h-4 w-4 flex-shrink-0 ${isDone ? "text-emerald-600" : "text-amber-600"}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-semibold">{node.stage}</div>
+                      <div className="text-[10px] text-muted-foreground">{node.desc}</div>
+                    </div>
+                    {isDone ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
+                    ) : (
+                      <Circle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-3 flex items-center gap-2">
+            <Info className="h-3 w-3 text-mlk" />
+            <span>Data flows left-to-right: SPR → Engine → Build → Runtime. Gate 9 (raw SPR xlsx) is the only open step.</span>
           </div>
         </CardContent>
       </Card>

@@ -1982,3 +1982,69 @@ VLM Verification:
 - ✅ Coalition colors: dark blue (BN), green (PN), red (PH)
 
 Commit: de702e2 — feat: global BN dark blue color + party logos across all tabs/modules/landing
+
+---
+Task ID: ENHANCEMENT-GUIDE-1
+Agent: main (Z.ai Code)
+Task: Implement enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md (Phase 1: Foundation)
+
+Implemented Phase 1 enhancements from the 70KB enhancement guide:
+
+New Files (5):
+1. src/lib/motion-variants.ts — Reusable Framer Motion variants:
+   - fadeInUp, fadeIn, slideInRight, slideInLeft, scaleIn
+   - staggerContainer, staggerContainerFast
+   - pageTransition, tabTransition
+   - hoverLift, hoverScale
+
+2. src/components/shared/premium-card.tsx — Reusable card wrapper:
+   - 3 variants: default, glass, gradient
+   - Hover lift animation + card-glow effect
+   - Clickable support
+
+3. src/components/shared/empty-state.tsx — Enterprise empty/error state:
+   - Icon + title + description + optional action button
+   - 3 variants: default, error, warning
+
+4. src/components/landing/trust-section.tsx — "Enterprise Data Governance":
+   - 3 trust cards with icons + badge labels
+   - PDPA Akta 709 Compliant (Certified)
+   - 3-Source Verification (Verified)
+   - Fully Auditable (Public)
+   - Glass cards with card-glow hover
+
+5. src/components/landing/site-footer.tsx — Enterprise SaaS footer:
+   - Brand column with pulse-dot "All systems operational"
+   - Product links (Dashboard, 2D Map, 3D Map, S2D Intelligence)
+   - Data Sources (DOSM, ElectionData.MY, SPR, EDL Data Lake)
+   - Legal (Privacy Policy, PDPA, Data Governance, Terms)
+   - Version info footer
+
+Enhanced Files (3):
+6. src/app/globals.css — Added 12 premium utility classes:
+   - card-stack, data-badge, kpi-card, divider-label
+   - metric-compare, animated-value, card-glow
+   - glass (with dark mode), pulse-dot (with animation ring)
+   - scroll-indicator (bounce), tab-slide-in, scrollbar-mlk
+   - Premium heading treatment (letter-spacing -0.02em)
+   - Data-dense table styling
+
+7. src/components/landing-page.tsx — Enhanced hero:
+   - Live status bar: "Systems Operational" + pulse dot + Updated time + Source
+   - Scroll indicator (animated ChevronDown)
+   - TrustSection integrated before footer
+   - SiteFooter replaces minimal footer
+
+8. src/components/dashboard.tsx — Tab transition animations:
+   - AnimatePresence with mode="wait"
+   - Slide-in/slide-out transitions (opacity + x, 200ms easeInOut)
+   - framer-motion import added
+
+VLM Verification:
+- ✅ Live status bar with green pulse dot + "Systems Operational"
+- ✅ Scroll indicator (chevron) below hero
+- ✅ Trust section with 3 cards (PDPA, 3-Source, Auditable)
+- ✅ Enterprise footer with multiple columns
+- ✅ Premium SaaS feel confirmed
+
+Commit: 58f2f08 — feat: enterprise SaaS premium UI/UX enhancements from enhancement guide

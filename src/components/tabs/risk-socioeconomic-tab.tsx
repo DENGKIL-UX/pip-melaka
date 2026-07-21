@@ -210,6 +210,68 @@ export function RiskSocioeconomicTab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* §7.5: Risk Matrix — 5×5 probability×impact grid */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> Risk Matrix — DUN-level (5×5)</CardTitle></CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[10px] border-collapse">
+              <thead>
+                <tr>
+                  <th className="p-1 text-muted-foreground text-left">Impact ↓ / Probability →</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">1<br/><span className="text-[8px]">Low</span></th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">2</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">3<br/><span className="text-[8px]">Med</span></th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">4</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">5<br/><span className="text-[8px]">High</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { impact: 5, label: "5 — Critical", color: "#dc2626" },
+                  { impact: 4, label: "4 — High", color: "#ea580c" },
+                  { impact: 3, label: "3 — Medium", color: "#f59e0b" },
+                  { impact: 2, label: "2 — Low", color: "#84cc16" },
+                  { impact: 1, label: "1 — Minimal", color: "#22c55e" },
+                ].map((row) => (
+                  <tr key={row.impact}>
+                    <td className="p-1 font-semibold text-right" style={{ color: row.color }}>{row.label}</td>
+                    {[1, 2, 3, 4, 5].map((prob) => {
+                      const score = row.impact * prob;
+                      const bg = score >= 15 ? "#dc262620" : score >= 10 ? "#ea580c20" : score >= 6 ? "#f59e0b20" : "#22c55e20";
+                      // Find DUNs that fall in this cell
+                      const dunsInCell = duns.filter((d) => {
+                        const probScore = d.metrics.senior_dependency_percent >= 30 ? 5 : d.metrics.senior_dependency_percent >= 25 ? 4 : d.metrics.senior_dependency_percent >= 20 ? 3 : d.metrics.senior_dependency_percent >= 15 ? 2 : 1;
+                        const impactScore = d.metrics.total_voters > 15000 ? 5 : d.metrics.total_voters > 10000 ? 4 : d.metrics.total_voters > 5000 ? 3 : 2;
+                        return probScore === prob && impactScore === row.impact;
+                      });
+                      return (
+                        <td key={prob} className="p-1 text-center border border-border/40" style={{ backgroundColor: bg }}>
+                          {dunsInCell.length > 0 ? (
+                            <div className="flex flex-wrap gap-0.5 justify-center">
+                              {dunsInCell.map((d) => (
+                                <span key={d.geography.dun_code} className="text-[8px] font-mono px-1 py-0.5 rounded bg-background/80" title={`N${d.geography.dun_code} ${d.geography.dun_name}`}>
+                                  N{d.geography.dun_code}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-[8px] text-muted-foreground/30">—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Probability = senior dependency tier · Impact = voter density · Cells show DUN codes in that risk zone
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

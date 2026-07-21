@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff, Grid3x3 } from "lucide-react";
+import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff, Grid3x3, LayoutGrid, List } from "lucide-react";
 import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN, DUN_NAMES, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
@@ -73,6 +73,7 @@ export function OverviewTab() {
   const [elections, setElections] = useState<ElectionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [offline, setOffline] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     (async () => {
@@ -241,7 +242,27 @@ export function OverviewTab() {
 
       {/* DUN seats grid — all 28 DUN constituencies with real PRN15 winners */}
       <div>
-        <div className="text-sm font-semibold mb-2 flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> DUN seats — all 28 state constituencies (PRN15 2021 real winners)</div>
+        <div className="text-sm font-semibold mb-2 flex items-center gap-2 justify-between">
+          <span className="flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> DUN seats — all 28 state constituencies (PRN15 2021 real winners)</span>
+          {/* §7.1: Grid/List toggle */}
+          <div className="flex items-center gap-1 p-0.5 rounded-md bg-muted/40 border border-border/60">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 rounded transition-colors ${viewMode === "grid" ? "bg-mlk text-white" : "text-muted-foreground hover:text-foreground"}`}
+              aria-label="Grid view"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-1.5 rounded transition-colors ${viewMode === "list" ? "bg-mlk text-white" : "text-muted-foreground hover:text-foreground"}`}
+              aria-label="List view"
+            >
+              <List className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+        {viewMode === "grid" ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
           {(() => {
             const prn15 = elections.find((e) => e.id === "PRN15");
@@ -275,6 +296,50 @@ export function OverviewTab() {
             });
           })()}
         </div>
+        ) : (
+        /* §7.1: List view — compact table-style */
+        <div className="rounded-lg border border-border/60 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full data-table">
+              <thead className="bg-muted/30 border-b border-border/60">
+                <tr>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Code</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">DUN Name</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Parliament</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">District</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Winner</th>
+                  <th className="text-right px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Vote %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  const prn15 = elections.find((e) => e.id === "PRN15");
+                  const dunResults = prn15?.dun_results ?? [];
+                  return ALL_DUNS.map((d) => {
+                    const realResult = dunResults.find((r) => r.dun_code === d.dun_code);
+                    const winner = (realResult?.winner ?? d.ge15Winner) as "PH" | "BN" | "PN";
+                    const winnerParty = realResult?.winner_party;
+                    const votesPct = realResult?.votes_pct;
+                    return (
+                      <tr key={`${d.parliament_code}-${d.dun_code}`} className="border-b border-border/40 last:border-0 hover:bg-mlk/5 transition-colors">
+                        <td className="px-3 py-1.5 text-[10px] font-mono text-muted-foreground">N{d.dun_code}</td>
+                        <td className="px-3 py-1.5 text-xs font-medium">{d.dun_name}</td>
+                        <td className="px-3 py-1.5 text-[10px] text-muted-foreground">P{d.parliament_code}</td>
+                        <td className="px-3 py-1.5 text-[10px] text-muted-foreground">{d.district}</td>
+                        <td className="px-3 py-1.5">
+                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[winner] }}>{winner}</span>
+                          {winnerParty && <span className="ms-1 text-[9px] text-muted-foreground">{winnerParty}</span>}
+                        </td>
+                        <td className="px-3 py-1.5 text-right text-[10px] font-mono">{votesPct ? `${votesPct.toFixed(1)}%` : "—"}</td>
+                      </tr>
+                    );
+                  });
+                })()}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        )}
         <div className="text-[10px] text-muted-foreground mt-2 flex items-center gap-3">
           <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> 5 verified (P134)</span>
           <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 23 pending (P135–P139)</span>

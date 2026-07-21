@@ -1837,3 +1837,41 @@ Unresolved issues or risks:
 1. The `NEXT_PUBLIC_BUILD_TIME` env var requires a production rebuild to take effect. The dev server shows "0m ago" (fallback). On CF Workers, it should show the actual build time after deploy.
 2. The `key={activeTab}` in dashboard.tsx still forces full remount of tabs on switch — this is a medium-severity UX issue (map re-initializes on tab switch). Should be fixed in a future round by keeping tabs mounted with CSS display:none.
 3. The `/api/query` route uses a fragile regex-based SQL parser — should be replaced with a proper SQL parser library in a future round.
+
+---
+Task ID: CI-RED-X-FIX
+Agent: main (Z.ai Code)
+Task: Resolve the red X on GitHub commits — user reported that https://github.com/DENGKIL-UX/pip-melaka/commits/main/ shows red X crosses on commits.
+
+Diagnosis:
+- The CF build log shows successful deploys (Version cbf27b2c), so the red X is NOT from Cloudflare.
+- Used GitHub API to query check-runs for the latest commit. Found 3 check runs:
+  1. Workers Builds: pip-melaka → success (CF deploy)
+  2. PR validation → skipped (not a PR)
+  3. lint · tsc · build → failure (THIS is the red X)
+- The failing job is the GitHub Actions CI workflow (.github/workflows/ci.yml).
+- Queried the job logs and found the Lint step fails with: 22 errors, 3253 warnings.
+- The errors are all `@typescript-eslint/no-this-alias` from a minified file at lines like 13:11621.
+- Identified the culprit: `public/s2d-360/assets/index-Ba9qhYoR.js` — a 3.3MB minified S2D-360 bundle that is tracked by git but was NOT in the ESLint ignores list.
+
+Root Cause:
+- ESLint was linting the minified S2D-360 JavaScript bundle (3.3MB, single-line minified).
+- This produced 22 `no-this-alias` errors (from `var that = this` patterns in the minified code) and 3253 `no-unused-expressions` warnings.
+- ESLint exits with code 1 when there are errors, causing the CI Lint step to fail.
+- When Lint fails, all subsequent steps (Type check, Prisma validate, Build, CF build) are skipped.
+
+Fix:
+1. Updated `eslint.config.mjs` to add `public/**`, `mini-services/**`, `scripts/**`, `.zscripts/**`, `.open-next/**`, `.wrangler/**` to the ignores array.
+2. Updated `.github/workflows/ci.yml` to add `NODE_OPTIONS: "--max-old-space-size=4096"` to the Lint step (prevents OOM on large projects).
+3. Updated `package.json` lint script to `NODE_OPTIONS='--max-old-space-size=4096' eslint .` for local runs.
+
+Verification:
+- Local lint: 0 errors, 2 warnings (down from 22 errors + 3253 warnings).
+- The 2 remaining warnings are non-blocking:
+  - `scenario-tab.tsx:55` — unused eslint-disable directive
+  - `chart.tsx:83` — `dangerouslySetInnerHTML` (shadcn/ui chart component, expected)
+- GitHub Actions CI: ✅ lint · tsc · build: success
+- Cloudflare Workers: ✅ Workers Builds: pip-melaka: success
+- Commit 783de8b now shows green checkmark on GitHub.
+
+Commit: 783de8b — fix(ci): resolve red X on GitHub — ESLint was linting minified S2D-360 bundle

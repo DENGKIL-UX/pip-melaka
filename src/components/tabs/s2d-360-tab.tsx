@@ -85,6 +85,7 @@ export function S2D360Tab() {
   const [loading, setLoading] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [view, setView] = useState<"native" | "full">("native");
+  const [deepLink, setDeepLink] = useState<string>("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Native engine data
@@ -345,9 +346,28 @@ export function S2D360Tab() {
       {/* Full Engine Iframe (when view=full) */}
       {view === "full" && (
         <>
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-[10px] text-muted-foreground">
-            Sections: <span className="text-foreground font-medium">Overview · Analysis · Forecasting · Reporting · Collection · Operations · Annotation · Integration</span>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          {/* §7.8: Deep link navigation — quick section access */}
+          <div className="flex items-center gap-1 flex-wrap">
+            <span className="text-[10px] text-muted-foreground me-1">Jump to:</span>
+            {[
+              { label: "Overview", hash: "/overview" },
+              { label: "Analysis", hash: "/analysis" },
+              { label: "Forecast", hash: "/forecasting" },
+              { label: "Reporting", hash: "/reporting" },
+              { label: "Collection", hash: "/collection" },
+              { label: "Operations", hash: "/operations" },
+            ].map((section) => (
+              <button
+                key={section.label}
+                onClick={() => setDeepLink(section.hash)}
+                className={`px-2 py-0.5 rounded text-[9px] font-medium transition-colors ${
+                  deepLink === section.hash ? "bg-mlk text-white" : "text-muted-foreground hover:bg-muted/60"
+                }`}
+              >
+                {section.label}
+              </button>
+            ))}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -382,7 +402,7 @@ export function S2D360Tab() {
           )}
           <iframe
             ref={iframeRef}
-            src="/s2d-360/index.html"
+            src={`/s2d-360/index.html${deepLink ? `#${deepLink}` : ""}`}
             className="w-full h-full border-0"
             title="S2D-360 Intelligence Engine"
             onLoad={() => setLoading(false)}

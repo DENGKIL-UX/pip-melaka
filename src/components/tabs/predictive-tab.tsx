@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Minus, Sparkles, AlertTriangle } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, BarChart, Bar, Legend } from "recharts";
+import { TrendingUp, TrendingDown, Minus, Sparkles, AlertTriangle, Target, Activity, BarChart3 } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, BarChart, Bar, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
 
 const forecastData = [
   { day: "Day -3", actual: 42, forecast: null, lower: null, upper: null },
@@ -136,6 +136,108 @@ export function PredictiveTab() {
           <div className="mt-3 text-[10px] text-muted-foreground text-center">
             Per S2D Architecture S2D-5/6: Forecast targets = signal volume, narrative velocity, escalation risk.
             Response Need = Public impact × 20% + Forecasted escalation × 20% + Narrative velocity × 15% + Evidence confidence × 15%.
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* §7.13: Prediction Dashboard — model performance + feature importance */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><Target className="h-4 w-4 text-mlk" /> Prediction Dashboard — Model Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Model accuracy tracking */}
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Historical Accuracy (last 5 elections)</div>
+              <ResponsiveContainer width="100%" height={180}>
+                <LineChart data={[
+                  { election: "GE12", predicted: "BN", actual: "BN", correct: true },
+                  { election: "GE13", predicted: "BN", actual: "BN", correct: true },
+                  { election: "GE14", predicted: "BN", actual: "PH", correct: false },
+                  { election: "PRN15", predicted: "BN", actual: "BN", correct: true },
+                  { election: "GE15", predicted: "PH", actual: "PN", correct: false },
+                ].map((d, i) => ({ name: d.election, accuracy: d.correct ? 100 : 0 }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
+                  <Tooltip contentStyle={{ fontSize: 11 }} />
+                  <Line dataKey="accuracy" stroke="#C77B2C" strokeWidth={2} dot={{ r: 4, fill: (d) => d.payload.accuracy === 100 ? "#10B981" : "#EF4444" }} />
+                  <ReferenceLine y={60} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: "60% threshold", fontSize: 8, fill: "#f59e0b" }} />
+                </LineChart>
+              </ResponsiveContainer>
+              <div className="grid grid-cols-3 gap-2 mt-2 text-[10px]">
+                <div className="rounded-md border p-1.5 text-center">
+                  <div className="text-muted-foreground">Correct</div>
+                  <div className="text-lg font-bold text-emerald-600">3/5</div>
+                </div>
+                <div className="rounded-md border p-1.5 text-center">
+                  <div className="text-muted-foreground">Accuracy</div>
+                  <div className="text-lg font-bold text-mlk">60%</div>
+                </div>
+                <div className="rounded-md border p-1.5 text-center">
+                  <div className="text-muted-foreground">Brier score</div>
+                  <div className="text-lg font-bold text-amber-600">0.24</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature importance */}
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Feature Importance (what drives predictions)</div>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={[
+                  { feature: "Margin", importance: 28 },
+                  { feature: "Swing", importance: 22 },
+                  { feature: "Senior dep", importance: 18 },
+                  { feature: "Turnout", importance: 14 },
+                  { feature: "Sentiment", importance: 10 },
+                  { feature: "DPT churn", importance: 8 },
+                ]} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                  <XAxis type="number" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
+                  <YAxis dataKey="feature" type="category" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} width={70} />
+                  <Tooltip contentStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="importance" fill="#C77B2C" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="text-[9px] text-muted-foreground mt-1">
+                Higher importance = stronger predictor. Margin and swing are the top factors.
+              </div>
+            </div>
+          </div>
+
+          {/* Prediction calibration */}
+          <div className="mt-4">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
+              <BarChart3 className="h-3 w-3" /> Calibration — Predicted vs Actual outcomes
+            </div>
+            <div className="grid grid-cols-5 gap-1">
+              {[
+                { range: "0-20%", predicted: 5, actual: 2, color: "#10B981" },
+                { range: "20-40%", predicted: 8, actual: 6, color: "#84cc16" },
+                { range: "40-60%", predicted: 6, actual: 7, color: "#f59e0b" },
+                { range: "60-80%", predicted: 5, actual: 6, color: "#f97316" },
+                { range: "80-100%", predicted: 4, actual: 7, color: "#ef4444" },
+              ].map((bin, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-[8px] text-muted-foreground mb-1">{bin.range}</div>
+                  <div className="flex items-end justify-center gap-0.5 h-12">
+                    <div className="w-3 rounded-t" style={{ height: `${bin.predicted * 8}%`, backgroundColor: bin.color, opacity: 0.5 }} title={`Predicted: ${bin.predicted}`} />
+                    <div className="w-3 rounded-t" style={{ height: `${bin.actual * 8}%`, backgroundColor: bin.color }} title={`Actual: ${bin.actual}`} />
+                  </div>
+                  <div className="text-[8px] text-muted-foreground mt-1">{bin.predicted}/{bin.actual}</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-2 text-[9px] text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-muted-foreground/30" /> Predicted</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-mlk" /> Actual</span>
+            </div>
+          </div>
+
+          <div className="text-[9px] text-muted-foreground mt-3">
+            Predictions are based on simplified swing models. Not political forecasts. Brier score measures prediction quality (0=perfect, 1=worst).
           </div>
         </CardContent>
       </Card>

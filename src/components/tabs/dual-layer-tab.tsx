@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Layers3, Users, Signal, ShieldCheck } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { SENTIMENT, TREND, PLATFORMS } from "@/lib/s2d-contracts";
 import { SEED_LOCALITY_SIGNAL_MAP } from "@/lib/s2d-seed-data";
 
@@ -23,6 +24,7 @@ const PLATFORM_ICONS: Record<string, string> = { TIKTOK: "🎵", FACEBOOK: "📘
 
 export function DualLayerTab() {
   return (
+    <div className="space-y-3">
     <Card className="border-mlk/20">
       <CardHeader>
         <div className="flex items-center gap-2">
@@ -123,5 +125,41 @@ export function DualLayerTab() {
         </div>
       </CardContent>
     </Card>
+
+      {/* §7.16: Layer blending — opacity slider between two layers */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Layers3 className="h-4 w-4 text-mlk" /> Layer Blending — Demographics × Sentiment</CardTitle></CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-mlk">Demographics Layer</span>
+              <span className="font-mono text-muted-foreground" id="blend-val">50% / 50%</span>
+              <span className="font-medium text-sky-600">Sentiment Layer</span>
+            </div>
+            <Slider defaultValue={[50]} min={0} max={100} step={5} className="w-full" aria-label="Layer blend opacity" />
+            <div className="h-3 rounded-full overflow-hidden flex">
+              <div className="h-full bg-mlk/40" style={{ width: "50%" }} />
+              <div className="h-full bg-sky-500/40" style={{ width: "50%" }} />
+            </div>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="rounded-md border border-mlk/20 p-2">
+                <div className="text-[10px] text-muted-foreground mb-1">Top Demographic Signal</div>
+                <div className="text-xs font-semibold">Senior dependency 25.9% (N01)</div>
+                <div className="text-[9px] text-muted-foreground">WARNING threshold breached</div>
+              </div>
+              <div className="rounded-md border border-sky-500/20 p-2">
+                <div className="text-[10px] text-muted-foreground mb-1">Top Sentiment Signal</div>
+                <div className="text-xs font-semibold">Negative sentiment 45% (N05)</div>
+                <div className="text-[9px] text-muted-foreground">Trending on TikTok</div>
+              </div>
+            </div>
+            <div className="text-[9px] text-muted-foreground">
+              Slider controls the blend weight between demographic risk (amber) and sentiment signals (blue).
+              Adjust to focus on one layer or find correlations.
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

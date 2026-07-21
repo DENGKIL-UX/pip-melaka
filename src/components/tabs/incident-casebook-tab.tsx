@@ -88,6 +88,44 @@ export function IncidentCasebookTab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* §7.11: Severity Matrix — categorize by type/severity/location */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-mlk" /> Incident Severity Matrix</CardTitle></CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[10px] border-collapse">
+              <thead>
+                <tr>
+                  <th className="p-1 text-muted-foreground text-left">Severity ↓ / Type →</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">Sentiment</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">Demographic</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">Electoral</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">Technical</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { sev: "CRITICAL", color: "#dc2626", counts: [1, 0, 0, 0] },
+                  { sev: "HIGH", color: "#ea580c", counts: [0, 1, 1, 0] },
+                  { sev: "MEDIUM", color: "#f59e0b", counts: [2, 0, 0, 1] },
+                  { sev: "LOW", color: "#84cc16", counts: [0, 0, 1, 0] },
+                ].map((row) => (
+                  <tr key={row.sev}>
+                    <td className="p-1 font-semibold text-right" style={{ color: row.color }}>{row.sev}</td>
+                    {row.counts.map((count, ci) => (
+                      <td key={ci} className="p-1 text-center border border-border/40" style={{ backgroundColor: count > 0 ? `${row.color}15` : "transparent" }}>
+                        {count > 0 ? <span className="text-[9px] font-mono font-bold" style={{ color: row.color }}>{count}</span> : <span className="text-[8px] text-muted-foreground/30">—</span>}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2">Matrix shows incident count by severity × type. Color intensity indicates risk density.</div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

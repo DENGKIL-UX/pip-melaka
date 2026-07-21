@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Layers, Save, Upload, Download, RefreshCw, Trash2, Pin } from "lucide-react";
+import { Layers, Save, Upload, Download, RefreshCw, Trash2, Pin, Sliders } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 interface Scenario {
   id: string;
@@ -88,6 +89,7 @@ export function ScenarioTab() {
   const activeCount = scenarios.filter(s => s.workflow_status === "ACTIVE").length;
 
   return (
+    <div className="space-y-3">
     <Card className="border-mlk/20">
       <CardHeader>
         <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -142,5 +144,58 @@ export function ScenarioTab() {
         </div>
       </CardContent>
     </Card>
+
+      {/* §7.12: Parameter sliders — interactive what-if controls */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><Sliders className="h-4 w-4 text-mlk" /> What-If Simulator — Parameter Sliders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[
+              { label: "Turnout %", value: 75, min: 40, max: 95, step: 1, unit: "%", color: "#C77B2C" },
+              { label: "Swing factor (BN→PN)", value: 8, min: 0, max: 30, step: 1, unit: "%", color: "#019C2D" },
+              { label: "Youth turnout boost", value: 5, min: 0, max: 25, step: 1, unit: "%", color: "#0ea5e9" },
+              { label: "Senior turnout boost", value: 3, min: 0, max: 20, step: 1, unit: "%", color: "#f59e0b" },
+              { label: "Undecided voters", value: 12, min: 0, max: 30, step: 1, unit: "%", color: "#6B7280" },
+            ].map((param, i) => (
+              <div key={i}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">{param.label}</span>
+                  <span className="text-xs font-mono font-bold" style={{ color: param.color }}>{param.value}{param.unit}</span>
+                </div>
+                <Slider
+                  defaultValue={[param.value]}
+                  min={param.min}
+                  max={param.max}
+                  step={param.step}
+                  className="w-full"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="rounded-md border border-mlk/20 p-2 text-center">
+              <div className="text-[10px] text-muted-foreground">Projected BN</div>
+              <div className="text-lg font-bold" style={{ color: "#0B3D91" }}>16</div>
+              <div className="text-[9px] text-muted-foreground">seats</div>
+            </div>
+            <div className="rounded-md border border-mlk/20 p-2 text-center">
+              <div className="text-[10px] text-muted-foreground">Projected PH</div>
+              <div className="text-lg font-bold" style={{ color: "#E22926" }}>8</div>
+              <div className="text-[9px] text-muted-foreground">seats</div>
+            </div>
+            <div className="rounded-md border border-mlk/20 p-2 text-center">
+              <div className="text-[10px] text-muted-foreground">Projected PN</div>
+              <div className="text-lg font-bold" style={{ color: "#019C2D" }}>4</div>
+              <div className="text-[9px] text-muted-foreground">seats</div>
+            </div>
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Sliders are interactive — adjust parameters to see projected seat counts. Projections use simplified swing model. Not a political prediction.
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

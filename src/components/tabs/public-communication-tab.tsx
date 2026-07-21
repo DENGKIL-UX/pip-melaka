@@ -89,6 +89,33 @@ export function PublicCommunicationTab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* §7.10: Template Library — reusable message templates */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><MessageSquare className="h-4 w-4 text-mlk" /> Template Library — Reusable Messages</CardTitle></CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              { name: "Senior Healthcare Response", category: "Healthcare", audience: "N05 Taboh Naning", template: "Kami prihatin dengan isu kesihatan warga emas di kawasan ini. Program kesihatan komuniti akan diperluas..." },
+              { name: "Youth Engagement", category: "Demographics", audience: "P138 Kota Melaka", template: "Inisiatif ekonomi belia baharu dilancarkan untuk membina peluang pekerjaan dalam sektor digital..." },
+              { name: "Sentiment Recovery", category: "Crisis Response", audience: "N01 Kuala Linggi", template: "Kami mengambil serius maklum balas komuniti. Sesi dialog terbuka akan diadakan pada minggu hadapan..." },
+              { name: "Infrastructure Update", category: "Development", audience: "P136 Tangga Batu", template: "Kemajuan projek infrastruktur di kawasan ini mengikut jadual. Tarikh siap dijangka Q3 2026..." },
+            ].map((tmpl, i) => (
+              <div key={i} className="rounded-lg border border-border/60 p-3 hover:border-mlk/30 hover:shadow-sm transition-all cursor-pointer">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold">{tmpl.name}</span>
+                  <Badge variant="outline" className="text-[8px]">{tmpl.category}</Badge>
+                </div>
+                <div className="text-[9px] text-muted-foreground mb-2">Target: {tmpl.audience}</div>
+                <div className="text-[10px] text-muted-foreground line-clamp-2 bg-muted/30 rounded p-2">{tmpl.template}</div>
+              </div>
+            ))}
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Templates are categorized by use case. Click to load into the composer. All templates are in Bahasa Malaysia.
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1875,3 +1875,55 @@ Verification:
 - Commit 783de8b now shows green checkmark on GitHub.
 
 Commit: 783de8b — fix(ci): resolve red X on GitHub — ESLint was linting minified S2D-360 bundle
+
+---
+Task ID: 3D-MAP-REBUILD
+Agent: main (Z.ai Code)
+Task: Rebuild the empty 3D Map tab with a proper Three.js 3D visualization of Melaka DUNs and Parlimen boundaries.
+
+Work Log:
+- Read existing map-3d-tab.tsx (404 lines) — had code but was likely not rendering due to: auto-rotate always on (no user interaction), only rendered largest polygon from MultiPolygon (losing islands), no OrbitControls.
+- Verified Three.js r185 + @types/three are installed.
+- Verified boundary GeoJSON files: 28 DUN features + 6 parlimen features in public/data/boundaries/.
+- Researched Three.js 3D map libraries (xyz-threejs, geo-three, three-geo, map33.js, threebox, flywave.gl, GlobeStream3D, vue-map-3d, three-tile). Decided to build custom using raw Three.js + ExtrudeGeometry for full control over the electoral visualization.
+
+Implementation (complete rewrite of map-3d-tab.tsx, 576 lines):
+1. **OrbitControls** — full mouse interaction (drag to rotate, scroll to zoom, right-drag to pan). Damping for smooth movement. Min/max distance limits. Max polar angle prevents going below the floor.
+2. **28 DUN extrusions** from real GeoJSON — all MultiPolygon rings rendered (not just largest). ExtrudeGeometry with bevel for premium look. Height based on margin of victory: ultra-marginal (<1pp) = 18 units, marginal (<5pp) = 14, moderate (<15pp) = 10, safe (<30pp) = 7, fortress (>30pp) = 4.
+3. **Parlimen wireframe overlay** — amber (#C77B2C) line outlines for the 6 parlimen boundaries. Toggleable via "Parlimen" button.
+4. **DUN labels** — canvas-based sprite labels showing N-code + DUN name. Toggleable via "Labels" button. Positioned at centroid + height offset.
+5. **Rich HTML tooltip** on hover — shows DUN code, name, parliament, district, winner coalition+party, candidate name, vote count, vote %, margin, swing indicator, marginal seat warning. Tooltip follows mouse position.
+6. **Emissive hover effect** — hovered DUN glows with MLK amber emissive material.
+7. **3 scenarios** — GE14 (2018), PRN15 (2021), GE15 (2022). Colors update dynamically. scenarioRef ensures tooltip always shows correct scenario.
+8. **Auto-play timeline** — cycles through scenarios every 3 seconds. Pause/Reset buttons.
+9. **Height legend** — bottom-right shows height scale (Safe/Moderate/Marginal/Ultra with colored bars).
+10. **Seat summary** — bottom-left shows BN/PH/PN counts per scenario.
+11. **Proper lighting** — ambient (0.4) + hemisphere (0.5) + directional (0.9) with shadows. PCFSoftShadowMap.
+12. **Dark themed scene** — background #0a0f1e, fog for depth, grid floor.
+13. **Error overlay** with reload button if 3D fails to load.
+14. **Proper cleanup** — disposes geometries, materials, textures, controls on unmount.
+
+VLM Verification (glm-4.6v):
+- ✅ 3D extruded polygons visible (28 DUN constituencies)
+- ✅ Coalition colors: blue (BN), red (PH), green (PN), gray (OTH)
+- ✅ Dark navy background with proper contrast
+- ✅ Labels toggle button visible
+- ✅ Seat counts panel visible (BN 21, PH 5, PN 2 for PRN15)
+- ✅ Scenario switching works — GE14 shows more red (PH 15) vs PRN15 blue-dominant (BN 21)
+- ✅ Height = Margin legend visible
+- ✅ OrbitControls instructions visible ("Drag to rotate · Scroll to zoom · Click DUN to select")
+
+Commit: f9843ef — feat(3d-map): complete rewrite with OrbitControls, extruded DUN by margin, rich hover
+
+Stage Summary:
+- The 3D Map tab is no longer empty — it now shows a fully interactive 3D visualization of all 28 Melaka DUN constituencies extruded by margin of victory.
+- Users can drag to rotate, scroll to zoom, and click DUNs to select them.
+- Hovering shows a rich tooltip with election results (candidate, votes, margin, swing).
+- Scenario switching (GE14/PRN15/GE15) dynamically updates colors.
+- The height-based encoding (tighter margin = taller) makes marginal seats visually pop.
+- Parlimen wireframe overlay and DUN labels are toggleable.
+- Production deployment verified working on https://pip-melaka.ritz-analytics.workers.dev
+
+Unresolved issues or risks:
+1. The 3D map chunk is dynamically imported — may need withRetry wrapper if the dev server OOMs (production CF Workers build is fine).
+2. The OrbitControls import path (`three/examples/jsm/controls/OrbitControls.js`) may need adjustment for different Three.js versions.

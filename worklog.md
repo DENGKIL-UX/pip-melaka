@@ -2048,3 +2048,41 @@ VLM Verification:
 - ✅ Premium SaaS feel confirmed
 
 Commit: 58f2f08 — feat: enterprise SaaS premium UI/UX enhancements from enhancement guide
+
+---
+Task ID: ENHANCEMENT-GUIDE-2
+Agent: main (Z.ai Code)
+Task: Implement remaining missed enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+New Files (5):
+1. src/hooks/use-responsive.ts — responsive breakpoint detection (isMobile, isTablet, isDesktop, isWide, sidebarCollapsible)
+2. src/hooks/use-hover-3d.ts — 3D tilt effect on hover (perspective + rotateX/rotateY)
+3. src/components/shared/loading-sequence.tsx — progressive loading (skeleton → fade-in, 3 variants: card/list/map)
+4. src/components/landing/metrics-strip.tsx — horizontal animated metrics (7 stats with whileInView)
+5. src/components/dashboard/quick-actions.tsx — per-tab quick action toolbar + Export dropdown
+
+Enhanced Files (2):
+6. src/components/landing-page.tsx:
+   - MetricsStrip integrated after bento hero
+   - MarginalSeatsWatchlist: Risk Score badges (Critical/High/Medium/Low)
+7. src/components/dashboard.tsx:
+   - QuickActions toolbar above tab content
+   - Per-tab actions (Layers, Reset, Fullscreen, Export, Filter, Configure)
+
+Sections from guide now implemented:
+- §3.2.2 MetricsStrip ✅
+- §3.2.3 Enhanced MarginalSeatsWatchlist (risk scores) ✅
+- §4.4 Quick-Action Toolbar ✅
+- §8.4 useResponsive hook ✅
+- §9.2 useHover3D micro-interaction ✅
+- §9.3 LoadingSequence ✅
+
+Sections still pending (future phases):
+- §4.2 Vertical sidebar navigation (DashboardShell)
+- §5.2.5 Map search/geocode
+- §6.2.1 Camera presets for 3D map
+- §7.x All 19 module tab enhancements
+- §10.x Performance optimization
+- §11.x Enterprise features (auth, real-time, API gateway)
+
+Commit: 19c1ca3 — feat: Phase 2 enhancements

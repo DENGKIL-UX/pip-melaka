@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Layers, Save, Upload, Download, RefreshCw, Trash2, Pin, Sliders } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { DUN_SUMMARY, DUN_COALITION_COUNTS } from "@/lib/dun-summary";
 
 interface Scenario {
   id: string;
@@ -36,6 +37,68 @@ const STATUS_COLORS: Record<string, string> = {
 export function ScenarioTab() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // What-If Simulator state — reactive slider values
+  const [turnout, setTurnout] = useState(75);
+  const [swingFactor, setSwingFactor] = useState(8);
+  const [youthBoost, setYouthBoost] = useState(5);
+  const [seniorBoost, setSeniorBoost] = useState(3);
+  const [undecided, setUndecided] = useState(12);
+
+  // Dynamic projection model — recalculates when any slider changes
+  const projection = useMemo(() => {
+    // Base = PRN15 results (BN:21, PH:5, PN:2)
+    let bn = DUN_COALITION_COUNTS.BN;
+    let ph = DUN_COALITION_COUNTS.PH;
+    let pn = DUN_COALITION_COUNTS.PN;
+
+    // Swing factor: moves seats from BN → PN (each 3% = 1 seat)
+    const seatsFromSwing = Math.round(swingFactor / 3);
+    const actualSwing = Math.min(seatsFromSwing, bn);
+    bn -= actualSwing;
+    pn += actualSwing;
+
+    // Youth boost: favours PH (each 5% = 1 seat from largest non-PH)
+    const seatsFromYouth = Math.round(youthBoost / 5);
+    for (let i = 0; i < seatsFromYouth; i++) {
+      if (bn >= ph && bn > 0) { bn--; ph++; }
+      else if (pn >= ph && pn > 0) { pn--; ph++; }
+    }
+
+    // Senior boost: favours BN (each 4% = 1 seat)
+    const seatsFromSenior = Math.round(seniorBoost / 4);
+    for (let i = 0; i < seatsFromSenior; i++) {
+      if (ph >= pn && ph > 0) { ph--; bn++; }
+      else if (pn > 0) { pn--; bn++; }
+    }
+
+    // Turnout: <60% favours BN (incumbent), >85% favours PH
+    if (turnout < 60) {
+      const gain = Math.round((60 - turnout) / 5);
+      for (let i = 0; i < gain; i++) {
+        if (ph >= pn && ph > 0) { ph--; bn++; }
+        else if (pn > 0) { pn--; bn++; }
+      }
+    }
+    if (turnout > 85) {
+      const gain = Math.round((turnout - 85) / 5);
+      for (let i = 0; i < gain; i++) {
+        if (bn > 0) { bn--; ph++; }
+      }
+    }
+
+    // Undecided: creates ±uncertainty
+    const uncertaintySeats = Math.round(undecided / 5);
+
+    // Normalize to 28
+    const total = bn + ph + pn;
+    if (total !== 28) bn += 28 - total;
+    bn = Math.max(0, Math.min(28, bn));
+    ph = Math.max(0, Math.min(28, ph));
+    pn = Math.max(0, Math.min(28, pn));
+
+    return { bn, ph, pn, uncertaintySeats };
+  }, [turnout, swingFactor, youthBoost, seniorBoost, undecided]);
 
   useEffect(() => {
     // Load from localStorage (per archive's window.storage pattern)
@@ -145,7 +208,7 @@ export function ScenarioTab() {
       </CardContent>
     </Card>
 
-      {/* §7.12: Parameter sliders — interactive what-if controls */}
+      {/* §7.12: What-If Simulator — DYNAMIC projection with reactive sliders */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2"><Sliders className="h-4 w-4 text-mlk" /> What-If Simulator — Parameter Sliders</CardTitle>
@@ -153,11 +216,11 @@ export function ScenarioTab() {
         <CardContent>
           <div className="space-y-4">
             {[
-              { label: "Turnout %", value: 75, min: 40, max: 95, step: 1, unit: "%", color: "#C77B2C" },
-              { label: "Swing factor (BN→PN)", value: 8, min: 0, max: 30, step: 1, unit: "%", color: "#019C2D" },
-              { label: "Youth turnout boost", value: 5, min: 0, max: 25, step: 1, unit: "%", color: "#0ea5e9" },
-              { label: "Senior turnout boost", value: 3, min: 0, max: 20, step: 1, unit: "%", color: "#f59e0b" },
-              { label: "Undecided voters", value: 12, min: 0, max: 30, step: 1, unit: "%", color: "#6B7280" },
+              { label: "Turnout %", value: turnout, set: setTurnout, min: 40, max: 95, step: 1, unit: "%", color: "#C77B2C" },
+              { label: "Swing factor (BN→PN)", value: swingFactor, set: setSwingFactor, min: 0, max: 30, step: 1, unit: "%", color: "#019C2D" },
+              { label: "Youth turnout boost", value: youthBoost, set: setYouthBoost, min: 0, max: 25, step: 1, unit: "%", color: "#0ea5e9" },
+              { label: "Senior turnout boost", value: seniorBoost, set: setSeniorBoost, min: 0, max: 20, step: 1, unit: "%", color: "#f59e0b" },
+              { label: "Undecided voters", value: undecided, set: setUndecided, min: 0, max: 30, step: 1, unit: "%", color: "#6B7280" },
             ].map((param, i) => (
               <div key={i}>
                 <div className="flex items-center justify-between mb-1">
@@ -165,7 +228,8 @@ export function ScenarioTab() {
                   <span className="text-xs font-mono font-bold" style={{ color: param.color }}>{param.value}{param.unit}</span>
                 </div>
                 <Slider
-                  defaultValue={[param.value]}
+                  value={[param.value]}
+                  onValueChange={(v) => param.set(v[0])}
                   min={param.min}
                   max={param.max}
                   step={param.step}
@@ -177,22 +241,43 @@ export function ScenarioTab() {
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="rounded-md border border-mlk/20 p-2 text-center">
               <div className="text-[10px] text-muted-foreground">Projected BN</div>
-              <div className="text-lg font-bold" style={{ color: "#0B3D91" }}>16</div>
+              <div className="text-lg font-bold" style={{ color: "#0B3D91" }}>
+                {projection.bn}
+                {projection.uncertaintySeats > 0 && <span className="text-[10px] text-muted-foreground"> ±{projection.uncertaintySeats}</span>}
+              </div>
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
             <div className="rounded-md border border-mlk/20 p-2 text-center">
               <div className="text-[10px] text-muted-foreground">Projected PH</div>
-              <div className="text-lg font-bold" style={{ color: "#E22926" }}>8</div>
+              <div className="text-lg font-bold" style={{ color: "#E22926" }}>
+                {projection.ph}
+                {projection.uncertaintySeats > 0 && <span className="text-[10px] text-muted-foreground"> ±{projection.uncertaintySeats}</span>}
+              </div>
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
             <div className="rounded-md border border-mlk/20 p-2 text-center">
               <div className="text-[10px] text-muted-foreground">Projected PN</div>
-              <div className="text-lg font-bold" style={{ color: "#019C2D" }}>4</div>
+              <div className="text-lg font-bold" style={{ color: "#019C2D" }}>
+                {projection.pn}
+                {projection.uncertaintySeats > 0 && <span className="text-[10px] text-muted-foreground"> ±{projection.uncertaintySeats}</span>}
+              </div>
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
           </div>
+          {/* Change indicator — shows base vs projected */}
+          <div className="flex items-center justify-center gap-3 mt-3 text-[10px]">
+            <span className="text-muted-foreground">Base (PRN15): BN {DUN_COALITION_COUNTS.BN} / PH {DUN_COALITION_COUNTS.PH} / PN {DUN_COALITION_COUNTS.PN}</span>
+            <span className="text-mlk font-semibold">→</span>
+            <span className="font-semibold">
+              <span style={{ color: "#0B3D91" }}>BN {projection.bn}</span>
+              {" / "}
+              <span style={{ color: "#E22926" }}>PH {projection.ph}</span>
+              {" / "}
+              <span style={{ color: "#019C2D" }}>PN {projection.pn}</span>
+            </span>
+          </div>
           <div className="text-[9px] text-muted-foreground mt-2">
-            Sliders are interactive — adjust parameters to see projected seat counts. Projections use simplified swing model. Not a political prediction.
+            Sliders are interactive — seat counts update in real-time. Model: swing shifts BN→PN, youth favours PH, senior favours BN, low turnout favours BN, high turnout favours PH, undecided creates ±uncertainty. Not a political prediction.
           </div>
         </CardContent>
       </Card>

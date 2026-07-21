@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TrendingUp, TrendingDown, PlusCircle, MinusCircle, Info, Star, WifiOff, Grid3x3 } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Area, AreaChart, ComposedChart } from "recharts";
 import { DPT_FALLBACK } from "@/lib/fallback-data";
 
 interface DptData {
@@ -226,6 +226,74 @@ export function AnalysisTab() {
             urban in-migration; combined with the PRN15 BN landslide, indicates shifting voter base requiring re-canvass before GE16.
             DUN-level churn data (above) enables targeted voter registration monitoring at the constituency level.
           </div>
+        </CardContent>
+      </Card>
+
+      {/* §7.4: Forecast extension with 95% confidence interval shading */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> DPT Forecast — 6-month projection with 95% CI</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {(() => {
+            // Build forecast data from historical net churn
+            const histData = data.per_month.map((m) => ({ month: m.month, actual: m.net }));
+            const avgNet = histData.reduce((s, d) => s + d.actual, 0) / histData.length;
+            const stdDev = Math.sqrt(histData.reduce((s, d) => s + (d.actual - avgNet) ** 2, 0) / histData.length);
+            // Generate 6-month forecast
+            const forecastData = Array.from({ length: 6 }, (_, i) => {
+              const monthLabel = `F+${i + 1}`;
+              const forecast = avgNet * (1 + (i * 0.02)); // slight upward trend
+              const ci = stdDev * 1.96 * Math.sqrt(1 + i / histData.length); // widening CI
+              return {
+                month: monthLabel,
+                forecast: Math.round(forecast),
+                lower: Math.round(forecast - ci),
+                upper: Math.round(forecast + ci),
+              };
+            });
+            const combined = [...histData.map((d) => ({ ...d, forecast: null, lower: null, upper: null })), ...forecastData.map((d) => ({ ...d, actual: null }))];
+
+            return (
+              <>
+                <ResponsiveContainer width="100%" height={280}>
+                  <ComposedChart data={combined}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+                    <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+                    <Tooltip contentStyle={{ fontSize: 11 }} />
+                    <Legend wrapperStyle={{ fontSize: 10 }} />
+                    {/* CI shading */}
+                    <Area dataKey="upper" stroke="none" fill="#C77B2C" fillOpacity={0.08} name="95% CI upper" />
+                    <Area dataKey="lower" stroke="none" fill="#C77B2C" fillOpacity={0.08} name="95% CI lower" />
+                    {/* Actual line */}
+                    <Line dataKey="actual" stroke="#C77B2C" strokeWidth={2} dot={{ r: 3 }} name="Actual net churn" connectNulls={false} />
+                    {/* Forecast line (dashed) */}
+                    <Line dataKey="forecast" stroke="#0ea5e9" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} name="Forecast" connectNulls={false} />
+                    <ReferenceLine x="F+1" stroke="var(--border)" strokeDasharray="2 2" label={{ value: "Forecast →", position: "top", fontSize: 9, fill: "var(--muted-foreground)" }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-3 gap-2 mt-3 text-[10px]">
+                  <div className="rounded-md border border-mlk/20 p-2 text-center">
+                    <div className="text-muted-foreground">Avg monthly net</div>
+                    <div className="text-lg font-bold text-mlk">+{Math.round(avgNet).toLocaleString()}</div>
+                  </div>
+                  <div className="rounded-md border border-mlk/20 p-2 text-center">
+                    <div className="text-muted-foreground">Std deviation</div>
+                    <div className="text-lg font-bold text-amber-600">±{Math.round(stdDev).toLocaleString()}</div>
+                  </div>
+                  <div className="rounded-md border border-mlk/20 p-2 text-center">
+                    <div className="text-muted-foreground">6mo projected net</div>
+                    <div className="text-lg font-bold text-emerald-600">+{Math.round(avgNet * 6).toLocaleString()}</div>
+                  </div>
+                </div>
+                <div className="text-[9px] text-muted-foreground mt-2">
+                  Forecast uses simple linear extrapolation with widening 95% confidence interval (±1.96σ).
+                  Shaded area represents uncertainty range. Not a political prediction — purely demographic trend.
+                </div>
+              </>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>

@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Radar, Play, RefreshCw, Database, Filter, Globe2 } from "lucide-react";
+import { Radar, Play, RefreshCw, Database, Filter, Globe2, TrendingUp } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { PLATFORMS } from "@/lib/s2d-contracts";
 
 const PLATFORM_ICONS: Record<string, string> = { TIKTOK: "🎵", FACEBOOK: "📘", INSTAGRAM: "📷", THREADS: "🧵", NEWS: "📰", OTHER: "🔗" };
@@ -246,6 +247,35 @@ export function ScraperTab() {
             Per S2D-1B: Collection runs with raw/accepted/dedup'd/rejected counts.
             Per S2D-1C: Deduplication via exact URL, text fingerprint, near-duplicate similarity.
             Production: Set APIFY_API_TOKEN env var to enable live Apify collection. Sandbox: synthetic signals.
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* §7.9: Sentiment trend chart */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> Sentiment Trend — 14-day rolling</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={Array.from({ length: 14 }, (_, i) => {
+              const day = i + 1;
+              const positive = Math.round(45 + Math.sin(i / 3) * 15 + Math.random() * 5);
+              const negative = Math.round(30 + Math.cos(i / 4) * 10 + Math.random() * 5);
+              const neutral = 100 - positive - negative;
+              return { day: `D${day}`, positive, negative, neutral };
+            })}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+              <XAxis dataKey="day" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
+              <YAxis tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
+              <Tooltip contentStyle={{ fontSize: 11 }} />
+              <Area dataKey="positive" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.3} name="Positive" />
+              <Area dataKey="neutral" stackId="1" stroke="#C77B2C" fill="#C77B2C" fillOpacity={0.3} name="Neutral" />
+              <Area dataKey="negative" stackId="1" stroke="#EF4444" fill="#EF4444" fillOpacity={0.3} name="Negative" />
+            </AreaChart>
+          </ResponsiveContainer>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Synthetic data for demo. Production: populated from Apify collection runs with sentiment classification.
           </div>
         </CardContent>
       </Card>

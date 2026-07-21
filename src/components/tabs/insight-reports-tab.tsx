@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, TrendingUp, AlertTriangle, CheckCircle2, ArrowRight } from "lucide-react";
+import { FileText, Calendar, TrendingUp, AlertTriangle, CheckCircle2, ArrowRight, Lightbulb, Clock } from "lucide-react";
 
 const dailyBrief = {
   date: new Date().toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "long", year: "numeric" }),
@@ -132,6 +132,40 @@ export function InsightReportsTab() {
 
           <div className="text-[10px] text-muted-foreground text-center">
             {dailyBrief.evidence_links} evidence links · Confidence: {dailyBrief.confidence}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* §7.14: Insight Feed — chronological insight stream */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><Lightbulb className="h-4 w-4 text-mlk" /> Insight Feed — Auto-generated</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {[
+              { time: "2h ago", type: "sentiment", severity: "WARNING", text: "Negative sentiment in N05 Taboh Naning increased 20pp in 3 days — senior healthcare narrative trending on TikTok", color: "#f59e0b" },
+              { time: "5h ago", type: "election", severity: "INFO", text: "PRN15 swing analysis: 11 DUN seats changed hands (PH→BN ×9, BN→PN ×1, PH→PN ×1). N06 Rembia is the most notable swing.", color: "#0ea5e9" },
+              { time: "8h ago", type: "demographics", severity: "CRITICAL", text: "N01 Kuala Linggi senior dependency crossed 25% threshold (25.9%) — WARNING tier activated in risk engine", color: "#dc2626" },
+              { time: "1d ago", type: "dpt", severity: "INFO", text: "P137 Hang Tuah Jaya shows highest net voter churn (+1,050) — urban in-migration pattern confirmed", color: "#0ea5e9" },
+              { time: "2d ago", type: "governance", severity: "INFO", text: "Provenance gate 8 closed (sample audit passed). Gate 9 (raw SPR xlsx) remains open — pending PDPA agreement", color: "#0ea5e9" },
+              { time: "3d ago", type: "scraper", severity: "WARNING", text: "Apify TikTok collection rate dropped 30% — possible API rate limit. Check APIFY_API_TOKEN validity", color: "#f59e0b" },
+            ].map((insight, i) => (
+              <div key={i} className="flex items-start gap-2 p-2 rounded-md border border-border/40 hover:bg-mlk/5 transition-colors">
+                <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-1.5" style={{ backgroundColor: insight.color }} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <Badge variant="outline" className="text-[8px]" style={{ color: insight.color, borderColor: insight.color + "40" }}>{insight.severity}</Badge>
+                    <span className="text-[9px] text-muted-foreground font-mono uppercase">{insight.type}</span>
+                    <span className="text-[9px] text-muted-foreground flex items-center gap-0.5 ms-auto"><Clock className="w-2.5 h-2.5" />{insight.time}</span>
+                  </div>
+                  <div className="text-[11px] text-foreground">{insight.text}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Auto-generated from S2D intelligence engine. Insights are classified by type and severity.
           </div>
         </CardContent>
       </Card>

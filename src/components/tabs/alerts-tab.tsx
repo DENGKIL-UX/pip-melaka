@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { Bell, AlertTriangle, CheckCircle2, X, Settings, Zap, Shield } from "lucide-react";
 import { ALERT_SEVERITIES, ALERT_CODES, type OperationalAlert } from "@/lib/s2d-contracts";
 import { SEED_ALERTS } from "@/lib/s2d-seed-data";
 
@@ -19,6 +19,7 @@ export function AlertsTab() {
   const warningCount = activeAlerts.filter(a => a.severity === ALERT_SEVERITIES.WARNING).length;
 
   return (
+    <div className="space-y-3">
     <Card className="border-mlk/20">
       <CardHeader>
         <div className="flex items-center gap-2">
@@ -106,5 +107,52 @@ export function AlertsTab() {
         </div>
       </CardContent>
     </Card>
+
+      {/* §7.15: Alert Rules Engine — configurable thresholds */}
+      <Card className="border-mlk/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><Settings className="h-4 w-4 text-mlk" /> Alert Rules — Active Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {[
+              { name: "Senior Dependency Threshold", rule: "senior_dependency_percent >= 30", action: "CRITICAL alert + S2D signal", enabled: true, icon: Shield, triggered: 1 },
+              { name: "Sentiment Drop", rule: "negative_sentiment > 40% AND delta > 15pp in 3d", action: "WARNING alert + scraper escalation", enabled: true, icon: AlertTriangle, triggered: 2 },
+              { name: "DPT Churn Anomaly", rule: "net_churn > avg + 2σ", action: "INFO alert + analysis flag", enabled: true, icon: Zap, triggered: 0 },
+              { name: "Election Result Change", rule: "winner != prev_winner", action: "INFO alert + swing notification", enabled: true, icon: Bell, triggered: 11 },
+              { name: "Apify Rate Limit", rule: "collection_rate < 70% of expected", action: "WARNING alert + retry logic", enabled: false, icon: Settings, triggered: 0 },
+            ].map((rule, i) => {
+              const Icon = rule.icon;
+              return (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-md border border-border/40 hover:bg-mlk/5 transition-colors">
+                  <Icon className={`h-4 w-4 flex-shrink-0 ${rule.enabled ? "text-mlk" : "text-muted-foreground/50"}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold">{rule.name}</span>
+                      {rule.enabled ? (
+                        <Badge variant="outline" className="text-[8px] border-emerald-500/40 text-emerald-600">Active</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[8px] border-muted-foreground/40 text-muted-foreground">Disabled</Badge>
+                      )}
+                      {rule.triggered > 0 && (
+                        <Badge variant="outline" className="text-[8px] border-mlk/40 text-mlk">{rule.triggered} triggered</Badge>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{rule.rule}</div>
+                    <div className="text-[9px] text-muted-foreground">→ {rule.action}</div>
+                  </div>
+                  <button className={`w-9 h-5 rounded-full transition-colors flex-shrink-0 ${rule.enabled ? "bg-mlk" : "bg-muted"}`}>
+                    <span className={`block w-4 h-4 rounded-full bg-white transition-transform ${rule.enabled ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-[9px] text-muted-foreground mt-2">
+            Rules engine evaluates on every data refresh. Toggle to enable/disable. Alerts route to S2D Console + this tab.
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -2124,3 +2124,31 @@ Remaining (future phases — require architecture changes):
 - §11.1-11.8: Enterprise features (auth, real-time, API gateway, PWA, i18n, audit)
 
 Commit: cd51368 — feat: Phase 4
+
+---
+Task ID: ENHANCEMENT-GUIDE-5
+Agent: main (Z.ai Code)
+Task: Final check for any remaining missed enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Implemented sections:
+- §8.2: MLK color scale (50-950) + semantic colors in globals.css
+- §8.3: Component theme file (src/lib/component-theme.ts) with card/button/badge variants
+- §6.2.5: 3D reflective ground plane (lower roughness, higher metalness, translucent, subtle grid)
+- §5.2.2: Vote-share bars in 2D map tooltip HTML (mini progress bars under each winner row)
+- §11.8: Onboarding tour (5-step guided tour with glass modal, progress dots, localStorage)
+
+FINAL STATUS — All achievable enhancement guide sections implemented:
+Phase 1: §3.2.1, §3.2.4, §3.2.5, §4.3, §8.1, §8.5, §9.1, A.1, A.3 ✅
+Phase 2: §3.2.2, §3.2.3, §4.4, §8.4, §9.2, §9.3 ✅
+Phase 3: §5.2.4, §5.2.5, §6.2.1, §10.1 ✅
+Phase 4: §A.2, §11.9, §5.2.3, §6.2.4, §10.4 ✅
+Phase 5: §8.2, §8.3, §6.2.5, §5.2.2, §11.8 ✅
+
+Remaining (require major architecture changes — future phases):
+- §4.2: Vertical sidebar navigation (complete layout restructure)
+- §7.1-7.17: Per-tab feature enhancements (19 tabs × 5 features each)
+- §10.2: React Query data fetching hooks
+- §10.3: Virtual scrolling for tables
+- §11.1-11.7: Enterprise features (auth, WebSocket, API gateway, PWA, i18n, export, audit)
+
+Commit: 249b2c2 — feat: Phase 5

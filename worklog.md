@@ -2212,3 +2212,19 @@ Implemented sections:
 - §7.5: Risk Matrix 5×5 grid (probability=senior dependency, impact=voter density, DUN codes in cells)
 
 Commit: 18e924f — feat: Phase 7
+
+---
+Task ID: ENHANCEMENT-GUIDE-8
+Agent: main (Z.ai Code)
+Task: Implement remaining per-tab enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Implemented sections:
+- §7.3: Demographics radar chart (RadarChart with 3 dimensions: senior dep, gender bal, voter density)
+- §7.6: Compare tab third slot + auto-highlight best values in emerald green
+- §7.17: Governance data lineage DAG (7-stage vertical flow: SPR → Engine → Build → Runtime)
+
+FINAL STATUS — All feasible enhancement guide sections implemented across 8 phases:
+Phase 1-7: Previously completed ✅
+Phase 8: §7.3 Radar, §7.6 3-way compare, §7.17 Data lineage ✅
+
+Commit: b2a1f7e — feat: Phase 8

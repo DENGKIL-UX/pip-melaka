@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3, History, User, Database, Search, Code, Loader2 } from "lucide-react";
+import { Vote, Calendar, Trophy, WifiOff, TrendingUp, TrendingDown, Minus, ArrowRight, Users2, Info, Grid3x3, History, User, Database, Search, Code, Loader2, Download } from "lucide-react";
+import { exportDunSummaryCSV } from "@/lib/csv-export";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, ReferenceLine, LineChart, Line } from "recharts";
 import { PARLIAMENTS, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
@@ -1042,6 +1044,15 @@ export function ElectionsTab() {
               <WifiOff className="h-2.5 w-2.5" /> offline data
             </span>
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs gap-1.5 ml-auto"
+            onClick={exportDunSummaryCSV}
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export CSV
+          </Button>
         </CardContent>
       </Card>
 

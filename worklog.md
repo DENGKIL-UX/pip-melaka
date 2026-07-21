@@ -2252,3 +2252,28 @@ Remaining (require enterprise infrastructure — future work):
 - §11.10 Testing infrastructure
 
 Commit: ce35cc9 — feat: Phase 9
+
+---
+Task ID: ENHANCEMENT-GUIDE-10
+Agent: main (Z.ai Code)
+Task: Implement remaining per-tab enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Implemented sections:
+- §7.10: Public Communication template library (4 BM templates with categories)
+- §7.11: Incidents severity matrix (4×4 grid: severity × type)
+- §7.12: Scenarios parameter sliders (5 interactive what-if controls + projected seats)
+- §7.16: Dual-Layer layer blending (opacity slider + top signal cards)
+
+FINAL STATUS — All feasible enhancement guide sections implemented across 10 phases:
+Phase 1-9: Previously completed ✅
+Phase 10: §7.10 Templates, §7.11 Matrix, §7.12 Sliders, §7.16 Blending ✅
+
+Remaining (require enterprise infrastructure — future work):
+- §4.2 Vertical sidebar navigation (layout restructure)
+- §7.7-7.8 S2D Console/360 (WebSocket + iframe deep linking)
+- §7.13 Predictive (model performance tracking)
+- §10.3 Virtual scrolling (needs @tanstack/react-virtual)
+- §11.1-11.7 Enterprise (auth, WS, API, PWA, i18n, export, audit)
+- §11.10 Testing infrastructure (Vitest/Playwright/Storybook)
+
+Commit: 1186648 — feat: Phase 10

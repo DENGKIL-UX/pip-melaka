@@ -131,15 +131,11 @@ export function Map3DTab() {
     (async () => {
       try {
         const THREE: any = await import("three");
-        if (cancelled || !mountRef.current) {
-          console.log("[Map3DTab] Cancelled or no mount ref");
-          return;
-        }
+        if (cancelled || !mountRef.current) return;
 
         const mount = mountRef.current;
         const width = mount.clientWidth || 800;
         const height = 540;
-        console.log("[Map3DTab] Mount dimensions:", width, "x", height);
 
         // Fetch GeoJSON
         const [dunRes, parRes] = await Promise.all([
@@ -149,7 +145,6 @@ export function Map3DTab() {
         if (!dunRes.ok || !parRes.ok) throw new Error("Boundary fetch failed");
         const dunData: GeoJSONCollection = await dunRes.json();
         const parData: GeoJSONCollection = await parRes.json();
-        console.log("[Map3DTab] GeoJSON loaded:", dunData.features.length, "DUN,", parData.features.length, "parlimen");
 
         // ─── Scene ──────────────────────────────────────────────────────
         const scene = new THREE.Scene();
@@ -422,7 +417,6 @@ export function Map3DTab() {
 
         // Store refs for later updates
         sceneRef.current = { scene, camera, renderer, dunMeshes, parlimenLines, THREE };
-        console.log("[Map3DTab] Built", dunMeshes.length, "DUN meshes,", parlimenLines.length, "parlimen lines");
 
         setLoading(false);
 
@@ -509,11 +503,8 @@ export function Map3DTab() {
         window.addEventListener("resize", onResize);
 
         // ─── Animation loop ─────────────────────────────────────────────
-        let frameCount = 0;
         const animate = () => {
           if (cancelled) return;
-          frameCount++;
-          if (frameCount <= 3) console.log("[Map3DTab] Animation frame", frameCount);
 
           // Toggle parlimen line visibility
           parlimenLines.forEach((l) => { l.visible = showParlimenRef.current; });
@@ -524,7 +515,6 @@ export function Map3DTab() {
           animationId = requestAnimationFrame(animate);
         };
         animate();
-        console.log("[Map3DTab] Animation loop started");
 
         // Cleanup
         return () => {

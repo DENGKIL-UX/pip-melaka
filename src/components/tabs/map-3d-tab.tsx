@@ -131,7 +131,6 @@ export function Map3DTab() {
     (async () => {
       try {
         const THREE: any = await import("three");
-        const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
         if (cancelled || !mountRef.current) return;
 
         const mount = mountRef.current;
@@ -161,19 +160,64 @@ export function Map3DTab() {
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.shadowMap.type = THREE.PCFShadowMap; // PCFSoftShadowMap deprecated in r185
         mount.innerHTML = "";
         mount.appendChild(renderer.domElement);
 
-        // ─── Controls ───────────────────────────────────────────────────
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.08;
-        controls.minDistance = 25;
-        controls.maxDistance = 120;
-        controls.maxPolarAngle = Math.PI / 2.1; // Prevent going below the floor
-        controls.target.set(0, 5, 0);
-        controls.autoRotate = false;
+        // ─── Custom Camera Controls (spherical orbit) ───────────────────
+        // Replaces three/examples/jsm/controls/OrbitControls.js which causes
+        // "__name is not defined" on Cloudflare Workers due to esbuild helper
+        // not being available in the OpenNext bundle.
+        const cameraTarget = new THREE.Vector3(0, 5, 0);
+        const sphericalState = {
+          radius: 70,
+          theta: Math.PI / 4,   // azimuthal angle (horizontal)
+          phi: Math.PI / 3.5,   // polar angle (vertical, 0=top, PI/2=horizon)
+        };
+        const updateCamera = () => {
+          const r = sphericalState.radius;
+          const t = sphericalState.theta;
+          const p = sphericalState.phi;
+          camera.position.x = cameraTarget.x + r * Math.sin(p) * Math.sin(t);
+          camera.position.y = cameraTarget.y + r * Math.cos(p);
+          camera.position.z = cameraTarget.z + r * Math.sin(p) * Math.cos(t);
+          camera.lookAt(cameraTarget);
+        };
+        updateCamera();
+
+        // Mouse drag = rotate, scroll = zoom
+        let isDragging = false;
+        let prevX = 0, prevY = 0;
+        const onPointerDown = (e: PointerEvent) => {
+          isDragging = true;
+          prevX = e.clientX;
+          prevY = e.clientY;
+          renderer.domElement.style.cursor = "grabbing";
+        };
+        const onPointerUp = () => {
+          isDragging = false;
+          renderer.domElement.style.cursor = "grab";
+        };
+        const onPointerMoveDrag = (e: PointerEvent) => {
+          if (!isDragging) return;
+          const dx = e.clientX - prevX;
+          const dy = e.clientY - prevY;
+          sphericalState.theta -= dx * 0.008;
+          sphericalState.phi = Math.max(0.15, Math.min(Math.PI / 2.05, sphericalState.phi - dy * 0.008));
+          prevX = e.clientX;
+          prevY = e.clientY;
+          updateCamera();
+        };
+        const onWheel = (e: WheelEvent) => {
+          e.preventDefault();
+          sphericalState.radius = Math.max(25, Math.min(150, sphericalState.radius + e.deltaY * 0.05));
+          updateCamera();
+        };
+        renderer.domElement.style.cursor = "grab";
+        renderer.domElement.addEventListener("pointerdown", onPointerDown);
+        renderer.domElement.addEventListener("pointerup", onPointerUp);
+        renderer.domElement.addEventListener("pointermove", onPointerMoveDrag);
+        renderer.domElement.addEventListener("wheel", onWheel, { passive: false });
 
         // ─── Lighting ───────────────────────────────────────────────────
         scene.add(new THREE.AmbientLight(0xffffff, 0.4));
@@ -372,7 +416,7 @@ export function Map3DTab() {
         }
 
         // Store refs for later updates
-        sceneRef.current = { scene, camera, renderer, controls, dunMeshes, parlimenLines, THREE };
+        sceneRef.current = { scene, camera, renderer, dunMeshes, parlimenLines, THREE };
 
         setLoading(false);
 
@@ -461,7 +505,6 @@ export function Map3DTab() {
         // ─── Animation loop ─────────────────────────────────────────────
         const animate = () => {
           if (cancelled) return;
-          controls.update();
 
           // Toggle parlimen line visibility
           parlimenLines.forEach((l) => { l.visible = showParlimenRef.current; });
@@ -480,8 +523,11 @@ export function Map3DTab() {
           renderer.domElement.removeEventListener("pointermove", onPointerMove);
           renderer.domElement.removeEventListener("pointerleave", onPointerLeave);
           renderer.domElement.removeEventListener("click", onClick);
+          renderer.domElement.removeEventListener("pointerdown", onPointerDown);
+          renderer.domElement.removeEventListener("pointerup", onPointerUp);
+          renderer.domElement.removeEventListener("pointermove", onPointerMoveDrag);
+          renderer.domElement.removeEventListener("wheel", onWheel);
           window.removeEventListener("resize", onResize);
-          controls.dispose();
           renderer.dispose();
           // Dispose geometries + materials
           dunMeshes.forEach(({ mesh, edges, label }) => {
@@ -562,7 +608,7 @@ export function Map3DTab() {
             <div>
               <CardTitle className="text-base">3D Map — Three.js ({SCENARIO_LABELS[scenario]})</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Real DOSM kawasanku GeoJSON · 28 DUN extruded by margin · OrbitControls · Hover for results
+                Real DOSM kawasanku GeoJSON · 28 DUN extruded by margin · Drag to rotate · Hover for results
               </p>
             </div>
           </div>
@@ -781,7 +827,7 @@ export function Map3DTab() {
 
         <p className="text-[10px] text-muted-foreground/70 mt-3 text-center">
           Three.js r185 · Real DOSM kawasanku GeoJSON (28 DUN + 6 parlimen) · Equirectangular projection ·
-          Extruded by margin of victory · OrbitControls (drag/zoom/pan) · Raycaster hover + click
+          Extruded by margin of victory · Custom orbit controls (drag/zoom) · Raycaster hover + click
         </p>
       </CardContent>
     </Card>

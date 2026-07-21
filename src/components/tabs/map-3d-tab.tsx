@@ -246,12 +246,15 @@ export function Map3DTab() {
         dirLight.shadow.camera.bottom = -40;
         scene.add(dirLight);
 
-        // ─── Base plate (dark floor) ────────────────────────────────────
+        // ─── Base plate (dark floor with subtle reflection) ─────────────
+        // §6.2.5: Reflective/translucent ground with grid lines
         const floorGeo = new THREE.PlaneGeometry(120, 120);
         const floorMat = new THREE.MeshStandardMaterial({
           color: 0x111827,
-          roughness: 0.9,
-          metalness: 0.1,
+          roughness: 0.6,      // Lower roughness for slight reflectivity
+          metalness: 0.3,      // Higher metalness for subtle reflection
+          transparent: true,
+          opacity: 0.85,       // Slightly translucent for depth
         });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
@@ -259,10 +262,15 @@ export function Map3DTab() {
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Grid helper
+        // Grid helper — subtle grid for spatial reference
         const grid = new THREE.GridHelper(100, 50, 0x1e293b, 0x131c2e);
         grid.position.y = 0;
+        grid.material.transparent = true;
+        grid.material.opacity = 0.4;
         scene.add(grid);
+
+        // §6.2.5: Atmospheric fog for depth perception (already have fog, enhance)
+        scene.fog = new THREE.Fog(0x0a0f1e, 60, 180);
 
         // ─── Build DUN extrusions ───────────────────────────────────────
         const dunMeshes: Array<{

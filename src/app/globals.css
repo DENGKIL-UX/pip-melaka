@@ -41,6 +41,25 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* §8.2: MLK amber color scale (50–950) */
+  --color-mlk-50: #FEF7EE;
+  --color-mlk-100: #FDEBD4;
+  --color-mlk-200: #FBD4A8;
+  --color-mlk-300: #F8B773;
+  --color-mlk-400: #F4923E;
+  --color-mlk-500: #E97C1A;
+  --color-mlk-600: #C77B2C;
+  --color-mlk-700: #A55A1F;
+  --color-mlk-800: #844816;
+  --color-mlk-900: #6C3B12;
+  --color-mlk-950: #3B1D08;
+
+  /* §8.2: Semantic colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
 }
 
 :root {

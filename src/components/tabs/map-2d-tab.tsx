@@ -442,7 +442,12 @@ export function Map2DTab() {
             const stats = votes != null ? ` · ${votes.toLocaleString()}v` : "";
             const pctStr = pct != null ? ` · ${pct.toFixed(1)}%` : "";
             const marginStr = margin != null ? ` · margin ${margin.toFixed(1)}pp` : "";
-            return `<div style="font-size:10px;display:flex;align-items:center">${logoStr}<span style="color:${c};font-weight:600">${label}: ${winner}${partyStr}${stats}${pctStr}${marginStr}</span></div>${candStr}`;
+            // §5.2.2: Mini vote-share bar
+            const barWidth = pct != null ? Math.min(pct, 100) : 0;
+            const barStr = pct != null
+              ? `<div style="height:3px;width:100%;background:#e2e8f0;border-radius:2px;margin-top:2px;overflow:hidden"><div style="height:100%;width:${barWidth}%;background:${c};border-radius:2px"></div></div>`
+              : "";
+            return `<div style="font-size:10px;display:flex;align-items:center">${logoStr}<span style="color:${c};font-weight:600">${label}: ${winner}${partyStr}${stats}${pctStr}${marginStr}</span></div>${candStr}${barStr}`;
           };
 
           if (scen === "GE15") {

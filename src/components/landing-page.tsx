@@ -12,6 +12,7 @@ import { type PartyCode } from "@/lib/party-metadata";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { PartyLogo } from "@/components/shared/party-logo";
+import { OnboardingTour } from "@/components/shared/onboarding-tour";
 import { TrustSection } from "@/components/landing/trust-section";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { MetricsStrip } from "@/components/landing/metrics-strip";
@@ -1275,6 +1276,9 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
 
       {/* Enterprise SaaS Footer */}
       <SiteFooter />
+
+      {/* Onboarding tour — shows on first visit */}
+      <OnboardingTour onComplete={() => {}} />
     </div>
   );
 }

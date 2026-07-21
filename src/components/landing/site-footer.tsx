@@ -4,6 +4,7 @@
  * SiteFooter — enterprise SaaS footer with brand, links, and legal sections.
  */
 import { ShieldCheck, Database, Globe2 } from "lucide-react";
+import { LanguageToggle } from "@/lib/i18n";
 
 export function SiteFooter() {
   return (
@@ -24,6 +25,9 @@ export function SiteFooter() {
             <div className="flex items-center gap-2 mt-4 text-[10px] text-muted-foreground">
               <span className="pulse-dot" aria-hidden="true" />
               <span>All systems operational</span>
+            </div>
+            <div className="mt-3">
+              <LanguageToggle />
             </div>
           </div>
 

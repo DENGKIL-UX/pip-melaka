@@ -22,6 +22,7 @@ import { GovernanceTab } from "@/components/tabs/governance-tab";
 import { AssistantPanel } from "@/components/shared/assistant-panel";
 import { SelectedDunDrawer } from "@/components/shared/selected-dun-drawer";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageToggle } from "@/lib/i18n";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { ShortcutCheatSheet } from "@/components/shared/shortcut-cheat-sheet";
 
@@ -176,6 +177,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                 <Download className="h-3.5 w-3.5" />
                 <span className="hidden xl:inline">Export</span>
               </Button>
+              <LanguageToggle />
               <ThemeToggle />
             </div>
           </div>

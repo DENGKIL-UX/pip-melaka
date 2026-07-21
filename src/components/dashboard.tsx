@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -192,8 +193,16 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
           })}
         </nav>
 
-        {/* Tab content */}
-        <div key={activeTab} className="tab-slide-in">
+        {/* Tab content — animated transitions */}
+        <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="tab-slide-in"
+        >
         {activeTab === "map-2d" && <Map2DTab />}
         {activeTab === "map-3d" && <Map3DTab />}
         {activeTab === "s2d" && <S2DConsoleTab />}
@@ -213,7 +222,8 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "risk" && <RiskSocioeconomicTab />}
         {activeTab === "compare" && <CompareTab />}
         {activeTab === "governance" && <GovernanceTab />}
-        </div>
+        </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Footer */}

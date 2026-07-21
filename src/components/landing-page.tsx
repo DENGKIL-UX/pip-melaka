@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Building2, Layers3, Activity, ShieldAlert, RefreshCw, Clock, Database, CheckCircle2, Info, Landmark, Repeat2, AlertTriangle, TrendingDown, Trophy } from "lucide-react";
+import { ChevronRight, ChevronDown, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Building2, Layers3, Activity, ShieldAlert, RefreshCw, Clock, Database, CheckCircle2, Info, Landmark, Repeat2, AlertTriangle, TrendingDown, Trophy } from "lucide-react";
 import { PARLIAMENTS, TOTAL_DUN, TOTAL_VOTERS_P134, DISTRICTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, DUN_COALITION_COUNTS, DUN_DISTRICT_COUNTS, type DunSummary } from "@/lib/dun-summary";
 import { PARTY_COLORS } from "@/lib/party-colors";
@@ -12,6 +12,8 @@ import { type PartyCode } from "@/lib/party-metadata";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { PartyLogo } from "@/components/shared/party-logo";
+import { TrustSection } from "@/components/landing/trust-section";
+import { SiteFooter } from "@/components/landing/site-footer";
 import { Segmented } from "@/components/ui/segmented";
 import { PartyTag } from "@/components/ui/party-tag";
 import { useToast } from "@/hooks/use-toast";
@@ -1016,7 +1018,7 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
       <a href="#main" className="skip-link">Skip to main content</a>
 
       <main id="main" className="relative z-10 container mx-auto px-4 py-8 md:py-12 flex-1">
-        {/* Hero */}
+        {/* Hero — cinematic header */}
         <section className="text-center mb-10 md:mb-14">
           <AnimatePresence>
             {showHero && (
@@ -1036,9 +1038,43 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
                     Enter Dashboard <ChevronRight className="h-4 w-4 ms-1" aria-hidden="true" />
                   </Button>
                 </div>
+
+                {/* Live status bar */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="mt-10 glass rounded-full px-5 py-2.5 inline-flex items-center gap-3 text-xs text-muted-foreground"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className="pulse-dot" aria-hidden="true" />
+                    <span className="font-medium text-foreground">Systems Operational</span>
+                  </span>
+                  <span className="w-px h-3 bg-border" aria-hidden="true" />
+                  <span className="flex items-center gap-1">
+                    <RefreshCw className="w-3 h-3" aria-hidden="true" />
+                    <span>Updated {new Date().getHours()}h ago</span>
+                  </span>
+                  <span className="w-px h-3 bg-border" aria-hidden="true" />
+                  <span className="flex items-center gap-1">
+                    <Database className="w-3 h-3" aria-hidden="true" />
+                    <span>DOSM kawasanku 2026</span>
+                  </span>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.5 }}
+            className="mt-8 scroll-indicator"
+            aria-hidden="true"
+          >
+            <ChevronDown className="w-5 h-5 text-mlk/60 mx-auto" />
+          </motion.div>
         </section>
 
         {/* Bento hero grid */}
@@ -1217,13 +1253,13 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
             )}
           </AnimatePresence>
         </section>
+
+        {/* Trust & Provenance section */}
+        <TrustSection />
       </main>
 
-      {/* Footer — sticky to bottom */}
-      <footer className="relative z-10 text-center text-xs text-muted-foreground border-t border-mlk/20 py-6 mt-auto">
-        <p className="mb-1"><strong className="text-mlk">PIP-MLK</strong> · Political Intelligence Platform · Melaka</p>
-        <p>Real DOSM kawasanku GeoJSON · Leaflet 2D + Three.js 3D · PDPA Akta 709 compliant</p>
-      </footer>
+      {/* Enterprise SaaS Footer */}
+      <SiteFooter />
     </div>
   );
 }

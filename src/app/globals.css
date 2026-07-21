@@ -445,4 +445,181 @@
     stroke-width: 3 !important;
     filter: drop-shadow(0 0 6px rgba(199, 123, 44, 0.5));
   }
+
+  /* ═══ R10: Enterprise SaaS Premium Additions ═════════════════════════ */
+
+  /* Card stack effect — multiple cards with z-index stacking */
+  .card-stack {
+    position: relative;
+  }
+  .card-stack > * + * {
+    margin-top: -4px;
+  }
+  .card-stack > *:not(:first-child) {
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+  }
+
+  /* Data badge — compact, informative */
+  .data-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    background: rgba(199, 123, 44, 0.08);
+    color: #C77B2C;
+    border: 1px solid rgba(199, 123, 44, 0.15);
+  }
+
+  /* KPI card — data-dense metric display */
+  .kpi-card {
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+  .kpi-card:hover {
+    border-color: rgba(199, 123, 44, 0.3);
+    box-shadow: 0 4px 20px rgba(199, 123, 44, 0.08);
+  }
+
+  /* Divider with label */
+  .divider-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .divider-label::before,
+  .divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Metric comparison — side by side with delta */
+  .metric-compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+
+  /* Animated value */
+  .animated-value {
+    font-variant-numeric: tabular-nums;
+    transition: all 0.3s ease;
+  }
+
+  /* Premium card glow on hover */
+  .card-glow {
+    position: relative;
+    overflow: visible;
+  }
+  .card-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(199, 123, 44, 0.15), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .card-glow:hover::before {
+    opacity: 1;
+  }
+
+  /* Glass effect utility */
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(199, 123, 44, 0.18);
+  }
+  .dark .glass {
+    background: rgba(20, 20, 22, 0.55);
+    border-color: rgba(232, 155, 69, 0.22);
+  }
+
+  /* Premium heading treatment */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+
+  /* Data-dense tables */
+  .data-table {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  /* Pulse dot — live status indicator */
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    position: relative;
+  }
+  .pulse-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: #10B981;
+    opacity: 0.4;
+    animation: pulse-ring 1.6s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+
+  /* Scroll indicator bounce */
+  .scroll-indicator {
+    animation: scroll-bounce 2s ease-in-out infinite;
+  }
+  @keyframes scroll-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(8px); opacity: 1; }
+  }
+
+  /* Tab slide-in transition */
+  .tab-slide-in {
+    animation: tab-slide 0.25s ease-out;
+  }
+  @keyframes tab-slide {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Custom scrollbar — MLK themed */
+  .scrollbar-mlk {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(199, 123, 44, 0.3) transparent;
+  }
+  .scrollbar-mlk::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-mlk::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-mlk::-webkit-scrollbar-thumb {
+    background: rgba(199, 123, 44, 0.3);
+    border-radius: 3px;
+  }
+  .scrollbar-mlk::-webkit-scrollbar-thumb:hover {
+    background: rgba(199, 123, 44, 0.5);
+  }
 }

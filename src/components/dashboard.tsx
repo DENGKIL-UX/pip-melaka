@@ -90,6 +90,31 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
     seedIfEmpty();
   }, [seedIfEmpty]);
 
+  // Preload adjacent tab chunks for faster navigation (§10.1)
+  useEffect(() => {
+    const currentIdx = TABS.findIndex((t) => t.id === activeTab);
+    if (currentIdx === -1) return;
+    // Preload next and previous tab by triggering a no-op dynamic import hint
+    // The browser will prefetch the chunk without rendering the component
+    const preloadTab = (idx: number) => {
+      if (idx < 0 || idx >= TABS.length) return;
+      const tabId = TABS[idx].id;
+      // Use requestIdleCallback to avoid blocking
+      const ric = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 100));
+      ric(() => {
+        const link = document.createElement("link");
+        link.rel = "prefetch";
+        link.as = "script";
+        // The chunk URL pattern from Next.js webpack dev
+        link.href = `/_next/static/chunks/_app-pages-browser_src_components_tabs_${tabId.replace(/-/g, "")}_tsx.js`;
+        document.head.appendChild(link);
+        setTimeout(() => link.remove(), 5000);
+      });
+    };
+    preloadTab(currentIdx + 1);
+    preloadTab(currentIdx - 1);
+  }, [activeTab]);
+
   return (
     <div className="app-shell bg-background">
       <a href="#dashboard-main" className="skip-link">Skip to main content</a>

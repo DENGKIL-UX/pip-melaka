@@ -108,6 +108,7 @@ export function Map3DTab() {
   const mountRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<any>(null);
+  const cameraControlRef = useRef<{ sphericalState: any; updateCamera: () => void } | null>(null);
   const [scenario, setScenario] = useState<Scenario>("PRN15");
   const [playing, setPlaying] = useState(false);
   const [hoveredDun, setHoveredDun] = useState<DunSummary | null>(null);
@@ -186,6 +187,9 @@ export function Map3DTab() {
           camera.lookAt(cameraTarget);
         };
         updateCamera();
+
+        // Expose camera control for preset buttons
+        cameraControlRef.current = { sphericalState, updateCamera };
 
         // Mouse drag = rotate, scroll = zoom
         let isDragging = false;
@@ -695,6 +699,34 @@ export function Map3DTab() {
             role="img"
             aria-label="3D visualization of 28 Melaka DUN extrusions"
           />
+
+          {/* Camera presets — top-center */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10">
+            <div className="glass rounded-lg p-1 flex gap-0.5">
+              {[
+                { label: "Top", radius: 80, theta: 0, phi: 0.15 },
+                { label: "Iso", radius: 70, theta: Math.PI / 4, phi: Math.PI / 3.5 },
+                { label: "Side", radius: 65, theta: 0, phi: Math.PI / 2.2 },
+                { label: "Close", radius: 35, theta: Math.PI / 4, phi: Math.PI / 3 },
+              ].map((preset) => (
+                <button
+                  key={preset.label}
+                  onClick={() => {
+                    const cc = cameraControlRef.current;
+                    if (cc) {
+                      cc.sphericalState.radius = preset.radius;
+                      cc.sphericalState.theta = preset.theta;
+                      cc.sphericalState.phi = preset.phi;
+                      cc.updateCamera();
+                    }
+                  }}
+                  className="px-3 py-1 text-[10px] rounded-md hover:bg-mlk/20 text-slate-300 hover:text-mlk transition-colors font-medium"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Loading overlay */}
           {loading && (

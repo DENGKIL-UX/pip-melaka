@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Map as MapIcon, Layers, ChevronDown, ChevronUp, MousePointer2, RefreshCw } from "lucide-react";
+import { Map as MapIcon, MapPin, Layers, ChevronDown, ChevronUp, MousePointer2, RefreshCw, Search, Database, Building2, Users } from "lucide-react";
 import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
 import { MLK_CENTER, MLK_DEFAULT_ZOOM, PARLIAMENTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
@@ -159,7 +159,82 @@ export function Map2DTab() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { setSelectedParliament, setSelectedDun } = useDashboardStore();
+
+  // ─── Search logic ──────────────────────────────────────────────────────
+  interface SearchResult {
+    code: string;
+    name: string;
+    type: "DUN" | "Parlimen";
+    parlCode?: string;
+    dunCode?: string;
+  }
+
+  const searchResults = useMemo<SearchResult[]>(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    const results: SearchResult[] = [];
+
+    // Search DUNs
+    DUN_SUMMARY.forEach((d) => {
+      if (
+        d.dunName.toLowerCase().includes(q) ||
+        d.dunCodeLabel.toLowerCase().includes(q) ||
+        d.dunCode.includes(q)
+      ) {
+        results.push({
+          code: d.dunCodeLabel,
+          name: d.dunName,
+          type: "DUN",
+          parlCode: d.parliamentCode,
+          dunCode: d.dunCode,
+        });
+      }
+    });
+
+    // Search Parliaments
+    PARLIAMENTS.forEach((p) => {
+      if (
+        p.name.toLowerCase().includes(q) ||
+        p.code.includes(q) ||
+        `p${p.code}`.includes(q)
+      ) {
+        results.push({
+          code: `P${p.code}`,
+          name: p.name,
+          type: "Parlimen",
+          parlCode: p.code,
+        });
+      }
+    });
+
+    return results.slice(0, 8);
+  }, [searchQuery]);
+
+  const handleSearchSelect = useCallback((result: SearchResult) => {
+    if (result.parlCode) {
+      setSelectedParliament(result.parlCode);
+      if (result.dunCode) {
+        setSelectedDun({ parliament: result.parlCode, dun: result.dunCode, name: result.name });
+      }
+      // Fly to the DUN/parlimen on the map
+      const map = mapRef.current;
+      if (map) {
+        const dunLayer = layerRefs.current.dun;
+        if (dunLayer && result.dunCode) {
+          dunLayer.eachLayer((lyr: any) => {
+            const code = extractDunCode(lyr.feature?.properties?.code_dun);
+            if (code === result.dunCode) {
+              map.fitBounds(lyr.getBounds(), { padding: [40, 40], maxZoom: 14 });
+              lyr.openTooltip();
+            }
+          });
+        }
+      }
+    }
+    setSearchQuery("");
+  }, [setSelectedParliament, setSelectedDun]);
 
   // Ref to hold the latest scenario so tooltip closures always read the current value
   // (fixes critical bug: tooltips showed stale scenario data after switching PRN15→GE14)
@@ -603,7 +678,7 @@ export function Map2DTab() {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Legend */}
+        {/* Legend + Search */}
         <div className="flex items-center gap-3 mb-4 text-xs flex-wrap">
           <span className="text-muted-foreground flex items-center gap-1"><Layers className="h-3 w-3" /> Coalition:</span>
           {Object.entries(PARTY_COLORS).map(([code, color]) => (
@@ -612,14 +687,67 @@ export function Map2DTab() {
               {code}
             </span>
           ))}
-          <span className="text-muted-foreground ml-auto flex items-center gap-1">
-            <MousePointer2 className="h-3 w-3" /> Hover any boundary for results · Click to select
+          {/* Search input */}
+          <div className="relative ml-auto">
+            <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+            <input
+              type="text"
+              placeholder="Search DUN or Parliament…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-8 w-48 rounded-md border border-border/60 bg-card pl-8 pr-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:border-mlk/40 focus:ring-1 focus:ring-mlk/20 transition-colors"
+              aria-label="Search DUN or Parliament by name"
+            />
+            {searchResults.length > 0 && (
+              <div className="absolute top-10 right-0 z-[1001] w-64 rounded-lg border border-mlk/20 bg-card shadow-lg overflow-hidden max-h-64 overflow-y-auto scrollbar-mlk">
+                {searchResults.map((r) => (
+                  <button
+                    key={`${r.type}-${r.code}`}
+                    onClick={() => handleSearchSelect(r)}
+                    className="w-full text-left px-3 py-2 hover:bg-mlk/5 transition-colors border-b border-border/40 last:border-0 flex items-center gap-2"
+                  >
+                    <MapPin className="w-3 h-3 text-mlk flex-shrink-0" />
+                    <span className="font-mono text-[10px] text-mlk font-bold">{r.code}</span>
+                    <span className="text-xs font-medium truncate">{r.name}</span>
+                    <Badge variant="outline" className="text-[8px] ml-auto">{r.type}</Badge>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <span className="text-muted-foreground flex items-center gap-1">
+            <MousePointer2 className="h-3 w-3" /> Hover for results
           </span>
         </div>
 
         {/* Map container */}
         <div className="relative rounded-lg border border-border overflow-hidden" style={{ height: 540 }}>
           <div ref={containerRef} className="w-full h-full" style={{ background: "#e5e7eb" }} />
+
+          {/* Map statistics overlay — top-center floating pill */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] pointer-events-none">
+            <div className="glass rounded-full px-5 py-2 flex items-center gap-4 text-xs shadow-lg">
+              <span className="flex items-center gap-1">
+                <Building2 className="w-3 h-3 text-mlk" />
+                <span className="font-medium">6 Parliaments</span>
+              </span>
+              <span className="w-px h-3 bg-border/40" />
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-mlk" />
+                <span className="font-medium">28 DUN</span>
+              </span>
+              <span className="w-px h-3 bg-border/40" />
+              <span className="flex items-center gap-1">
+                <Users className="w-3 h-3 text-mlk" />
+                <span className="font-medium">71,415 Voters</span>
+              </span>
+              <span className="w-px h-3 bg-border/40" />
+              <span className="flex items-center gap-1">
+                <Database className="w-3 h-3 text-mlk" />
+                <span className="font-medium text-mlk">{scenario}</span>
+              </span>
+            </div>
+          </div>
 
           {/* Loading overlay */}
           {loading && (

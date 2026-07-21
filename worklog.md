@@ -2363,3 +2363,33 @@ changes (KV bindings, D1 database, Durable Objects) that would need
 wrangler.toml reconfiguration and potentially a different deployment target.
 
 Commit: e61036e — feat: Phase 11
+
+---
+Task ID: I18N-IMPLEMENTATION
+Agent: main (Z.ai Code)
+Task: Implement i18n (§11.5) — EN/BM language toggle
+
+Research finding: react-i18next (9.7k stars) is the most popular React i18n library, but the project already has next-intl installed. However, next-intl App Router integration requires [locale] segment routing + middleware changes that would break OpenNext on Cloudflare Workers.
+
+Decision: Implemented a lightweight client-side React Context i18n system instead — zero new packages, zero routing changes, 100% safe on CF Workers.
+
+New file: src/lib/i18n.tsx (267 lines)
+- I18nProvider: React Context wrapping entire app
+- useI18n() hook: { locale, setLocale, t(key) }
+- LanguageToggle: EN/BM segmented toggle button
+- 70+ translation keys in English + Bahasa Malaysia
+- localStorage persistence ('pip-mlk-locale')
+
+Integration:
+- layout.tsx: I18nProvider wraps children inside ThemeProvider
+- dashboard.tsx: LanguageToggle in header next to ThemeToggle
+- site-footer.tsx: LanguageToggle below 'systems operational' indicator
+
+Translation coverage:
+- Landing: hero, subtitle, status bar, trust section (PDPA, verification, auditable)
+- Dashboard: all 19 tab labels
+- Map: hover text, search, coalition labels
+- Common: loading, export, filter, refresh, close, skip, next, back
+- Onboarding: all 5 steps
+
+Commit: 22b1d3e — feat: i18n implementation

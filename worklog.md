@@ -1952,3 +1952,33 @@ Verification (production):
 - ✅ Seat classification shows "Moderate (5-20pp)" for N06
 
 Commit: d8cd44e — merge + fix(drawer): show election results + analytics for ALL 28 DUNs
+
+---
+Task ID: GLOBAL-BN-COLOR-LOGOS
+Agent: main (Z.ai Code)
+Task: Change BN color from light blue to dark blue globally, and make party logos global across all tabs/modules/landing (like Elections tab).
+
+Changes:
+
+1. BN Color Change (global):
+   - party-colors.ts: BN #0F7DC2 → #0B3D91 (dark blue)
+   - party-metadata.ts: BN coalition color → #0B3D91
+   - party-metadata.ts: BN component parties (UMNO, MCA, MIC) → #0B3D91
+   - landing-page.tsx: DunCompositionStrip now uses PARTY_COLORS.BN/PH/PN
+   - map-2d-tab.tsx: choropleth layer color → #0B3D91
+   - All components using PARTY_COLORS or coalitionColor() automatically inherit
+
+2. Party Logos (global — like Elections tab):
+   - Landing page PremiumDunCard: PartyLogo next to incumbent candidate
+   - Landing page MarginalSeatsWatchlist: PartyLogo next to incumbent
+   - SelectedDunDrawer ElectionResultCard: PartyLogo next to candidate
+   - 2D Map tooltip: <img> party logo in winnerRow HTML
+   - 3D Map tooltip: PartyLogo next to coalition/party info
+   - Overview tab: coalition PartyLogo on seat composition cards
+
+VLM Verification:
+- ✅ Dark blue BN color visible in progress bars and indicators
+- ✅ Party logos visible next to candidate names
+- ✅ Coalition colors: dark blue (BN), green (PN), red (PH)
+
+Commit: de702e2 — feat: global BN dark blue color + party logos across all tabs/modules/landing

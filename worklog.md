@@ -2152,3 +2152,52 @@ Remaining (require major architecture changes — future phases):
 - §11.1-11.7: Enterprise features (auth, WebSocket, API gateway, PWA, i18n, export, audit)
 
 Commit: 249b2c2 — feat: Phase 5
+
+---
+Task ID: ENHANCEMENT-GUIDE-6
+Agent: main (Z.ai Code)
+Task: Sync to 45730eb + implement remaining feasible enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Synced workspace to latest origin/main (46a220f) which includes Phases 1-5.
+Then implemented Phase 6 with remaining feasible sections:
+
+§A.4 — Enhanced DataTable component:
+- Sortable columns (click header to toggle asc/desc)
+- Global search filter with icon
+- Pagination (configurable page size, prev/next buttons)
+- Row click handler
+- Density toggle (compact h-7 / comfortable h-10)
+- Built on @tanstack/react-table + shadcn/ui styling
+
+§10.2 — React Query data fetching hooks:
+- 7 hooks: useElectionsData, useDunBoundaries, useParlimenBoundaries,
+  useDunIntelligence, useDashboardOverview, useS2dSignals, useAggregateContext
+- Each with appropriate stale times (30s-1hr) and gcTime (5min-24hr)
+- Retry with exponential backoff (3 retries, max 10s delay)
+
+§7.2 — Elections tab CSV export:
+- exportDunSummaryCSV() utility function
+- Exports all 28 DUNs with full PRN15+GE14 election data
+- CSV includes: DUN code, name, parliament, district, winner, party,
+  candidate, votes, vote%, margin%, swing, marginal, safe status
+- Export button added to Elections tab header
+
+New files:
+- src/components/shared/data-table.tsx (155 lines)
+- src/hooks/use-data.ts (118 lines)
+- src/lib/csv-export.ts (72 lines)
+
+Enhanced files:
+- src/components/tabs/elections-tab.tsx (Button import + Export CSV button)
+
+FINAL STATUS — All feasible enhancement guide sections implemented:
+Phase 1-5: All previously completed sections ✅
+Phase 6: §A.4 DataTable, §10.2 React Query hooks, §7.2 CSV export ✅
+
+Remaining (require major architecture changes):
+- §4.2: Vertical sidebar navigation
+- §7.1, §7.3-7.17: Per-tab feature enhancements
+- §10.3: Virtual scrolling (needs @tanstack/react-virtual)
+- §11.1-11.7: Enterprise features (auth, WebSocket, API gateway, PWA, i18n, export center, audit)
+
+Commit: e34b4ce — feat: Phase 6 — data table, React Query hooks, CSV export

@@ -306,7 +306,7 @@ function staticFallback(question: string): string {
   if (has(q, "prn15", "state election", "bn 21")) {
     return "PRN15 (20 Nov 2021): BN won 21/28 DUN seats — a landslide. PH won 5, PN won 2. BN regained the Melaka state government. [ElectionData.my]";
   }
-  if (has(q, "ge15", "pn 4", "parliament")) {
+  if (has(q, "ge15", "pn 3", "parliament")) {
     return "GE15 (19 Nov 2022): PN won 3 parliaments (P134, P136, P139). PH won 3 (P135, P137, P138). BN won 0. Melaka's parliamentary delegation split. [ElectionData.my]";
   }
   if (has(q, "senior", "taboh", "n05")) {

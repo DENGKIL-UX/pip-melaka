@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Building2, Layers3, Activity, ShieldAlert, RefreshCw, Clock, Database, CheckCircle2, Info, Landmark, Repeat2, AlertTriangle, TrendingDown, Trophy } from "lucide-react";
 import { PARLIAMENTS, TOTAL_DUN, TOTAL_VOTERS_P134, DISTRICTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, DUN_COALITION_COUNTS, DUN_DISTRICT_COUNTS, type DunSummary } from "@/lib/dun-summary";
+import { PARTY_COLORS } from "@/lib/party-colors";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { Segmented } from "@/components/ui/segmented";
@@ -332,7 +333,7 @@ function DunCoalitionFilterTabs({
               "px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-mlk",
               isActive
                 ? tab.id === "swing"
-                  ? "bg-mlk text-white shadow-sm"
+                  ? "bg-gradient-to-r from-mlk to-mlk-amber-dark text-white shadow-sm"
                   : "bg-mlk text-white shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
             )}
@@ -654,11 +655,16 @@ function BentoHero({ onEnter }: { onEnter: () => void }) {
  * in data freshness".
  */
 function DataFreshnessStrip() {
-  // Build-time timestamp — would be injected at build time in production.
-  // For now, compute relative to page load.
+  // Real build timestamp injected by next.config.ts at build time.
+  // Falls back to "just now" if env var is missing (dev mode without rebuild).
   const buildTime = useMemo(() => {
-    // In production this would be from build env. Use a fixed recent timestamp.
-    return new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 hours ago
+    const envTime = process.env.NEXT_PUBLIC_BUILD_TIME;
+    if (envTime) {
+      const parsed = new Date(envTime);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    // Fallback: treat as just-built (0 seconds ago)
+    return new Date();
   }, []);
 
   const [relativeTime, setRelativeTime] = useState("");
@@ -696,6 +702,137 @@ function DataFreshnessStrip() {
         Source: <span className="text-foreground font-medium">DOSM kawasanku 2026</span>
       </span>
     </div>
+  );
+}
+
+/**
+ * MarginalSeatsWatchlist — highlights the 6 DUN seats with <5pp margin.
+ *
+ * These are the seats most likely to flip in PRN16 (next state election).
+ * Shows: DUN code, name, incumbent, runner-up, margin, and a mini vote-share bar.
+ * Clicking any card enters the dashboard.
+ */
+function MarginalSeatsWatchlist({ onEnter }: { onEnter: () => void }) {
+  const marginalSeats = useMemo(() => {
+    return DUN_SUMMARY
+      .filter((d) => d.isMarginal)
+      .sort((a, b) => a.prn15.marginPct - b.prn15.marginPct); // tightest first
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-500/5 via-mlk/5 to-amber-500/5 p-5 md:p-6"
+    >
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              Marginal Seats Watchlist
+              <Badge variant="outline" className="text-[9px] border-red-500/40 text-red-600 dark:text-red-400">
+                {marginalSeats.length} seats
+              </Badge>
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              DUN seats with &lt;5pp victory margin — most likely to flip in PRN16
+            </p>
+          </div>
+        </div>
+        <InfoTooltip
+          label="What is a marginal seat?"
+          content={
+            <div>
+              <div className="font-semibold text-mlk mb-1">Marginal Seat (&lt;5pp margin)</div>
+              <div className="text-muted-foreground">
+                A seat where the winner&apos;s vote share minus the runner-up&apos;s is less than 5 percentage points.
+                These seats are statistically competitive and most likely to change hands in the next election.
+                Watchlist sorted by tightest margin first.
+              </div>
+            </div>
+          }
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {marginalSeats.map((dun, i) => {
+          const marginColor = dun.prn15.marginPct < 1 ? "#dc2626" : dun.prn15.marginPct < 3 ? "#f59e0b" : "#eab308";
+          const winnerColor = dun.prn15.coalition === "BN" ? PARTY_COLORS.BN : dun.prn15.coalition === "PH" ? PARTY_COLORS.PH : PARTY_COLORS.PN;
+          const runnerUpColor = dun.prn15.runnerUpCoalition === "BN" ? PARTY_COLORS.BN : dun.prn15.runnerUpCoalition === "PH" ? PARTY_COLORS.PH : PARTY_COLORS.PN;
+          return (
+            <motion.button
+              key={dun.dunCode}
+              type="button"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.4 + i * 0.05 }}
+              whileHover={{ y: -2 }}
+              onClick={onEnter}
+              className="group text-left rounded-xl border border-border/60 bg-card/80 hover:border-mlk/30 hover:shadow-md transition-all p-4 focus-mlk"
+              aria-label={`View ${dun.dunName} — marginal seat (${dun.prn15.marginPct.toFixed(1)}pp margin)`}
+            >
+              {/* Header — code + name + margin badge */}
+              <div className="flex items-start justify-between mb-2 gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[10px] font-bold text-mlk bg-mlk/10 px-1.5 py-0.5 rounded">
+                      {dun.dunCodeLabel}
+                    </span>
+                    <span className="font-mono text-[9px] text-muted-foreground">P{dun.parliamentCode}</span>
+                  </div>
+                  <h4 className="mt-1 text-sm font-semibold group-hover:text-mlk transition-colors truncate">
+                    {dun.dunName}
+                  </h4>
+                  <p className="text-[10px] text-muted-foreground">{dun.parliamentName} · {dun.district}</p>
+                </div>
+                <span
+                  className="font-mono text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap"
+                  style={{ color: marginColor, backgroundColor: `${marginColor}15` }}
+                >
+                  {dun.prn15.marginPct.toFixed(1)}pp
+                </span>
+              </div>
+
+              {/* Vote share bar — winner vs runner-up */}
+              <div className="mb-2">
+                <div className="flex h-2 rounded-full overflow-hidden bg-muted">
+                  <div
+                    className="h-full transition-all"
+                    style={{
+                      width: `${dun.prn15.votesPct}%`,
+                      backgroundColor: winnerColor,
+                    }}
+                  />
+                  <div
+                    className="h-full transition-all opacity-60"
+                    style={{
+                      width: `${Math.max(0, dun.prn15.votesPct - dun.prn15.marginPct)}%`,
+                      backgroundColor: runnerUpColor,
+                    }}
+                  />
+                </div>
+                <div className="flex items-center justify-between mt-1 text-[9px] text-muted-foreground">
+                  <span style={{ color: winnerColor }} className="font-medium">
+                    {dun.prn15.coalition} · {dun.prn15.party} ({dun.prn15.votesPct.toFixed(1)}%)
+                  </span>
+                  <span style={{ color: runnerUpColor }} className="font-medium">
+                    {dun.prn15.runnerUpCoalition} · {dun.prn15.runnerUpParty}
+                  </span>
+                </div>
+              </div>
+
+              {/* Incumbent */}
+              <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                <Trophy className="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" />
+                <span className="truncate" title={dun.prn15.candidate}>{dun.prn15.candidate}</span>
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
+    </motion.div>
   );
 }
 
@@ -904,8 +1041,13 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
         </section>
 
         {/* Data freshness strip */}
-        <section className="mb-12 md:mb-16">
+        <section className="mb-8 md:mb-10">
           <DataFreshnessStrip />
+        </section>
+
+        {/* Marginal Seats Watchlist — 6 DUN seats with <5pp margin */}
+        <section className="mb-8 md:mb-12" aria-label="Marginal seats watchlist">
+          <MarginalSeatsWatchlist onEnter={onEnter} />
         </section>
 
         {/* Seats section — Parliament / DUN segmented toggle */}

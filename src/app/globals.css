@@ -62,7 +62,6 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
   --ring: #C77B2C; /* MLK amber-gold focus ring */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -97,7 +96,6 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
   --ring: #E89B45; /* lighter MLK amber for dark mode */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -418,5 +416,33 @@
   .leaflet-control-zoom,
   .leaflet-control-scale {
     z-index: 500 !important;
+  }
+
+  /* ─── Leaflet SVG path hover effects ─────────────────────────────────── */
+  /* Smooth transitions for DUN/parlimen polygon hover */
+  .leaflet-interactive {
+    transition: fill-opacity 0.15s ease, stroke-width 0.15s ease, stroke 0.15s ease;
+    cursor: pointer;
+  }
+
+  /* DUN paths — highlight on hover with thicker border + brighter fill */
+  .mlk-dun-path.leaflet-interactive:hover {
+    fill-opacity: 0.9 !important;
+    stroke-width: 2.5 !important;
+    stroke: #C77B2C !important;
+  }
+
+  /* Parlimen paths — amber border highlight on hover */
+  .mlk-parl-path.leaflet-interactive:hover {
+    fill-opacity: 0.15 !important;
+    stroke-width: 4 !important;
+    stroke: #C77B2C !important;
+  }
+
+  /* Selected DUN — persistent highlight (set via Leaflet setStyle) */
+  .mlk-dun-path.leaflet-interactive.mlk-selected {
+    stroke: #C77B2C !important;
+    stroke-width: 3 !important;
+    filter: drop-shadow(0 0 6px rgba(199, 123, 44, 0.5));
   }
 }

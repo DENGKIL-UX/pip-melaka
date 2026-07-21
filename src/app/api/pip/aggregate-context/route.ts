@@ -36,10 +36,15 @@ const DUN_AGGREGATES: Record<string, {
   "05": { totalPopulation: 16000, totalRegisteredElectors: 13602, localityCount: 8, dmCount: 25, geographyMix: { urbanShare: 0.10, semiUrbanShare: 0.30, ruralShare: 0.60 }, ageBandShares: [{ label: "18-30", share: 0.16 }, { label: "31-40", share: 0.18 }, { label: "41-55", share: 0.25 }, { label: "56+", share: 0.41 }], broadPopulationSegments: [{ label: "B40", share: 0.65 }, { label: "M40", share: 0.28 }, { label: "T20", share: 0.07 }] },
 };
 
-function buildAggregateContext(level: string, code: string, parliamentCode?: string): PipAggregateContextInput {
+function buildAggregateContext(level: string, code: string, parliamentCode?: string): PipAggregateContextInput | null {
   const dunCode = level === "DUN" ? code.padStart(2, "0") : "01";
   const parlCode = parliamentCode || "134";
-  const aggregate = DUN_AGGREGATES[dunCode] || DUN_AGGREGATES["01"];
+  // Only P134 DUNs (01-05) have verified aggregate data. Return null for unknown
+  // DUNs so the caller gets a clear 404 instead of silently receiving N01's data.
+  const aggregate = DUN_AGGREGATES[dunCode];
+  if (!aggregate) {
+    return null;
+  }
 
   return {
     schema: "pip.constituency-aggregate-context.v1",
@@ -76,6 +81,15 @@ export const GET = withCORS(async (req: NextRequest) => {
   const parliamentCode = searchParams.get("parliamentCode") || undefined;
 
   const context = buildAggregateContext(level, code, parliamentCode);
+
+  // Return 404 for DUNs without verified aggregate data (N06-N28 pending raw SPR data)
+  if (!context) {
+    return NextResponse.json({
+      error: `No aggregate context available for ${level} ${code}.`,
+      detail: "Only P134 DUNs (N01–N05) have verified aggregate demographics. P135–P139 (N06–N28) are pending raw SPR voter data.",
+      availableCodes: ["01", "02", "03", "04", "05"],
+    }, { status: 404 });
+  }
   const validation = validatePipAggregateContext(context);
 
   if (!validation.valid) {

@@ -160,6 +160,13 @@ export function Map2DTab() {
   const [hovered, setHovered] = useState<string | null>(null);
   const { setSelectedParliament, setSelectedDun } = useDashboardStore();
 
+  // Ref to hold the latest scenario so tooltip closures always read the current value
+  // (fixes critical bug: tooltips showed stale scenario data after switching PRN15→GE14)
+  const scenarioRef = useRef<Scenario>(scenario);
+  useEffect(() => {
+    scenarioRef.current = scenario;
+  }, [scenario]);
+
   // Stable callback for applying layer visibility
   const applyLayerVisibility = useCallback(() => {
     const map = mapRef.current;
@@ -212,7 +219,11 @@ export function Map2DTab() {
           center: MLK_CENTER,
           zoom: MLK_DEFAULT_ZOOM,
           zoomControl: false,
-          preferCanvas: true,
+          // Use SVG renderer (default) instead of Canvas for better hover interactivity:
+          // - Per-path CSS :hover styles work (highlight on hover)
+          // - Sticky tooltips are smoother (no canvas repaint on mousemove)
+          // - 37 polygons is negligible for SVG performance
+          preferCanvas: false,
           minZoom: 8,
           maxZoom: 17,
         });
@@ -306,9 +317,9 @@ export function Map2DTab() {
         };
 
         const parLayer = L.geoJSON(parData as any, {
-          style: { color: "#f59e0b", weight: 3, fillOpacity: 0.05 },
+          style: { color: "#f59e0b", weight: 3, fillOpacity: 0.05, className: "mlk-parl-path" },
           onEachFeature: (feat, lyr) => {
-            lyr.bindTooltip(() => buildParlTooltip(feat as GeoJSONFeature, scenario), {
+            lyr.bindTooltip(() => buildParlTooltip(feat as GeoJSONFeature, scenarioRef.current), {
               sticky: true,
               className: "mlk-map-tooltip",
             });
@@ -383,8 +394,8 @@ export function Map2DTab() {
             const code = extractDunCode(feat?.properties?.code_dun);
             const dunSum = getDunByCode(code);
             const winner =
-              scenario === "PRN15" ? dunSum?.prn15.coalition :
-              scenario === "GE14" ? dunSum?.ge14.coalition :
+              scenarioRef.current === "PRN15" ? dunSum?.prn15.coalition :
+              scenarioRef.current === "GE14" ? dunSum?.ge14.coalition :
               null; // GE15 has no DUN
             const color = layers.choropleth ? coalitionColor(winner) : "#38bdf8";
             return {
@@ -392,10 +403,11 @@ export function Map2DTab() {
               weight: 1,
               fillColor: color,
               fillOpacity: layers.choropleth ? 0.7 : 0.2,
+              className: "mlk-dun-path",
             };
           },
           onEachFeature: (feat, lyr) => {
-            lyr.bindTooltip(() => buildDunTooltip(feat as GeoJSONFeature, scenario), {
+            lyr.bindTooltip(() => buildDunTooltip(feat as GeoJSONFeature, scenarioRef.current), {
               sticky: true,
               className: "mlk-map-tooltip",
             });
@@ -483,7 +495,8 @@ export function Map2DTab() {
     applyLayerVisibility();
   }, [applyLayerVisibility]);
 
-  // Update DUN choropleth + tooltips when scenario or choropleth toggle changes
+  // Update DUN choropleth colors when scenario or choropleth toggle changes.
+  // Tooltips read scenarioRef.current (always up-to-date), so no re-bind needed here.
   useEffect(() => {
     const dunLayer = layerRefs.current.dun;
     if (!dunLayer) return;
@@ -501,6 +514,12 @@ export function Map2DTab() {
         fillOpacity: layers.choropleth ? 0.7 : 0.2,
       };
     });
+
+    // Also update the GE15 parlimen layer if it exists
+    const ge15Layer = layerRefs.current.ge15;
+    if (ge15Layer && layers.ge15) {
+      ge15Layer.bringToFront();
+    }
   }, [scenario, layers.choropleth]);
 
   const toggle = (id: string) => {
@@ -509,7 +528,8 @@ export function Map2DTab() {
 
   const activeCount = Object.values(layers).filter(Boolean).length;
 
-  // Seat counts for current scenario (from DUN_SUMMARY)
+  // Seat counts for current scenario — computed from DUN_SUMMARY (PRN15/GE14)
+  // or from melaka-elections.json parliament_summary (GE15, since GE15 is federal-only)
   const seatCounts = useMemo(() => {
     const counts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
     if (scenario === "PRN15") {
@@ -517,8 +537,12 @@ export function Map2DTab() {
     } else if (scenario === "GE14") {
       DUN_SUMMARY.forEach((d) => { counts[d.ge14.coalition]++; });
     } else if (scenario === "GE15") {
-      // GE15 is parlimen-level — use known results
-      counts.PN = 3; counts.PH = 3; counts.BN = 0;
+      // GE15 is parlimen-level — derive from the 6 parliament results in DUN_SUMMARY
+      // (each parliament's ge15Winner field, set from melaka-elections.json)
+      PARLIAMENTS.forEach((p) => {
+        const winner = p.ge15Winner;
+        if (winner && winner in counts) counts[winner]++;
+      });
     }
     return counts;
   }, [scenario]);

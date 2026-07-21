@@ -56,8 +56,11 @@ jobs:
           key: prisma-${{ runner.os }}-${{ hashFiles('prisma/schema.prisma') }}
 
       # 1. Lint — ESLint with Next.js core-web-vitals + TypeScript configs.
+      #    NODE_OPTIONS increases the heap size to prevent OOM on large projects.
       - name: Lint
         run: bun run lint
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
 
       # 2. Type check — strict TypeScript compilation, no JS emit.
       #    Uses --skipLibCheck to avoid errors in third-party .d.ts files.

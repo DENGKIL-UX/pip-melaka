@@ -54,7 +54,7 @@ export const COALITIONS: Record<CoalitionCode, CoalitionMeta> = {
     name: "BN",
     fullName: "Barisan Nasional",
     uid: "001-BN",
-    color: "#0F7DC2",
+    color: "#0B3D91",  // Dark blue (BN official dacing blue)
     memberParties: ["UMNO", "MCA", "MIC"],
   },
   PH: {
@@ -95,7 +95,7 @@ export const PARTIES: Record<PartyCode, PartyMeta> = {
     fullName: "United Malays National Organisation",
     coalition: "BN",
     uid: "001-UMNO",
-    color: "#1660A8",
+    color: "#0B3D91",  // Dark blue (BN family)
     formed: 1946,
   },
   MCA: {
@@ -104,7 +104,7 @@ export const PARTIES: Record<PartyCode, PartyMeta> = {
     fullName: "Malaysian Chinese Association",
     coalition: "BN",
     uid: "003-MCA",
-    color: "#1B4F9C",
+    color: "#0B3D91",  // Dark blue (BN family)
     formed: 1949,
   },
   MIC: {
@@ -113,7 +113,7 @@ export const PARTIES: Record<PartyCode, PartyMeta> = {
     fullName: "Malaysian Indian Congress",
     coalition: "BN",
     uid: "002-MIC",
-    color: "#1E40AF",
+    color: "#0B3D91",  // Dark blue (BN family)
     formed: 1946,
   },
   // PH component parties

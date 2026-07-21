@@ -8,8 +8,10 @@ import { ChevronRight, ShieldCheck, Globe2, Vote, Users, TrendingUp, MapPin, Bui
 import { PARLIAMENTS, TOTAL_DUN, TOTAL_VOTERS_P134, DISTRICTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, DUN_COALITION_COUNTS, DUN_DISTRICT_COUNTS, type DunSummary } from "@/lib/dun-summary";
 import { PARTY_COLORS } from "@/lib/party-colors";
+import { type PartyCode } from "@/lib/party-metadata";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
+import { PartyLogo } from "@/components/shared/party-logo";
 import { Segmented } from "@/components/ui/segmented";
 import { PartyTag } from "@/components/ui/party-tag";
 import { useToast } from "@/hooks/use-toast";
@@ -243,8 +245,11 @@ function PremiumDunCard({
           <Trophy className="w-3 h-3 text-muted-foreground mt-0.5 flex-shrink-0" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Incumbent (PRN15 · 2021)</div>
-            <div className="text-xs font-medium truncate" title={prn15.candidate}>
-              {prn15.candidate}
+            <div className="flex items-center gap-1.5">
+              <PartyLogo party={prn15.party as PartyCode} size="xs" />
+              <div className="text-xs font-medium truncate" title={prn15.candidate}>
+                {prn15.candidate}
+              </div>
             </div>
             <div className="text-[10px] text-muted-foreground">
               <span className="font-mono">{prn15.party}</span> · {prn15.votes.toLocaleString()} votes ({prn15.votesPct.toFixed(1)}%)
@@ -401,9 +406,9 @@ function DistrictFilterTabs({
  */
 function DunCompositionStrip() {
   const segments = [
-    { code: "BN" as const, count: DUN_COALITION_COUNTS.BN, color: "#0F7DC2" },
-    { code: "PH" as const, count: DUN_COALITION_COUNTS.PH, color: "#E22926" },
-    { code: "PN" as const, count: DUN_COALITION_COUNTS.PN, color: "#019C2D" },
+    { code: "BN" as const, count: DUN_COALITION_COUNTS.BN, color: PARTY_COLORS.BN },
+    { code: "PH" as const, count: DUN_COALITION_COUNTS.PH, color: PARTY_COLORS.PH },
+    { code: "PN" as const, count: DUN_COALITION_COUNTS.PN, color: PARTY_COLORS.PN },
   ];
   const total = segments.reduce((s, x) => s + x.count, 0);
 
@@ -825,6 +830,7 @@ function MarginalSeatsWatchlist({ onEnter }: { onEnter: () => void }) {
 
               {/* Incumbent */}
               <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                <PartyLogo party={dun.prn15.party as PartyCode} size="xs" />
                 <Trophy className="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" />
                 <span className="truncate" title={dun.prn15.candidate}>{dun.prn15.candidate}</span>
               </div>

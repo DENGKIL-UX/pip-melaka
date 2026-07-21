@@ -1,7 +1,7 @@
 // ponytail: MLK — Coalition / party colors.
 
 export const PARTY_COLORS = {
-  BN: "#0F7DC2",
+  BN: "#0B3D91",  // Dark blue (BN official dacing blue)
   PH: "#E22926",
   PN: "#019C2D",
   OTH: "#6B7280",

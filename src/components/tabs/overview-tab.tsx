@@ -10,6 +10,7 @@ import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
 import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
 import { PartyTag, StatusTag } from "@/components/ui/party-tag";
+import { PartyLogo } from "@/components/shared/party-logo";
 import type { CoalitionCode } from "@/lib/party-metadata";
 
 // Build full DUN list from PARLIAMENTS + DUN_NAMES
@@ -192,15 +193,18 @@ export function OverviewTab() {
               return (
                 <>
                   <div className="grid grid-cols-3 gap-2 text-center mb-3">
-                    <div className="rounded-md border p-2" style={{ borderColor: PARTY_COLORS.BN + "60" }}>
+                    <div className="rounded-md border p-2 flex flex-col items-center gap-1" style={{ borderColor: PARTY_COLORS.BN + "60" }}>
+                      <PartyLogo coalition="BN" size="xs" />
                       <div className="text-lg font-bold" style={{ color: PARTY_COLORS.BN }}>{counts.BN}</div>
                       <div className="text-[10px] text-muted-foreground">BN</div>
                     </div>
-                    <div className="rounded-md border p-2" style={{ borderColor: PARTY_COLORS.PH + "60" }}>
+                    <div className="rounded-md border p-2 flex flex-col items-center gap-1" style={{ borderColor: PARTY_COLORS.PH + "60" }}>
+                      <PartyLogo coalition="PH" size="xs" />
                       <div className="text-lg font-bold" style={{ color: PARTY_COLORS.PH }}>{counts.PH}</div>
                       <div className="text-[10px] text-muted-foreground">PH</div>
                     </div>
-                    <div className="rounded-md border p-2" style={{ borderColor: PARTY_COLORS.PN + "60" }}>
+                    <div className="rounded-md border p-2 flex flex-col items-center gap-1" style={{ borderColor: PARTY_COLORS.PN + "60" }}>
+                      <PartyLogo coalition="PN" size="xs" />
                       <div className="text-lg font-bold" style={{ color: PARTY_COLORS.PN }}>{counts.PN}</div>
                       <div className="text-[10px] text-muted-foreground">PN</div>
                     </div>

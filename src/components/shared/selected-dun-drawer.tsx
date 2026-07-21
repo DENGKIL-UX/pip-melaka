@@ -11,6 +11,8 @@ import { useDashboardStore } from "@/stores/dashboard-store";
 import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
 import { getDunName, PARLIAMENTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
+import { type PartyCode } from "@/lib/party-metadata";
+import { PartyLogo } from "@/components/shared/party-logo";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -127,9 +129,12 @@ function ElectionResultCard({
           Swing: {prevCoalition} → {result.coalition}
         </div>
       )}
-      <div className="text-[10px] text-muted-foreground mb-1.5 truncate" title={result.candidate}>
-        <Trophy className="h-2.5 w-2.5 inline me-1" />
-        {result.candidate}
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <PartyLogo party={result.party as PartyCode} size="xs" />
+        <div className="text-[10px] text-muted-foreground truncate flex-1" title={result.candidate}>
+          <Trophy className="h-2.5 w-2.5 inline me-1" />
+          {result.candidate}
+        </div>
       </div>
       <div className="flex items-center gap-2 mb-1.5">
         <span className="text-[10px] font-mono text-muted-foreground">{result.party}</span>

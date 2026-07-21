@@ -8,6 +8,8 @@ import { Box, Play, Pause, RotateCcw, MousePointer2, Layers, ZoomIn } from "luci
 import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
 import { MLK_CENTER, PARLIAMENTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
+import { type PartyCode } from "@/lib/party-metadata";
+import { PartyLogo } from "@/components/shared/party-logo";
 import { useDashboardStore } from "@/stores/dashboard-store";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -758,14 +760,15 @@ export function Map3DTab() {
                   const swing = result.coalition !== otherResult.coalition;
                   return (
                     <div className="text-xs space-y-1">
-                      <div>
+                      <div className="flex items-center gap-1.5">
+                        <PartyLogo party={result.party as PartyCode} size="xs" />
                         <span className="text-slate-400">{scenario}: </span>
                         <span className="font-semibold" style={{ color: coalitionColor(result.coalition) }}>
                           {result.coalition}
                         </span>
                         <span className="text-slate-500"> ({result.party})</span>
                       </div>
-                      <div className="text-[10px] text-slate-400">{result.candidate}</div>
+                      <div className="text-[10px] text-slate-400 pl-6">{result.candidate}</div>
                       <div className="text-[10px] text-slate-500">
                         {result.votes.toLocaleString()} votes · {result.votesPct.toFixed(1)}% · margin {result.marginPct.toFixed(1)}pp
                       </div>

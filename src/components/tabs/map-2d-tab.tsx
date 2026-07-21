@@ -8,6 +8,7 @@ import { Map as MapIcon, Layers, ChevronDown, ChevronUp, MousePointer2, RefreshC
 import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
 import { MLK_CENTER, MLK_DEFAULT_ZOOM, PARLIAMENTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
+import { partyLogoUrl, type PartyCode } from "@/lib/party-metadata";
 import { useDashboardStore } from "@/stores/dashboard-store";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ const LAYERS: LayerDef[] = [
   { id: "adm2", label: "Districts (3)", group: "boundary", defaultOn: true, color: "#7dd3fc" },
   { id: "par", label: "Parlimen (6)", group: "electoral", defaultOn: true, color: "#f59e0b" },
   { id: "dun", label: "DUN (28)", group: "electoral", defaultOn: true, color: "#38bdf8" },
-  { id: "choropleth", label: "Winner choropleth", group: "data", defaultOn: true, color: "#0F7DC2" },
+  { id: "choropleth", label: "Winner choropleth", group: "data", defaultOn: true, color: "#0B3D91" },
   { id: "ge15", label: "GE15 parlimen", group: "data", defaultOn: false, color: "#019C2D" },
 ];
 
@@ -356,11 +357,12 @@ export function Map2DTab() {
             if (!winner) return `<div style="font-size:10px;color:#94a3b8">${label}: —</div>`;
             const c = coalitionColor(winner);
             const partyStr = party ? ` <span style="color:#475569">(${party})</span>` : "";
-            const candStr = cand ? `<div style="font-size:9px;color:#64748b">${cand}</div>` : "";
+            const logoStr = party ? `<img src="${partyLogoUrl(party as PartyCode)}" style="height:14px;width:14px;object-fit:contain;vertical-align:middle;margin-right:3px;border-radius:2px;background:#fff;padding:1px" onerror="this.style.display='none'" />` : "";
+            const candStr = cand ? `<div style="font-size:9px;color:#64748b;padding-left:17px">${cand}</div>` : "";
             const stats = votes != null ? ` · ${votes.toLocaleString()}v` : "";
             const pctStr = pct != null ? ` · ${pct.toFixed(1)}%` : "";
             const marginStr = margin != null ? ` · margin ${margin.toFixed(1)}pp` : "";
-            return `<div style="font-size:10px"><span style="color:${c};font-weight:600">${label}: ${winner}${partyStr}${stats}${pctStr}${marginStr}</span></div>${candStr}`;
+            return `<div style="font-size:10px;display:flex;align-items:center">${logoStr}<span style="color:${c};font-weight:600">${label}: ${winner}${partyStr}${stats}${pctStr}${marginStr}</span></div>${candStr}`;
           };
 
           if (scen === "GE15") {

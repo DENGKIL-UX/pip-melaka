@@ -622,4 +622,108 @@
   .scrollbar-mlk::-webkit-scrollbar-thumb:hover {
     background: rgba(199, 123, 44, 0.5);
   }
+
+  /* ═══ A.2: Animation Keyframes ═══════════════════════════════════════ */
+
+  /* Spin slow — 3s linear infinite */
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  /* Pulse fast — 1.5s cubic-bezier */
+  .animate-pulse-fast {
+    animation: pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulse-fast {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Bounce gentle — 2s infinite */
+  .animate-bounce-gentle {
+    animation: bounce-gentle 2s infinite;
+  }
+  @keyframes bounce-gentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Shimmer sweep — 3s linear infinite */
+  .animate-shimmer {
+    animation: shimmer-sweep 3s linear infinite;
+  }
+  @keyframes shimmer-sweep {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  /* Slide up — 0.3s ease-out */
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  @keyframes slide-up {
+    0% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Slide down — 0.3s ease-out */
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+  @keyframes slide-down {
+    0% { transform: translateY(-10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Scale in — 0.2s ease-out */
+  .animate-scale-in {
+    animation: scale-in-anim 0.2s ease-out;
+  }
+  @keyframes scale-in-anim {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Fade in — 0.3s ease-out */
+  .animate-fade-in {
+    animation: fade-in-anim 0.3s ease-out;
+  }
+  @keyframes fade-in-anim {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* Gradient pattern background */
+  .bg-grid-pattern {
+    background-image: radial-gradient(circle, rgba(199, 123, 44, 0.08) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* ═══ 11.9: Dark Mode Smooth Transition ═══════════════════════════════ */
+
+  /* Smooth 300ms theme transition on all elements */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 300ms;
+    transition-timing-function: ease;
+  }
+
+  /* But not for elements that have their own transitions (avoid overriding) */
+  .no-theme-transition,
+  .no-theme-transition *,
+  .leaflet-container,
+  .leaflet-container *,
+  canvas,
+  .framer-motion,
+  [data-framer-motion] {
+    transition: none !important;
+  }
+
+  /* Slightly warmer dark tones (not pure black) */
+  .dark {
+    --background: oklch(0.145 0 0);
+    --card: oklch(0.175 0.005 285);
+  }
 }

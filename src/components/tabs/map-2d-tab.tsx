@@ -308,10 +308,15 @@ export function Map2DTab() {
         mapRef.current = map;
 
         // Tile layer (CARTO Voyager — better contrast for boundaries)
+        // §10.4: Tile caching via crossOrigin + browser HTTP cache headers
         L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
           attribution: "&copy; OpenStreetMap &copy; CARTO",
           subdomains: "abcd",
           maxZoom: 19,
+          crossOrigin: true,           // Enable CORS for tile caching
+          keepBuffer: 4,               // Keep 4 tile rows/cols outside viewport for smooth panning
+          updateWhenZooming: false,    // Don't update tiles during zoom animation (reduces requests)
+          maxNativeZoom: 18,           // Don't request tiles above zoom 18 (use scaled tiles)
         }).addTo(map);
 
         // Fetch GeoJSON + elections data in parallel
@@ -831,6 +836,31 @@ export function Map2DTab() {
                     <div className="text-[9px] text-muted-foreground">{party}</div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Glass map legend — bottom-right */}
+          <div className="absolute bottom-3 right-3 z-[1000]">
+            <div className="glass rounded-lg p-3 text-xs shadow-lg min-w-[120px]">
+              <div className="font-semibold mb-2 text-foreground">{scenario} Winner</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: PARTY_COLORS.BN }} />
+                  <span>BN</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: PARTY_COLORS.PH }} />
+                  <span>PH</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: PARTY_COLORS.PN }} />
+                  <span>PN</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,#6B7280_2px,#6B7280_4px)]" />
+                  <span>No Data</span>
+                </div>
               </div>
             </div>
           </div>

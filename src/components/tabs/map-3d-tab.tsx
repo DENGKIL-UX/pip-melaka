@@ -10,6 +10,7 @@ import { MLK_CENTER, PARLIAMENTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
 import { type PartyCode } from "@/lib/party-metadata";
 import { PartyLogo } from "@/components/shared/party-logo";
+import { Slider } from "@/components/ui/slider";
 import { useDashboardStore } from "@/stores/dashboard-store";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -661,19 +662,44 @@ export function Map3DTab() {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Timeline scrubber */}
-        <div className="flex items-center gap-2 mb-4">
-          {SCENARIOS.map((s) => (
-            <button
-              key={s}
-              onClick={() => { setPlaying(false); setScenario(s); }}
-              className={`flex-1 rounded-md p-2 text-center transition-all ${
-                scenario === s ? "bg-mlk text-white shadow-md" : "bg-muted/30 hover:bg-muted/50"
-              }`}
+        {/* Timeline scrubber — enhanced with slider */}
+        <div className="mb-4">
+          <div className="flex items-center gap-3 mb-2">
+            {SCENARIOS.map((s, i) => (
+              <button
+                key={s}
+                onClick={() => { setPlaying(false); setScenario(s); }}
+                className={`flex-1 rounded-md p-2 text-center transition-all ${
+                  scenario === s ? "bg-mlk text-white shadow-md" : "bg-muted/30 hover:bg-muted/50"
+                }`}
+              >
+                <div className="text-xs font-semibold">{SCENARIO_LABELS[s]}</div>
+              </button>
+            ))}
+          </div>
+          {/* Slider for smooth timeline scrubbing */}
+          <div className="flex items-center gap-3 px-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 flex-shrink-0"
+              onClick={() => setPlaying((p) => !p)}
+              aria-label={playing ? "Pause" : "Play"}
             >
-              <div className="text-xs font-semibold">{SCENARIO_LABELS[s]}</div>
-            </button>
-          ))}
+              {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+            </Button>
+            <Slider
+              value={[SCENARIOS.indexOf(scenario)]}
+              onValueChange={([v]) => { setPlaying(false); setScenario(SCENARIOS[v]); }}
+              max={SCENARIOS.length - 1}
+              step={1}
+              className="flex-1"
+              aria-label="Timeline slider"
+            />
+            <div className="flex justify-between text-[9px] text-muted-foreground w-32 flex-shrink-0 text-right">
+              <span className="font-mono">{SCENARIO_LABELS[scenario]}</span>
+            </div>
+          </div>
         </div>
 
         {/* Legend */}

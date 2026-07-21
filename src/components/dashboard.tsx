@@ -58,30 +58,31 @@ const AlertsTab = dynamic(() => withRetry(() => import("@/components/tabs/alerts
 const DualLayerTab = dynamic(() => withRetry(() => import("@/components/tabs/dual-layer-tab").then((m) => ({ default: m.DualLayerTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Dual-Layer…</div> });
 const ScraperTab = dynamic(() => withRetry(() => import("@/components/tabs/scraper-tab").then((m) => ({ default: m.ScraperTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Scraper…</div> });
 
-const TABS: Array<{ id: DashboardTab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "map-2d", label: "2D Map", icon: MapIcon },
-  { id: "map-3d", label: "3D Map", icon: Box },
-  { id: "elections", label: "Elections", icon: Vote },
-  { id: "demographics", label: "Demographics", icon: Users },
-  { id: "analysis", label: "DPT Analysis", icon: TrendingUp },
-  { id: "risk", label: "Risk + Socio", icon: ShieldAlert },
-  { id: "compare", label: "Compare", icon: ArrowLeftRight },
-  { id: "s2d", label: "S2D Console", icon: Activity },
-  { id: "s2d-360", label: "S2D 360", icon: Brain },
-  { id: "scraper", label: "Scraper", icon: Radar },
-  { id: "public-comm", label: "Public Comm", icon: MessageSquare },
-  { id: "incidents", label: "Incidents", icon: AlertTriangle },
-  { id: "scenarios", label: "Scenarios", icon: Layers3 },
-  { id: "predictive", label: "Predictive", icon: Sparkle },
-  { id: "insights", label: "Insights", icon: FileText },
-  { id: "alerts", label: "Alerts", icon: Bell },
-  { id: "dual-layer", label: "Dual-Layer", icon: Layers3 },
-  { id: "governance", label: "Governance", icon: ShieldCheck },
+const TABS: Array<{ id: DashboardTab; label: string; i18nKey: string; icon: React.ComponentType<{ className?: string }> }> = [
+  { id: "overview", label: "Overview", i18nKey: "tab.overview", icon: LayoutDashboard },
+  { id: "map-2d", label: "2D Map", i18nKey: "tab.map2d", icon: MapIcon },
+  { id: "map-3d", label: "3D Map", i18nKey: "tab.map3d", icon: Box },
+  { id: "elections", label: "Elections", i18nKey: "tab.elections", icon: Vote },
+  { id: "demographics", label: "Demographics", i18nKey: "tab.demographics", icon: Users },
+  { id: "analysis", label: "DPT Analysis", i18nKey: "tab.analysis", icon: TrendingUp },
+  { id: "risk", label: "Risk + Socio", i18nKey: "tab.risk", icon: ShieldAlert },
+  { id: "compare", label: "Compare", i18nKey: "tab.compare", icon: ArrowLeftRight },
+  { id: "s2d", label: "S2D Console", i18nKey: "tab.s2d", icon: Activity },
+  { id: "s2d-360", label: "S2D 360", i18nKey: "tab.s2d360", icon: Brain },
+  { id: "scraper", label: "Scraper", i18nKey: "tab.scraper", icon: Radar },
+  { id: "public-comm", label: "Public Comm", i18nKey: "tab.publicComm", icon: MessageSquare },
+  { id: "incidents", label: "Incidents", i18nKey: "tab.incidents", icon: AlertTriangle },
+  { id: "scenarios", label: "Scenarios", i18nKey: "tab.scenarios", icon: Layers3 },
+  { id: "predictive", label: "Predictive", i18nKey: "tab.predictive", icon: Sparkle },
+  { id: "insights", label: "Insights", i18nKey: "tab.insights", icon: FileText },
+  { id: "alerts", label: "Alerts", i18nKey: "tab.alerts", icon: Bell },
+  { id: "dual-layer", label: "Dual-Layer", i18nKey: "tab.dualLayer", icon: Layers3 },
+  { id: "governance", label: "Governance", i18nKey: "tab.governance", icon: ShieldCheck },
 ];
 
 export function Dashboard({ onExit }: { onExit: () => void }) {
   const { activeTab, setActiveTab } = useDashboardStore();
+  const { t } = useI18n();
   const signalsCount = useS2DStore((s) => s.signals.filter(sig => sig.status !== "resolved").length);
   const loopStatus = useS2DStore((s) => s.loopStatus);
   const seedIfEmpty = useS2DStore((s) => s.seedIfEmpty);
@@ -193,7 +194,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
               const Icon = tab?.icon ?? LayoutDashboard;
               return <Icon className="h-6 w-6 text-mlk" aria-hidden="true" />;
             })()}
-            {TABS.find((t) => t.id === activeTab)?.label ?? "Overview"}
+            {TABS.find((t) => t.id === activeTab) ? t(TABS.find((t) => t.id === activeTab)!.i18nKey, TABS.find((t) => t.id === activeTab)?.label) : t("tab.overview", "Overview")}
           </h1>
         </div>
 
@@ -215,7 +216,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                 }`}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="hidden sm:inline">{t(tab.i18nKey, tab.label)}</span>
               </button>
             );
           })}

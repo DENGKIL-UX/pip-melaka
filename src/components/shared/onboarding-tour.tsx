@@ -13,41 +13,18 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { X, ChevronRight, ChevronLeft, CheckCircle2, MapPin, Vote, AlertTriangle, Brain } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
-const STEPS = [
-  {
-    icon: CheckCircle2,
-    title: "Welcome to PIP-MLK",
-    description: "Political Intelligence Platform for Melaka state. Truth Above All — 6 parliaments, 28 DUN, 3 elections with real DOSM kawasanku GeoJSON boundaries.",
-    color: "#C77B2C",
-  },
-  {
-    icon: MapPin,
-    title: "Interactive 2D & 3D Maps",
-    description: "Explore Melaka's 28 DUN and 6 parlimen boundaries on the 2D Leaflet map or the 3D Three.js extruded map. Hover for election results, click for detailed analytics.",
-    color: "#0ea5e9",
-  },
-  {
-    icon: Vote,
-    title: "Real Election Data",
-    description: "GE14 (2018), PRN15 (2021), and GE15 (2022) results from ElectionData.MY. See winners, margins, vote shares, and swing analysis for every seat.",
-    color: "#10B981",
-  },
-  {
-    icon: AlertTriangle,
-    title: "Marginal Seats Watchlist",
-    description: "6 DUN seats with <5pp victory margin — the most competitive seats most likely to flip in PRN16. Sorted by tightest margin with risk scores.",
-    color: "#EF4444",
-  },
-  {
-    icon: Brain,
-    title: "S2D Intelligence Engine",
-    description: "9-phase Sensing→Deciding→Acting loop with 56-page intelligence engine. Real-time signal feeds, scenario simulations, and predictive analytics.",
-    color: "#8B5CF6",
-  },
+const STEP_KEYS = [
+  { icon: CheckCircle2, titleKey: "onboarding.welcome.title", descKey: "onboarding.welcome.desc", color: "#C77B2C" },
+  { icon: MapPin, titleKey: "onboarding.maps.title", descKey: "onboarding.maps.desc", color: "#0ea5e9" },
+  { icon: Vote, titleKey: "onboarding.elections.title", descKey: "onboarding.elections.desc", color: "#10B981" },
+  { icon: AlertTriangle, titleKey: "onboarding.marginal.title", descKey: "onboarding.marginal.desc", color: "#EF4444" },
+  { icon: Brain, titleKey: "onboarding.s2d.title", descKey: "onboarding.s2d.desc", color: "#8B5CF6" },
 ];
 
 export function OnboardingTour({ onComplete }: { onComplete: () => void }) {
+  const { t } = useI18n();
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
 
@@ -62,7 +39,7 @@ export function OnboardingTour({ onComplete }: { onComplete: () => void }) {
   }, []);
 
   const handleNext = () => {
-    if (step < STEPS.length - 1) {
+    if (step < STEP_KEYS.length - 1) {
       setStep(step + 1);
     } else {
       handleComplete();
@@ -87,7 +64,7 @@ export function OnboardingTour({ onComplete }: { onComplete: () => void }) {
 
   if (!visible) return null;
 
-  const current = STEPS[step];
+  const current = STEP_KEYS[step];
   const Icon = current.icon;
 
   return (
@@ -125,14 +102,14 @@ export function OnboardingTour({ onComplete }: { onComplete: () => void }) {
           </div>
 
           {/* Step content */}
-          <h3 className="text-xl font-bold mb-2">{current.title}</h3>
+          <h3 className="text-xl font-bold mb-2">{t(current.titleKey)}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-            {current.description}
+            {t(current.descKey)}
           </p>
 
           {/* Progress dots */}
           <div className="flex items-center gap-1.5 mb-4">
-            {STEPS.map((_, i) => (
+            {STEP_KEYS.map((_, i) => (
               <div
                 key={i}
                 className="h-1.5 rounded-full transition-all duration-300"
@@ -148,7 +125,7 @@ export function OnboardingTour({ onComplete }: { onComplete: () => void }) {
           {/* Buttons */}
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              Step {step + 1} of {STEPS.length}
+              Step {step + 1} of {STEP_KEYS.length}
             </span>
             <div className="flex items-center gap-2">
               {step > 0 && (
@@ -162,8 +139,8 @@ export function OnboardingTour({ onComplete }: { onComplete: () => void }) {
                 onClick={handleNext}
                 className="bg-mlk text-white hover:bg-mlk/90 text-xs"
               >
-                {step === STEPS.length - 1 ? "Get Started" : "Next"}
-                {step < STEPS.length - 1 && <ChevronRight className="h-3.5 w-3.5 ms-1" />}
+                {step === STEP_KEYS.length - 1 ? t("common.getStarted", "Get Started") : t("common.next", "Next")}
+                {step < STEP_KEYS.length - 1 && <ChevronRight className="h-3.5 w-3.5 ms-1" />}
               </Button>
             </div>
           </div>

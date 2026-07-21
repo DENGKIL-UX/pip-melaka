@@ -13,6 +13,7 @@ import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { PartyLogo } from "@/components/shared/party-logo";
 import { OnboardingTour } from "@/components/shared/onboarding-tour";
+import { useI18n } from "@/lib/i18n";
 import { TrustSection } from "@/components/landing/trust-section";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { MetricsStrip } from "@/components/landing/metrics-strip";
@@ -910,6 +911,7 @@ function ParliamentFilterTabs({
 }
 
 export function LandingPage({ onEnter }: { onEnter: () => void }) {
+  const { t } = useI18n();
   const [showHero, setShowHero] = useState(false);
   const [filter, setFilter] = useState<FilterKind>("all");
   const [seatsView, setSeatsView] = useState<SeatsView>("parliament");
@@ -1038,17 +1040,17 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                 <Badge variant="outline" className="mb-4 border-mlk/40 text-mlk bg-mlk/5">
                   <ShieldCheck className="h-3 w-3 me-1" aria-hidden="true" />
-                  PIP-MLK · Political Intelligence Platform · Melaka
+                  {t("landing.badge")}
                 </Badge>
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
-                  <span className="bg-mlk-gradient bg-clip-text text-transparent text-mlk-glow">Truth Above All.</span>
+                  <span className="bg-mlk-gradient bg-clip-text text-transparent text-mlk-glow">{t("landing.hero")}</span>
                 </h1>
                 <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
-                  A public-facing political intelligence dashboard for Melaka state — 6 parliaments, 28 DUN, 3 elections. Real DOSM kawasanku GeoJSON boundaries. Build-time engine demographics. No PDPA-sensitive data ever shipped.
+                  {t("landing.subtitle")}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3 justify-center">
-                  <Button size="lg" onClick={handleEnter} className="bg-mlk text-white hover:bg-mlk-amber-dark text-base h-12 px-8" aria-label="Enter the PIP-MLK dashboard">
-                    Enter Dashboard <ChevronRight className="h-4 w-4 ms-1" aria-hidden="true" />
+                  <Button size="lg" onClick={handleEnter} className="bg-mlk text-white hover:bg-mlk-amber-dark text-base h-12 px-8" aria-label={t("landing.enterDashboard")}>
+                    {t("landing.enterDashboard")} <ChevronRight className="h-4 w-4 ms-1" aria-hidden="true" />
                   </Button>
                 </div>
 
@@ -1061,17 +1063,17 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
                 >
                   <span className="flex items-center gap-1.5">
                     <span className="pulse-dot" aria-hidden="true" />
-                    <span className="font-medium text-foreground">Systems Operational</span>
+                    <span className="font-medium text-foreground">{t("landing.systemsOperational")}</span>
                   </span>
                   <span className="w-px h-3 bg-border" aria-hidden="true" />
                   <span className="flex items-center gap-1">
                     <RefreshCw className="w-3 h-3" aria-hidden="true" />
-                    <span>Updated {new Date().getHours()}h ago</span>
+                    <span>{t("landing.updated")} {new Date().getHours()}h ago</span>
                   </span>
                   <span className="w-px h-3 bg-border" aria-hidden="true" />
                   <span className="flex items-center gap-1">
                     <Database className="w-3 h-3" aria-hidden="true" />
-                    <span>DOSM kawasanku 2026</span>
+                    <span>{t("landing.source")}</span>
                   </span>
                 </motion.div>
               </motion.div>

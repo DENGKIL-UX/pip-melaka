@@ -1927,3 +1927,28 @@ Stage Summary:
 Unresolved issues or risks:
 1. The 3D map chunk is dynamically imported — may need withRetry wrapper if the dev server OOMs (production CF Workers build is fine).
 2. The OrbitControls import path (`three/examples/jsm/controls/OrbitControls.js`) may need adjustment for different Three.js versions.
+
+---
+Task ID: DRAWER-FIX-1
+Agent: main (Z.ai Code)
+Task: Fix the DUN drawer showing no datasets/analytics when clicking DUNs on 2D and 3D maps.
+
+Root Cause:
+The SelectedDunDrawer component only fetched demographics from /data/p134/dun-intelligence.jsonl which contains data for only 5 DUNs (N01-N05 in P134). When clicking any other DUN (N06-N28), it showed "No demographics available" with NO election data at all — even though the election data for all 28 DUNs is available in DUN_SUMMARY (src/lib/dun-summary.ts).
+
+Fix:
+Rewrote SelectedDunDrawer to use DUN_SUMMARY as the primary data source:
+- Election Results section (ALL 28 DUNs): PRN15 + GE14 results with candidate, votes, vote%, margin, vote-share bars, and GE15 parlimen result
+- Analytics section (ALL 28 DUNs): Incumbent, margin of victory, swing direction, seat classification (Marginal/Moderate/Safe)
+- Demographics section (P134 N01-N05 only): Total voters, gender split, senior dependency, age distribution
+- "Demographics pending" notice for non-P134 DUNs with clear explanation
+- Evidence tier footer showing data provenance
+
+Verification (production):
+- ✅ Clicked N01 Kuala Linggi (P134) — shows full election results + demographics
+- ✅ Clicked N06 Rembia (P135) — shows election results + analytics + "Demographics pending" notice
+- ✅ Swing indicator shows "PH → BN" for N06 Rembia
+- ✅ Vote-share bars render with coalition colors
+- ✅ Seat classification shows "Moderate (5-20pp)" for N06
+
+Commit: d8cd44e — merge + fix(drawer): show election results + analytics for ALL 28 DUNs

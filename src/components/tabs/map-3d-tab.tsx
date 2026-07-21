@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Box, Play, Pause, RotateCcw } from "lucide-react";
-import { PARTY_COLORS } from "@/lib/party-colors";
-import { MLK_CENTER, getDunName } from "@/lib/melaka-constants";
+import { Box, Play, Pause, RotateCcw, MousePointer2, Layers, ZoomIn } from "lucide-react";
+import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
+import { MLK_CENTER, PARLIAMENTS } from "@/lib/melaka-constants";
+import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
 import { useDashboardStore } from "@/stores/dashboard-store";
+
+// ─── Types ─────────────────────────────────────────────────────────────────
 
 interface GeoJSONFeature {
   type: "Feature";
@@ -20,25 +23,25 @@ interface GeoJSONCollection {
   features: GeoJSONFeature[];
 }
 
-interface ElectionDoc {
-  elections: Array<{
-    id: string;
-    dun_results?: Array<{ parliament_code: string; dun_code: string; winner: string }>;
-    parliament_results?: Array<{ parliament_code: string; winner: string }>;
-  }>;
-}
+// ─── Constants ──────────────────────────────────────────────────────────────
 
-const SCENARIOS = ["GE14", "PRN15", "GE15", "PROJ_2026"] as const;
-type Scenario = typeof SCENARIOS[number];
+const SCENARIOS = ["GE14", "PRN15", "GE15"] as const;
+type Scenario = (typeof SCENARIOS)[number];
+
+const SCENARIO_LABELS: Record<Scenario, string> = {
+  GE14: "GE14 · 2018",
+  PRN15: "PRN15 · 2021",
+  GE15: "GE15 · 2022",
+};
 
 // Equirectangular projection centered on Melaka
 const PROJECTION = {
   lonCenter: MLK_CENTER[1],
   latCenter: MLK_CENTER[0],
-  scale: 200,
+  scale: 300,
 };
 
-function projectShape(lon: number, lat: number): [number, number] {
+function projectXY(lon: number, lat: number): [number, number] {
   return [
     (lon - PROJECTION.lonCenter) * PROJECTION.scale,
     (lat - PROJECTION.latCenter) * PROJECTION.scale,
@@ -53,202 +56,399 @@ function projectWorld(lon: number, lat: number, y: number): [number, number, num
   ];
 }
 
-// Get coordinates from GeoJSON geometry
-function getCoords(geometry: { type: string; coordinates: unknown }): number[][] {
+/** Extract all polygon rings from a GeoJSON geometry (handles MultiPolygon). */
+function getAllRings(geometry: { type: string; coordinates: unknown }): number[][][][] {
   if (geometry.type === "Polygon") {
-    return (geometry.coordinates as number[][][])[0];
+    return [geometry.coordinates as number[][][]];
   }
   if (geometry.type === "MultiPolygon") {
-    const polys = geometry.coordinates as number[][][][];
-    // Return the largest polygon
-    let largest = polys[0][0];
-    for (const poly of polys) {
-      if (poly[0].length > largest.length) largest = poly[0];
-    }
-    return largest;
+    return geometry.coordinates as number[][][][];
   }
   return [];
 }
 
-// Get centroid of coordinates
+/** Get the largest polygon's outer ring (for centroid + label placement). */
+function getMainRing(geometry: { type: string; coordinates: unknown }): number[][] {
+  const rings = getAllRings(geometry);
+  if (rings.length === 0) return [];
+  let largest = rings[0][0];
+  for (const ring of rings) {
+    if (ring[0].length > largest.length) largest = ring[0];
+  }
+  return largest;
+}
+
+/** Get centroid of a coordinate ring (for label placement). */
 function getCentroid(coords: number[][]): [number, number] {
   let lon = 0, lat = 0;
   for (const c of coords) { lon += c[0]; lat += c[1]; }
   return [lon / coords.length, lat / coords.length];
 }
 
+/** Coalition color or fallback grey. */
+function coalitionColor(coalition: string | null | undefined): string {
+  if (!coalition) return "#94A3B8";
+  return PARTY_COLORS[coalition as keyof typeof PARTY_COLORS] ?? "#6B7280";
+}
+
+/** Get the DUN winner for a scenario from DUN_SUMMARY (richer than elDoc). */
+function getDunWinnerForScenario(dun: DunSummary, scen: Scenario): string | null {
+  if (scen === "PRN15") return dun.prn15.coalition;
+  if (scen === "GE14") return dun.ge14.coalition;
+  // GE15 is federal-only — no DUN winner, show parlimen winner
+  const parl = PARLIAMENTS.find((p) => p.code === dun.parliamentCode);
+  return parl?.ge15Winner ?? null;
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
+
 export function Map3DTab() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<any>(null);
   const [scenario, setScenario] = useState<Scenario>("PRN15");
   const [playing, setPlaying] = useState(false);
-  const [hovered, setHovered] = useState<string | null>(null);
+  const [hoveredDun, setHoveredDun] = useState<DunSummary | null>(null);
+  const [showParlimen, setShowParlimen] = useState(true);
+  const [showLabels, setShowLabels] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const { setSelectedParliament, setSelectedDun } = useDashboardStore();
 
-  // Build Three.js scene
+  // Refs for values needed inside the Three.js effect
+  const scenarioRef = useRef<Scenario>(scenario);
+  useEffect(() => { scenarioRef.current = scenario; }, [scenario]);
+  const showParlimenRef = useRef(showParlimen);
+  useEffect(() => { showParlimenRef.current = showParlimen; }, [showParlimen]);
+  const showLabelsRef = useRef(showLabels);
+  useEffect(() => { showLabelsRef.current = showLabels; }, [showLabels]);
+
+  // ─── Initialize Three.js scene (runs once) ──────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    let animationId: number;
+    let animationId = 0;
 
     (async () => {
       try {
         const THREE: any = await import("three");
+        const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
         if (cancelled || !mountRef.current) return;
 
         const mount = mountRef.current;
         const width = mount.clientWidth;
-        const height = 500;
+        const height = 540;
 
-        // Fetch GeoJSON + elections
-        const [dunRes, elRes] = await Promise.all([
+        // Fetch GeoJSON
+        const [dunRes, parRes] = await Promise.all([
           fetch("/data/boundaries/mlk-dun-geo.json"),
-          fetch("/data/elections/melaka-elections.json"),
+          fetch("/data/boundaries/mlk-parlimen-geo.json"),
         ]);
+        if (!dunRes.ok || !parRes.ok) throw new Error("Boundary fetch failed");
         const dunData: GeoJSONCollection = await dunRes.json();
-        const elDoc: ElectionDoc = await elRes.json();
+        const parData: GeoJSONCollection = await parRes.json();
 
-        // Scene
+        // ─── Scene ──────────────────────────────────────────────────────
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0f172a);
-        scene.fog = new THREE.Fog(0x0f172a, 50, 150);
+        scene.background = new THREE.Color(0x0a0f1e);
+        scene.fog = new THREE.Fog(0x0a0f1e, 80, 200);
 
-        // Camera
-        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-        camera.position.set(0, 40, 50);
-        camera.lookAt(0, 0, 0);
+        // ─── Camera ─────────────────────────────────────────────────────
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(30, 45, 55);
 
-        // Renderer
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // ─── Renderer ───────────────────────────────────────────────────
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         mount.innerHTML = "";
         mount.appendChild(renderer.domElement);
 
-        // Lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(20, 40, 20);
+        // ─── Controls ───────────────────────────────────────────────────
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.minDistance = 25;
+        controls.maxDistance = 120;
+        controls.maxPolarAngle = Math.PI / 2.1; // Prevent going below the floor
+        controls.target.set(0, 5, 0);
+        controls.autoRotate = false;
+
+        // ─── Lighting ───────────────────────────────────────────────────
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+        const hemiLight = new THREE.HemisphereLight(0xffeedd, 0x1a1a2e, 0.5);
+        hemiLight.position.set(0, 50, 0);
+        scene.add(hemiLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        dirLight.position.set(30, 50, 25);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 150;
+        dirLight.shadow.camera.left = -40;
+        dirLight.shadow.camera.right = 40;
+        dirLight.shadow.camera.top = 40;
+        dirLight.shadow.camera.bottom = -40;
         scene.add(dirLight);
 
-        // Grid floor
-        const gridHelper = new THREE.GridHelper(80, 40, 0x334155, 0x1e293b);
-        scene.add(gridHelper);
+        // ─── Base plate (dark floor) ────────────────────────────────────
+        const floorGeo = new THREE.PlaneGeometry(120, 120);
+        const floorMat = new THREE.MeshStandardMaterial({
+          color: 0x111827,
+          roughness: 0.9,
+          metalness: 0.1,
+        });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -0.1;
+        floor.receiveShadow = true;
+        scene.add(floor);
 
-        // Build 28 DUN extrusions from real GeoJSON
-        const extrusions: Array<{ mesh: any; parliament: string; dun: string; baseHeight: number }> = [];
+        // Grid helper
+        const grid = new THREE.GridHelper(100, 50, 0x1e293b, 0x131c2e);
+        grid.position.y = 0;
+        scene.add(grid);
+
+        // ─── Build DUN extrusions ───────────────────────────────────────
+        const dunMeshes: Array<{
+          mesh: any;
+          edges: any;
+          label: any;
+          dun: DunSummary;
+          baseHeight: number;
+        }> = [];
+
+        // Compute height scale: margin of victory determines height
+        // Tighter margin = taller (more attention-grabbing)
+        // Safe seats (>20pp) = shorter
+        const heightForMargin = (marginPct: number): number => {
+          // Map 0pp→16, 5pp→12, 15pp→8, 30pp→5, 50pp→3
+          if (marginPct < 1) return 18; // Ultra-marginal
+          if (marginPct < 5) return 14; // Marginal
+          if (marginPct < 15) return 10; // Moderate
+          if (marginPct < 30) return 7; // Safe
+          return 4; // Fortress
+        };
 
         for (const feat of dunData.features) {
-          const coords = getCoords(feat.geometry);
-          if (coords.length < 3) continue;
-
           const code = String(feat.properties?.code_dun ?? "").replace("N.", "");
           const parlCode = String(feat.properties?.code_parlimen ?? "").replace("P.", "");
-          const dunName = String(feat.properties?.dun ?? "").replace(/N\.\d+\s/, "");
+          const dunName = String(feat.properties?.dun ?? "").replace(/^N\.\d+\s*/, "");
+          const dunSum = getDunByCode(code);
+          if (!dunSum) continue;
 
-          // Project coordinates to 2D XY
-          const shape2d = new THREE.Shape();
-          coords.forEach((c, i) => {
-            const [x, y] = projectShape(c[0], c[1]);
-            if (i === 0) shape2d.moveTo(x, y);
-            else shape2d.lineTo(x, y);
-          });
+          const rings = getAllRings(feat.geometry);
+          if (rings.length === 0) continue;
 
-          // Height based on voter count (P134 has real data, others use default)
-          const voters = parlCode === "134" ? 71415 : 50000;
-          const baseHeight = Math.max(2, (voters / 71415) * 12);
+          // Height based on PRN15 margin
+          const baseHeight = heightForMargin(dunSum.prn15.marginPct);
 
-          // Extrude
-          const geometry = new THREE.ExtrudeGeometry(shape2d, {
+          // Build a merged extrude geometry from all polygon rings
+          const shapes: any[] = [];
+          for (const ring of rings) {
+            const outer = ring[0];
+            if (outer.length < 3) continue;
+            const shape = new THREE.Shape();
+            outer.forEach((c, i) => {
+              const [x, y] = projectXY(c[0], c[1]);
+              if (i === 0) shape.moveTo(x, y);
+              else shape.lineTo(x, y);
+            });
+            // Add holes (inner rings) if any
+            for (let h = 1; h < ring.length; h++) {
+              const hole = new THREE.Path();
+              ring[h].forEach((c, i) => {
+                const [x, y] = projectXY(c[0], c[1]);
+                if (i === 0) hole.moveTo(x, y);
+                else hole.lineTo(x, y);
+              });
+              shape.holes.push(hole);
+            }
+            shapes.push(shape);
+          }
+
+          if (shapes.length === 0) continue;
+
+          // Create extrude geometry from the first (largest) shape
+          // For multiple shapes, we'd need mergeGeometries, but for simplicity
+          // use the largest and add the rest as separate meshes
+          const mainShape = shapes[0];
+          const geometry = new THREE.ExtrudeGeometry(mainShape, {
             depth: baseHeight,
-            bevelEnabled: false,
+            bevelEnabled: true,
+            bevelThickness: 0.3,
+            bevelSize: 0.3,
+            bevelSegments: 2,
           });
-          // Rotate -90°X to lie flat in world XZ
           geometry.rotateX(-Math.PI / 2);
 
-          const winner = getDunWinner(elDoc, parlCode, code, "PRN15");
-          const color = winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] ?? "#6B7280" : "#94A3B8";
+          const winner = getDunWinnerForScenario(dunSum, scenarioRef.current);
+          const color = coalitionColor(winner);
 
           const material = new THREE.MeshPhongMaterial({
             color: new THREE.Color(color),
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.88,
+            shininess: 30,
+            specular: 0x222222,
           });
           const mesh = new THREE.Mesh(geometry, material);
-          mesh.userData = { parliament: parlCode, dun: code, dunName, baseHeight };
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.userData = { dun: dunSum, type: "dun" };
           scene.add(mesh);
-          extrusions.push({ mesh, parliament: parlCode, dun: code, baseHeight });
+
+          // Edge outline for crisp boundaries
+          const edges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(geometry, 30),
+            new THREE.LineBasicMaterial({ color: 0x1a1a2e, linewidth: 1, transparent: true, opacity: 0.6 }),
+          );
+          scene.add(edges);
 
           // Label sprite
-          const [clon, clat] = getCentroid(coords);
-          const [cx, , cz] = projectWorld(clon, clat, baseHeight + 2);
+          const mainRing = getMainRing(feat.geometry);
+          const [clon, clat] = getCentroid(mainRing);
+          const [cx, , cz] = projectWorld(clon, clat, 0);
           const canvas = document.createElement("canvas");
-          canvas.width = 128;
-          canvas.height = 48;
+          canvas.width = 256;
+          canvas.height = 80;
           const ctx = canvas.getContext("2d")!;
-          ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
-          ctx.fillRect(0, 0, 128, 48);
-          ctx.fillStyle = "#C77B2C";
-          ctx.font = "bold 18px monospace";
+          ctx.fillStyle = "rgba(10, 15, 30, 0.85)";
+          ctx.fillRect(0, 0, 256, 80);
+          ctx.strokeStyle = MLK_ACCENT;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(1, 1, 254, 78);
+          ctx.fillStyle = MLK_ACCENT;
+          ctx.font = "bold 28px monospace";
           ctx.textAlign = "center";
-          ctx.fillText(`N${code}`, 64, 22);
+          ctx.fillText(dunSum.dunCodeLabel, 128, 36);
           ctx.fillStyle = "#e2e8f0";
-          ctx.font = "10px sans-serif";
-          ctx.fillText(dunName.slice(0, 16), 64, 38);
+          ctx.font = "16px sans-serif";
+          ctx.fillText(dunName.slice(0, 18), 128, 62);
           const texture = new THREE.CanvasTexture(canvas);
-          const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-          sprite.position.set(cx, baseHeight + 2, cz);
-          sprite.scale.set(5, 2, 1);
-          scene.add(sprite);
+          texture.minFilter = THREE.LinearFilter;
+          const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+          label.position.set(cx, baseHeight + 3, cz);
+          label.scale.set(6, 2.2, 1);
+          label.userData = { type: "label" };
+          scene.add(label);
+
+          dunMeshes.push({ mesh, edges, label, dun: dunSum, baseHeight });
         }
 
-        // Store refs
-        sceneRef.current = { scene, camera, renderer, extrusions, THREE, elDoc };
+        // ─── Parlimen wireframe overlay ─────────────────────────────────
+        const parlimenLines: any[] = [];
+        for (const feat of parData.features) {
+          const rings = getAllRings(feat.geometry);
+          for (const ring of rings) {
+            const outer = ring[0];
+            if (outer.length < 3) continue;
+            const points: number[] = [];
+            outer.forEach((c) => {
+              const [x, y] = projectXY(c[0], c[1]);
+              points.push(x, 0.5, -y);
+            });
+            // Close the loop
+            const first = projectXY(outer[0][0], outer[0][1]);
+            points.push(first[0], 0.5, -first[1]);
 
-        // Auto-rotate
-        let angle = 0;
-        const animate = () => {
-          if (cancelled) return;
-          angle += 0.002;
-          camera.position.x = Math.cos(angle) * 55;
-          camera.position.z = Math.sin(angle) * 55;
-          camera.lookAt(0, 5, 0);
-          renderer.render(scene, camera);
-          animationId = requestAnimationFrame(animate);
-        };
-        animate();
+            const lineGeo = new THREE.BufferGeometry();
+            lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
+            const lineMat = new THREE.LineBasicMaterial({
+              color: MLK_ACCENT,
+              linewidth: 2,
+              transparent: true,
+              opacity: 0.8,
+            });
+            const line = new THREE.Line(lineGeo, lineMat);
+            line.userData = { type: "parlimen" };
+            scene.add(line);
+            parlimenLines.push(line);
+          }
+        }
 
-        // Raycaster
+        // Store refs for later updates
+        sceneRef.current = { scene, camera, renderer, controls, dunMeshes, parlimenLines, THREE };
+
+        setLoading(false);
+
+        // ─── Raycaster for hover/click ──────────────────────────────────
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
-        const onMouseMove = (event: MouseEvent) => {
-          const rect = renderer.domElement.getBoundingClientRect();
-          pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-          pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-          raycaster.setFromCamera(pointer, camera);
-          const intersects = raycaster.intersectObjects(extrusions.map((e) => e.mesh));
-          if (intersects.length > 0) {
-            const ud = intersects[0].object.userData;
-            setHovered(`${ud.parliament}-${ud.dun}`);
-          } else {
-            setHovered(null);
-          }
-        };
-        const onMouseClick = (event: MouseEvent) => {
-          const rect = renderer.domElement.getBoundingClientRect();
-          pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-          pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-          raycaster.setFromCamera(pointer, camera);
-          const intersects = raycaster.intersectObjects(extrusions.map((e) => e.mesh));
-          if (intersects.length > 0) {
-            const ud = intersects[0].object.userData;
-            setSelectedParliament(ud.parliament);
-            setSelectedDun({ parliament: ud.parliament, dun: ud.dun, name: ud.dunName });
-          }
-        };
-        renderer.domElement.addEventListener("mousemove", onMouseMove);
-        renderer.domElement.addEventListener("click", onMouseClick);
+        let hoveredMesh: any = null;
 
-        // Resize
+        const onPointerMove = (event: MouseEvent) => {
+          const rect = renderer.domElement.getBoundingClientRect();
+          pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+          pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+          const intersects = raycaster.intersectObjects(dunMeshes.map((d) => d.mesh));
+
+          // Reset previous hover
+          if (hoveredMesh && (!intersects[0] || intersects[0].object !== hoveredMesh)) {
+            hoveredMesh.material.emissive?.setHex(0x000000);
+            hoveredMesh.material.opacity = 0.88;
+            hoveredMesh = null;
+            setHoveredDun(null);
+          }
+
+          if (intersects.length > 0) {
+            const mesh = intersects[0].object;
+            if (mesh !== hoveredMesh) {
+              hoveredMesh = mesh;
+              mesh.material.emissive = new THREE.Color(MLK_ACCENT);
+              mesh.material.emissiveIntensity = 0.3;
+              mesh.material.opacity = 1.0;
+              setHoveredDun(mesh.userData.dun as DunSummary);
+            }
+
+            // Update tooltip position
+            if (tooltipRef.current) {
+              tooltipRef.current.style.left = `${event.clientX - rect.left + 15}px`;
+              tooltipRef.current.style.top = `${event.clientY - rect.top + 15}px`;
+              tooltipRef.current.style.display = "block";
+            }
+          } else {
+            if (tooltipRef.current) {
+              tooltipRef.current.style.display = "none";
+            }
+          }
+        };
+
+        const onPointerLeave = () => {
+          if (hoveredMesh) {
+            hoveredMesh.material.emissive?.setHex(0x000000);
+            hoveredMesh.material.opacity = 0.88;
+            hoveredMesh = null;
+          }
+          setHoveredDun(null);
+          if (tooltipRef.current) {
+            tooltipRef.current.style.display = "none";
+          }
+        };
+
+        const onClick = (event: MouseEvent) => {
+          const rect = renderer.domElement.getBoundingClientRect();
+          pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+          pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+          const intersects = raycaster.intersectObjects(dunMeshes.map((d) => d.mesh));
+          if (intersects.length > 0) {
+            const ud = intersects[0].object.userData.dun as DunSummary;
+            setSelectedParliament(ud.parliamentCode);
+            setSelectedDun({ parliament: ud.parliamentCode, dun: ud.dunCode, name: ud.dunName });
+          }
+        };
+
+        renderer.domElement.addEventListener("pointermove", onPointerMove);
+        renderer.domElement.addEventListener("pointerleave", onPointerLeave);
+        renderer.domElement.addEventListener("click", onClick);
+
+        // ─── Resize handler ─────────────────────────────────────────────
         const onResize = () => {
           if (!mountRef.current) return;
           const w = mountRef.current.clientWidth;
@@ -258,34 +458,69 @@ export function Map3DTab() {
         };
         window.addEventListener("resize", onResize);
 
+        // ─── Animation loop ─────────────────────────────────────────────
+        const animate = () => {
+          if (cancelled) return;
+          controls.update();
+
+          // Toggle parlimen line visibility
+          parlimenLines.forEach((l) => { l.visible = showParlimenRef.current; });
+          // Toggle label visibility
+          dunMeshes.forEach((d) => { d.label.visible = showLabelsRef.current; });
+
+          renderer.render(scene, camera);
+          animationId = requestAnimationFrame(animate);
+        };
+        animate();
+
+        // Cleanup
         return () => {
           cancelled = true;
           cancelAnimationFrame(animationId);
-          renderer.domElement.removeEventListener("mousemove", onMouseMove);
-          renderer.domElement.removeEventListener("click", onMouseClick);
+          renderer.domElement.removeEventListener("pointermove", onPointerMove);
+          renderer.domElement.removeEventListener("pointerleave", onPointerLeave);
+          renderer.domElement.removeEventListener("click", onClick);
           window.removeEventListener("resize", onResize);
+          controls.dispose();
           renderer.dispose();
+          // Dispose geometries + materials
+          dunMeshes.forEach(({ mesh, edges, label }) => {
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+            edges.geometry.dispose();
+            edges.material.dispose();
+            label.material.map?.dispose();
+            label.material.dispose();
+          });
+          parlimenLines.forEach((l) => {
+            l.geometry.dispose();
+            l.material.dispose();
+          });
         };
-      } catch (e) {
-        console.error("3D map error:", e);
+      } catch (e: any) {
+        console.error("[Map3DTab] init error:", e);
+        setLoadError(e?.message ?? String(e));
+        setLoading(false);
       }
     })();
 
     return () => { cancelled = true; };
   }, []);
 
-  // Update colors when scenario changes
+  // ─── Update colors when scenario changes ────────────────────────────────
   useEffect(() => {
-    if (!sceneRef.current) return;
-    const { extrusions, elDoc } = sceneRef.current;
-    for (const ext of extrusions) {
-      const winner = getDunWinner(elDoc, ext.parliament, ext.dun, scenario);
-      const color = winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] ?? "#6B7280" : "#94A3B8";
-      ext.mesh.material.color.set(color);
+    const ctx = sceneRef.current;
+    if (!ctx) return;
+    const { dunMeshes, THREE } = ctx;
+    for (const { mesh, dun } of dunMeshes) {
+      const winner = getDunWinnerForScenario(dun, scenario);
+      const color = coalitionColor(winner);
+      mesh.material.color.set(color);
+      mesh.material.emissive?.setHex(0x000000);
     }
   }, [scenario]);
 
-  // Auto-play
+  // ─── Auto-play timeline ────────────────────────────────────────────────
   useEffect(() => {
     if (!playing) return;
     const interval = setInterval(() => {
@@ -293,19 +528,29 @@ export function Map3DTab() {
         const idx = SCENARIOS.indexOf(prev);
         return SCENARIOS[(idx + 1) % SCENARIOS.length];
       });
-    }, 2500);
+    }, 3000);
     return () => clearInterval(interval);
   }, [playing]);
 
-  // Seat counts
-  const seatCounts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
-  if (scenario === "PRN15") { seatCounts.BN = 21; seatCounts.PH = 5; seatCounts.PN = 2; }
-  else if (scenario === "GE14") { seatCounts.PH = 15; seatCounts.BN = 13; seatCounts.PN = 0; }
-  else if (scenario === "GE15") { seatCounts.PN = 3; seatCounts.PH = 3; seatCounts.BN = 0; }
-  else { seatCounts.BN = 18; seatCounts.PH = 6; seatCounts.PN = 4; } // PROJ_2026 estimate
+  // ─── Seat counts ────────────────────────────────────────────────────────
+  const seatCounts = useMemo(() => {
+    const counts: Record<string, number> = { BN: 0, PH: 0, PN: 0 };
+    if (scenario === "PRN15") {
+      DUN_SUMMARY.forEach((d) => { counts[d.prn15.coalition]++; });
+    } else if (scenario === "GE14") {
+      DUN_SUMMARY.forEach((d) => { counts[d.ge14.coalition]++; });
+    } else if (scenario === "GE15") {
+      PARLIAMENTS.forEach((p) => {
+        if (p.ge15Winner && p.ge15Winner in counts) counts[p.ge15Winner]++;
+      });
+    }
+    return counts;
+  }, [scenario]);
 
-  const SCENARIO_LABELS: Record<Scenario, string> = {
-    GE14: "GE14 2018", PRN15: "PRN15 2021", GE15: "GE15 2022", PROJ_2026: "PROJ 2026",
+  const handleRetry = () => {
+    setLoadError(null);
+    setLoading(true);
+    if (typeof window !== "undefined") window.location.reload();
   };
 
   return (
@@ -316,14 +561,48 @@ export function Map3DTab() {
             <Box className="h-5 w-5 text-mlk" />
             <div>
               <CardTitle className="text-base">3D Map — Three.js ({SCENARIO_LABELS[scenario]})</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">Real DOSM kawasanku DUN polygons · Extruded by voter count · 4-scenario timeline morph</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Real DOSM kawasanku GeoJSON · 28 DUN extruded by margin · OrbitControls · Hover for results
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPlaying((p) => !p)} aria-label={playing ? "Pause" : "Play"}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 text-xs ${showParlimen ? "text-mlk" : "text-muted-foreground"}`}
+              onClick={() => setShowParlimen((v) => !v)}
+              aria-label="Toggle parlimen overlay"
+            >
+              <Layers className="h-3.5 w-3.5 me-1" />
+              Parlimen
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 text-xs ${showLabels ? "text-mlk" : "text-muted-foreground"}`}
+              onClick={() => setShowLabels((v) => !v)}
+              aria-label="Toggle labels"
+            >
+              <MousePointer2 className="h-3.5 w-3.5 me-1" />
+              Labels
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setPlaying((p) => !p)}
+              aria-label={playing ? "Pause" : "Play"}
+            >
               {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setPlaying(false); setScenario("PRN15"); }} aria-label="Reset">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => { setPlaying(false); setScenario("PRN15"); }}
+              aria-label="Reset"
+            >
               <RotateCcw className="h-4 w-4" />
             </Button>
           </div>
@@ -345,60 +624,166 @@ export function Map3DTab() {
           ))}
         </div>
 
-        {/* 3D canvas */}
-        <div
-          ref={mountRef}
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 overflow-hidden"
-          style={{ height: 500 }}
-          role="img"
-          aria-label="3D visualization of 28 DUN extrusions from real GeoJSON"
-        />
-
-        {/* Hover tooltip */}
-        {hovered && (() => {
-          const [parlCode, dunCode] = hovered.split("-");
-          const winner = sceneRef.current?.elDoc
-            ? getDunWinner(sceneRef.current.elDoc, parlCode, dunCode, scenario)
-            : null;
-          return (
-            <div className="mt-2 rounded-md border border-mlk/30 bg-mlk/5 p-2 text-xs">
-              <span className="font-mono text-mlk font-bold">N{dunCode}</span>{" "}
-              <span className="font-medium">{getDunName(parlCode, dunCode)}</span>{" "}
-              <span className="text-muted-foreground">P{parlCode}</span>{" "}
-              <span className="font-mono" style={{ color: winner ? PARTY_COLORS[winner as keyof typeof PARTY_COLORS] : "#64748b" }}>{winner ?? "no data"}</span>
-            </div>
-          );
-        })()}
-
-        {/* Seat summary */}
-        <div className="grid grid-cols-3 gap-2 mt-4">
-          {Object.entries(seatCounts).map(([party, count]) => (
-            <div key={party} className="rounded-md border p-2 text-center" style={{ borderColor: PARTY_COLORS[party as keyof typeof PARTY_COLORS] + "40" }}>
-              <div className="text-lg font-bold" style={{ color: PARTY_COLORS[party as keyof typeof PARTY_COLORS] }}>{count}</div>
-              <div className="text-[10px] text-muted-foreground">{party} seats</div>
-            </div>
+        {/* Legend */}
+        <div className="flex items-center gap-3 mb-3 text-xs flex-wrap">
+          <span className="text-muted-foreground flex items-center gap-1"><Layers className="h-3 w-3" /> Coalition:</span>
+          {Object.entries(PARTY_COLORS).map(([code, color]) => (
+            <span key={code} className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+              {code}
+            </span>
           ))}
+          <span className="text-muted-foreground ml-auto flex items-center gap-1">
+            <ZoomIn className="h-3 w-3" /> Drag to rotate · Scroll to zoom · Click DUN to select
+          </span>
+        </div>
+
+        {/* 3D canvas container */}
+        <div className="relative rounded-lg border border-slate-700 overflow-hidden" style={{ height: 540 }}>
+          <div
+            ref={mountRef}
+            className="w-full h-full"
+            style={{ background: "#0a0f1e" }}
+            role="img"
+            aria-label="3D visualization of 28 Melaka DUN extrusions"
+          />
+
+          {/* Loading overlay */}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/50 backdrop-blur-sm z-10">
+              <div className="flex items-center gap-2 rounded-md bg-card px-3 py-2 text-sm shadow-md">
+                <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-mlk border-t-transparent" />
+                <span>Loading 3D map…</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error overlay */}
+          {loadError && !loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm z-10 p-4">
+              <div className="rounded-lg bg-card border border-red-500/30 p-4 text-sm shadow-lg max-w-md">
+                <div className="font-semibold text-red-500 mb-1">3D map failed to load</div>
+                <div className="text-xs text-muted-foreground mb-3 font-mono break-all">{loadError}</div>
+                <Button size="sm" onClick={handleRetry} className="h-7 text-xs">
+                  <RotateCcw className="h-3 w-3 me-1" /> Reload
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Floating tooltip */}
+          <div
+            ref={tooltipRef}
+            className="absolute pointer-events-none z-20 hidden"
+            style={{ display: "none" }}
+          >
+            {hoveredDun && (
+              <div className="rounded-lg border border-mlk/40 bg-slate-950/95 px-3 py-2 shadow-xl backdrop-blur min-w-[220px]">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-sm font-bold text-mlk">{hoveredDun.dunCodeLabel}</span>
+                  <span className="font-semibold text-white">{hoveredDun.dunName}</span>
+                </div>
+                <div className="text-[10px] text-slate-400 mb-2">{hoveredDun.parliamentName} · {hoveredDun.district}</div>
+                {(() => {
+                  const result = scenario === "PRN15" ? hoveredDun.prn15 : scenario === "GE14" ? hoveredDun.ge14 : null;
+                  if (!result) {
+                    // GE15 — show parlimen winner
+                    const parl = PARLIAMENTS.find((p) => p.code === hoveredDun.parliamentCode);
+                    return (
+                      <div className="text-xs">
+                        <div className="text-amber-400 mb-1">⚠ GE15 = federal only — no DUN ballot</div>
+                        <div>
+                          <span className="text-slate-400">GE15 Parlimen: </span>
+                          <span className="font-semibold" style={{ color: coalitionColor(parl?.ge15Winner) }}>
+                            {parl?.ge15Winner ?? "—"}
+                          </span>
+                        </div>
+                        <div className="mt-1 pt-1 border-t border-slate-700">
+                          <span className="text-slate-400">PRN15 DUN: </span>
+                          <span className="font-semibold" style={{ color: coalitionColor(hoveredDun.prn15.coalition) }}>
+                            {hoveredDun.prn15.coalition}
+                          </span>
+                          <span className="text-slate-500"> ({hoveredDun.prn15.party})</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  const otherResult = scenario === "PRN15" ? hoveredDun.ge14 : hoveredDun.prn15;
+                  const swing = result.coalition !== otherResult.coalition;
+                  return (
+                    <div className="text-xs space-y-1">
+                      <div>
+                        <span className="text-slate-400">{scenario}: </span>
+                        <span className="font-semibold" style={{ color: coalitionColor(result.coalition) }}>
+                          {result.coalition}
+                        </span>
+                        <span className="text-slate-500"> ({result.party})</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400">{result.candidate}</div>
+                      <div className="text-[10px] text-slate-500">
+                        {result.votes.toLocaleString()} votes · {result.votesPct.toFixed(1)}% · margin {result.marginPct.toFixed(1)}pp
+                      </div>
+                      {swing && (
+                        <div className="text-[10px] text-mlk font-semibold">
+                          ⟳ Swing: {otherResult.coalition} → {result.coalition}
+                        </div>
+                      )}
+                      {hoveredDun.isMarginal && (
+                        <div className="text-[10px] text-red-400 font-semibold">⚠ Marginal seat (&lt;5pp)</div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+
+          {/* Seat summary — bottom-left */}
+          <div className="absolute bottom-3 left-3 z-10">
+            <div className="rounded-lg border border-mlk/30 bg-slate-950/90 px-3 py-2 shadow-lg backdrop-blur">
+              <div className="text-[10px] text-slate-400 uppercase mb-1">{scenario} {scenario === "GE15" ? "parlimen" : "DUN"} seats</div>
+              <div className="flex gap-3">
+                {Object.entries(seatCounts).map(([party, count]) => (
+                  <div key={party} className="text-center">
+                    <div className="text-lg font-bold" style={{ color: coalitionColor(party) }}>{count}</div>
+                    <div className="text-[9px] text-slate-400">{party}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Height legend — bottom-right */}
+          <div className="absolute bottom-3 right-3 z-10">
+            <div className="rounded-lg border border-mlk/30 bg-slate-950/90 px-3 py-2 shadow-lg backdrop-blur">
+              <div className="text-[10px] text-slate-400 uppercase mb-1">Height = Margin</div>
+              <div className="flex items-end gap-1">
+                <div className="flex flex-col items-center">
+                  <div className="w-3 bg-emerald-500" style={{ height: 8 }} />
+                  <div className="text-[8px] text-slate-400 mt-0.5">Safe</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-3 bg-amber-500" style={{ height: 14 }} />
+                  <div className="text-[8px] text-slate-400 mt-0.5">Mod.</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-3 bg-orange-500" style={{ height: 18 }} />
+                  <div className="text-[8px] text-slate-400 mt-0.5">Marg.</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-3 bg-red-500" style={{ height: 24 }} />
+                  <div className="text-[8px] text-slate-400 mt-0.5">Ultra</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <p className="text-[10px] text-muted-foreground/70 mt-3 text-center">
-          Three.js r185 · Real DOSM kawasanku GeoJSON (28 DUN polygons) · Equirectangular projection ·
-          Extruded by voter count · 4-scenario timeline morph · Raycaster hover + click
+          Three.js r185 · Real DOSM kawasanku GeoJSON (28 DUN + 6 parlimen) · Equirectangular projection ·
+          Extruded by margin of victory · OrbitControls (drag/zoom/pan) · Raycaster hover + click
         </p>
       </CardContent>
     </Card>
   );
-}
-
-function getDunWinner(elDoc: ElectionDoc, parlCode: string, dunCode: string, scenario: Scenario): string | null {
-  if (scenario === "PROJ_2026") {
-    // Projection: extrapolate from PRN15
-    const prn15 = elDoc.elections.find((e) => e.id === "PRN15");
-    return prn15?.dun_results?.find((r) => r.parliament_code === parlCode && r.dun_code === dunCode)?.winner ?? "BN";
-  }
-  if (scenario === "GE15") {
-    const ge15 = elDoc.elections.find((e) => e.id === "GE15");
-    return ge15?.parliament_results?.find((r) => r.parliament_code === parlCode)?.winner ?? "PN";
-  }
-  const election = elDoc.elections.find((e) => e.id === scenario);
-  return election?.dun_results?.find((r) => r.parliament_code === parlCode && r.dun_code === dunCode)?.winner ?? "BN";
 }

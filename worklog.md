@@ -2099,3 +2099,28 @@ Implemented sections:
 - §10.1 Bundle Splitting — preload adjacent tab chunks via requestIdleCallback
 
 Commit: 2b02f2d — feat: Phase 3 enhancements
+
+---
+Task ID: ENHANCEMENT-GUIDE-4
+Agent: main (Z.ai Code)
+Task: Check and implement any remaining missed enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Implemented sections:
+- §A.2: CSS animation keyframes (8 animations: spin-slow, pulse-fast, bounce-gentle, shimmer, slide-up, slide-down, scale-in, fade-in + bg-grid-pattern)
+- §11.9: Dark mode smooth 300ms theme transition (with exclusions for leaflet/canvas/framer-motion)
+- §5.2.3: Glass map legend panel (bottom-right floating panel with coalition colors + No Data pattern)
+- §6.2.4: Time animation slider for 3D map (Slider component + play/pause + year label)
+- §10.4: Map tile caching (crossOrigin, keepBuffer, updateWhenZooming, maxNativeZoom)
+
+Complete enhancement guide implementation status:
+- Phase 1 (§3.2.1, §3.2.4, §3.2.5, §4.3, §8.1-8.3, §8.5, §9.1, A.1, A.3): ✅
+- Phase 2 (§3.2.2, §3.2.3, §4.4, §8.4, §9.2, §9.3): ✅
+- Phase 3 (§5.2.4, §5.2.5, §6.2.1, §10.1): ✅
+- Phase 4 (§A.2, §11.9, §5.2.3, §6.2.4, §10.4): ✅
+
+Remaining (future phases — require architecture changes):
+- §4.2: Vertical sidebar navigation
+- §7.x: Per-tab feature enhancements (19 tabs)
+- §11.1-11.8: Enterprise features (auth, real-time, API gateway, PWA, i18n, audit)
+
+Commit: cd51368 — feat: Phase 4

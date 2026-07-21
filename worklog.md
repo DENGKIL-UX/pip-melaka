@@ -2308,3 +2308,58 @@ QA Test Results (production: pip-melaka.ritz-analytics.workers.dev):
 
 All 20 tested enhancements confirmed working on production.
 Remaining sections require enterprise infrastructure (not feasible without architecture changes).
+
+---
+Task ID: ENHANCEMENT-GUIDE-11
+Agent: main (Z.ai Code)
+Task: Implement remaining safe sections + enterprise enhancement safety assessment
+
+Implemented sections:
+- §7.13: Predictive prediction dashboard (accuracy chart, feature importance, calibration)
+- §7.8: S2D 360 deep link navigation (quick section jump buttons + URL hash)
+
+Enterprise Enhancement Safety Assessment on Cloudflare Workers:
+
+✅ SAFE (implemented or feasible):
+- §4.2 Vertical sidebar (layout restructure — no runtime risk)
+- §7.8 Deep links ← IMPLEMENTED (URL hash params)
+- §7.13 Prediction dashboard ← IMPLEMENTED (UI components + recharts)
+- §10.3 Virtual scrolling (package install only)
+- §11.5 i18n (next-intl installed, translation files only)
+- §11.10 Testing infrastructure (dev-only, no production impact)
+
+⚠️ CAUTION (needs testing, may partially work):
+- §7.7/§11.2 Real-time WebSocket — needs a mini-service with Durable Objects
+  (CF Workers supports WebSocket via Durable Objects, but requires a separate
+  service with its own port. Current architecture uses OpenNext which doesn't
+  natively support WebSocket.)
+- §11.6 Data Export Center — PDF generation (html2canvas/pdf-lib) may fail
+  on CF Workers due to lack of Node.js canvas APIs. CSV export works fine.
+
+❌ NOT SAFE on CF Workers (will break or is architecturally incompatible):
+- §11.1 Authentication — NextAuth.js v4 requires:
+  1. JWT_SECRET (already MISSING in dev.log: "MISSING: JWT_SECRET, CSRF_SECRET")
+  2. Database adapter (Prisma + SQLite won't work on CF Workers serverless)
+  3. OAuth provider secrets (Google/GitHub client IDs)
+  4. OpenNext may not properly handle NextAuth's server-side session callbacks
+  Risk: Authentication would break the entire app if JWT_SECRET is missing.
+
+- §11.4 PWA (Service Worker) — OpenNext serves static assets via CF's asset
+  binding, not traditional Next.js static file serving. A service worker
+  registration at /sw.js would not be served correctly. Offline support
+  is fundamentally incompatible with the serverless Workers architecture.
+
+- §11.3 API Gateway (Rate Limiting) — Requires stateful storage for rate
+  limit counters. CF Workers are stateless — would need KV or Durable Objects
+  binding (not currently configured in wrangler.toml).
+
+- §11.7 Audit Trail — Requires persistent storage (KV or D1 database).
+  Current wrangler.toml only has `env.ASSETS` binding. No KV/D1/Durable
+  Objects bindings are configured.
+
+RECOMMENDATION: Do NOT proceed with §11.1, §11.3, §11.4, §11.7 on the
+current CF Workers + OpenNext deployment. These require infrastructure
+changes (KV bindings, D1 database, Durable Objects) that would need
+wrangler.toml reconfiguration and potentially a different deployment target.
+
+Commit: e61036e — feat: Phase 11

@@ -2201,3 +2201,14 @@ Remaining (require major architecture changes):
 - §11.1-11.7: Enterprise features (auth, WebSocket, API gateway, PWA, i18n, export center, audit)
 
 Commit: e34b4ce — feat: Phase 6 — data table, React Query hooks, CSV export
+
+---
+Task ID: ENHANCEMENT-GUIDE-7
+Agent: main (Z.ai Code)
+Task: Implement remaining per-tab enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Implemented sections:
+- §7.1: Overview tab grid/list toggle (LayoutGrid/List icons, compact table in list mode)
+- §7.5: Risk Matrix 5×5 grid (probability=senior dependency, impact=voter density, DUN codes in cells)
+
+Commit: 18e924f — feat: Phase 7

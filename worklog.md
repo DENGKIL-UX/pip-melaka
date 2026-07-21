@@ -2086,3 +2086,16 @@ Sections still pending (future phases):
 - §11.x Enterprise features (auth, real-time, API gateway)
 
 Commit: 19c1ca3 — feat: Phase 2 enhancements
+
+---
+Task ID: ENHANCEMENT-GUIDE-3
+Agent: main (Z.ai Code)
+Task: Implement remaining missed enhancements from PIP-MELAKA-ENHANCEMENT-GUIDE.md
+
+Implemented sections:
+- §5.2.5 Map Search — search input with live DUN/Parliament filtering + fly-to on select
+- §5.2.4 Map Statistics Overlay — floating glass pill with 6P/28DUN/71K voters/scenario
+- §6.2.1 Camera Presets — 4 preset buttons (Top/Iso/Side/Close) for 3D map
+- §10.1 Bundle Splitting — preload adjacent tab chunks via requestIdleCallback
+
+Commit: 2b02f2d — feat: Phase 3 enhancements

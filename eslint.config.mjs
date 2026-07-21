@@ -89,7 +89,28 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "react/no-danger": "warn",
   },
 }, {
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills", "upload/**", "engine-staging/**", "engine/**", "engine-archive/**", ".secrets/**", "pip-melaka-blueprint/**", "bp-tmp/**"]
+  ignores: [
+    "node_modules/**",
+    ".next/**",
+    ".open-next/**",
+    ".wrangler/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "examples/**",
+    "skills",
+    "upload/**",
+    "engine-staging/**",
+    "engine/**",
+    "engine-archive/**",
+    ".secrets/**",
+    "pip-melaka-blueprint/**",
+    "bp-tmp/**",
+    "public/**",            // Static assets — includes S2D-360 minified bundle
+    "mini-services/**",     // Independent Bun services (own lint configs)
+    "scripts/**",           // Shell/utility scripts
+    ".zscripts/**",         // Build automation scripts
+  ]
 }];
 
 export default eslintConfig;

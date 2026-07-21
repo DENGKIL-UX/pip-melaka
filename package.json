@@ -9,7 +9,7 @@
     "deploy": "npm run build:cf && npx @opennextjs/cloudflare deploy",
     "deploy:version": "npx wrangler versions upload",
     "preview:cf": "npm run build:cf && npx wrangler dev",
-    "lint": "eslint .",
+    "lint": "NODE_OPTIONS='--max-old-space-size=4096' eslint .",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",

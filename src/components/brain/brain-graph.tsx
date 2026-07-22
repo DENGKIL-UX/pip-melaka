@@ -39,7 +39,7 @@ import {
   ETHNICITY_COLORS,
   partyColor,
 } from "@/lib/party-colors";
-import { PARLIAMENTS, DISTRICTS } from "@/lib/melaka-constants";
+import { PARLIAMENTS, DISTRICTS, getDunName } from "@/lib/melaka-constants";
 import { useBrainStore, type BrainLensMode } from "@/stores/brain-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
 
@@ -336,7 +336,7 @@ function buildDunNodes(
   for (const parl of PARLIAMENTS) {
     for (let i = 0; i < parl.dunCodes.length; i++) {
       const dunCode = parl.dunCodes[i];
-      const dunName = parl.dunNames[i];
+      const dunName = getDunName(parl.code, dunCode);
       const intel = intelligenceByCode.get(`${parl.code}|${dunCode}`);
       const prn15Res = prn15?.dun_results.find(
         (r) => r.parliament_code === parl.code && r.dun_code === dunCode

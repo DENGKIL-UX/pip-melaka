@@ -8,6 +8,7 @@ import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as
 import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN, DUN_NAMES, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { useI18n } from "@/lib/i18n";
 import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
 import { PartyTag, StatusTag } from "@/components/ui/party-tag";
 import { PartyLogo } from "@/components/shared/party-logo";
@@ -69,6 +70,7 @@ function KpiCard({ icon: Icon, label, value, sub, accent }: { icon: React.Compon
 
 export function OverviewTab() {
   const setActiveTab = useDashboardStore((s) => s.setActiveTab);
+  const { t } = useI18n();
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [elections, setElections] = useState<ElectionSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,8 +123,8 @@ export function OverviewTab() {
         <Card className="border-amber-500/40 bg-amber-500/5">
           <CardContent className="p-3 flex items-center gap-2 text-xs">
             <WifiOff className="h-4 w-4 text-amber-600 flex-shrink-0" />
-            <span className="text-amber-700 dark:text-amber-300 font-medium">Offline data mode.</span>
-            <span className="text-muted-foreground">Live fetch failed (dev server may have restarted) — showing cached inline snapshot of the last verified P134 / SPR / DOSM build.</span>
+            <span className="text-amber-700 dark:text-amber-300 font-medium">{t("overview.offlineMode")}</span>
+            <span className="text-muted-foreground">{t("overview.offlineDesc")}</span>
           </CardContent>
         </Card>
       )}
@@ -132,30 +134,30 @@ export function OverviewTab() {
         <CardContent className="p-4 flex flex-col md:flex-row md:items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-mlk flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-mlk">Proxy evidence tier · 8 of 9 provenance gates closed</div>
+            <div className="text-sm font-semibold text-mlk">{t("overview.proxyBannerTitle")}</div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              Demographics verified against engine-built P134 (71,415 voters). Gate 9 (raw SPR voter xlsx) remains open — see Governance tab.
+              {t("overview.proxyBannerDesc")}
             </div>
           </div>
           <Button size="sm" variant="outline" className="border-mlk/40 text-mlk" onClick={() => setActiveTab("governance")}>
-            <ShieldCheck className="h-3.5 w-3.5 me-1" /> View provenance
+            <ShieldCheck className="h-3.5 w-3.5 me-1" /> {t("overview.viewProvenance")}
           </Button>
         </CardContent>
       </Card>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <KpiCard icon={Users} label="Voters" value={m.total_voters.toLocaleString()} sub="P134 verified" accent />
-        <KpiCard icon={Vote} label="Parliaments" value={String(gc.parliaments)} sub="P134–P139" />
-        <KpiCard icon={Building2} label="DUN" value={`${gc.duns} / ${TOTAL_DUN}`} sub="P134 sampled" />
-        <KpiCard icon={Layers} label="DM" value={String(gc.dms)} sub="Daerah Mengundi" />
-        <KpiCard icon={MapPin} label="Localities" value={String(gc.localities)} sub="P134 localities" />
+        <KpiCard icon={Users} label={t("overview.kpiVoters")} value={m.total_voters.toLocaleString()} sub={t("overview.kpiVotersSub")} accent />
+        <KpiCard icon={Vote} label={t("overview.kpiParliaments")} value={String(gc.parliaments)} sub="P134–P139" />
+        <KpiCard icon={Building2} label={t("overview.kpiDun")} value={`${gc.duns} / ${TOTAL_DUN}`} sub={t("overview.kpiDunSub")} />
+        <KpiCard icon={Layers} label={t("overview.kpiDm")} value={String(gc.dms)} sub={t("overview.kpiDmSub")} />
+        <KpiCard icon={MapPin} label={t("overview.kpiLocalities")} value={String(gc.localities)} sub={t("overview.kpiLocalitiesSub")} />
       </div>
 
       {/* Elections history + DUN composition */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <Card className="border-mlk/20 hover-lift">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Vote className="h-4 w-4 text-mlk" /> Election history (real ElectionData.MY)</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Vote className="h-4 w-4 text-mlk" /> {t("overview.electionHistory")}</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {elections.map((e) => (
               <div key={e.id} className="flex items-center justify-between gap-2 text-xs">
@@ -177,14 +179,14 @@ export function OverviewTab() {
                 </div>
               </div>
             ))}
-            <div className="text-[9px] text-muted-foreground italic mt-1">Source: lake.electiondata.my · CC0 1.0 · Thevananthan, T. (2025) MECo</div>
-            <Button size="sm" variant="ghost" className="text-mlk text-xs w-full" onClick={() => setActiveTab("elections")}>Open Elections →</Button>
+            <div className="text-[9px] text-muted-foreground italic mt-1">{t("overview.electionSource")}</div>
+            <Button size="sm" variant="ghost" className="text-mlk text-xs w-full" onClick={() => setActiveTab("elections")}>{t("overview.openElections")}</Button>
           </CardContent>
         </Card>
 
         {/* Current DUN composition from PRN15 (real data) */}
         <Card className="border-mlk/20 hover-lift">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> Current DUN composition (PRN15 2021)</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> {t("overview.dunComposition")}</CardTitle></CardHeader>
           <CardContent>
             {(() => {
               const prn15 = elections.find((e) => e.id === "PRN15");
@@ -210,8 +212,8 @@ export function OverviewTab() {
                       <div className="text-[10px] text-muted-foreground">PN</div>
                     </div>
                   </div>
-                  <div className="text-[9px] text-muted-foreground">28 DUN seats · BN landslide 21/28 · Real per-candidate data from ElectionData.MY</div>
-                  <Button size="sm" variant="ghost" className="text-mlk text-xs w-full mt-2" onClick={() => setActiveTab("elections")}>Open Elections →</Button>
+                  <div className="text-[9px] text-muted-foreground">{t("overview.dunCompositionDesc")}</div>
+                  <Button size="sm" variant="ghost" className="text-mlk text-xs w-full mt-2" onClick={() => setActiveTab("elections")}>{t("overview.openElections")}</Button>
                 </>
               );
             })()}
@@ -221,19 +223,19 @@ export function OverviewTab() {
 
       {/* Parliament cards */}
       <div>
-        <div className="text-sm font-semibold mb-2 flex items-center gap-2"><Building2 className="h-4 w-4 text-mlk" /> Parliament seats (GE15 winners)</div>
+        <div className="text-sm font-semibold mb-2 flex items-center gap-2"><Building2 className="h-4 w-4 text-mlk" /> {t("overview.parliamentSeats")}</div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {PARLIAMENTS.map((p) => (
             <Card key={p.code} className="border-mlk/20 hover-lift">
               <CardContent className="p-3">
                 <div className="text-[10px] text-muted-foreground font-mono">P{p.code}</div>
                 <div className="text-sm font-semibold truncate">{p.name}</div>
-                <div className="text-[10px] text-muted-foreground mb-2">{p.district} · {p.dunCount} DUN</div>
+                <div className="text-[10px] text-muted-foreground mb-2">{p.district} · {p.dunCount} {t("overview.dun")}</div>
                 <div className="flex items-center justify-between">
                   <PartyBadge party={p.ge15Winner} />
                   <span className="text-[10px] text-muted-foreground">GE15</span>
                 </div>
-                {p.totalVoters > 0 && <div className="text-[10px] text-muted-foreground mt-1">{p.totalVoters.toLocaleString()} voters</div>}
+                {p.totalVoters > 0 && <div className="text-[10px] text-muted-foreground mt-1">{p.totalVoters.toLocaleString()} {t("overview.votersUnit")}</div>}
               </CardContent>
             </Card>
           ))}
@@ -243,20 +245,20 @@ export function OverviewTab() {
       {/* DUN seats grid — all 28 DUN constituencies with real PRN15 winners */}
       <div>
         <div className="text-sm font-semibold mb-2 flex items-center gap-2 justify-between">
-          <span className="flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> DUN seats — all 28 state constituencies (PRN15 2021 real winners)</span>
+          <span className="flex items-center gap-2"><Grid3x3 className="h-4 w-4 text-mlk" /> {t("overview.dunSeatsTitle")}</span>
           {/* §7.1: Grid/List toggle */}
           <div className="flex items-center gap-1 p-0.5 rounded-md bg-muted/40 border border-border/60">
             <button
               onClick={() => setViewMode("grid")}
               className={`p-1.5 rounded transition-colors ${viewMode === "grid" ? "bg-mlk text-white" : "text-muted-foreground hover:text-foreground"}`}
-              aria-label="Grid view"
+              aria-label={t("overview.gridView")}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
               className={`p-1.5 rounded transition-colors ${viewMode === "list" ? "bg-mlk text-white" : "text-muted-foreground hover:text-foreground"}`}
-              aria-label="List view"
+              aria-label={t("overview.listView")}
             >
               <List className="h-3.5 w-3.5" />
             </button>
@@ -303,12 +305,12 @@ export function OverviewTab() {
             <table className="w-full data-table">
               <thead className="bg-muted/30 border-b border-border/60">
                 <tr>
-                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Code</th>
-                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">DUN Name</th>
-                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Parliament</th>
-                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">District</th>
-                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Winner</th>
-                  <th className="text-right px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">Vote %</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">{t("overview.colCode")}</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">{t("overview.colDunName")}</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">{t("overview.colParliament")}</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">{t("overview.colDistrict")}</th>
+                  <th className="text-left px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">{t("overview.colWinner")}</th>
+                  <th className="text-right px-3 py-2 font-semibold text-[10px] uppercase tracking-wide text-muted-foreground">{t("overview.colVotePct")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -341,19 +343,19 @@ export function OverviewTab() {
         </div>
         )}
         <div className="text-[10px] text-muted-foreground mt-2 flex items-center gap-3">
-          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> 5 verified (P134)</span>
-          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> 23 pending (P135–P139)</span>
-          <span>· PRN15 2021 real winners from ElectionData.MY</span>
+          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {t("overview.verified")}</span>
+          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> {t("overview.pending")}</span>
+          <span>· {t("overview.realWinners")}</span>
         </div>
       </div>
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { tab: "map-2d" as const, label: "2D Map", icon: MapIcon },
-          { tab: "map-3d" as const, label: "3D Map", icon: Box },
-          { tab: "compare" as const, label: "Compare", icon: ArrowLeftRight },
-          { tab: "s2d" as const, label: "S2D Console", icon: Activity },
+          { tab: "map-2d" as const, label: t("overview.viewMap"), icon: MapIcon },
+          { tab: "map-3d" as const, label: t("overview.view3D"), icon: Box },
+          { tab: "compare" as const, label: t("overview.viewCompare"), icon: ArrowLeftRight },
+          { tab: "s2d" as const, label: t("overview.viewS2D"), icon: Activity },
         ].map(({ tab, label, icon: Icon }) => (
           <Button key={tab} variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk h-auto py-3 flex flex-col gap-1" onClick={() => setActiveTab(tab)}>
             <Icon className="h-5 w-5" />
@@ -366,9 +368,9 @@ export function OverviewTab() {
         <CardContent className="p-3 text-[11px] text-muted-foreground flex items-start gap-2">
           <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-mlk" />
           <div>
-            <strong className="text-mlk">Engine provenance:</strong> Demographics from P134 transformer run
+            <strong className="text-mlk">{t("overview.engineProvenanceTitle")}</strong> {t("overview.engineProvenanceDesc", "")}
             (clean: {m.profile_completeness_score.toFixed(2)}% completeness, gender balance {m.gender_balance_score.toFixed(1)}).
-            Senior dependency {m.senior_dependency_percent.toFixed(1)}% — see <button className="text-mlk underline" onClick={() => setActiveTab("risk")}>Risk tab</button> for DUN-level signals.
+            Senior dependency {m.senior_dependency_percent.toFixed(1)}% — see <button className="text-mlk underline" onClick={() => setActiveTab("risk")}>{t("overview.riskTab")}</button> {t("overview.riskTabDesc", "")}.
           </div>
         </CardContent>
       </Card>

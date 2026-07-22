@@ -2495,3 +2495,390 @@ Total dictionary now: 116 keys × 2 locales = 232 translations.
 i18n is 100% client-side (React Context) — no routing changes, no middleware, no server
 component refactoring needed. Safe on Cloudflare Workers + OpenNext. No new packages
 installed. No impact on bundle size (translations are ~7 KB total).
+
+---
+Task ID: ELECTIONS-I18N
+Agent: general-purpose (Elections tab i18n)
+Task: Wire i18n into elections-tab.tsx — translate internal content EN↔BM
+
+Work Log:
+- Read worklog.md (last 200 lines) for I18N-WIRING-FINAL context — confirmed elections-tab
+  was flagged as "PARTIALLY wired (English-only)" requiring ~20-30 new keys per tab.
+- Read src/lib/i18n.tsx to understand dictionary structure: 116 keys × 2 locales,
+  `t(key, fallback?)` lookup pattern, `useI18n()` hook returning `{locale, setLocale, t}`.
+  Identified `overview.*` as the last namespace before the closing `},` of each locale.
+- Read src/components/tabs/elections-tab.tsx (1083 lines) completely — catalogued 6
+  components containing hardcoded English: PartyBreakdownCard, SwingAnalysis,
+  HistoricalTrendsCard, ElectionView, DataQueryCard, ElectionsTab; plus the marginTier
+  helper function returning English labels used both for display AND internal filtering.
+- Added 73 new `elections.*` keys to BOTH the `en` and `ms` dictionaries in
+  src/lib/i18n.tsx (inserted right after `overview.viewS2D`, before the closing `},`).
+  Keys cover: loading states, verified-tier banner, export button, swing analysis
+  (headline text, stat boxes, axis labels, dot legend, table headers, notes),
+  historical trends (title, sub-labels, provenance note), election view (HEADLINE badge,
+  seat counts, current DUN composition, chart titles, results table headers, runner-up,
+  margin, tier), data query (NL query title, intro, placeholder, button, generated SQL,
+  error, row count, 0-rows message). All BM translations natural Malaysian standard Malay.
+- Refactored `marginTier` helper to return an additional `labelKey: "marginal" |
+  "competitive" | "safe"` field — internal `label` (uppercase) preserved for filter
+  comparisons (`r.tier.label === "MARGINAL"`), new `labelKey` drives translated display
+  via `t(\`elections.${tier.labelKey}\`)`. Zero impact on filtering logic.
+- Added `import { useI18n } from "@/lib/i18n"` and `const { t } = useI18n()` to all 6
+  components. Renamed two inner `.find((t) => ...)` callbacks in HistoricalTrendsCard to
+  `.find((rec) => ...)` to avoid shadowing the i18n `t` function.
+- Replaced all hardcoded English UI strings with `t("elections.*")` calls. Where
+  appropriate, used template-literal composition (e.g. `${fromLabel} ${t("elections.margin")}`)
+  to handle EN/BM word order for axis labels, table headers, and chart titles — both
+  languages are SVO so concatenation is safe.
+- Intentionally left untranslated (proper nouns / API-functional text):
+  • Party codes: BN, PH, PN, BEBAS, OTH, ALONE
+  • DUN codes (N01, N05…), Parliament codes (P134…), Election codes (GE14, PRN15, GE15)
+  • Place names: Melaka, Taboh Naning, Kuala Linggi, etc. (rendered from data)
+  • Party/coalition full names from PARTIES/COALITIONS metadata (data-driven)
+  • `fromLabel`/`toLabel` strings ("GE14 (2018)", "PRN15 (2021)") — same in both locales
+  • "DuckDB + CF AI" badge — tech stack proper noun
+  • SUGGESTED_QUERIES (8 sample NL prompts in DataQueryCard) — sent directly to CF
+    Workers AI (Llama 3.1 8B) which expects English prompts; translating would change
+    API behaviour. Added a code comment documenting this intentional exception.
+- Verified with `bun run lint` — 0 errors, 3 pre-existing warnings (data-table.tsx
+  TanStack Table memoization, scenario-tab.tsx unused eslint-disable, chart.tsx
+  dangerouslySetInnerHTML). No new issues introduced in elections-tab.tsx or i18n.tsx.
+
+Stage Summary:
+- 73 new translation keys added to each of `en` and `ms` dictionaries (146 total entries)
+  in src/lib/i18n.tsx.
+- Files modified: src/lib/i18n.tsx (dictionary extension), src/components/tabs/elections-tab.tsx
+  (useI18n wiring across 6 components + marginTier refactor).
+- Lint result: 0 errors, 3 warnings (all pre-existing, none in modified files).
+- Elections tab internal content now fully translates EN↔BM when language toggle is
+  switched — KPI boxes, swing analysis cards, scatter/bar chart axis labels & legends,
+  historical trends card, results tables (headers + tier badges), data query card
+  (title, intro, placeholder, button, SQL label, row-count message, 0-rows message).
+- No visual layout or functionality changes; no new packages installed.
+
+---
+Task ID: S2D-I18N
+Agent: general-purpose (S2D Console tab i18n)
+Task: Wire i18n into s2d-console-tab.tsx — translate internal content EN↔BM
+
+Work Log:
+- Read worklog.md (last 250 lines) — confirmed S2D Console tab was flagged in
+  I18N-WIRING-FINAL as "PARTIALLY wired (English-only)" and that the ELECTIONS-I18N
+  task established the precedent: ~20-30 new keys per tab, `useI18n()` hook pattern,
+  dictionary insertion right after `elections.*` block, BM translations kept natural
+  Malaysian standard Malay (not Indonesian), proper nouns (party codes, DUN codes,
+  election codes, "S2D" itself) left untranslated.
+- Read src/lib/i18n.tsx (762 lines) — confirmed `t(key, fallback?)` lookup with
+  English fallback, `useI18n()` hook returning `{ locale, setLocale, t }`, and that
+  the `elections.*` block ends each locale's dictionary just before the closing `},`.
+- Read src/components/tabs/s2d-console-tab.tsx (283 lines) — catalogued all hardcoded
+  English: console title + description, 3 loop-phase labels (sensing/deciding/acting),
+  phase-pipeline count labels (signals/pending/in progress), 4 KPI strip labels
+  (New/Acknowledged/Acting/Resolved), 3 severity labels (CRITICAL/WARNING/INFO,
+  rendered via `.toUpperCase()`), 4 status labels (NEW/ACKNOWLEDGED/ACTING/RESOLVED,
+  via `.toUpperCase()`), 4 analytical-level labels (descriptive/diagnostic/predictive/
+  prescriptive), 4 action button labels (Acknowledge/Take Action/Mark resolved/Clear
+  resolved), signal feed title, no-active-signals message, Action/Resolved prefixes,
+  architecture reference card (title, pipeline, signal sources paragraph with inline
+  `<strong>context</strong>`), and 7 seeded signals × 3 fields (title/description/
+  recommendation) = 21 signal-text strings.
+- Read src/stores/s2d-store.ts (193 lines) — discovered the 7 seeded signals live in
+  the store (out of scope to modify). Their `id` fields are dynamic
+  (`sig_<timestamp>_<random>`), so I cannot key translations off the id. Instead I
+  derived a composite stable key `(source, metric, parliament, dun)` and built a
+  lookup map `getSignalI18nKey()` that returns the stable i18n namespace for each
+  seeded signal (e.g. `"s2d.sig.seniorN05"` for the N05 senior-dependency signal).
+  User-added signals (no match) fall back to their original English store text.
+- Added 58 new `s2d.*` translation keys to BOTH the `en` and `ms` dictionaries in
+  src/lib/i18n.tsx (inserted right after `elections.queryReturned0`, before the
+  closing `},` of each locale). Total: 116 new translation entries. Key groups:
+  • Console header (2): consoleTitle, consoleDesc
+  • Loop phases (6): sensingPhase/decidingPhase/actingPhase + signalsUnit/pendingUnit/
+    inProgressUnit (count-suffix pattern, e.g. `${n} ${t("s2d.signalsUnit")}`)
+  • KPI strip (4): kpiNew/kpiAcknowledged/kpiActing/kpiResolved
+  • Severity labels (3): sevCritical/sevWarning/sevInfo — already uppercase in both
+    locales (CRITICAL/KRITIKAL etc.) so `.toUpperCase()` could be dropped
+  • Status labels (4): statusNew/.../statusResolved — same uppercase pattern
+  • Analytical levels (4): levelDescriptive/.../levelPrescriptive — lowercase to
+    match original display (CSS `capitalize` handles first letter)
+  • Action buttons (4): btnAcknowledge/btnTakeAction/btnMarkResolved/btnClearResolved
+    (the last uses `{n}` placeholder replaced via `.replace("{n}", String(n))`)
+  • Signal feed (2): signalFeed, noActiveSignals
+  • Action/Resolved prefixes (2): actionLabel, resolvedLabel
+  • Architecture card (6): archRefTitle, archPipeline, archSourcesIntro,
+    archSourcesP1, archSourcesContext, archSourcesP2 — split the original inline
+    `<strong>context</strong>` paragraph into 3 strings to avoid
+    dangerouslySetInnerHTML (consistent with project's lint-clean approach).
+  • Seeded signals (21): 7 signals × 3 fields (title/desc/rec) under namespace
+    `s2d.sig.<id>.*` where <id> ∈ {seniorN05, seniorN03, genderN05, dptNet,
+    ge15Split, jasinPoverty, profileP134}.
+- Wired `useI18n()` hook into s2d-console-tab.tsx:
+  • Added `import { useI18n } from "@/lib/i18n"` and extended the store import to
+    also bring in `type SignalSeverity, type SignalStatus` (both already exported
+    from s2d-store).
+  • Added 4 typed i18n key maps: SEVERITY_I18N_KEY, STATUS_I18N_KEY, LEVEL_I18N_KEY,
+    LOOP_PHASE_I18N_KEY — typed as `Record<SignalSeverity, string>` etc. for
+    compile-time key safety (mirrors the metrics-strip.tsx pattern from
+    I18N-WIRING-FINAL).
+  • Added `getSignalI18nKey(signal)` helper with documented JSDoc explaining the
+    composite-key lookup and the intentional store-file scope boundary.
+  • Both `SignalCard` and `S2DConsoleTab` components now call `const { t } = useI18n()`.
+  • Replaced every hardcoded English string with `t("s2d.*")` calls:
+    - Console title + description → t("s2d.consoleTitle") / t("s2d.consoleDesc")
+    - Loop status indicator + phase pipeline labels → t(LOOP_PHASE_I18N_KEY[...])
+    - Phase counts → `${n} ${t("s2d.signalsUnit|pendingUnit|inProgressUnit")}`
+    - KPI strip → t("s2d.kpiNew|kpiAcknowledged|kpiActing|kpiResolved")
+    - Severity / status badges → t(SEVERITY_I18N_KEY[...]) / t(STATUS_I18N_KEY[...])
+    - Analytical-level badges + grid → t(LEVEL_I18N_KEY[...])
+    - Action buttons → t("s2d.btnAcknowledge|btnTakeAction|btnMarkResolved")
+    - Clear-resolved button → t("s2d.btnClearResolved").replace("{n}", ...)
+    - Signal feed title → t("s2d.signalFeed")
+    - No-active-signals message → t("s2d.noActiveSignals")
+    - Action/Resolved action-text prefixes → t("s2d.actionLabel|resolvedLabel")
+    - Architecture card title + pipeline + 3-part sources paragraph → respective
+      t("s2d.arch*") calls with inline `<strong>` wrapping the translated "context"
+      / "konteks" word
+  • In SignalCard, the signal's `title`/`description`/`recommendation`/`action` text
+    is rendered via `sigKey ? t(\`${sigKey}.title|desc|rec\`, original) : original`
+    pattern — so seeded signals translate EN↔BM while user-added signals gracefully
+    fall back to their original English store text.
+- Intentionally left untranslated (proper nouns / technical identifiers):
+  • "S2D" itself (system acronym) — appears in console title, architecture reference
+  • "P134", "P135", "P136", "P137", "P138", "P139" (parliament codes)
+  • "N01", "N03", "N05" (DUN codes) — preserved verbatim in translated signal text
+  • "BN", "PH", "PN" (coalition codes) — preserved verbatim in translated signal text
+  • "GE15", "GE14", "PRN15", "PRN16" (election cycle codes) — preserved verbatim
+  • "DPT", "DOSM", "PIP", "Gini", "TikTok", "Apify" (technical/data-source names)
+  • Place names: "Melaka", "Taboh Naning", "Ayer Limau", "Masjid Tanah", "Jasin",
+    "Kuala Linggi" — these are proper nouns, kept verbatim in translated strings
+  • `toLocaleTimeString("en-MY", ...)` — JS locale identifier (technical, not
+    user-facing text). The output time format ("2:30 PM") is identical in EN and BM
+    visual presentation; changing the locale string identifier would alter visual
+    output without being a string-translation concern, so it was left as-is per the
+    "no visual layout changes" rule.
+  • File names / code references in architecture text: "S2D Architecture_v2.txt",
+    "/api/engine" — these are file/route identifiers, not natural-language text.
+  • `signal.metric`, `signal.source`, `signal.id`, `signal.parliament`, `signal.dun`
+    field values — these are data, not display strings.
+- Verified with `bun run lint` — 0 errors, 3 warnings (all pre-existing from other
+  files: data-table.tsx TanStack Table memoization, scenario-tab.tsx unused
+  eslint-disable, chart.tsx dangerouslySetInnerHTML). No new issues introduced in
+  src/lib/i18n.tsx or src/components/tabs/s2d-console-tab.tsx.
+
+Stage Summary:
+- 58 new translation keys added to each of `en` and `ms` dictionaries (116 total
+  entries) in src/lib/i18n.tsx under the `s2d.*` namespace.
+- Files modified: src/lib/i18n.tsx (dictionary extension), src/components/tabs/
+  s2d-console-tab.tsx (useI18n wiring + 4 typed key maps + getSignalI18nKey helper
+  + all UI strings replaced with t() calls; seeded signal text translated at render
+  time via composite-key lookup without modifying s2d-store.ts).
+- Lint result: 0 errors, 3 warnings (all pre-existing, none in modified files).
+- S2D Console tab internal content now fully translates EN↔BM when the language
+  toggle is switched: console header (title + description), loop status indicator,
+  3-phase pipeline (labels + counts), KPI strip (4 labels), analytical-level grid
+  (4 labels), severity/status/level badges on each signal card, 4 action button
+  labels, clear-resolved button (with count), signal feed title, no-active-signals
+  message, action/resolved prefixes on signal cards, architecture reference card
+  (title + pipeline + 3-part signal-sources paragraph with translated inline
+  "context" / "konteks"), and all 7 seeded signals' title + description +
+  recommendation text. User-added signals fall back to their original store text.
+
+---
+Task ID: DEMO-I18N
+Agent: general-purpose (Demographics tab i18n)
+Task: Wire i18n into demographics-tab.tsx — translate internal content EN↔BM
+
+Work Log:
+- Read worklog.md (last 300 lines) for prior i18n context — confirmed
+  I18N-WIRING-FINAL flagged demographics-tab as "PARTIALLY wired (English-only)",
+  and that ELECTIONS-I18N (73 keys) and S2D-I18N (58 keys) established the
+  precedent: ~20-30+ new keys per tab, `useI18n()` hook pattern, dictionary
+  insertion right after the prior tab's namespace block, BM translations kept
+  natural Malaysian standard Malay (not Indonesian), proper nouns (party codes,
+  DUN codes, election codes, place names) left untranslated, `t()` calls paired
+  with `.replace("{n}", ...)` for parameterized strings.
+- Read src/lib/i18n.tsx (883 lines) — confirmed `t(key, fallback?)` lookup with
+  English fallback, `useI18n()` hook returning `{ locale, setLocale, t }`, and
+  that each locale's dictionary ends with the `s2d.*` namespace block (the
+  s2d.sig.profileP134.rec key on lines 417 / 805) right before the closing `},`.
+- Read src/components/tabs/demographics-tab.tsx (354 lines) completely —
+  catalogued all hardcoded English: proxy evidence banner (title + body),
+  offline-data chip, DUN+voter-count badge, 2 chart titles (gender split,
+  senior dep), chart bar/legend names ("Male %", "Female %"), senior-dep
+  tooltip label, 3 risk-tier legend dots, population-pyramid chart title,
+  pyramid tooltip/legend labels ("Male (est.)" / "Female (est.)"), 4 KPI side-
+  panel labels (Total voters / Male-Female / Youth 18-29 / Senior 56+),
+  "across N DUNs" sub-label, pyramid provenance note (with inline <code>
+  age_band_counts</code>), per-DUN table title + 8 column headers, tier badges
+  in table + RiskSignal cards (lowercase + uppercase variants), Risk signals
+  card title, 3 summary-count badges (N critical / N warning / N clear),
+  threshold footnote, radar chart title + 3 Radar `name` props (dataKeys kept
+  as English identifiers), radar note paragraph.
+- Added 50 new `demo.*` translation keys to BOTH the `en` and `ms` dictionaries
+  in src/lib/i18n.tsx (100 total entries). Inserted right after
+  `s2d.sig.profileP134.rec`, before the closing `},` of each locale's
+  dictionary. Key groups:
+  • Proxy banner (3): proxyBannerTitle, proxyBannerBody, offlineData
+  • Header summary (1): dunVotersSummary — uses `{duns}` + `{voters}`
+    placeholders, replaced via chained `.replace()` calls
+  • Gender chart (3): genderSplitByDun, malePct, femalePct
+  • Senior-dep chart (5): seniorDepByDun (full title), seniorDep (short
+    tooltip label), seniorDepFull (inline phrase for RiskSignal), ge30Critical,
+    ge25Warning, lt25Clear (legend dots)
+  • Population pyramid (10): populationPyramid title; maleEst/femaleEst
+    (tooltip + legend + Bar `name` props); totalVoters/acrossDuns/maleFemale/
+    youth1829/senior56plus KPI side-panel labels (acrossDuns uses `{n}`
+    placeholder); pyramidNoteP1/pyramidNoteCode/pyramidNoteP2 — split the
+    original inline `<code>age_band_counts</code>` paragraph into 3 strings to
+    avoid dangerouslySetInnerHTML (mirrors S2D-I18N precedent for inline
+    `<strong>context</strong>`)
+  • Per-DUN table (9): perDunDemographics title; colDun/colVoters/colMale/
+    colFemale/colSeniorDep/colGenderBal/colAgeGroup/colEthnicity column headers
+  • Risk-tier labels (6): critical/warning/clear (lowercase, for inline table
+    badge + summary count text) + criticalUpper/warningUpper/clearUpper
+    (uppercase, for RiskSignal card badge). clearUpper included for type-
+    Record completeness even though clear-tier cards never render
+  • Risk signals card (5): riskSignals title; criticalCount/warningCount/
+    clearCount (each with `{n}` placeholder); thresholdNote footnote
+  • Radar chart (5): radarTitle; radarSeniorDep/radarGenderBal/radarVoterDensity
+    (Radar `name` props — dataKeys kept as English identifiers); radarNote
+- Wired `useI18n()` hook into demographics-tab.tsx:
+  • Added `import { useI18n } from "@/lib/i18n"`.
+  • Extracted a top-level `type SeniorTier = "critical" | "warning" | "clear"`
+    (replacing the inline union return type of `seniorTier()`).
+  • Added 2 typed i18n key maps `TIER_UPPER_I18N_KEY` and `TIER_LOWER_I18N_KEY`
+    (typed as `Record<SeniorTier, string>`) — mirrors the SEVERITY_I18N_KEY /
+    STATUS_I18N_KEY pattern from S2D-I18N for compile-time key safety.
+  • Both `RiskSignal` and `DemographicsTab` components now call
+    `const { t } = useI18n()`.
+  • Replaced every hardcoded English UI string with `t("demo.*")` calls:
+    - Proxy banner: `<strong>{t("demo.proxyBannerTitle")}</strong> {t("demo.proxyBannerBody")}`
+    - Offline chip / DUN+voter badge: t("demo.offlineData") / chained
+      `.replace()` for `{duns}` + `{voters}` placeholders
+    - Gender chart title + Bar `name` props: t("demo.genderSplitByDun") /
+      t("demo.malePct") / t("demo.femalePct")
+    - Senior-dep chart title + tooltip label + 3 legend dots:
+      t("demo.seniorDepByDun") / t("demo.seniorDep") / t("demo.ge30Critical") /
+      t("demo.ge25Warning") / t("demo.lt25Clear")
+    - Pyramid chart title + tooltip + Legend + 2 Bar `name` props + 4 KPI
+      side-panel labels + across-DUNs sub-label (with `.replace("{n}", ...)`) +
+      3-part pyramid-note paragraph (P1 + <code>age_band_counts</code> + P2)
+    - Per-DUN table title + 8 column headers
+    - Inline table tier badge: `t(TIER_LOWER_I18N_KEY[tier])`
+    - RiskSignal card badge: `t(TIER_UPPER_I18N_KEY[tier])` (replaces the
+      previous `tier.toUpperCase()` call — BM uppercase variants are
+      "KRITIKAL"/"AMARAN" so `.toUpperCase()` no longer applies)
+    - RiskSignal inline phrase: `{t("demo.seniorDepFull")} {pct}%`
+    - Risk signals card title + 3 summary count badges (each via
+      `.replace("{n}", ...)`) + threshold footnote
+    - Radar chart title + 3 Radar `name` props (dataKeys remain English
+      identifiers like "Senior Dep" — only the display `name` is translated)
+      + radar note paragraph
+- Intentionally left untranslated (proper nouns / data-driven identifiers /
+  universal numeric ranges):
+  • DUN codes (N01, N03, N05…) and parliament codes (P134, P135…) — rendered
+    inline within translated strings (e.g. "5 DUN (N01–N05) dalam P134
+    Masjid Tanah")
+  • Place names from `d.geography.dun_name` (Taboh Naning, Ayer Limau, etc.)
+    — data-driven, not display strings
+  • `d.metrics.dominant_age_group` and `d.metrics.dominant_ethnicity_group`
+    cell values — data-driven strings from the engine output JSONL
+  • AGE_BANDS display labels ("18–20", "21–29", "30–39", "40–49", "50–55",
+    "56–64", "65+") — universal numeric age ranges, identical in EN and BM
+  • Radar chart `dataKey` strings ("Senior Dep", "Gender Bal", "Male %",
+    "Female %", "Voter Density") — these are Recharts data-lookup property
+    names that must remain stable across locale changes; only the display
+    `name` prop is translated
+  • "PDPA" (statute acronym), "SPR" (Suruhanjaya Pilihan Raya acronym),
+    "DUN" / "DUNs" (Dewan Undangan Negeri acronym — already a BM term)
+  • `toLocaleString()` numeric output — JS locale identifier is technical;
+    number formatting is identical visually in EN and BM
+- Verified with `bun run lint` — 0 errors, 3 warnings (all pre-existing from
+  other files: data-table.tsx TanStack Table memoization, scenario-tab.tsx
+  unused eslint-disable, chart.tsx dangerouslySetInnerHTML). No new issues
+  introduced in src/lib/i18n.tsx or src/components/tabs/demographics-tab.tsx.
+
+Stage Summary:
+- 50 new translation keys added to each of `en` and `ms` dictionaries (100
+  total entries) in src/lib/i18n.tsx under the `demo.*` namespace.
+- Files modified: src/lib/i18n.tsx (dictionary extension), src/components/tabs/
+  demographics-tab.tsx (useI18n wiring + 2 typed key maps for tier labels +
+  all UI strings replaced with t() calls; placeholder substitution via
+  `.replace("{n}", ...)` / `.replace("{duns}", ...).replace("{voters}", ...)`
+  for parameterized badges and sub-labels).
+- Lint result: 0 errors, 3 warnings (all pre-existing, none in modified files).
+- Demographics tab internal content now fully translates EN↔BM when the
+  language toggle is switched: proxy evidence banner (title + body), offline
+  chip, DUN+voter-count summary badge, 2 chart titles (gender split, senior
+  dependency) + bar/tooltip/legend labels, 3 risk-tier legend dots,
+  population-pyramid chart title + tooltip + Legend + Bar names + 4 KPI side-
+  panel labels + across-DUNs sub-label + 3-part provenance note (with inline
+  `<code>age_band_counts</code>`), per-DUN table title + 8 column headers,
+  tier badges in table + RiskSignal cards (lowercase + uppercase variants),
+  Risk signals card title + 3 summary count badges + threshold footnote,
+  radar chart title + 3 Radar `name` props + radar note paragraph.
+- No visual layout or functionality changes; no new packages installed.
+
+---
+Task ID: TAB-CONTENT-I18N-COMPLETE
+Agent: main (Z.ai Code)
+Task: Wire i18n into tab CONTENT panels (not just labels) — Insights + Overview + Elections + S2D + Demographics
+
+## Current project status description/assessment
+
+User reported (with VLM screenshot evidence) that toggling EN→BM only translated tab LABELS but all internal content remained English. VLM analysis of the screenshot confirmed: the Wawasan (Insights) tab in BM mode showed English for "Daily Intelligence Brief (S2D-7A)", "EXECUTIVE JUDGEMENT", "Most Important Change", "Highest-Risk Narrative", "BN/PH/PN Sentiment", "Top Economic Issues", "Locality Hotspots", "24-Hour Outlook", "72-Hour Outlook", "Recommended Actions", all 4 action items, and the insight feed entries.
+
+This task closed that gap by wiring i18n into the 5 highest-traffic tab content panels.
+
+## Current goals/completed modifications/verification results
+
+### Dictionary extension
+Added 245+ new i18n keys × 2 locales = 490+ new translation entries across 5 namespaces:
+- `insights.*` (47 keys) — daily brief, executive judgement, sentiment cards, outlook, actions, insight feed
+- `overview.*` (35 keys) — honesty banner, KPI labels, election history, DUN composition, table headers, quick actions
+- `elections.*` (73 keys) — subagent-added: GE14/PRN15/GE15 views, seat counts, vote shares, swing analysis, historical trends, results tables, data query card
+- `s2d.*` (58 keys) — subagent-added: console title, 3-phase pipeline (sensing/deciding/acting), KPI strip, signal feed, 7 seeded signals with recommendations
+- `demo.*` (50 keys) — subagent-added: gender chart, senior dependency radial, population pyramid, per-DUN table, risk tier labels, radar chart
+
+### Component wiring
+1. **insight-reports-tab.tsx** — fully rewritten: dailyBrief object dissolved into t() calls; date locale switches en-MY↔ms-MY; insight feed entries translated; sentiment movement/issues/hotspots/actions all use t()
+2. **overview-tab.tsx** — KPI cards, honesty banner, election history, DUN composition, parliament cards, DUN grid (list view table headers), quick actions, engine provenance footer all use t()
+3. **elections-tab.tsx** — subagent wired useI18n() into all 6 components (PartyBreakdownCard, SwingAnalysis, HistoricalTrendsCard, ElectionView, DataQueryCard, ElectionsTab); marginTier helper refactored with labelKey for translated tier badges
+4. **s2d-console-tab.tsx** — subagent wired console header, 3-phase pipeline, KPI strip, signal feed, architecture reference card, all 7 seeded signals (composite-key lookup for store-driven text)
+5. **demographics-tab.tsx** — subagent wired proxy banner, DUN/voter summary, gender chart, senior-dep radial, population pyramid (chart + 4 KPI side-panel cards), per-DUN table (8 column headers), risk-tier labels, radar chart
+
+### Verification results
+- `bun run lint`: 0 errors, 3 warnings (all pre-existing in unrelated files)
+- Dev server: 200 OK on all routes, no compile errors
+- agent-browser E2E (BM mode verified tab-by-tab):
+  - **Wawasan (Insights)**: "Ringkasan Kecerdasan Harian (S2D-7A)", "PERTIMBANGAN EKSEKUTIF", "Sentimen negatif meningkat di P134 Taboh Naning (N05)...", "PERUBAHAN TERPENTING", "NARATIF BERISIKO TERTINGGI", "Sentimen BN/PH/PN", "ISU EKONOMI TERATAS", "TITIK PANAS LOKALITI", "PANDANGAN 24/72 JAM", "TINDAKAN DISYORKAN" + all 4 actions, "12 pautan bukti · Keyakinan: SEDERHANA (65%)..." ✅
+  - **Gambaran Keseluruhan (Overview)**: "Tingkat bukti proksi · 8 daripada 9 pintu provenans ditutup", "PENGUNDI TERSAHKAN/PARLIMEN/KERUSI DUN/DAERAH MENGUNDI/LOKALITI", "Sejarah pilihan raya (ElectionData.MY sebenar)", "Komposisi DUN semasa (PRN15 2021)", "Kerusi parlimen (pemenang GE15)", "Kerusi DUN — semua 28 kawasan negeri", "Lihat Peta 2D/3D", "Lihat Konsol S2D" ✅
+  - **Pilihan Raya (Elections)**: "Tingkat tersahkan · sumber: takungan data ElectionData.my...", "Kerusi DUN", "Pecahan parti — parti komponen yang memenangi kerusi", "Kerusi DUN mengikut parlimen", "Pemenang (Gabungan)" column header ✅
+  - **Konsol S2D**: "Konsol Tindakan S2D — Merasakan → Membuat Keputusan → Bertindak", "Merasakan/Membuat Keputusan/Bertindak", "Diakui/Bertindak/Selesai", "Suapan Isyarat", "27.7% pengundi berumur 56+ (amaran: 25%)...", "Ambil Tindakan" button ✅
+  - **Demografi**: "5 DUN (N01–N05) dalam P134 Masjid Tanah — output enjin sebenar, 71,415 pengundi tersahkan...", "Pecahan jantina mengikut DUN (%)", "Kebergantungan warga emas (56+) mengikut DUN", "≥30% kritikal / ≥25% amaran", "Piramid populasi — P134 teragregat", "JUMLAH PENGUNDI / LELAKI / PEREMPUAN", column headers "Pengundi/Lelaki/Perempuan/Imbangan jantina" ✅
+- No runtime errors in browser console
+
+## Unresolved issues / risks / next-phase recommendations
+
+### i18n coverage status (updated)
+- ✅ FULLY wired: landing (hero/status/trust/footer/metrics), dashboard chrome (header/tabs/loading), onboarding tour, 2D map, 3D map, Insights, Overview, Elections, S2D Console, Demographics
+- ⚠️ NOT YET wired (English-only internal content): 11 remaining tabs:
+  - analysis-tab.tsx (DPT Analysis — voter churn charts)
+  - risk-socioeconomic-tab.tsx (Risk Matrix + socio indicators)
+  - compare-tab.tsx (3-way parliament comparison)
+  - governance-tab.tsx (provenance DAG)
+  - s2d-360-tab.tsx (S2D 360 intelligence engine — large bundle)
+  - scraper-tab.tsx (sentiment scraper dashboard)
+  - public-communication-tab.tsx (template library)
+  - incident-casebook-tab.tsx (incident severity matrix)
+  - scenario-tab.tsx (what-if sliders)
+  - predictive-tab.tsx (prediction dashboard)
+  - alerts-tab.tsx (alert rules engine)
+  - dual-layer-tab.tsx (layer blending)
+- ⚠️ NOT wired: selected-dun-drawer.tsx (546 lines — DUN detail drawer), command-palette.tsx, quick-actions.tsx toolbar, data-table.tsx column headers
+
+### Recommended next-phase priorities
+1. **Wire selected-dun-drawer.tsx** — the DUN detail drawer is opened from multiple tabs and has many hardcoded strings ("Election Results", "Demographics", "Senior Dependency", "Voter Turnout", "Candidate", "Votes", "Margin")
+2. **Wire remaining 11 tabs** — each is ~150-400 lines; estimate ~30-50 new keys per tab = ~400 new keys total
+3. **Add `<html lang>` dynamic attribute** — currently static "en"; should update to "ms" when locale changes (SEO + screen reader)
+4. **Test on production CF Workers deployment** — verify translations work in production build (client-side Context should be fine, but worth confirming after the next `git push` triggers CF deploy)

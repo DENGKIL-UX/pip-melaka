@@ -9,6 +9,25 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { getDunName } from "@/lib/melaka-constants";
 import { MLK_ACCENT } from "@/lib/party-colors";
 import { DUN_FALLBACK } from "@/lib/fallback-data";
+import { useI18n } from "@/lib/i18n";
+
+type SeniorTier = "critical" | "warning" | "clear";
+
+// i18n key maps for the three senior-dependency risk tiers.
+// `*Upper` variants render the uppercase badge text used inside the
+// RiskSignal cards; lowercase variants render the inline table badge and the
+// summary count badges. Mirrors the typed-key-map pattern established in
+// s2d-console-tab.tsx (SEVERITY_I18N_KEY / STATUS_I18N_KEY).
+const TIER_UPPER_I18N_KEY: Record<SeniorTier, string> = {
+  critical: "demo.criticalUpper",
+  warning: "demo.warningUpper",
+  clear: "demo.clearUpper",
+};
+const TIER_LOWER_I18N_KEY: Record<SeniorTier, string> = {
+  critical: "demo.critical",
+  warning: "demo.warning",
+  clear: "demo.clear",
+};
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
@@ -42,13 +61,14 @@ function seniorColor(pct: number) {
   return "#16a34a"; // green — clear
 }
 
-function seniorTier(pct: number): "critical" | "warning" | "clear" {
+function seniorTier(pct: number): SeniorTier {
   if (pct >= 30) return "critical";
   if (pct >= 25) return "warning";
   return "clear";
 }
 
 function RiskSignal({ d }: { d: DunRecord }) {
+  const { t } = useI18n();
   const tier = seniorTier(d.metrics.senior_dependency_percent);
   if (tier === "clear") return null;
   const Icon = tier === "critical" ? ShieldAlert : Heart;
@@ -57,9 +77,9 @@ function RiskSignal({ d }: { d: DunRecord }) {
       <Icon className={`h-3.5 w-3.5 mt-0.5 flex-shrink-0 ${tier === "critical" ? "text-red-600" : "text-amber-600"}`} />
       <div>
         <span className="font-medium">{d.geography.dun_name} (N{d.geography.dun_code})</span>{" "}
-        <span className="text-muted-foreground">senior dependency {d.metrics.senior_dependency_percent.toFixed(1)}%</span>
+        <span className="text-muted-foreground">{t("demo.seniorDepFull")} {d.metrics.senior_dependency_percent.toFixed(1)}%</span>
         <Badge variant="outline" className={`ms-1 text-[9px] ${tier === "critical" ? "border-red-500/40 text-red-600" : "border-amber-500/40 text-amber-600"}`}>
-          {tier.toUpperCase()}
+          {t(TIER_UPPER_I18N_KEY[tier])}
         </Badge>
       </div>
     </div>
@@ -67,6 +87,7 @@ function RiskSignal({ d }: { d: DunRecord }) {
 }
 
 export function DemographicsTab() {
+  const { t } = useI18n();
   const [duns, setDuns] = useState<DunRecord[] | null>(null);
   const [offline, setOffline] = useState(false);
 
@@ -140,13 +161,13 @@ export function DemographicsTab() {
       <Card className="border-mlk/20">
         <CardContent className="p-3 flex items-center gap-2 text-xs">
           <Info className="h-4 w-4 text-mlk" />
-          <span><strong className="text-mlk">Proxy evidence tier.</strong> 5 DUNs (N01–N05) within P134 Masjid Tanah — real engine output, 71,415 verified voters. P135–P139 pending raw SPR rolls.</span>
+          <span><strong className="text-mlk">{t("demo.proxyBannerTitle")}</strong> {t("demo.proxyBannerBody")}</span>
           {offline ? (
             <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
-              <WifiOff className="h-2.5 w-2.5" /> offline data
+              <WifiOff className="h-2.5 w-2.5" /> {t("demo.offlineData")}
             </span>
           ) : (
-            <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk">{duns.length} DUN · {totalVoters.toLocaleString()} voters</Badge>
+            <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk">{t("demo.dunVotersSummary").replace("{duns}", String(duns.length)).replace("{voters}", totalVoters.toLocaleString())}</Badge>
           )}
         </CardContent>
       </Card>
@@ -154,7 +175,7 @@ export function DemographicsTab() {
       {/* Gender + Senior dep charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <Card className="border-mlk/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> Gender split by DUN (%)</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> {t("demo.genderSplitByDun")}</CardTitle></CardHeader>
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -164,8 +185,8 @@ export function DemographicsTab() {
                   <YAxis tick={{ fontSize: 10 }} domain={[0, 60]} />
                   <Tooltip contentStyle={{ fontSize: 11 }} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="male" name="Male %" fill="#0F7DC2" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="female" name="Female %" fill="#E22926" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="male" name={t("demo.malePct")} fill="#0F7DC2" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="female" name={t("demo.femalePct")} fill="#E22926" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -173,22 +194,22 @@ export function DemographicsTab() {
         </Card>
 
         <Card className="border-mlk/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> Senior dependency (56+) by DUN</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> {t("demo.seniorDepByDun")}</CardTitle></CardHeader>
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <RadialBarChart innerRadius="20%" outerRadius="100%" data={radialData} startAngle={90} endAngle={-270}>
                   <PolarAngleAxis type="number" domain={[0, 40]} tick={{ fontSize: 9 }} />
                   <RadialBar background dataKey="pct" cornerRadius={6} />
-                  <Tooltip contentStyle={{ fontSize: 11 }} formatter={(v: number) => [`${v.toFixed(1)}%`, "Senior dep"]} />
+                  <Tooltip contentStyle={{ fontSize: 11 }} formatter={(v: number) => [`${v.toFixed(1)}%`, t("demo.seniorDep")]} />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: 9 }} />
                 </RadialBarChart>
               </ResponsiveContainer>
             </div>
             <div className="text-[10px] text-muted-foreground flex gap-3 justify-center mt-1">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-600" /> ≥30% critical</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-600" /> ≥25% warning</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-600" /> &lt;25% clear</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-600" /> {t("demo.ge30Critical")}</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-600" /> {t("demo.ge25Warning")}</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-600" /> {t("demo.lt25Clear")}</span>
             </div>
           </CardContent>
         </Card>
@@ -198,7 +219,7 @@ export function DemographicsTab() {
       <Card className="border-mlk/20 bg-mlk-radial">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Pyramid className="h-4 w-4 text-mlk" /> Population pyramid — P134 aggregated
+            <Pyramid className="h-4 w-4 text-mlk" /> {t("demo.populationPyramid")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -216,22 +237,22 @@ export function DemographicsTab() {
                   <YAxis type="category" dataKey="label" tick={{ fontSize: 10 }} width={50} />
                   <Tooltip
                     contentStyle={{ fontSize: 11 }}
-                    formatter={(v: number, k: string) => [Math.abs(v).toLocaleString(), k === "male" ? "Male (est.)" : "Female (est.)"]}
+                    formatter={(v: number, k: string) => [Math.abs(v).toLocaleString(), k === "male" ? t("demo.maleEst") : t("demo.femaleEst")]}
                   />
-                  <Legend wrapperStyle={{ fontSize: 10 }} formatter={(v) => (v === "male" ? "Male (est.)" : "Female (est.)")} />
-                  <Bar dataKey="male" name="male" fill="#0F7DC2" radius={[0, 0, 0, 3]} />
-                  <Bar dataKey="female" name="female" fill="#E22926" radius={[0, 3, 0, 0]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} formatter={(v) => (v === "male" ? t("demo.maleEst") : t("demo.femaleEst"))} />
+                  <Bar dataKey="male" name={t("demo.maleEst")} fill="#0F7DC2" radius={[0, 0, 0, 3]} />
+                  <Bar dataKey="female" name={t("demo.femaleEst")} fill="#E22926" radius={[0, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
             <div className="flex flex-col justify-center gap-3">
               <div className="rounded-lg border border-mlk/20 bg-background/60 p-3">
-                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Total voters</div>
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("demo.totalVoters")}</div>
                 <div className="text-xl font-bold text-mlk">{totalVoters.toLocaleString()}</div>
-                <div className="text-[10px] text-muted-foreground">across {duns.length} DUNs</div>
+                <div className="text-[10px] text-muted-foreground">{t("demo.acrossDuns").replace("{n}", String(duns.length))}</div>
               </div>
               <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
-                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Male / Female</div>
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("demo.maleFemale")}</div>
                 <div className="text-sm font-semibold">
                   <span className="text-blue-600 dark:text-blue-300">{totalMaleVoters.toLocaleString()}</span>
                   <span className="text-muted-foreground mx-1">/</span>
@@ -242,36 +263,36 @@ export function DemographicsTab() {
                 </div>
               </div>
               <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
-                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Youth (18–29)</div>
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("demo.youth1829")}</div>
                 <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{youthVoters.toLocaleString()} <span className="text-[10px] text-muted-foreground">({youthPct.toFixed(1)}%)</span></div>
               </div>
               <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Senior (56+)</div>
+                <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("demo.senior56plus")}</div>
                 <div className="text-sm font-semibold text-amber-700 dark:text-amber-300">{seniorVoters.toLocaleString()} <span className="text-[10px] text-muted-foreground">({seniorPct.toFixed(1)}%)</span></div>
               </div>
             </div>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2 italic">
-            Age bands from engine <code className="font-mono">age_band_counts</code>. Gender split within each band estimated using per-DUN male/female ratio (PDPA: no per-voter age × gender cross-tab shipped).
+            {t("demo.pyramidNoteP1")}<code className="font-mono">{t("demo.pyramidNoteCode")}</code>{t("demo.pyramidNoteP2")}
           </div>
         </CardContent>
       </Card>
 
       {/* Per-DUN table */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm">Per-DUN demographics</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">{t("demo.perDunDemographics")}</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-[10px]">DUN</TableHead>
-                <TableHead className="text-[10px] text-right">Voters</TableHead>
-                <TableHead className="text-[10px] text-right">Male</TableHead>
-                <TableHead className="text-[10px] text-right">Female</TableHead>
-                <TableHead className="text-[10px] text-right">Senior dep</TableHead>
-                <TableHead className="text-[10px] text-right">Gender bal</TableHead>
-                <TableHead className="text-[10px]">Age group</TableHead>
-                <TableHead className="text-[10px]">Ethnicity</TableHead>
+                <TableHead className="text-[10px]">{t("demo.colDun")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("demo.colVoters")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("demo.colMale")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("demo.colFemale")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("demo.colSeniorDep")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("demo.colGenderBal")}</TableHead>
+                <TableHead className="text-[10px]">{t("demo.colAgeGroup")}</TableHead>
+                <TableHead className="text-[10px]">{t("demo.colEthnicity")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -291,7 +312,7 @@ export function DemographicsTab() {
                     <TableCell className="text-[10px] text-right">{d.metrics.gender_balance_score.toFixed(1)}</TableCell>
                     <TableCell className="text-[10px] font-mono">{d.metrics.dominant_age_group}</TableCell>
                     <TableCell className="text-[10px]">{d.metrics.dominant_ethnicity_group}</TableCell>
-                    {tier !== "clear" && <TableCell><Badge variant="outline" className={`text-[9px] ${tier === "critical" ? "border-red-500/40 text-red-600" : "border-amber-500/40 text-amber-600"}`}>{tier}</Badge></TableCell>}
+                    {tier !== "clear" && <TableCell><Badge variant="outline" className={`text-[9px] ${tier === "critical" ? "border-red-500/40 text-red-600" : "border-amber-500/40 text-amber-600"}`}>{t(TIER_LOWER_I18N_KEY[tier])}</Badge></TableCell>}
                   </TableRow>
                 );
               })}
@@ -303,17 +324,17 @@ export function DemographicsTab() {
       {/* Risk signals */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> Risk signals</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> {t("demo.riskSignals")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex gap-2 mb-2">
-            <Badge variant="outline" className="border-red-500/40 text-red-600 text-[10px]">{criticalCount} critical</Badge>
-            <Badge variant="outline" className="border-amber-500/40 text-amber-600 text-[10px]">{warningCount} warning</Badge>
-            <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 text-[10px]">{duns.length - criticalCount - warningCount} clear</Badge>
+            <Badge variant="outline" className="border-red-500/40 text-red-600 text-[10px]">{t("demo.criticalCount").replace("{n}", String(criticalCount))}</Badge>
+            <Badge variant="outline" className="border-amber-500/40 text-amber-600 text-[10px]">{t("demo.warningCount").replace("{n}", String(warningCount))}</Badge>
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 text-[10px]">{t("demo.clearCount").replace("{n}", String(duns.length - criticalCount - warningCount))}</Badge>
           </div>
           {duns.map((d) => <RiskSignal key={d.geography.dun_code} d={d} />)}
           <p className="text-[10px] text-muted-foreground mt-2" style={{ color: MLK_ACCENT }}>
-            Thresholds: ≥30% senior dependency = CRITICAL (aging DUN, healthcare pressure); ≥25% = WARNING.
+            {t("demo.thresholdNote")}
           </p>
         </CardContent>
       </Card>
@@ -321,7 +342,7 @@ export function DemographicsTab() {
       {/* §7.3: Radar Chart — multi-dimensional DUN comparison */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> DUN Radar Comparison — Multi-dimensional</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> {t("demo.radarTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -336,16 +357,15 @@ export function DemographicsTab() {
               <PolarGrid stroke="var(--border)" />
               <PolarAngleAxis dataKey="dun" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
               <PolarRadiusAxis tick={{ fontSize: 8, fill: "var(--muted-foreground)" }} angle={90} domain={[0, 100]} />
-              <Radar name="Senior Dep" dataKey="Senior Dep" stroke="#dc2626" fill="#dc2626" fillOpacity={0.15} />
-              <Radar name="Gender Bal" dataKey="Gender Bal" stroke="#C77B2C" fill="#C77B2C" fillOpacity={0.15} />
-              <Radar name="Voter Density" dataKey="Voter Density" stroke="#0ea5e9" fill="#0ea5e9" fillOpacity={0.15} />
+              <Radar name={t("demo.radarSeniorDep")} dataKey="Senior Dep" stroke="#dc2626" fill="#dc2626" fillOpacity={0.15} />
+              <Radar name={t("demo.radarGenderBal")} dataKey="Gender Bal" stroke="#C77B2C" fill="#C77B2C" fillOpacity={0.15} />
+              <Radar name={t("demo.radarVoterDensity")} dataKey="Voter Density" stroke="#0ea5e9" fill="#0ea5e9" fillOpacity={0.15} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Tooltip contentStyle={{ fontSize: 11 }} />
             </RadarChart>
           </ResponsiveContainer>
           <div className="text-[9px] text-muted-foreground mt-2">
-            Radar shows 5 DUNs (N01–N05) across 3 dimensions: senior dependency, gender balance, voter density.
-            Higher values = more pronounced in that dimension.
+            {t("demo.radarNote")}
           </div>
         </CardContent>
       </Card>

@@ -17,6 +17,7 @@ import { PartyLogo, CoalitionBadge } from "@/components/shared/party-logo";
 import { Segmented } from "@/components/ui/segmented";
 import { PartyTag, CheckableTag, StatusTag, CoalitionFilterBar } from "@/components/ui/party-tag";
 import { CandidateHistoryDialog } from "@/components/shared/candidate-history-dialog";
+import { useI18n } from "@/lib/i18n";
 
 interface Election {
   id: string; name: string; date: string; headline_fact: string;
@@ -58,10 +59,10 @@ function SeatCount({ summary }: { summary: { PH: number; BN: number; PN: number;
   );
 }
 
-function marginTier(margin: number): { label: "MARGINAL" | "COMPETITIVE" | "SAFE"; color: string; bg: string } {
-  if (margin < 5) return { label: "MARGINAL", color: "#dc2626", bg: "bg-red-500/10 border-red-500/40 text-red-600 dark:text-red-300" };
-  if (margin < 10) return { label: "COMPETITIVE", color: "#d97706", bg: "bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-300" };
-  return { label: "SAFE", color: "#16a34a", bg: "bg-emerald-500/10 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" };
+function marginTier(margin: number): { label: "MARGINAL" | "COMPETITIVE" | "SAFE"; labelKey: "marginal" | "competitive" | "safe"; color: string; bg: string } {
+  if (margin < 5) return { label: "MARGINAL", labelKey: "marginal", color: "#dc2626", bg: "bg-red-500/10 border-red-500/40 text-red-600 dark:text-red-300" };
+  if (margin < 10) return { label: "COMPETITIVE", labelKey: "competitive", color: "#d97706", bg: "bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-300" };
+  return { label: "SAFE", labelKey: "safe", color: "#16a34a", bg: "bg-emerald-500/10 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" };
 }
 
 /**
@@ -72,6 +73,7 @@ function marginTier(margin: number): { label: "MARGINAL" | "COMPETITIVE" | "SAFE
  * with their ElectionData.my logos, grouped under their parent coalition.
  */
 function PartyBreakdownCard({ el }: { el: Election }) {
+  const { t } = useI18n();
   const breakdown = el.party_breakdown ?? {};
   const hasPartyData = Object.keys(breakdown).length > 0;
 
@@ -79,7 +81,7 @@ function PartyBreakdownCard({ el }: { el: Election }) {
     return (
       <Card className="border-mlk/20">
         <CardContent className="p-4 text-xs text-muted-foreground">
-          No party-level breakdown available for this election.
+          {t("elections.noPartyBreakdown")}
         </CardContent>
       </Card>
     );
@@ -94,7 +96,7 @@ function PartyBreakdownCard({ el }: { el: Election }) {
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <Users2 className="h-4 w-4 text-mlk" />
-          Party breakdown — component parties that won seats
+          {t("elections.partyBreakdownTitle")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -117,7 +119,7 @@ function PartyBreakdownCard({ el }: { el: Election }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-sm font-bold">{coalSeats}</span>
-                  <span className="text-[10px] text-muted-foreground">seats · {coalPct.toFixed(0)}%</span>
+                  <span className="text-[10px] text-muted-foreground">{t("elections.seats")} · {coalPct.toFixed(0)}%</span>
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -137,7 +139,7 @@ function PartyBreakdownCard({ el }: { el: Election }) {
                       </div>
                       <div className="text-end">
                         <div className="font-mono text-sm font-bold">{seats}</div>
-                        <div className="text-[8px] text-muted-foreground">{seatPct.toFixed(0)}% of {coal}</div>
+                        <div className="text-[8px] text-muted-foreground">{seatPct.toFixed(0)}% {t("elections.ofCoalition")} {coal}</div>
                       </div>
                     </div>
                   );
@@ -150,9 +152,7 @@ function PartyBreakdownCard({ el }: { el: Election }) {
         <div className="text-[9px] text-muted-foreground italic flex items-start gap-1">
           <Info className="h-3 w-3 flex-shrink-0 mt-0.5" />
           <span>
-            Real per-candidate data from ElectionData.MY data lake (<code className="font-mono">lake.electiondata.my/results_headline/</code>).
-            Party and coalition UIDs are verbatim from the MECo dataset (Thevananthan, T. 2025).
-            Logos from <code className="font-mono">electiondata.my/parties/&#123;uid&#125;/png</code>.
+            {t("elections.partyBreakdownNote")}
           </span>
         </div>
       </CardContent>
@@ -183,6 +183,7 @@ function winnerVotePct(vote_share: Record<string, number>): number {
 }
 
 function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]; onSelectCandidate: (name: string) => void }) {
+  const { t } = useI18n();
   const [view, setView] = useState<"parliament" | "dun">("parliament");
   const ge14 = elections.find((e) => e.id === "GE14");
   const ge15 = elections.find((e) => e.id === "GE15");
@@ -294,8 +295,8 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
   const safeCount = rows.filter((r) => r.tier.label === "SAFE").length;
 
   const headlineText = view === "parliament"
-    ? "Between GE14 and GE15, Melaka's 6 parliamentary seats swung dramatically from PH (4 seats) to a PN/PH tie (3 each). BN collapsed from 2 seats to 0."
-    : "Between GE14 (2018 state) and PRN15 (2021 snap election), Melaka's 28 DUN seats swung heavily back to BN. BN went from 13 to 21 seats — a landslide recovery. PH collapsed from 15 to 5. PN entered with 2 seats.";
+    ? t("elections.swingHeadlineParl")
+    : t("elections.swingHeadlineDun");
 
   return (
     <div className="space-y-3 fade-in-up">
@@ -304,8 +305,8 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
         value={view}
         onChange={(v) => setView(v)}
         options={[
-          { value: "parliament" as const, label: "Parliament (6 seats)" },
-          { value: "dun" as const, label: "DUN (28 seats)" },
+          { value: "parliament" as const, label: t("elections.viewParliament") },
+          { value: "dun" as const, label: t("elections.viewDun") },
         ]}
       />
 
@@ -314,31 +315,31 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="h-4 w-4 text-mlk" />
             <span className="text-xs font-mono text-muted-foreground">{fromLabel} → {toLabel}</span>
-            <Badge className="text-[9px] bg-mlk text-white border-transparent ms-auto">{view === "parliament" ? "PARLIAMENT SWING" : "DUN SWING"}</Badge>
+            <Badge className="text-[9px] bg-mlk text-white border-transparent ms-auto">{view === "parliament" ? t("elections.parliamentSwing") : t("elections.dunSwing")}</Badge>
           </div>
           <div className="text-sm font-medium leading-snug mb-3">
             {headlineText}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <div className="rounded-lg border border-mlk/20 bg-background/60 p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Seat Flips</div>
+              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("elections.seatFlips")}</div>
               <div className="text-lg font-bold text-mlk">{flips.length}<span className="text-[10px] text-muted-foreground"> / {totalSeats}</span></div>
-              <div className="text-[9px] text-muted-foreground">winner changed</div>
+              <div className="text-[9px] text-muted-foreground">{t("elections.winnerChanged")}</div>
             </div>
             <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Marginal</div>
+              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("elections.marginal")}</div>
               <div className="text-lg font-bold text-red-600 dark:text-red-300">{marginalCount}<span className="text-[10px] text-muted-foreground"> / {totalSeats}</span></div>
-              <div className="text-[9px] text-muted-foreground">margin &lt;5%</div>
+              <div className="text-[9px] text-muted-foreground">{t("elections.marginLt5")}</div>
             </div>
             <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Competitive</div>
+              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("elections.competitive")}</div>
               <div className="text-lg font-bold text-amber-700 dark:text-amber-300">{competitiveCount}<span className="text-[10px] text-muted-foreground"> / {totalSeats}</span></div>
-              <div className="text-[9px] text-muted-foreground">margin 5–10%</div>
+              <div className="text-[9px] text-muted-foreground">{t("elections.margin5to10")}</div>
             </div>
             <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Safe</div>
+              <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("elections.safe")}</div>
               <div className="text-lg font-bold text-emerald-700 dark:text-emerald-300">{safeCount}<span className="text-[10px] text-muted-foreground"> / {totalSeats}</span></div>
-              <div className="text-[9px] text-muted-foreground">margin &gt;10%</div>
+              <div className="text-[9px] text-muted-foreground">{t("elections.marginGt10")}</div>
             </div>
           </div>
         </CardContent>
@@ -347,7 +348,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <ArrowRight className="h-4 w-4 text-mlk" /> Vote % shift: {fromLabel} → {toLabel}
+            <ArrowRight className="h-4 w-4 text-mlk" /> {t("elections.voteShiftLabel")}: {fromLabel} → {toLabel}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -358,26 +359,26 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
                 <XAxis
                   type="number"
                   dataKey="x"
-                  name={`${fromLabel} margin %`}
+                  name={`${fromLabel} ${t("elections.marginPctLabel")}`}
                   domain={[0, view === "parliament" ? 14 : 50]}
                   tick={{ fontSize: 10 }}
-                  label={{ value: `${fromLabel} margin %`, position: "insideBottom", offset: -16, style: { fontSize: 10, fill: "currentColor" } }}
+                  label={{ value: `${fromLabel} ${t("elections.marginPctLabel")}`, position: "insideBottom", offset: -16, style: { fontSize: 10, fill: "currentColor" } }}
                 />
                 <YAxis
                   type="number"
                   dataKey="y"
-                  name={`${toLabel} margin %`}
+                  name={`${toLabel} ${t("elections.marginPctLabel")}`}
                   domain={[0, view === "parliament" ? 10 : 50]}
                   tick={{ fontSize: 10 }}
-                  label={{ value: `${toLabel} margin %`, angle: -90, position: "insideLeft", style: { fontSize: 10, fill: "currentColor" } }}
+                  label={{ value: `${toLabel} ${t("elections.marginPctLabel")}`, angle: -90, position: "insideLeft", style: { fontSize: 10, fill: "currentColor" } }}
                 />
                 <ZAxis type="number" dataKey="z" range={[view === "parliament" ? 200 : 80, view === "parliament" ? 200 : 80]} />
-                <ReferenceLine y={5} stroke="#dc2626" strokeDasharray="4 2" strokeOpacity={0.4} label={{ value: "marginal", fontSize: 9, fill: "#dc2626", position: "insideTopRight" }} />
+                <ReferenceLine y={5} stroke="#dc2626" strokeDasharray="4 2" strokeOpacity={0.4} label={{ value: t("elections.marginalLabel"), fontSize: 9, fill: "#dc2626", position: "insideTopRight" }} />
                 <ReferenceLine x={5} stroke="#dc2626" strokeDasharray="4 2" strokeOpacity={0.4} />
                 <Tooltip
                   cursor={{ strokeDasharray: "3 3" }}
                   contentStyle={{ fontSize: 11 }}
-                  formatter={(v: number, k: string) => [`${v.toFixed(1)}%`, k === "x" ? `${fromLabel} margin` : k === "y" ? `${toLabel} margin` : k]}
+                  formatter={(v: number, k: string) => [`${v.toFixed(1)}%`, k === "x" ? `${fromLabel} ${t("elections.margin")}` : k === "y" ? `${toLabel} ${t("elections.margin")}` : k]}
                   labelFormatter={() => ""}
                 />
                 <Scatter data={scatterData} fill="#C77B2C">
@@ -387,14 +388,14 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
             </ResponsiveContainer>
           </div>
           <div className="text-[9px] text-muted-foreground text-center mt-1">
-            Each dot = 1 {view === "parliament" ? "parliament" : "DUN"} · colour = {toLabel} winner · top-left = safe in both elections · bottom-right = tightened
+            {view === "parliament" ? t("elections.dotLegendParl") : t("elections.dotLegendDun")}
           </div>
         </CardContent>
       </Card>
 
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Winner&apos;s vote % — {fromLabel} vs {toLabel}</CardTitle>
+          <CardTitle className="text-sm">{t("elections.winnerVoteLabel")} — {fromLabel} {t("elections.vsLabel")} {toLabel}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className={view === "dun" ? "h-96" : "h-64"}>
@@ -418,7 +419,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-mlk" /> Seat-by-seat swing ({view === "parliament" ? "6 parliament" : "28 DUN"})
+            <Trophy className="h-4 w-4 text-mlk" /> {view === "parliament" ? t("elections.seatBySeatParl") : t("elections.seatBySeatDun")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -426,14 +427,14 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[10px]">{view === "parliament" ? "Parliament" : "DUN"}</TableHead>
-                  <TableHead className="text-[10px]">{fromLabel} Winner</TableHead>
+                  <TableHead className="text-[10px]">{view === "parliament" ? t("elections.parliament") : t("elections.dun")}</TableHead>
+                  <TableHead className="text-[10px]">{fromLabel} {t("elections.winner")}</TableHead>
                   <TableHead className="text-[10px] text-center">→</TableHead>
-                  <TableHead className="text-[10px]">{toLabel} Winner</TableHead>
-                  <TableHead className="text-[10px] text-right">{fromLabel} margin</TableHead>
-                  <TableHead className="text-[10px] text-right">{toLabel} margin</TableHead>
-                  <TableHead className="text-[10px] text-right">Δ margin</TableHead>
-                  <TableHead className="text-[10px]">{toLabel} tier</TableHead>
+                  <TableHead className="text-[10px]">{toLabel} {t("elections.winner")}</TableHead>
+                  <TableHead className="text-[10px] text-right">{fromLabel} {t("elections.margin")}</TableHead>
+                  <TableHead className="text-[10px] text-right">{toLabel} {t("elections.margin")}</TableHead>
+                  <TableHead className="text-[10px] text-right">{t("elections.deltaMargin")}</TableHead>
+                  <TableHead className="text-[10px]">{toLabel} {t("elections.tier")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -464,9 +465,9 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
                       </TableCell>
                       <TableCell className="text-center">
                         {r.winnerChanged ? (
-                          <ArrowRight className="h-3 w-3 text-mlk mx-auto" aria-label="winner changed" />
+                          <ArrowRight className="h-3 w-3 text-mlk mx-auto" aria-label={t("elections.winnerChanged")} />
                         ) : (
-                          <Minus className="h-3 w-3 text-muted-foreground mx-auto" aria-label="no change" />
+                          <Minus className="h-3 w-3 text-muted-foreground mx-auto" aria-label={t("elections.noChange")} />
                         )}
                       </TableCell>
                       <TableCell>
@@ -481,7 +482,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
                             <button
                               className="text-[8px] text-mlk hover:underline focus-mlk rounded"
                               onClick={() => onSelectCandidate(winnerCandidate15)}
-                              title="View full election history"
+                              title={t("elections.viewFullHistory")}
                             >
                               <User className="h-2 w-2 inline" />
                             </button>
@@ -494,7 +495,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
                         <DeltaIcon className="h-3 w-3 inline me-1" />{deltaSign}{r.marginDelta.toFixed(1)}pp
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={`text-[9px] ${r.tier.bg}`}>{r.tier.label}</Badge>
+                        <Badge variant="outline" className={`text-[9px] ${r.tier.bg}`}>{t(`elections.${r.tier.labelKey}`)}</Badge>
                       </TableCell>
                     </TableRow>
                   );
@@ -503,8 +504,8 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
             </Table>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2 italic">
-            Δ margin = {toLabel} margin − {fromLabel} margin (percentage points). Negative = seat tightened. Rows highlighted in amber = winner flipped between elections.
-            {view === "dun" && " GE14 DUN margins computed from vote_share (real ElectionData.MY data)."}
+            {view === "parliament" ? t("elections.swingTableNoteParl") : t("elections.swingTableNoteDun")}
+            {view === "dun" && ` ${t("elections.ge14DunNote")}`}
           </div>
         </CardContent>
       </Card>
@@ -520,6 +521,7 @@ function SwingAnalysis({ elections, onSelectCandidate }: { elections: Election[]
  * parliament, SE11→SE15 for DUN).
  */
 function HistoricalTrendsCard() {
+  const { t } = useI18n();
   const [trends, setTrends] = useState<{ parlimen: Record<string, Array<{ election: string; date: string; seats_won: number; seats_total: number; votes_perc: number }>>; dun: Record<string, Array<{ election: string; date: string; seats_won: number; seats_total: number; votes_perc: number }>> } | null>(null);
 
   useEffect(() => {
@@ -536,7 +538,7 @@ function HistoricalTrendsCard() {
   const parlData = parlElections.map((el) => {
     const entry: Record<string, number | string> = { election: el.replace("GE-", "GE") };
     ["BN", "PH", "PN"].forEach((coal) => {
-      const found = trends.parlimen[coal]?.find((t) => t.election === el);
+      const found = trends.parlimen[coal]?.find((rec) => rec.election === el);
       if (found) entry[coal] = found.votes_perc;
     });
     return entry;
@@ -546,7 +548,7 @@ function HistoricalTrendsCard() {
   const dunData = dunElections.map((el) => {
     const entry: Record<string, number | string> = { election: el.replace("SE-", "SE") };
     ["BN", "PH", "PN"].forEach((coal) => {
-      const found = trends.dun[coal]?.find((t) => t.election === el);
+      const found = trends.dun[coal]?.find((rec) => rec.election === el);
       if (found) entry[coal] = found.votes_perc;
     });
     return entry;
@@ -558,13 +560,13 @@ function HistoricalTrendsCard() {
     <Card className="border-mlk/20 bg-mlk-radial">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <History className="h-4 w-4 text-mlk" /> Historical coalition trends (Melaka)
+          <History className="h-4 w-4 text-mlk" /> {t("elections.historicalTrends")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {parlData.length > 0 && (
           <div>
-            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Parliament vote % (GE11–GE15)</div>
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">{t("elections.parliamentVoteTrend")}</div>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={parlData} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
@@ -583,7 +585,7 @@ function HistoricalTrendsCard() {
         )}
         {dunData.length > 0 && (
           <div>
-            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">DUN vote % (SE11–SE15)</div>
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">{t("elections.dunVoteTrend")}</div>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={dunData} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
@@ -603,9 +605,7 @@ function HistoricalTrendsCard() {
         <div className="text-[9px] text-muted-foreground italic flex items-start gap-1">
           <Info className="h-3 w-3 flex-shrink-0 mt-0.5 text-mlk" />
           <span>
-            Real coalition vote-share trends from ElectionData.MY REST API (api.electiondata.my/v1/parties/results).
-            BN dominated 2004 (71.6% parl, 69.3% DUN) but collapsed to 29.6% by GE15. PH peaked in GE14 (52.9%) then fell to 38.7%.
-            PN first contested Melaka in SE15/GE15.
+            {t("elections.historicalTrendsNote")}
           </span>
         </div>
       </CardContent>
@@ -614,6 +614,7 @@ function HistoricalTrendsCard() {
 }
 
 function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandidate: (name: string) => void }) {
+  const { t } = useI18n();
   const isPRN = el.id === "PRN15";
   const parlData = el.parliament_results.map((r) => {
     const p = PARLIAMENTS.find((x) => x.code === r.parliament_code);
@@ -635,12 +636,12 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
           <div className="flex items-center gap-2 mb-1">
             <Calendar className="h-4 w-4 text-mlk" />
             <span className="text-xs font-mono text-muted-foreground">{el.date}</span>
-            {isPRN && <Badge className="text-[9px] bg-mlk text-white border-transparent">HEADLINE</Badge>}
+            {isPRN && <Badge className="text-[9px] bg-mlk text-white border-transparent">{t("elections.headline")}</Badge>}
           </div>
           <div className="text-sm font-medium leading-snug">{el.headline_fact}</div>
           <div className="mt-2 flex flex-wrap gap-3 items-center">
-            {el.parliament_summary && (<div><div className="text-[10px] text-muted-foreground mb-1">Parliament seats</div><SeatCount summary={el.parliament_summary} /></div>)}
-            {el.dun_summary && (<div><div className="text-[10px] text-muted-foreground mb-1">DUN seats</div><SeatCount summary={el.dun_summary} /></div>)}
+            {el.parliament_summary && (<div><div className="text-[10px] text-muted-foreground mb-1">{t("elections.parliamentSeats")}</div><SeatCount summary={el.parliament_summary} /></div>)}
+            {el.dun_summary && (<div><div className="text-[10px] text-muted-foreground mb-1">{t("elections.dunSeats")}</div><SeatCount summary={el.dun_summary} /></div>)}
           </div>
         </CardContent>
       </Card>
@@ -653,7 +654,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
         <Card className="border-mlk/20 bg-mlk-radial">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Grid3x3 className="h-4 w-4 text-mlk" /> Current DUN composition (from PRN15 2021)
+              <Grid3x3 className="h-4 w-4 text-mlk" /> {t("elections.currentDunComposition")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -703,7 +704,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
 
       {/* Chart */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm">{el.parliament_results.length > 0 ? "Parliament vote %" : "DUN seats by parliament"}</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">{el.parliament_results.length > 0 ? t("elections.parliamentVotePct") : t("elections.dunSeatsByParliament")}</CardTitle></CardHeader>
         <CardContent>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -713,7 +714,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={50} interval={0} />
                   <YAxis tick={{ fontSize: 10 }} domain={[0, 60]} />
                   <Tooltip contentStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="votes" name="Vote %" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="votes" name={t("elections.votePct")} radius={[4, 4, 0, 0]}>
                     {parlData.map((d, i) => <Cell key={i} fill={d.fill} />)}
                   </Bar>
                 </BarChart>
@@ -736,16 +737,16 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
 
       {/* Results table — now includes party column + clickable candidate names */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> Results table <span className="text-[9px] text-muted-foreground font-normal">· Click winner name for full election history</span></CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> {t("elections.resultsTable")} <span className="text-[9px] text-muted-foreground font-normal">{t("elections.clickWinnerHint")}</span></CardTitle></CardHeader>
         <CardContent>
           {showDunBars ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[10px]">Parliament</TableHead>
-                  <TableHead className="text-[10px]">DUN</TableHead>
-                  <TableHead className="text-[10px]">Winner (Coalition)</TableHead>
-                  <TableHead className="text-[10px]">Party</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.parliament")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.dun")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.winnerCoalition")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.party")}</TableHead>
                   <TableHead className="text-[10px] text-right">BN</TableHead>
                   <TableHead className="text-[10px] text-right">PH</TableHead>
                   <TableHead className="text-[10px] text-right">PN</TableHead>
@@ -763,7 +764,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                           <button
                             className="text-[9px] text-mlk hover:underline flex items-center gap-0.5 focus-mlk rounded"
                             onClick={() => onSelectCandidate(d.winner_candidate!)}
-                            title="View full election history"
+                            title={t("elections.viewFullHistory")}
                           >
                             <User className="h-2.5 w-2.5" />
                             {d.winner_candidate.length > 20 ? d.winner_candidate.substring(0, 18) + "…" : d.winner_candidate}
@@ -785,13 +786,13 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[10px]">Parliament</TableHead>
-                  <TableHead className="text-[10px]">Winner (Coalition)</TableHead>
-                  <TableHead className="text-[10px]">Party</TableHead>
-                  <TableHead className="text-[10px] text-right">Vote %</TableHead>
-                  <TableHead className="text-[10px]">Runner-up</TableHead>
-                  <TableHead className="text-[10px] text-right">Margin</TableHead>
-                  <TableHead className="text-[10px]">Tier</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.parliament")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.winnerCoalition")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.party")}</TableHead>
+                  <TableHead className="text-[10px] text-right">{t("elections.votePct")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.runnerUp")}</TableHead>
+                  <TableHead className="text-[10px] text-right">{t("elections.margin")}</TableHead>
+                  <TableHead className="text-[10px]">{t("elections.tier")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -807,7 +808,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                             <button
                               className="text-[9px] text-mlk hover:underline flex items-center gap-0.5 focus-mlk rounded"
                               onClick={() => onSelectCandidate(r.winner_candidate!)}
-                              title="View full election history"
+                              title={t("elections.viewFullHistory")}
                             >
                               <User className="h-2.5 w-2.5" />
                               {r.winner_candidate.length > 20 ? r.winner_candidate.substring(0, 18) + "…" : r.winner_candidate}
@@ -821,7 +822,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
                       <TableCell className="text-[10px] text-right">{r.votes_pct.toFixed(1)}%</TableCell>
                       <TableCell className="text-[10px]">{r.runner_up}</TableCell>
                       <TableCell className="text-[10px] text-right font-mono">{r.margin_pct.toFixed(1)}%</TableCell>
-                      <TableCell><Badge variant="outline" className={`text-[9px] ${tier.bg}`}>{tier.label}</Badge></TableCell>
+                      <TableCell><Badge variant="outline" className={`text-[9px] ${tier.bg}`}>{t(`elections.${tier.labelKey}`)}</Badge></TableCell>
                     </TableRow>
                   );
                 })}
@@ -841,6 +842,7 @@ function ElectionView({ el, onSelectCandidate }: { el: Election; onSelectCandida
  * against election data → results displayed in a table + SQL shown.
  */
 function DataQueryCard() {
+  const { t } = useI18n();
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -852,6 +854,8 @@ function DataQueryCard() {
     error?: string;
   } | null>(null);
 
+  // SUGGESTED_QUERIES kept in English — sent directly to CF Workers AI (Llama 3.1 8B)
+  // which expects English prompts. Translating would change API behavior.
   const SUGGESTED_QUERIES = [
     "How many DUN seats did BN win in PRN15?",
     "Which parliament had the smallest margin in GE15?",
@@ -894,14 +898,13 @@ function DataQueryCard() {
     <Card className="border-mlk/20 bg-mlk-radial">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <Database className="h-4 w-4 text-mlk" /> Natural Language Data Query
+          <Database className="h-4 w-4 text-mlk" /> {t("elections.naturalLanguageQuery")}
           <Badge className="text-[9px] bg-mlk text-white border-transparent ms-1">DuckDB + CF AI</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="text-[10px] text-muted-foreground">
-          Ask any question about Melaka election data in plain English. CF Workers AI (Llama 3.1 8B) generates SQL,
-          DuckDB executes it against real ElectionData.MY results (12 parliament + 56 DUN records).
+          {t("elections.queryIntro")}
         </div>
 
         {/* Suggested queries */}
@@ -929,10 +932,10 @@ function DataQueryCard() {
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask: Which DUN did PH win by the smallest margin?"
+              placeholder={t("elections.queryPlaceholder")}
               className="w-full h-9 pl-8 pr-3 text-xs rounded-md bg-background border border-mlk/20 focus:border-mlk focus:outline-none focus:ring-1 focus:ring-mlk/40 placeholder:text-muted-foreground"
               disabled={loading}
-              aria-label="Natural language query"
+              aria-label={t("elections.queryAriaLabel")}
             />
           </div>
           <button
@@ -941,7 +944,7 @@ function DataQueryCard() {
             className="h-9 px-3 rounded-md bg-mlk text-white text-xs font-medium hover:bg-mlk/90 disabled:opacity-50 flex items-center gap-1.5"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
-            Query
+            {t("elections.queryButton")}
           </button>
         </form>
 
@@ -953,7 +956,7 @@ function DataQueryCard() {
               <div className="rounded-md border border-mlk/20 bg-background/60 p-2">
                 <div className="flex items-center gap-1.5 mb-1">
                   <Code className="h-3 w-3 text-mlk" />
-                  <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wide">Generated SQL</span>
+                  <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wide">{t("elections.generatedSql")}</span>
                 </div>
                 <pre className="text-[10px] font-mono text-foreground whitespace-pre-wrap break-words">{result.generated_sql}</pre>
               </div>
@@ -962,7 +965,7 @@ function DataQueryCard() {
             {/* Error */}
             {result.error && (
               <div className="rounded-md border border-red-500/40 bg-red-500/5 p-2 text-[10px] text-red-600 dark:text-red-300">
-                <strong>Error:</strong> {result.error}
+                <strong>{t("elections.errorLabel")}</strong> {result.error}
               </div>
             )}
 
@@ -970,8 +973,8 @@ function DataQueryCard() {
             {result.rows.length > 0 && (
               <div className="rounded-md border border-mlk/20 overflow-hidden">
                 <div className="bg-mlk/5 px-2 py-1 text-[9px] text-muted-foreground flex items-center justify-between">
-                  <span>{result.row_count} row{result.row_count !== 1 ? "s" : ""} returned</span>
-                  <span className="font-mono">DuckDB in-memory</span>
+                  <span>{result.row_count} {result.row_count !== 1 ? t("elections.rowPlural") : t("elections.rowSingular")} {t("elections.returned")}</span>
+                  <span className="font-mono">{t("elections.duckdbInMemory")}</span>
                 </div>
                 <div className="max-h-80 overflow-auto scrollbar-mlk">
                   <Table>
@@ -1000,7 +1003,7 @@ function DataQueryCard() {
 
             {result.rows.length === 0 && !result.error && (
               <div className="text-[10px] text-muted-foreground text-center py-2">
-                Query returned 0 rows.
+                {t("elections.queryReturned0")}
               </div>
             )}
           </div>
@@ -1011,6 +1014,7 @@ function DataQueryCard() {
 }
 
 export function ElectionsTab() {
+  const { t } = useI18n();
   const [data, setData] = useState<Election[] | null>(null);
   const [offline, setOffline] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
@@ -1031,17 +1035,17 @@ export function ElectionsTab() {
     setHistoryOpen(true);
   };
 
-  if (!data) return <Card className="border-mlk/20"><CardContent className="p-8 animate-pulse bg-muted/30 text-muted-foreground text-sm">Loading elections…</CardContent></Card>;
+  if (!data) return <Card className="border-mlk/20"><CardContent className="p-8 animate-pulse bg-muted/30 text-muted-foreground text-sm">{t("elections.loading")}</CardContent></Card>;
 
   return (
     <div className="space-y-3 fade-in-up">
       <Card className="border-mlk/20">
         <CardContent className="p-3 text-xs text-muted-foreground flex items-center gap-2">
           <Vote className="h-4 w-4 text-mlk flex-shrink-0" />
-          <span>Verified tier · source: ElectionData.my data lake + REST API. Real per-candidate data from lake.electiondata.my. Click any winner name for full election history (party switches visible).</span>
+          <span>{t("elections.verifiedTier")}</span>
           {offline && (
             <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
-              <WifiOff className="h-2.5 w-2.5" /> offline data
+              <WifiOff className="h-2.5 w-2.5" /> {t("elections.offlineData")}
             </span>
           )}
           <Button
@@ -1051,7 +1055,7 @@ export function ElectionsTab() {
             onClick={exportDunSummaryCSV}
           >
             <Download className="h-3.5 w-3.5" />
-            Export CSV
+            {t("elections.exportCsv")}
           </Button>
         </CardContent>
       </Card>
@@ -1062,8 +1066,8 @@ export function ElectionsTab() {
       <Tabs defaultValue="PRN15">
         <TabsList className="w-full justify-start">
           {data.map((e) => <TabsTrigger key={e.id} value={e.id} className="text-xs">{e.id}</TabsTrigger>)}
-          <TabsTrigger value="swing" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">Swing Analysis</TabsTrigger>
-          <TabsTrigger value="query" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">Data Query</TabsTrigger>
+          <TabsTrigger value="swing" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">{t("elections.swingAnalysis")}</TabsTrigger>
+          <TabsTrigger value="query" className="text-xs text-mlk data-[state=active]:bg-mlk data-[state=active]:text-white">{t("elections.dataQuery")}</TabsTrigger>
         </TabsList>
         {data.map((e) => (
           <TabsContent key={e.id} value={e.id}><ElectionView el={e} onSelectCandidate={handleSelectCandidate} /></TabsContent>

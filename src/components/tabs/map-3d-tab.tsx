@@ -117,6 +117,7 @@ export function Map3DTab() {
   const [showLabels, setShowLabels] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [autoRotate, setAutoRotate] = useState(false);
   const { setSelectedParliament, setSelectedDun } = useDashboardStore();
 
   // Refs for values needed inside the Three.js effect
@@ -126,6 +127,8 @@ export function Map3DTab() {
   useEffect(() => { showParlimenRef.current = showParlimen; }, [showParlimen]);
   const showLabelsRef = useRef(showLabels);
   useEffect(() => { showLabelsRef.current = showLabels; }, [showLabels]);
+  const autoRotateRef = useRef(autoRotate);
+  useEffect(() => { autoRotateRef.current = autoRotate; }, [autoRotate]);
 
   // ─── Initialize Three.js scene (runs once) ──────────────────────────────
   useEffect(() => {
@@ -152,11 +155,15 @@ export function Map3DTab() {
 
         // ─── Scene ──────────────────────────────────────────────────────
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0f1e);
-        scene.fog = new THREE.Fog(0x0a0f1e, 80, 200);
+        // Brightened background (was 0x0a0f1e — too dark). Now a dark blue-grey
+        // that provides contrast without being pitch black.
+        scene.background = new THREE.Color(0x1a2332);
+        // Fog pushed further out so it doesn't darken the map extrusions
+        scene.fog = new THREE.Fog(0x1a2332, 150, 400);
 
         // ─── Camera ─────────────────────────────────────────────────────
-        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        // Widened FOV + recentered target for better framing of all 28 DUNs.
+        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
         camera.position.set(30, 45, 55);
 
         // ─── Renderer ───────────────────────────────────────────────────
@@ -165,6 +172,9 @@ export function Map3DTab() {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFShadowMap; // PCFSoftShadowMap deprecated in r185
+        // Tone mapping for brighter, more visible scene
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.3;
         mount.innerHTML = "";
         mount.appendChild(renderer.domElement);
 
@@ -174,7 +184,7 @@ export function Map3DTab() {
         // not being available in the OpenNext bundle.
         const cameraTarget = new THREE.Vector3(0, 5, 0);
         const sphericalState = {
-          radius: 70,
+          radius: 90,            // zoomed out (was 70) for wider framing
           theta: Math.PI / 4,   // azimuthal angle (horizontal)
           phi: Math.PI / 3.5,   // polar angle (vertical, 0=top, PI/2=horizon)
         };
@@ -227,13 +237,9 @@ export function Map3DTab() {
         renderer.domElement.addEventListener("wheel", onWheel, { passive: false });
 
         // ─── Lighting ───────────────────────────────────────────────────
-        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-
-        const hemiLight = new THREE.HemisphereLight(0xffeedd, 0x1a1a2e, 0.5);
-        hemiLight.position.set(0, 50, 0);
-        scene.add(hemiLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        // Lighting — increased intensity for visibility (was 0.4 / 0.9 — too dark)
+        scene.add(new THREE.AmbientLight(0xb0c8e0, 0.9));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
         dirLight.position.set(30, 50, 25);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
@@ -245,16 +251,25 @@ export function Map3DTab() {
         dirLight.shadow.camera.top = 40;
         dirLight.shadow.camera.bottom = -40;
         scene.add(dirLight);
+        // Fill light from opposite side to brighten shadowed faces
+        const fillLight = new THREE.DirectionalLight(0x80a0ff, 0.5);
+        fillLight.position.set(-25, 40, -20);
+        scene.add(fillLight);
+
+        const hemiLight = new THREE.HemisphereLight(0xffeedd, 0x1a1a2e, 0.5);
+        hemiLight.position.set(0, 50, 0);
+        scene.add(hemiLight);
 
         // ─── Base plate (dark floor with subtle reflection) ─────────────
         // §6.2.5: Reflective/translucent ground with grid lines
-        const floorGeo = new THREE.PlaneGeometry(120, 120);
+        // Brightened floor (was 0x111827 — too dark). Now slate-800 for visibility.
+        const floorGeo = new THREE.PlaneGeometry(150, 150);
         const floorMat = new THREE.MeshStandardMaterial({
-          color: 0x111827,
-          roughness: 0.6,      // Lower roughness for slight reflectivity
-          metalness: 0.3,      // Higher metalness for subtle reflection
+          color: 0x1e293b,
+          roughness: 0.5,
+          metalness: 0.3,
           transparent: true,
-          opacity: 0.85,       // Slightly translucent for depth
+          opacity: 0.9,
         });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
@@ -262,15 +277,16 @@ export function Map3DTab() {
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Grid helper — subtle grid for spatial reference
-        const grid = new THREE.GridHelper(100, 50, 0x1e293b, 0x131c2e);
+        // Grid helper — brightened grid for spatial reference
+        const grid = new THREE.GridHelper(120, 40, 0x334155, 0x1e293b);
         grid.position.y = 0;
         grid.material.transparent = true;
-        grid.material.opacity = 0.4;
+        grid.material.opacity = 0.5;
         scene.add(grid);
 
-        // §6.2.5: Atmospheric fog for depth perception (already have fog, enhance)
-        scene.fog = new THREE.Fog(0x0a0f1e, 60, 180);
+        // §6.2.5: Atmospheric fog for depth perception (already set above with
+        // brighter color 0x1a2332 — do not override with the old dark 0x0a0f1e).
+        // scene.fog = new THREE.Fog(0x0a0f1e, 60, 180);  // REMOVED — was too dark
 
         // ─── Build DUN extrusions ───────────────────────────────────────
         const dunMeshes: Array<{
@@ -526,6 +542,12 @@ export function Map3DTab() {
           // Toggle label visibility
           dunMeshes.forEach((d) => { d.label.visible = showLabelsRef.current; });
 
+          // Auto-rotate: increment theta (azimuthal angle) for slow spin
+          if (autoRotateRef.current && cameraControlRef.current) {
+            cameraControlRef.current.sphericalState.theta += 0.003;
+            cameraControlRef.current.updateCamera();
+          }
+
           renderer.render(scene, camera);
           animationId = requestAnimationFrame(animate);
         };
@@ -760,6 +782,24 @@ export function Map3DTab() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Auto-rotate toggle — top-right of map */}
+          <div className="absolute top-3 right-3 z-10">
+            <button
+              onClick={() => setAutoRotate((v) => !v)}
+              className={`glass rounded-lg px-3 py-1.5 flex items-center gap-1.5 text-[10px] font-medium transition-colors ${
+                autoRotate ? "bg-mlk text-white" : "text-slate-300 hover:text-mlk"
+              }`}
+              aria-label={autoRotate ? "Stop auto-rotate" : "Start auto-rotate"}
+              title={autoRotate ? "Stop auto-rotate" : "Start auto-rotate"}
+            >
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+              </svg>
+              {autoRotate ? "Rotating" : "Auto-Rotate"}
+            </button>
           </div>
 
           {/* Loading overlay */}

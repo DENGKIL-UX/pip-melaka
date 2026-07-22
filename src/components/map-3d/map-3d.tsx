@@ -419,6 +419,8 @@ export function Map3D({ className }: Map3DProps) {
             const mat = ex.mesh.material as import("three").MeshStandardMaterial;
             ex.currentColor.copy(ex.targetColor);
             mat.color.copy(ex.targetColor);
+            // Update emissive to match (so glow stays consistent with winner color)
+            mat.emissive.copy(ex.targetColor).multiplyScalar(0.3);
             ex.currentHeight = ex.targetHeight;
             ex.mesh.scale.y = ex.targetHeight;
           }
@@ -443,10 +445,12 @@ export function Map3D({ className }: Map3DProps) {
             if (colorDelta > 0.001) {
               ex.currentColor.lerp(ex.targetColor, lerpFactor);
               mat.color.copy(ex.currentColor);
+              mat.emissive.copy(ex.currentColor).multiplyScalar(0.3);
               morphedAny = true;
             } else if (!ex.currentColor.equals(ex.targetColor)) {
               ex.currentColor.copy(ex.targetColor);
               mat.color.copy(ex.targetColor);
+              mat.emissive.copy(ex.targetColor).multiplyScalar(0.3);
               morphedAny = true;
             }
             if (heightDelta > 0.01) {

@@ -45,13 +45,16 @@ export async function createScene(opts: SceneOptions): Promise<SceneBundle> {
   // ── Scene ────────────────────────────────────────────────────────────────
   const scene = new THREE.Scene();
   // Background is transparent (alpha:true on renderer) so the dark slate-900
-  // container CSS shows through. Fog adds depth for the scatter layer.
-  scene.fog = new THREE.Fog(0x0f172a, 200, 600);
+  // container CSS shows through. Fog pushed further out so it doesn't darken
+  // the map extrusions (was 200-600, now 400-1000).
+  scene.fog = new THREE.Fog(0x0f172a, 400, 1000);
 
   // ── Camera ───────────────────────────────────────────────────────────────
-  // PerspectiveCamera at [0, 80, 120] looking at origin — see DESIGN.md §3 row 2.
-  const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 2000);
-  camera.position.set(0, 80, 120);
+  // PerspectiveCamera — positioned higher and further back for a wider framing
+  // that centers the map with all effects (HUD ring radius 135) visible.
+  // Previous [0, 80, 120] was too tight; new [0, 110, 170] zooms out + centers.
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2000);
+  camera.position.set(0, 110, 170);
   camera.lookAt(0, 0, 0);
 
   // ── Renderer ─────────────────────────────────────────────────────────────
@@ -64,13 +67,22 @@ export async function createScene(opts: SceneOptions): Promise<SceneBundle> {
   // Cap pixel ratio at 2 — retina screens otherwise render 4× the pixels.
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  // Tone mapping for brighter, more visible scene
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.3;
 
   // ── Lighting ─────────────────────────────────────────────────────────────
-  const ambient = new THREE.AmbientLight(0x404040, 0.6);
+  // Increased intensity for better visibility (was 0.6 / 0.8 — too dark).
+  // Added a second fill light from the opposite side for even illumination.
+  const ambient = new THREE.AmbientLight(0x6080a0, 1.0);
   scene.add(ambient);
-  const directional = new THREE.DirectionalLight(0xffffff, 0.8);
-  directional.position.set(100, 100, 50);
+  const directional = new THREE.DirectionalLight(0xffffff, 1.4);
+  directional.position.set(100, 150, 80);
   scene.add(directional);
+  // Fill light from opposite side to reduce shadows on dark surfaces
+  const fillLight = new THREE.DirectionalLight(0xa0c0ff, 0.6);
+  fillLight.position.set(-80, 100, -60);
+  scene.add(fillLight);
 
   // ── Controls (lazy-loaded from examples/jsm) ─────────────────────────────
   let controls: SceneBundle["controls"] = null;
@@ -82,10 +94,13 @@ export async function createScene(opts: SceneOptions): Promise<SceneBundle> {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = !prefersReducedMotion;
     controls.dampingFactor = 0.08;
-    controls.minDistance = 40;
-    controls.maxDistance = 400;
+    controls.minDistance = 50;
+    controls.maxDistance = 500;
     controls.maxPolarAngle = Math.PI * 0.48; // don't go below the floor
     controls.target.set(0, 0, 0);
+    // Auto-rotate config (enabled/disabled via UI button in map-3d.tsx)
+    controls.autoRotate = false;
+    controls.autoRotateSpeed = 0.8; // slow gentle rotation
   } catch (err) {
     // Defensive — if the controls chunk fails to load, the camera is still
     // usable in its default position. Surfaced in console per AGENT.md §3

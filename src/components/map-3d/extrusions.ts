@@ -272,10 +272,14 @@ export function buildDunExtrusion(
   const baseColor = new THREE.Color(initialColorHex);
   const material = new THREE.MeshStandardMaterial({
     color: baseColor.clone(),
-    roughness: 0.55,
-    metalness: 0.15,
+    roughness: 0.4,
+    metalness: 0.25,
     transparent: true,
-    opacity: 0.95,
+    opacity: 0.92,
+    // Emissive boost so the extrusions glow slightly and are visible against
+    // the dark background even in low-light areas.
+    emissive: baseColor.clone().multiplyScalar(0.3),
+    emissiveIntensity: 0.4,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(cx, 0, cz);
@@ -393,16 +397,18 @@ export function buildParlimenOutlines(
 
 export function buildTerrain(
   THREE: typeof import("three"),
-  size = 240
+  size = 300
 ): THREE.Mesh {
   const geometry = new THREE.PlaneGeometry(size, size, 1, 1);
   geometry.rotateX(-Math.PI / 2); // lay flat on XZ plane
+  // Brightened terrain (was slate-800 0x1e293b — too dark). Now slate-700
+  // with higher opacity so the floor is visible against the dark background.
   const material = new THREE.MeshStandardMaterial({
-    color: 0x1e293b, // slate-800
-    roughness: 0.95,
-    metalness: 0.05,
+    color: 0x334155, // slate-700 (brighter than slate-800)
+    roughness: 0.85,
+    metalness: 0.15,
     transparent: true,
-    opacity: 0.7,
+    opacity: 0.85,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.y = -0.05;

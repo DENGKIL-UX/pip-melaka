@@ -2945,3 +2945,80 @@ so the widgets won and covered the drawer/panel.
 ## Commit
 5d5c5dd — fix: 2D map drawer + AI panel appear above map (z-index stacking fix)
 Pushed to origin/main. CF Workers auto-deploy triggered.
+
+---
+Task ID: ZINDEX-FIX + S2D-6B-CHART-FIX
+Agent: main (Z.ai Code)
+Task: Fix 2D map drawer/AI panel z-index stacking + S2D-6B bar chart black color bug
+
+## Current project status description/assessment
+
+User reported two bugs:
+1. **2D map drawer/AI panel behind map**: When clicking a DUN/Parliament on the 2D map, the detail drawer appeared BEHIND the map. Same for the AI assistant panel — it rendered behind the map's floating widgets.
+2. **S2D-6B bar chart black in dark mode**: The "Escalation Risk Score by Locality (S2D-6B)" bar chart in the Predictive tab used black bars that were invisible in dark mode.
+
+VLM (glm-5v-turbo) confirmed both issues via screenshot analysis.
+
+## Current goals/completed modifications/verification results
+
+### Bug 1: Z-index stacking fix (commit 66090ed)
+**Root cause**: The 2D map's floating widgets (Map Layers panel `z-[1000]`, search dropdown `z-[1001]`, legend `z-[1000]`, seat summary `z-[1000]`) used higher z-index values than the DUN drawer (`z-50`) and AI assistant panel (`z-50`). Since the map container `<div>` did not create a stacking context, those `z-[1000]` values "leaked" to the page level and rendered ON TOP of the drawer and AI panel.
+
+**Fix**: Added `isolate` (CSS `isolation: isolate`) to the map container — creates a new stacking context boundary so all `z-[1000]` values inside the map are scoped to the map only.
+
+Files modified:
+- `src/components/tabs/map-2d-tab.tsx` — added `isolate` to map container div
+- `src/components/tabs/map-3d-tab.tsx` — added `isolate` to 3D canvas container
+- `src/components/map-2d/map-2d.tsx` — added `isolate` to fullscreen map variant
+- `src/components/shared/selected-dun-drawer.tsx` — bumped z-index: backdrop z-40→z-[60], panel z-50→z-[80]
+- `src/components/shared/assistant-panel.tsx` — bumped z-index: FAB button z-50→z-[55], panel z-50→z-[65]; FAB now hides (opacity-0 + pointer-events-none) when panel is open to avoid overlapping the panel's bottom edge
+
+Z-index hierarchy (page level):
+- Header: z-30
+- AI FAB button: z-[55]
+- AI panel: z-[65]
+- Drawer backdrop: z-[60]
+- Drawer panel: z-[80]
+- Command palette: z-[100]
+- Onboarding tour: z-[9999]
+- Map container: `isolate` (all internal z-[1000] scoped to map only)
+
+VLM-verified: AI panel now renders ON TOP of the 2D map and all its floating widgets.
+
+### Bug 2: S2D-6B bar chart black bars (commit 2bcf02c)
+**Root cause**: Recharts anti-pattern — nested `<Bar>` elements inside an outer `<Bar>`:
+```jsx
+<Bar dataKey="risk_score">
+  {escalationRisk.map((entry) => (
+    <Bar key={idx} fill={entry.risk_score >= 75 ? "#EF4444" : ...} />
+  ))}
+</Bar>
+```
+Recharts does NOT render nested `<Bar>` children as individual colored bars. It renders ONE bar series (the outer `<Bar>`) with the default black fill (#000). The inner `<Bar>` elements with conditional fills were silently ignored. In dark mode, black bars on dark background = invisible.
+
+**Fix**: Replaced with correct Recharts pattern — single `<Bar>` with `<Cell>` children:
+```jsx
+<Bar dataKey="risk_score" radius={[0, 4, 4, 0]}>
+  {escalationRisk.map((entry, idx) => (
+    <Cell key={idx} fill={entry.risk_score >= 75 ? "#EF4444" : entry.risk_score >= 50 ? "#F59E0B" : "#10B981"} />
+  ))}
+</Bar>
+```
+Also added `stroke="var(--muted-foreground)"` to XAxis/YAxis and `color: "var(--card-foreground)"` to Tooltip for dark-mode readability.
+
+File modified: `src/components/tabs/predictive-tab.tsx`
+
+VLM-verified (scrolled to chart): bars now display correct RAG colors — red (>=75, e.g. N03 Ayer Limau ~82), amber (>=50, e.g. N15 Pengkalan Batu ~72), green (<50, e.g. N01 Kuala Linggi ~24). Chart is "highly readable" in dark mode per VLM.
+
+### Also fixed
+- Removed duplicate `src/middleware.ts` (was conflicting with `src/proxy.ts` — Next.js 16 renamed middleware → proxy; having both causes "Both middleware file and proxy file detected" build error). The `proxy.ts` is the correct Next.js 16 convention.
+
+### Verification
+- `bun run lint`: 0 errors, 3 warnings (pre-existing)
+- Dev server: 200 OK on `/` after clearing Turbopack cache and removing middleware.ts
+- agent-browser E2E: AI panel renders above map; S2D-6B chart shows RAG-colored bars
+- Git: rebased on top of remote (cron job had pushed commit 5d5c5dd with same z-index fix); conflict in assistant-panel.tsx resolved keeping the opacity-hide-when-open enhancement
+
+## Unresolved issues / risks
+- None for these two bugs. Both VLM-verified as fixed.
+- The cron job (every 15 min) may continue making changes — need to coordinate to avoid future rebase conflicts.

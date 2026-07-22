@@ -1,10 +1,10 @@
 // src/proxy.ts
-// PIP-MLK Next.js 16 Proxy — Edge runtime for Cloudflare Workers.
-// Next.js 16 renamed middleware → proxy. Uses experimental-edge runtime.
+// PIP-MLK Next.js 16 Proxy — CORS + security headers + rate limiting.
+// Next.js 16 renamed middleware → proxy. Proxy ALWAYS runs on Node.js runtime;
+// route segment config (e.g. `export const runtime`) is NOT allowed in proxy
+// files. See https://nextjs.org/docs/messages/middleware-to-proxy
 
 import { NextRequest, NextResponse } from "next/server";
-
-export const runtime = "experimental-edge";
 
 // ─── Allowed CORS origins ─────────────────────────────────────────────────────
 const ALLOWED_ORIGINS: string[] = [

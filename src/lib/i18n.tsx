@@ -102,6 +102,74 @@ const translations: Record<Locale, Record<string, string>> = {
     "onboarding.marginal.desc": "6 DUN seats with <5pp victory margin — the most competitive seats most likely to flip in PRN16. Sorted by tightest margin with risk scores.",
     "onboarding.s2d.title": "S2D Intelligence Engine",
     "onboarding.s2d.desc": "9-phase Sensing→Deciding→Acting loop with 56-page intelligence engine. Real-time signal feeds, scenario simulations, and predictive analytics.",
+    "onboarding.step": "Step",
+    "onboarding.of": "of",
+
+    // Trust section badges
+    "trust.certified": "Certified",
+    "trust.verified": "Verified",
+    "trust.public": "Public",
+
+    // Metrics strip
+    "metrics.parliaments": "Parliaments",
+    "metrics.dunSeats": "DUN Seats",
+    "metrics.elections": "Elections",
+    "metrics.verifiedVoters": "Verified Voters",
+    "metrics.geojsonLayers": "GeoJSON Layers",
+    "metrics.s2dPhases": "S2D Phases",
+    "metrics.gatesClosed": "Gates Closed",
+
+    // Footer
+    "footer.tagline": "Political Intelligence Platform for Melaka State. Truth Above All.",
+    "footer.allSystemsOperational": "All systems operational",
+    "footer.product": "Product",
+    "footer.dashboard": "Dashboard",
+    "footer.map2d": "2D Map",
+    "footer.map3d": "3D Map",
+    "footer.s2dIntelligence": "S2D Intelligence",
+    "footer.dataSources": "Data Sources",
+    "footer.legal": "Legal",
+    "footer.privacyPolicy": "Privacy Policy",
+    "footer.pdpaAkta": "PDPA Akta 709",
+    "footer.dataGovernance": "Data Governance",
+    "footer.termsOfUse": "Terms of Use",
+    "footer.builtWith": "Built with Next.js 16 + Cloudflare Workers + Three.js + Leaflet.",
+    "footer.dataSourcedFrom": "Data sourced from DOSM kawasanku (2026 redelineation) · ElectionData.MY (CC0) · Real DOSM kawasanku GeoJSON · PDPA Akta 709 compliant",
+
+    // Dashboard loading fallbacks
+    "loading.map2d": "Loading 2D map…",
+    "loading.map3d": "Loading 3D map…",
+    "loading.s2dConsole": "Loading S2D console…",
+    "loading.s2d360": "Loading S2D 360…",
+    "loading.publicComm": "Loading Public Comm…",
+    "loading.incidents": "Loading Incidents…",
+    "loading.scenarios": "Loading Scenarios…",
+    "loading.predictive": "Loading Predictive…",
+    "loading.insights": "Loading Insights…",
+    "loading.alerts": "Loading Alerts…",
+    "loading.dualLayer": "Loading Dual-Layer…",
+    "loading.scraper": "Loading Scraper…",
+
+    // Dashboard header tooltips
+    "header.backToLanding": "Back to landing page",
+    "header.commandPalette": "Open command palette (Cmd+K)",
+    "header.exportBrief": "Export intelligence brief as JSON",
+    "header.s2dLoop": "S2D loop",
+    "header.signals": "signals",
+
+    // Map legend
+    "map.legendTitle": "Coalition",
+    "map.legendNoData": "No Data",
+    "map.statsParliaments": "Parliaments",
+    "map.statsDun": "DUN",
+    "map.statsVoters": "voters",
+    "map.statsScenario": "scenario",
+    "map.cameraTop": "Top",
+    "map.cameraIso": "Iso",
+    "map.cameraSide": "Side",
+    "map.cameraClose": "Close",
+    "map.cameraPresets": "Camera Presets",
+    "map.timeAnimation": "Time Animation",
   },
 
   ms: {
@@ -177,6 +245,74 @@ const translations: Record<Locale, Record<string, string>> = {
     "onboarding.marginal.desc": "6 kerusi DUN dengan margin kemenangan <5pp — kerusi paling kompetitif yang berkemungkinan bertukar tangan dalam PRN16. Disusun mengikut margin paling nipis dengan skor risiko.",
     "onboarding.s2d.title": "Enjin Kecerdasan S2D",
     "onboarding.s2d.desc": "Gelung 9-fasa Merasakan→Membuat Keputusan→Bertindak dengan enjin kecerdasan 56-halaman. Suapan isyarat masa nyata, simulasi senario, dan analitik ramalan.",
+    "onboarding.step": "Langkah",
+    "onboarding.of": "daripada",
+
+    // Trust section badges
+    "trust.certified": "Disahkan",
+    "trust.verified": "Tersahkan",
+    "trust.public": "Awam",
+
+    // Metrics strip
+    "metrics.parliaments": "Parlimen",
+    "metrics.dunSeats": "Kerusi DUN",
+    "metrics.elections": "Pilihan Raya",
+    "metrics.verifiedVoters": "Pengundi Tersahkan",
+    "metrics.geojsonLayers": "Lapisan GeoJSON",
+    "metrics.s2dPhases": "Fasa S2D",
+    "metrics.gatesClosed": "Pintu Ditutup",
+
+    // Footer
+    "footer.tagline": "Platform Kecerdasan Politik untuk Negeri Melaka. Kebenaran Di Atas Segalanya.",
+    "footer.allSystemsOperational": "Semua sistem beroperasi",
+    "footer.product": "Produk",
+    "footer.dashboard": "Papan Pemuka",
+    "footer.map2d": "Peta 2D",
+    "footer.map3d": "Peta 3D",
+    "footer.s2dIntelligence": "Kecerdasan S2D",
+    "footer.dataSources": "Sumber Data",
+    "footer.legal": "Undang-undang",
+    "footer.privacyPolicy": "Polisi Privasi",
+    "footer.pdpaAkta": "PDPA Akta 709",
+    "footer.dataGovernance": "Tadbir Urus Data",
+    "footer.termsOfUse": "Terma Penggunaan",
+    "footer.builtWith": "Dibina dengan Next.js 16 + Cloudflare Workers + Three.js + Leaflet.",
+    "footer.dataSourcedFrom": "Data dari DOSM kawasanku (penjadualan semula 2026) · ElectionData.MY (CC0) · GeoJSON DOSM kawasanku sebenar · Mematuhi PDPA Akta 709",
+
+    // Dashboard loading fallbacks
+    "loading.map2d": "Memuatkan peta 2D…",
+    "loading.map3d": "Memuatkan peta 3D…",
+    "loading.s2dConsole": "Memuatkan konsol S2D…",
+    "loading.s2d360": "Memuatkan S2D 360…",
+    "loading.publicComm": "Memuatkan Komunikasi Awam…",
+    "loading.incidents": "Memuatkan Insiden…",
+    "loading.scenarios": "Memuatkan Senario…",
+    "loading.predictive": "Memuatkan Ramalan…",
+    "loading.insights": "Memuatkan Wawasan…",
+    "loading.alerts": "Memuatkan Amaran…",
+    "loading.dualLayer": "Memuatkan Lapisan Dual…",
+    "loading.scraper": "Memuatkan Pengikis…",
+
+    // Dashboard header tooltips
+    "header.backToLanding": "Kembali ke halaman utama",
+    "header.commandPalette": "Buka palet arahan (Cmd+K)",
+    "header.exportBrief": "Eksport ringkasan kecerdasan sebagai JSON",
+    "header.s2dLoop": "Gelung S2D",
+    "header.signals": "isyarat",
+
+    // Map legend
+    "map.legendTitle": "Gabungan",
+    "map.legendNoData": "Tiada Data",
+    "map.statsParliaments": "Parlimen",
+    "map.statsDun": "DUN",
+    "map.statsVoters": "pengundi",
+    "map.statsScenario": "senario",
+    "map.cameraTop": "Atas",
+    "map.cameraIso": "Iso",
+    "map.cameraSide": "Sisi",
+    "map.cameraClose": "Dekat",
+    "map.cameraPresets": "Praset Kamera",
+    "map.timeAnimation": "Animasi Masa",
   },
 };
 

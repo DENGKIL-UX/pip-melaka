@@ -22,9 +22,23 @@ import { GovernanceTab } from "@/components/tabs/governance-tab";
 import { AssistantPanel } from "@/components/shared/assistant-panel";
 import { SelectedDunDrawer } from "@/components/shared/selected-dun-drawer";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { LanguageToggle } from "@/lib/i18n";
+import { LanguageToggle, useI18n } from "@/lib/i18n";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { ShortcutCheatSheet } from "@/components/shared/shortcut-cheat-sheet";
+
+/**
+ * §11.5: i18n-aware loading fallback for lazy-loaded tab chunks.
+ * Renders a centered spinner + translated "Loading X…" message.
+ */
+function TabLoading({ messageKey, fallback }: { messageKey: string; fallback: string }) {
+  const { t } = useI18n();
+  return (
+    <div className="h-[450px] flex flex-col items-center justify-center gap-3 text-muted-foreground">
+      <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-mlk border-t-transparent" aria-hidden="true" />
+      <span className="text-sm">{t(messageKey, fallback)}</span>
+    </div>
+  );
+}
 
 /**
  * Retry wrapper for next/dynamic — retries the chunk load up to 5 times with
@@ -45,18 +59,18 @@ function withRetry<T>(importFn: () => Promise<T>, retries = 5): Promise<T> {
 // Lazy-load map components (Leaflet + Three.js are heavy — ssr: false because
 // they reference window during module evaluation). ALL dynamic imports use
 // withRetry to handle transient ChunkLoadError (dev server OOM during compilation).
-const Map2DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab }))), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 2D map…</div> });
-const Map3DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-3d-tab").then((m) => ({ default: m.Map3DTab }))), { ssr: false, loading: () => <div className="h-[500px] flex items-center justify-center text-muted-foreground">Loading 3D map…</div> });
-const S2DConsoleTab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-console-tab").then((m) => ({ default: m.S2DConsoleTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D console…</div> });
-const S2D360Tab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-360-tab").then((m) => ({ default: m.S2D360Tab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading S2D 360…</div> });
-const PublicCommunicationTab = dynamic(() => withRetry(() => import("@/components/tabs/public-communication-tab").then((m) => ({ default: m.PublicCommunicationTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Public Comm…</div> });
-const IncidentCasebookTab = dynamic(() => withRetry(() => import("@/components/tabs/incident-casebook-tab").then((m) => ({ default: m.IncidentCasebookTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Incidents…</div> });
-const ScenarioTab = dynamic(() => withRetry(() => import("@/components/tabs/scenario-tab").then((m) => ({ default: m.ScenarioTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Scenarios…</div> });
-const PredictiveTab = dynamic(() => withRetry(() => import("@/components/tabs/predictive-tab").then((m) => ({ default: m.PredictiveTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Predictive…</div> });
-const InsightReportsTab = dynamic(() => withRetry(() => import("@/components/tabs/insight-reports-tab").then((m) => ({ default: m.InsightReportsTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Insights…</div> });
-const AlertsTab = dynamic(() => withRetry(() => import("@/components/tabs/alerts-tab").then((m) => ({ default: m.AlertsTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Alerts…</div> });
-const DualLayerTab = dynamic(() => withRetry(() => import("@/components/tabs/dual-layer-tab").then((m) => ({ default: m.DualLayerTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Dual-Layer…</div> });
-const ScraperTab = dynamic(() => withRetry(() => import("@/components/tabs/scraper-tab").then((m) => ({ default: m.ScraperTab }))), { ssr: false, loading: () => <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading Scraper…</div> });
+const Map2DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-2d-tab").then((m) => ({ default: m.Map2DTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.map2d" fallback="Loading 2D map…" /> });
+const Map3DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-3d-tab").then((m) => ({ default: m.Map3DTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.map3d" fallback="Loading 3D map…" /> });
+const S2DConsoleTab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-console-tab").then((m) => ({ default: m.S2DConsoleTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.s2dConsole" fallback="Loading S2D console…" /> });
+const S2D360Tab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-360-tab").then((m) => ({ default: m.S2D360Tab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.s2d360" fallback="Loading S2D 360…" /> });
+const PublicCommunicationTab = dynamic(() => withRetry(() => import("@/components/tabs/public-communication-tab").then((m) => ({ default: m.PublicCommunicationTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.publicComm" fallback="Loading Public Comm…" /> });
+const IncidentCasebookTab = dynamic(() => withRetry(() => import("@/components/tabs/incident-casebook-tab").then((m) => ({ default: m.IncidentCasebookTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.incidents" fallback="Loading Incidents…" /> });
+const ScenarioTab = dynamic(() => withRetry(() => import("@/components/tabs/scenario-tab").then((m) => ({ default: m.ScenarioTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.scenarios" fallback="Loading Scenarios…" /> });
+const PredictiveTab = dynamic(() => withRetry(() => import("@/components/tabs/predictive-tab").then((m) => ({ default: m.PredictiveTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.predictive" fallback="Loading Predictive…" /> });
+const InsightReportsTab = dynamic(() => withRetry(() => import("@/components/tabs/insight-reports-tab").then((m) => ({ default: m.InsightReportsTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.insights" fallback="Loading Insights…" /> });
+const AlertsTab = dynamic(() => withRetry(() => import("@/components/tabs/alerts-tab").then((m) => ({ default: m.AlertsTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.alerts" fallback="Loading Alerts…" /> });
+const DualLayerTab = dynamic(() => withRetry(() => import("@/components/tabs/dual-layer-tab").then((m) => ({ default: m.DualLayerTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.dualLayer" fallback="Loading Dual-Layer…" /> });
+const ScraperTab = dynamic(() => withRetry(() => import("@/components/tabs/scraper-tab").then((m) => ({ default: m.ScraperTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.scraper" fallback="Loading Scraper…" /> });
 
 const TABS: Array<{ id: DashboardTab; label: string; i18nKey: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "overview", label: "Overview", i18nKey: "tab.overview", icon: LayoutDashboard },
@@ -126,7 +140,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <Button variant="ghost" size="sm" onClick={onExit} className="text-muted-foreground hover:text-mlk p-2 h-8" aria-label="Back to landing page">
+              <Button variant="ghost" size="sm" onClick={onExit} className="text-muted-foreground hover:text-mlk p-2 h-8" aria-label={t("header.backToLanding")}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <Sparkles className="h-5 w-5 text-mlk flex-shrink-0" aria-hidden="true" />
@@ -136,7 +150,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] hidden md:inline-flex items-center gap-1.5" aria-label={`S2D loop: ${loopStatus}, ${signalsCount} signals`}>
+              <Badge variant="outline" className="text-[10px] hidden md:inline-flex items-center gap-1.5" aria-label={`${t("header.s2dLoop")}: ${loopStatus}, ${signalsCount} ${t("header.signals")}`}>
                 <span className="pulse-dot" aria-hidden="true" />
                 <Activity className="h-3 w-3" aria-hidden="true" />
                 S2D: {loopStatus} · {signalsCount}
@@ -154,7 +168,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                   const ev = new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: false, bubbles: true });
                   window.dispatchEvent(ev);
                 }}
-                aria-label="Open command palette (Cmd+K)"
+                aria-label={t("header.commandPalette")}
               >
                 <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-muted">⌘K</kbd>
                 <Search className="h-3.5 w-3.5" />
@@ -172,8 +186,8 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                   });
                   downloadBrief(brief);
                 }}
-                aria-label="Export intelligence brief as JSON"
-                title="Export intelligence brief (JSON)"
+                aria-label={t("header.exportBrief")}
+                title={t("header.exportBrief")}
               >
                 <Download className="h-3.5 w-3.5" />
                 <span className="hidden xl:inline">Export</span>

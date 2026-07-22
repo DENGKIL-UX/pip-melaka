@@ -4,9 +4,11 @@
  * TrustSection — "Enterprise Data Governance" section for the landing page.
  *
  * Three trust cards: PDPA Compliance, 3-Source Verification, Fully Auditable.
+ * §11.5 i18n-wired (EN/BM).
  */
 import { motion } from "framer-motion";
 import { ShieldCheck, Database, Globe2, BadgeCheck } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 function TrustCard({
   icon: Icon,
@@ -45,6 +47,8 @@ function TrustCard({
 }
 
 export function TrustSection() {
+  const { t } = useI18n();
+
   return (
     <section className="py-16 md:py-20" aria-label="Data governance and trust">
       <motion.div
@@ -55,36 +59,36 @@ export function TrustSection() {
         className="text-center mb-10"
       >
         <div className="divider-label mb-4">
-          <span>Enterprise Data Governance</span>
+          <span>{t("landing.trustTitle")}</span>
         </div>
         <h2 className="text-2xl md:text-3xl font-bold">
-          <span className="bg-mlk-gradient bg-clip-text text-transparent">Truth Above All.</span>
+          <span className="bg-mlk-gradient bg-clip-text text-transparent">{t("landing.hero")}</span>
         </h2>
         <p className="text-sm text-muted-foreground mt-2 max-w-2xl mx-auto">
-          Every data point is traceable, every transformation logged, every boundary verified against official gazettes.
+          {t("landing.trustSubtitle")}
         </p>
       </motion.div>
 
       <div className="grid md:grid-cols-3 gap-6">
         <TrustCard
           icon={ShieldCheck}
-          title="PDPA Akta 709 Compliant"
-          description="Zero individual voter data shipped. All analytics are aggregate-level only. The platform never exposes personal voter records."
-          badge="Certified"
+          title={t("landing.pdpaTitle")}
+          description={t("landing.pdpaDesc")}
+          badge={t("trust.certified")}
           delay={0.1}
         />
         <TrustCard
           icon={Database}
-          title="3-Source Verification"
-          description="DOSM kawasanku GeoJSON + SPR voter rolls + ElectionData.MY API — cross-referenced and verified at build time."
-          badge="Verified"
+          title={t("landing.verifiedTitle")}
+          description={t("landing.verifiedDesc")}
+          badge={t("trust.verified")}
           delay={0.2}
         />
         <TrustCard
           icon={Globe2}
-          title="Fully Auditable"
-          description="Complete build-time engine with open-source pipeline. Every transformation logged with provenance gates (8 of 9 closed)."
-          badge="Public"
+          title={t("landing.auditableTitle")}
+          description={t("landing.auditableDesc")}
+          badge={t("trust.public")}
           delay={0.3}
         />
       </div>

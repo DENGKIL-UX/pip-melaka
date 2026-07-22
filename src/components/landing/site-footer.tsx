@@ -2,11 +2,14 @@
 
 /**
  * SiteFooter — enterprise SaaS footer with brand, links, and legal sections.
+ * §11.5 i18n-wired (EN/BM).
  */
 import { ShieldCheck, Database, Globe2 } from "lucide-react";
-import { LanguageToggle } from "@/lib/i18n";
+import { LanguageToggle, useI18n } from "@/lib/i18n";
 
 export function SiteFooter() {
+  const { t } = useI18n();
+
   return (
     <footer className="relative z-10 border-t border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-10 md:py-12">
@@ -20,11 +23,11 @@ export function SiteFooter() {
               </span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Political Intelligence Platform for Melaka State. Truth Above All.
+              {t("footer.tagline")}
             </p>
             <div className="flex items-center gap-2 mt-4 text-[10px] text-muted-foreground">
               <span className="pulse-dot" aria-hidden="true" />
-              <span>All systems operational</span>
+              <span>{t("footer.allSystemsOperational")}</span>
             </div>
             <div className="mt-3">
               <LanguageToggle />
@@ -33,19 +36,21 @@ export function SiteFooter() {
 
           {/* Product links */}
           <div>
-            <h4 className="font-semibold mb-3 text-xs uppercase tracking-wider text-muted-foreground">Product</h4>
+            <h4 className="font-semibold mb-3 text-xs uppercase tracking-wider text-muted-foreground">
+              {t("footer.product")}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">Dashboard</a></li>
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">2D Map</a></li>
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">3D Map</a></li>
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">S2D Intelligence</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.dashboard")}</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.map2d")}</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.map3d")}</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.s2dIntelligence")}</a></li>
             </ul>
           </div>
 
           {/* Data sources */}
           <div>
             <h4 className="font-semibold mb-3 text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-              <Database className="w-3 h-3" /> Data Sources
+              <Database className="w-3 h-3" /> {t("footer.dataSources")}
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
@@ -73,22 +78,24 @@ export function SiteFooter() {
 
           {/* Legal */}
           <div>
-            <h4 className="font-semibold mb-3 text-xs uppercase tracking-wider text-muted-foreground">Legal</h4>
+            <h4 className="font-semibold mb-3 text-xs uppercase tracking-wider text-muted-foreground">
+              {t("footer.legal")}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">PDPA Akta 709</a></li>
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">Data Governance</a></li>
-              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">Terms of Use</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.privacyPolicy")}</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.pdpaAkta")}</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.dataGovernance")}</a></li>
+              <li><a href="#" className="text-foreground/80 hover:text-mlk transition-colors">{t("footer.termsOfUse")}</a></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 pt-6 border-t border-border/40 text-center text-xs text-muted-foreground">
           <p className="mb-1">
-            <strong className="text-mlk">PIP-MLK</strong> v1.0.0 — Built with Next.js 16 + Cloudflare Workers + Three.js + Leaflet.
+            <strong className="text-mlk">PIP-MLK</strong> v1.0.0 — {t("footer.builtWith")}
           </p>
           <p>
-            Data sourced from DOSM kawasanku (2026 redelineation) · ElectionData.MY (CC0) · Real DOSM kawasanku GeoJSON · PDPA Akta 709 compliant
+            {t("footer.dataSourcedFrom")}
           </p>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { MLK_CENTER, MLK_DEFAULT_ZOOM, PARLIAMENTS } from "@/lib/melaka-constant
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
 import { partyLogoUrl, type PartyCode } from "@/lib/party-metadata";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { useI18n } from "@/lib/i18n";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -161,6 +162,7 @@ export function Map2DTab() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { setSelectedParliament, setSelectedDun } = useDashboardStore();
+  const { t } = useI18n();
 
   // ─── Search logic ──────────────────────────────────────────────────────
   interface SearchResult {
@@ -690,7 +692,7 @@ export function Map2DTab() {
       <CardContent>
         {/* Legend + Search */}
         <div className="flex items-center gap-3 mb-4 text-xs flex-wrap">
-          <span className="text-muted-foreground flex items-center gap-1"><Layers className="h-3 w-3" /> Coalition:</span>
+          <span className="text-muted-foreground flex items-center gap-1"><Layers className="h-3 w-3" /> {t("map.legendTitle")}:</span>
           {Object.entries(PARTY_COLORS).map(([code, color]) => (
             <span key={code} className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
@@ -702,11 +704,11 @@ export function Map2DTab() {
             <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
             <input
               type="text"
-              placeholder="Search DUN or Parliament…"
+              placeholder={t("map.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 w-48 rounded-md border border-border/60 bg-card pl-8 pr-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:border-mlk/40 focus:ring-1 focus:ring-mlk/20 transition-colors"
-              aria-label="Search DUN or Parliament by name"
+              aria-label={t("map.searchPlaceholder")}
             />
             {searchResults.length > 0 && (
               <div className="absolute top-10 right-0 z-[1001] w-64 rounded-lg border border-mlk/20 bg-card shadow-lg overflow-hidden max-h-64 overflow-y-auto scrollbar-mlk">
@@ -726,7 +728,7 @@ export function Map2DTab() {
             )}
           </div>
           <span className="text-muted-foreground flex items-center gap-1">
-            <MousePointer2 className="h-3 w-3" /> Hover for results
+            <MousePointer2 className="h-3 w-3" /> {t("map.hoverResults")}
           </span>
         </div>
 
@@ -739,17 +741,17 @@ export function Map2DTab() {
             <div className="glass rounded-full px-5 py-2 flex items-center gap-4 text-xs shadow-lg">
               <span className="flex items-center gap-1">
                 <Building2 className="w-3 h-3 text-mlk" />
-                <span className="font-medium">6 Parliaments</span>
+                <span className="font-medium">6 {t("map.statsParliaments")}</span>
               </span>
               <span className="w-px h-3 bg-border/40" />
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3 text-mlk" />
-                <span className="font-medium">28 DUN</span>
+                <span className="font-medium">28 {t("map.statsDun")}</span>
               </span>
               <span className="w-px h-3 bg-border/40" />
               <span className="flex items-center gap-1">
                 <Users className="w-3 h-3 text-mlk" />
-                <span className="font-medium">71,415 Voters</span>
+                <span className="font-medium">71,415 {t("map.statsVoters")}</span>
               </span>
               <span className="w-px h-3 bg-border/40" />
               <span className="flex items-center gap-1">
@@ -764,7 +766,7 @@ export function Map2DTab() {
             <div className="absolute inset-0 flex items-center justify-center bg-slate-950/30 backdrop-blur-sm z-[500]">
               <div className="flex items-center gap-2 rounded-md bg-card px-3 py-2 text-sm shadow-md">
                 <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-mlk border-t-transparent" />
-                <span>Loading 2D map…</span>
+                <span>{t("loading.map2d")}</span>
               </div>
             </div>
           )}
@@ -864,7 +866,7 @@ export function Map2DTab() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,#6B7280_2px,#6B7280_4px)]" />
-                  <span>No Data</span>
+                  <span>{t("map.legendNoData")}</span>
                 </div>
               </div>
             </div>
@@ -890,7 +892,7 @@ export function Map2DTab() {
             </div>
           ) : (
             <div className="text-xs text-muted-foreground/60">
-              Hover over any boundary on the map to see election results…
+              {t("map.hoverResults")}
             </div>
           )}
         </div>

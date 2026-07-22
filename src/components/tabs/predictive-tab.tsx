@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, Sparkles, AlertTriangle, Target, Activity, BarChart3 } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, BarChart, Bar, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, BarChart, Bar, Cell, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
 
 const forecastData = [
   { day: "Day -3", actual: 42, forecast: null, lower: null, upper: null },
@@ -103,19 +103,22 @@ export function PredictiveTab() {
             </CardContent>
           </Card>
 
-          {/* Escalation risk scoring */}
+          {/* Escalation risk scoring — §7.13 S2D-6B
+              FIX: previously used nested <Bar> inside <Bar> (anti-pattern) which
+              caused Recharts to render ONE bar series with default black fill.
+              Correct pattern: single <Bar> with <Cell> children for per-bar colors. */}
           <Card className="border-mlk/10">
             <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-mlk" /> Escalation Risk Score by Locality (S2D-6B)</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={escalationRisk} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
-                  <YAxis type="category" dataKey="locality" tick={{ fontSize: 9 }} width={100} />
-                  <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px" }} />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
+                  <YAxis type="category" dataKey="locality" tick={{ fontSize: 9 }} width={100} stroke="var(--muted-foreground)" />
+                  <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--card-foreground)" }} />
                   <Bar dataKey="risk_score" radius={[0, 4, 4, 0]}>
                     {escalationRisk.map((entry, idx) => (
-                      <Bar key={idx} dataKey="risk_score" fill={entry.risk_score >= 75 ? "#EF4444" : entry.risk_score >= 50 ? "#F59E0B" : "#10B981"} />
+                      <Cell key={idx} fill={entry.risk_score >= 75 ? "#EF4444" : entry.risk_score >= 50 ? "#F59E0B" : "#10B981"} />
                     ))}
                   </Bar>
                 </BarChart>

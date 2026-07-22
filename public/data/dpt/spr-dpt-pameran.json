@@ -1,0 +1,6842 @@
+[
+  {
+    "parliament_code": "134",
+    "parliament_name": "Masjid Tanah",
+    "district": "Alor Gajah",
+    "month": "2026-01",
+    "month_label": "January 2026",
+    "additions": 111,
+    "deletions": 44,
+    "net": 67,
+    "mom_delta": 0,
+    "dun_breakdown": [
+      {
+        "dun_code": "01",
+        "dun_name": "Kuala Linggi",
+        "additions": 26,
+        "deletions": 11,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      },
+      {
+        "dun_code": "02",
+        "dun_name": "Tanjung Bidara",
+        "additions": 20,
+        "deletions": 8,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "03",
+        "dun_name": "Ayer Limau",
+        "additions": 18,
+        "deletions": 7,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "04",
+        "dun_name": "Lendu",
+        "additions": 17,
+        "deletions": 7,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "05",
+        "dun_name": "Taboh Naning",
+        "additions": 19,
+        "deletions": 7,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-134-2026-01.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "134",
+    "parliament_name": "Masjid Tanah",
+    "district": "Alor Gajah",
+    "month": "2026-02",
+    "month_label": "February 2026",
+    "additions": 86,
+    "deletions": 23,
+    "net": 63,
+    "mom_delta": -4,
+    "dun_breakdown": [
+      {
+        "dun_code": "01",
+        "dun_name": "Kuala Linggi",
+        "additions": 21,
+        "deletions": 5,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "02",
+        "dun_name": "Tanjung Bidara",
+        "additions": 14,
+        "deletions": 3,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "03",
+        "dun_name": "Ayer Limau",
+        "additions": 13,
+        "deletions": 5,
+        "net": 8,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "04",
+        "dun_name": "Lendu",
+        "additions": 20,
+        "deletions": 4,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "05",
+        "dun_name": "Taboh Naning",
+        "additions": 15,
+        "deletions": 5,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-134-2026-02.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "134",
+    "parliament_name": "Masjid Tanah",
+    "district": "Alor Gajah",
+    "month": "2026-03",
+    "month_label": "March 2026",
+    "additions": 92,
+    "deletions": 35,
+    "net": 57,
+    "mom_delta": -6,
+    "dun_breakdown": [
+      {
+        "dun_code": "01",
+        "dun_name": "Kuala Linggi",
+        "additions": 23,
+        "deletions": 6,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "02",
+        "dun_name": "Tanjung Bidara",
+        "additions": 22,
+        "deletions": 5,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 0,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "03",
+        "dun_name": "Ayer Limau",
+        "additions": 21,
+        "deletions": 5,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "04",
+        "dun_name": "Lendu",
+        "additions": 19,
+        "deletions": 7,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "05",
+        "dun_name": "Taboh Naning",
+        "additions": 20,
+        "deletions": 7,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-134-2026-03.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "134",
+    "parliament_name": "Masjid Tanah",
+    "district": "Alor Gajah",
+    "month": "2026-04",
+    "month_label": "April 2026",
+    "additions": 108,
+    "deletions": 58,
+    "net": 50,
+    "mom_delta": -7,
+    "dun_breakdown": [
+      {
+        "dun_code": "01",
+        "dun_name": "Kuala Linggi",
+        "additions": 21,
+        "deletions": 9,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "02",
+        "dun_name": "Tanjung Bidara",
+        "additions": 27,
+        "deletions": 9,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "03",
+        "dun_name": "Ayer Limau",
+        "additions": 16,
+        "deletions": 10,
+        "net": 6,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "04",
+        "dun_name": "Lendu",
+        "additions": 28,
+        "deletions": 15,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 3,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 4,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "05",
+        "dun_name": "Taboh Naning",
+        "additions": 25,
+        "deletions": 11,
+        "net": 14,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-134-2026-04.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "134",
+    "parliament_name": "Masjid Tanah",
+    "district": "Alor Gajah",
+    "month": "2026-05",
+    "month_label": "May 2026",
+    "additions": 130,
+    "deletions": 46,
+    "net": 84,
+    "mom_delta": 34,
+    "dun_breakdown": [
+      {
+        "dun_code": "01",
+        "dun_name": "Kuala Linggi",
+        "additions": 18,
+        "deletions": 8,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "02",
+        "dun_name": "Tanjung Bidara",
+        "additions": 24,
+        "deletions": 8,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "03",
+        "dun_name": "Ayer Limau",
+        "additions": 26,
+        "deletions": 8,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "04",
+        "dun_name": "Lendu",
+        "additions": 22,
+        "deletions": 8,
+        "net": 14,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "05",
+        "dun_name": "Taboh Naning",
+        "additions": 26,
+        "deletions": 8,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-134-2026-05.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "135",
+    "parliament_name": "Alor Gajah",
+    "district": "Alor Gajah",
+    "month": "2026-01",
+    "month_label": "January 2026",
+    "additions": 105,
+    "deletions": 38,
+    "net": 67,
+    "mom_delta": 0,
+    "dun_breakdown": [
+      {
+        "dun_code": "06",
+        "dun_name": "Kelebang",
+        "additions": 27,
+        "deletions": 9,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "03",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "07",
+        "dun_name": "Gadek",
+        "additions": 38,
+        "deletions": 15,
+        "net": 23,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 3,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 3,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 9,
+            "deletions": 4,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 8,
+            "deletions": 3,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 3,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 7,
+            "deletions": 3,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "08",
+        "dun_name": "Durian Tunggal",
+        "additions": 27,
+        "deletions": 14,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-135-2026-01.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "135",
+    "parliament_name": "Alor Gajah",
+    "district": "Alor Gajah",
+    "month": "2026-02",
+    "month_label": "February 2026",
+    "additions": 71,
+    "deletions": 21,
+    "net": 50,
+    "mom_delta": -17,
+    "dun_breakdown": [
+      {
+        "dun_code": "06",
+        "dun_name": "Kelebang",
+        "additions": 23,
+        "deletions": 6,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "07",
+        "dun_name": "Gadek",
+        "additions": 20,
+        "deletions": 7,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "08",
+        "dun_name": "Durian Tunggal",
+        "additions": 30,
+        "deletions": 6,
+        "net": 24,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-135-2026-02.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "135",
+    "parliament_name": "Alor Gajah",
+    "district": "Alor Gajah",
+    "month": "2026-03",
+    "month_label": "March 2026",
+    "additions": 95,
+    "deletions": 38,
+    "net": 57,
+    "mom_delta": 7,
+    "dun_breakdown": [
+      {
+        "dun_code": "06",
+        "dun_name": "Kelebang",
+        "additions": 23,
+        "deletions": 13,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 3,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "07",
+        "dun_name": "Gadek",
+        "additions": 23,
+        "deletions": 10,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "08",
+        "dun_name": "Durian Tunggal",
+        "additions": 33,
+        "deletions": 12,
+        "net": 21,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "06",
+            "additions": 7,
+            "deletions": 3,
+            "net": 4
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-135-2026-03.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "135",
+    "parliament_name": "Alor Gajah",
+    "district": "Alor Gajah",
+    "month": "2026-04",
+    "month_label": "April 2026",
+    "additions": 92,
+    "deletions": 53,
+    "net": 39,
+    "mom_delta": -18,
+    "dun_breakdown": [
+      {
+        "dun_code": "06",
+        "dun_name": "Kelebang",
+        "additions": 27,
+        "deletions": 13,
+        "net": 14,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "07",
+        "dun_name": "Gadek",
+        "additions": 39,
+        "deletions": 17,
+        "net": 22,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 10,
+            "deletions": 3,
+            "net": 7
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 10,
+            "deletions": 4,
+            "net": 6
+          },
+          {
+            "dm_code": "04",
+            "additions": 8,
+            "deletions": 2,
+            "net": 6
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 3,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "08",
+        "dun_name": "Durian Tunggal",
+        "additions": 36,
+        "deletions": 15,
+        "net": 21,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 9,
+            "deletions": 3,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 9,
+            "deletions": 3,
+            "net": 6
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-135-2026-04.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "135",
+    "parliament_name": "Alor Gajah",
+    "district": "Alor Gajah",
+    "month": "2026-05",
+    "month_label": "May 2026",
+    "additions": 112,
+    "deletions": 41,
+    "net": 71,
+    "mom_delta": 32,
+    "dun_breakdown": [
+      {
+        "dun_code": "06",
+        "dun_name": "Kelebang",
+        "additions": 28,
+        "deletions": 12,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "07",
+        "dun_name": "Gadek",
+        "additions": 39,
+        "deletions": 17,
+        "net": 22,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 3,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 8,
+            "deletions": 3,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 9,
+            "deletions": 2,
+            "net": 7
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 4,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 9,
+            "deletions": 2,
+            "net": 7
+          }
+        ]
+      },
+      {
+        "dun_code": "08",
+        "dun_name": "Durian Tunggal",
+        "additions": 30,
+        "deletions": 12,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 7,
+            "deletions": 3,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-135-2026-05.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "136",
+    "parliament_name": "Bukit Katil",
+    "district": "Melaka Tengah",
+    "month": "2026-01",
+    "month_label": "January 2026",
+    "additions": 95,
+    "deletions": 47,
+    "net": 48,
+    "mom_delta": 0,
+    "dun_breakdown": [
+      {
+        "dun_code": "09",
+        "dun_name": "Bukit Katil",
+        "additions": 13,
+        "deletions": 7,
+        "net": 6,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "10",
+        "dun_name": "Ayer Molek",
+        "additions": 19,
+        "deletions": 10,
+        "net": 9,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "11",
+        "dun_name": "Kesidang",
+        "additions": 14,
+        "deletions": 8,
+        "net": 6,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 1,
+            "deletions": 2,
+            "net": -1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "12",
+        "dun_name": "Bandar Hilir",
+        "additions": 18,
+        "deletions": 6,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "13",
+        "dun_name": "Bemban",
+        "additions": 12,
+        "deletions": 9,
+        "net": 3,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "14",
+        "dun_name": "Ayer Keroh",
+        "additions": 14,
+        "deletions": 9,
+        "net": 5,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-136-2026-01.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "136",
+    "parliament_name": "Bukit Katil",
+    "district": "Melaka Tengah",
+    "month": "2026-02",
+    "month_label": "February 2026",
+    "additions": 119,
+    "deletions": 28,
+    "net": 91,
+    "mom_delta": 43,
+    "dun_breakdown": [
+      {
+        "dun_code": "09",
+        "dun_name": "Bukit Katil",
+        "additions": 24,
+        "deletions": 5,
+        "net": 19,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "10",
+        "dun_name": "Ayer Molek",
+        "additions": 18,
+        "deletions": 3,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "11",
+        "dun_name": "Kesidang",
+        "additions": 24,
+        "deletions": 5,
+        "net": 19,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "12",
+        "dun_name": "Bandar Hilir",
+        "additions": 15,
+        "deletions": 5,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "13",
+        "dun_name": "Bemban",
+        "additions": 17,
+        "deletions": 4,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "14",
+        "dun_name": "Ayer Keroh",
+        "additions": 20,
+        "deletions": 5,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-136-2026-02.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "136",
+    "parliament_name": "Bukit Katil",
+    "district": "Melaka Tengah",
+    "month": "2026-03",
+    "month_label": "March 2026",
+    "additions": 116,
+    "deletions": 36,
+    "net": 80,
+    "mom_delta": -11,
+    "dun_breakdown": [
+      {
+        "dun_code": "09",
+        "dun_name": "Bukit Katil",
+        "additions": 15,
+        "deletions": 8,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "10",
+        "dun_name": "Ayer Molek",
+        "additions": 17,
+        "deletions": 5,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "11",
+        "dun_name": "Kesidang",
+        "additions": 22,
+        "deletions": 5,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 0,
+            "net": 5
+          }
+        ]
+      },
+      {
+        "dun_code": "12",
+        "dun_name": "Bandar Hilir",
+        "additions": 19,
+        "deletions": 6,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "13",
+        "dun_name": "Bemban",
+        "additions": 15,
+        "deletions": 7,
+        "net": 8,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "14",
+        "dun_name": "Ayer Keroh",
+        "additions": 22,
+        "deletions": 7,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-136-2026-03.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "136",
+    "parliament_name": "Bukit Katil",
+    "district": "Melaka Tengah",
+    "month": "2026-04",
+    "month_label": "April 2026",
+    "additions": 187,
+    "deletions": 31,
+    "net": 156,
+    "mom_delta": 76,
+    "dun_breakdown": [
+      {
+        "dun_code": "09",
+        "dun_name": "Bukit Katil",
+        "additions": 33,
+        "deletions": 6,
+        "net": 27,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "10",
+        "dun_name": "Ayer Molek",
+        "additions": 34,
+        "deletions": 4,
+        "net": 30,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 0,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          }
+        ]
+      },
+      {
+        "dun_code": "11",
+        "dun_name": "Kesidang",
+        "additions": 35,
+        "deletions": 4,
+        "net": 31,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      },
+      {
+        "dun_code": "12",
+        "dun_name": "Bandar Hilir",
+        "additions": 37,
+        "deletions": 5,
+        "net": 32,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 0,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "13",
+        "dun_name": "Bemban",
+        "additions": 23,
+        "deletions": 6,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "14",
+        "dun_name": "Ayer Keroh",
+        "additions": 26,
+        "deletions": 5,
+        "net": 21,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 0,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-136-2026-04.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "136",
+    "parliament_name": "Bukit Katil",
+    "district": "Melaka Tengah",
+    "month": "2026-05",
+    "month_label": "May 2026",
+    "additions": 89,
+    "deletions": 21,
+    "net": 68,
+    "mom_delta": -88,
+    "dun_breakdown": [
+      {
+        "dun_code": "09",
+        "dun_name": "Bukit Katil",
+        "additions": 16,
+        "deletions": 3,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "10",
+        "dun_name": "Ayer Molek",
+        "additions": 14,
+        "deletions": 3,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "11",
+        "dun_name": "Kesidang",
+        "additions": 19,
+        "deletions": 3,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "12",
+        "dun_name": "Bandar Hilir",
+        "additions": 15,
+        "deletions": 4,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "13",
+        "dun_name": "Bemban",
+        "additions": 17,
+        "deletions": 3,
+        "net": 14,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "14",
+        "dun_name": "Ayer Keroh",
+        "additions": 11,
+        "deletions": 2,
+        "net": 9,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-136-2026-05.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "137",
+    "parliament_name": "Kota Melaka",
+    "district": "Melaka Tengah",
+    "month": "2026-01",
+    "month_label": "January 2026",
+    "additions": 89,
+    "deletions": 59,
+    "net": 30,
+    "mom_delta": 0,
+    "dun_breakdown": [
+      {
+        "dun_code": "15",
+        "dun_name": "Kota Laksamana",
+        "additions": 17,
+        "deletions": 12,
+        "net": 5,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "16",
+        "dun_name": "Bandar Melaka",
+        "additions": 17,
+        "deletions": 14,
+        "net": 3,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 3,
+            "net": -2
+          }
+        ]
+      },
+      {
+        "dun_code": "17",
+        "dun_name": "Klebang Besar",
+        "additions": 21,
+        "deletions": 15,
+        "net": 6,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 4,
+            "net": -1
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 3,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 4,
+            "net": -1
+          }
+        ]
+      },
+      {
+        "dun_code": "18",
+        "dun_name": "Tanjung Kling",
+        "additions": 22,
+        "deletions": 10,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "19",
+        "dun_name": "Paya Rumput",
+        "additions": 17,
+        "deletions": 14,
+        "net": 3,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-137-2026-01.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "137",
+    "parliament_name": "Kota Melaka",
+    "district": "Melaka Tengah",
+    "month": "2026-02",
+    "month_label": "February 2026",
+    "additions": 61,
+    "deletions": 21,
+    "net": 40,
+    "mom_delta": 10,
+    "dun_breakdown": [
+      {
+        "dun_code": "15",
+        "dun_name": "Kota Laksamana",
+        "additions": 10,
+        "deletions": 5,
+        "net": 5,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "16",
+        "dun_name": "Bandar Melaka",
+        "additions": 11,
+        "deletions": 3,
+        "net": 8,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "17",
+        "dun_name": "Klebang Besar",
+        "additions": 12,
+        "deletions": 5,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "18",
+        "dun_name": "Tanjung Kling",
+        "additions": 12,
+        "deletions": 5,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "19",
+        "dun_name": "Paya Rumput",
+        "additions": 11,
+        "deletions": 4,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-137-2026-02.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "137",
+    "parliament_name": "Kota Melaka",
+    "district": "Melaka Tengah",
+    "month": "2026-03",
+    "month_label": "March 2026",
+    "additions": 98,
+    "deletions": 28,
+    "net": 70,
+    "mom_delta": 30,
+    "dun_breakdown": [
+      {
+        "dun_code": "15",
+        "dun_name": "Kota Laksamana",
+        "additions": 14,
+        "deletions": 7,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "16",
+        "dun_name": "Bandar Melaka",
+        "additions": 14,
+        "deletions": 6,
+        "net": 8,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "17",
+        "dun_name": "Klebang Besar",
+        "additions": 18,
+        "deletions": 7,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "18",
+        "dun_name": "Tanjung Kling",
+        "additions": 20,
+        "deletions": 7,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "19",
+        "dun_name": "Paya Rumput",
+        "additions": 15,
+        "deletions": 5,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-137-2026-03.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "137",
+    "parliament_name": "Kota Melaka",
+    "district": "Melaka Tengah",
+    "month": "2026-04",
+    "month_label": "April 2026",
+    "additions": 110,
+    "deletions": 59,
+    "net": 51,
+    "mom_delta": -19,
+    "dun_breakdown": [
+      {
+        "dun_code": "15",
+        "dun_name": "Kota Laksamana",
+        "additions": 17,
+        "deletions": 14,
+        "net": 3,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "16",
+        "dun_name": "Bandar Melaka",
+        "additions": 18,
+        "deletions": 14,
+        "net": 4,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 3,
+            "net": -1
+          }
+        ]
+      },
+      {
+        "dun_code": "17",
+        "dun_name": "Klebang Besar",
+        "additions": 17,
+        "deletions": 12,
+        "net": 5,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "18",
+        "dun_name": "Tanjung Kling",
+        "additions": 21,
+        "deletions": 12,
+        "net": 9,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 3,
+            "net": 0
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "19",
+        "dun_name": "Paya Rumput",
+        "additions": 29,
+        "deletions": 14,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 3,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-137-2026-04.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "137",
+    "parliament_name": "Kota Melaka",
+    "district": "Melaka Tengah",
+    "month": "2026-05",
+    "month_label": "May 2026",
+    "additions": 120,
+    "deletions": 51,
+    "net": 69,
+    "mom_delta": 18,
+    "dun_breakdown": [
+      {
+        "dun_code": "15",
+        "dun_name": "Kota Laksamana",
+        "additions": 18,
+        "deletions": 7,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "16",
+        "dun_name": "Bandar Melaka",
+        "additions": 29,
+        "deletions": 8,
+        "net": 21,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "17",
+        "dun_name": "Klebang Besar",
+        "additions": 31,
+        "deletions": 11,
+        "net": 20,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "18",
+        "dun_name": "Tanjung Kling",
+        "additions": 21,
+        "deletions": 11,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "19",
+        "dun_name": "Paya Rumput",
+        "additions": 21,
+        "deletions": 11,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 3,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 3,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-137-2026-05.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "138",
+    "parliament_name": "Jasin",
+    "district": "Jasin",
+    "month": "2026-01",
+    "month_label": "January 2026",
+    "additions": 163,
+    "deletions": 31,
+    "net": 132,
+    "mom_delta": 0,
+    "dun_breakdown": [
+      {
+        "dun_code": "20",
+        "dun_name": "Bemban",
+        "additions": 31,
+        "deletions": 7,
+        "net": 24,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "21",
+        "dun_name": "Asahan",
+        "additions": 44,
+        "deletions": 6,
+        "net": 38,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "04",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          }
+        ]
+      },
+      {
+        "dun_code": "22",
+        "dun_name": "Naning",
+        "additions": 32,
+        "deletions": 9,
+        "net": 23,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 8,
+            "deletions": 2,
+            "net": 6
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "23",
+        "dun_name": "Jasin",
+        "additions": 32,
+        "deletions": 10,
+        "net": 22,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-138-2026-01.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "138",
+    "parliament_name": "Jasin",
+    "district": "Jasin",
+    "month": "2026-02",
+    "month_label": "February 2026",
+    "additions": 80,
+    "deletions": 13,
+    "net": 67,
+    "mom_delta": -65,
+    "dun_breakdown": [
+      {
+        "dun_code": "20",
+        "dun_name": "Bemban",
+        "additions": 24,
+        "deletions": 4,
+        "net": 20,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 0,
+            "net": 6
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "21",
+        "dun_name": "Asahan",
+        "additions": 16,
+        "deletions": 4,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "22",
+        "dun_name": "Naning",
+        "additions": 18,
+        "deletions": 3,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "23",
+        "dun_name": "Jasin",
+        "additions": 23,
+        "deletions": 3,
+        "net": 20,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-138-2026-02.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "138",
+    "parliament_name": "Jasin",
+    "district": "Jasin",
+    "month": "2026-03",
+    "month_label": "March 2026",
+    "additions": 127,
+    "deletions": 20,
+    "net": 107,
+    "mom_delta": 40,
+    "dun_breakdown": [
+      {
+        "dun_code": "20",
+        "dun_name": "Bemban",
+        "additions": 38,
+        "deletions": 5,
+        "net": 33,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "04",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          }
+        ]
+      },
+      {
+        "dun_code": "21",
+        "dun_name": "Asahan",
+        "additions": 40,
+        "deletions": 4,
+        "net": 36,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      },
+      {
+        "dun_code": "22",
+        "dun_name": "Naning",
+        "additions": 28,
+        "deletions": 5,
+        "net": 23,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "23",
+        "dun_name": "Jasin",
+        "additions": 24,
+        "deletions": 5,
+        "net": 19,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-138-2026-03.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "138",
+    "parliament_name": "Jasin",
+    "district": "Jasin",
+    "month": "2026-04",
+    "month_label": "April 2026",
+    "additions": 135,
+    "deletions": 33,
+    "net": 102,
+    "mom_delta": -5,
+    "dun_breakdown": [
+      {
+        "dun_code": "20",
+        "dun_name": "Bemban",
+        "additions": 32,
+        "deletions": 7,
+        "net": 25,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 8,
+            "deletions": 2,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "05",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "21",
+        "dun_name": "Asahan",
+        "additions": 39,
+        "deletions": 10,
+        "net": 29,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 8,
+            "deletions": 2,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "04",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "05",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "22",
+        "dun_name": "Naning",
+        "additions": 41,
+        "deletions": 6,
+        "net": 35,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "03",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "04",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "05",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "06",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          }
+        ]
+      },
+      {
+        "dun_code": "23",
+        "dun_name": "Jasin",
+        "additions": 25,
+        "deletions": 8,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-138-2026-04.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "138",
+    "parliament_name": "Jasin",
+    "district": "Jasin",
+    "month": "2026-05",
+    "month_label": "May 2026",
+    "additions": 125,
+    "deletions": 34,
+    "net": 91,
+    "mom_delta": -11,
+    "dun_breakdown": [
+      {
+        "dun_code": "20",
+        "dun_name": "Bemban",
+        "additions": 24,
+        "deletions": 8,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "21",
+        "dun_name": "Asahan",
+        "additions": 26,
+        "deletions": 8,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "22",
+        "dun_name": "Naning",
+        "additions": 39,
+        "deletions": 9,
+        "net": 30,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 9,
+            "deletions": 2,
+            "net": 7
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          }
+        ]
+      },
+      {
+        "dun_code": "23",
+        "dun_name": "Jasin",
+        "additions": 33,
+        "deletions": 9,
+        "net": 24,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 8,
+            "deletions": 2,
+            "net": 6
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-138-2026-05.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "139",
+    "parliament_name": "Tangga Batu",
+    "district": "Jasin",
+    "month": "2026-01",
+    "month_label": "January 2026",
+    "additions": 83,
+    "deletions": 23,
+    "net": 60,
+    "mom_delta": 0,
+    "dun_breakdown": [
+      {
+        "dun_code": "24",
+        "dun_name": "Krubong",
+        "additions": 18,
+        "deletions": 3,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "25",
+        "dun_name": "Pengkalan Batu",
+        "additions": 19,
+        "deletions": 5,
+        "net": 14,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "26",
+        "dun_name": "Padang Temu",
+        "additions": 12,
+        "deletions": 3,
+        "net": 9,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "27",
+        "dun_name": "Bukit Baru",
+        "additions": 18,
+        "deletions": 3,
+        "net": 15,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "28",
+        "dun_name": "Ayer Molek",
+        "additions": 21,
+        "deletions": 5,
+        "net": 16,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-139-2026-01.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "139",
+    "parliament_name": "Tangga Batu",
+    "district": "Jasin",
+    "month": "2026-02",
+    "month_label": "February 2026",
+    "additions": 100,
+    "deletions": 27,
+    "net": 73,
+    "mom_delta": 13,
+    "dun_breakdown": [
+      {
+        "dun_code": "24",
+        "dun_name": "Krubong",
+        "additions": 18,
+        "deletions": 7,
+        "net": 11,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 2,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 2,
+            "net": 0
+          }
+        ]
+      },
+      {
+        "dun_code": "25",
+        "dun_name": "Pengkalan Batu",
+        "additions": 22,
+        "deletions": 5,
+        "net": 17,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "26",
+        "dun_name": "Padang Temu",
+        "additions": 23,
+        "deletions": 5,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      },
+      {
+        "dun_code": "27",
+        "dun_name": "Bukit Baru",
+        "additions": 16,
+        "deletions": 6,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "28",
+        "dun_name": "Ayer Molek",
+        "additions": 23,
+        "deletions": 4,
+        "net": 19,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 0,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-139-2026-02.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "139",
+    "parliament_name": "Tangga Batu",
+    "district": "Jasin",
+    "month": "2026-03",
+    "month_label": "March 2026",
+    "additions": 58,
+    "deletions": 15,
+    "net": 43,
+    "mom_delta": -30,
+    "dun_breakdown": [
+      {
+        "dun_code": "24",
+        "dun_name": "Krubong",
+        "additions": 10,
+        "deletions": 3,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "25",
+        "dun_name": "Pengkalan Batu",
+        "additions": 13,
+        "deletions": 3,
+        "net": 10,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 1,
+            "deletions": 1,
+            "net": 0
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "26",
+        "dun_name": "Padang Temu",
+        "additions": 9,
+        "deletions": 2,
+        "net": 7,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "06",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          }
+        ]
+      },
+      {
+        "dun_code": "27",
+        "dun_name": "Bukit Baru",
+        "additions": 15,
+        "deletions": 2,
+        "net": 13,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 2,
+            "deletions": 0,
+            "net": 2
+          }
+        ]
+      },
+      {
+        "dun_code": "28",
+        "dun_name": "Ayer Molek",
+        "additions": 15,
+        "deletions": 3,
+        "net": 12,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 1,
+            "deletions": 0,
+            "net": 1
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "05",
+            "additions": 3,
+            "deletions": 0,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-139-2026-03.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "139",
+    "parliament_name": "Tangga Batu",
+    "district": "Jasin",
+    "month": "2026-04",
+    "month_label": "April 2026",
+    "additions": 183,
+    "deletions": 21,
+    "net": 162,
+    "mom_delta": 119,
+    "dun_breakdown": [
+      {
+        "dun_code": "24",
+        "dun_name": "Krubong",
+        "additions": 37,
+        "deletions": 5,
+        "net": 32,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 9,
+            "deletions": 0,
+            "net": 9
+          },
+          {
+            "dm_code": "02",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 0,
+            "net": 9
+          },
+          {
+            "dm_code": "06",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          }
+        ]
+      },
+      {
+        "dun_code": "25",
+        "dun_name": "Pengkalan Batu",
+        "additions": 28,
+        "deletions": 4,
+        "net": 24,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 0,
+            "net": 6
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          }
+        ]
+      },
+      {
+        "dun_code": "26",
+        "dun_name": "Padang Temu",
+        "additions": 35,
+        "deletions": 4,
+        "net": 31,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "02",
+            "additions": 3,
+            "deletions": 1,
+            "net": 2
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 0,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "27",
+        "dun_name": "Bukit Baru",
+        "additions": 34,
+        "deletions": 5,
+        "net": 29,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "02",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          }
+        ]
+      },
+      {
+        "dun_code": "28",
+        "dun_name": "Ayer Molek",
+        "additions": 47,
+        "deletions": 4,
+        "net": 43,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 12,
+            "deletions": 1,
+            "net": 11
+          },
+          {
+            "dm_code": "02",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "03",
+            "additions": 9,
+            "deletions": 0,
+            "net": 9
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "05",
+            "additions": 9,
+            "deletions": 1,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 8,
+            "deletions": 1,
+            "net": 7
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-139-2026-04.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  },
+  {
+    "parliament_code": "139",
+    "parliament_name": "Tangga Batu",
+    "district": "Jasin",
+    "month": "2026-05",
+    "month_label": "May 2026",
+    "additions": 173,
+    "deletions": 44,
+    "net": 129,
+    "mom_delta": -33,
+    "dun_breakdown": [
+      {
+        "dun_code": "24",
+        "dun_name": "Krubong",
+        "additions": 30,
+        "deletions": 10,
+        "net": 20,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "02",
+            "additions": 6,
+            "deletions": 2,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "25",
+        "dun_name": "Pengkalan Batu",
+        "additions": 25,
+        "deletions": 7,
+        "net": 18,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 2,
+            "deletions": 1,
+            "net": 1
+          },
+          {
+            "dm_code": "03",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "04",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "26",
+        "dun_name": "Padang Temu",
+        "additions": 30,
+        "deletions": 9,
+        "net": 21,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "02",
+            "additions": 5,
+            "deletions": 1,
+            "net": 4
+          },
+          {
+            "dm_code": "03",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "04",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "05",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 5,
+            "deletions": 2,
+            "net": 3
+          }
+        ]
+      },
+      {
+        "dun_code": "27",
+        "dun_name": "Bukit Baru",
+        "additions": 44,
+        "deletions": 7,
+        "net": 37,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 9,
+            "deletions": 2,
+            "net": 7
+          },
+          {
+            "dm_code": "02",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "03",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "04",
+            "additions": 4,
+            "deletions": 2,
+            "net": 2
+          },
+          {
+            "dm_code": "05",
+            "additions": 10,
+            "deletions": 2,
+            "net": 8
+          },
+          {
+            "dm_code": "06",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          }
+        ]
+      },
+      {
+        "dun_code": "28",
+        "dun_name": "Ayer Molek",
+        "additions": 44,
+        "deletions": 9,
+        "net": 35,
+        "dm_breakdown": [
+          {
+            "dm_code": "01",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          },
+          {
+            "dm_code": "02",
+            "additions": 7,
+            "deletions": 1,
+            "net": 6
+          },
+          {
+            "dm_code": "03",
+            "additions": 6,
+            "deletions": 1,
+            "net": 5
+          },
+          {
+            "dm_code": "04",
+            "additions": 10,
+            "deletions": 1,
+            "net": 9
+          },
+          {
+            "dm_code": "05",
+            "additions": 4,
+            "deletions": 1,
+            "net": 3
+          },
+          {
+            "dm_code": "06",
+            "additions": 7,
+            "deletions": 2,
+            "net": 5
+          }
+        ]
+      }
+    ],
+    "source_pdf": "spr-dpt-pameran-139-2026-05.pdf",
+    "pdf_producer": "FPDF 1.85",
+    "pdf_extracted_with": "pdftotext -layout (100% accurate, no OCR needed)",
+    "evidence_tier": "Verified",
+    "age_scope_note": "DPT Pameran PDFs list additions/deletions by polling district (DM) only — no age breakdown (DG_DPT_AGE_SCOPE)"
+  }
+]

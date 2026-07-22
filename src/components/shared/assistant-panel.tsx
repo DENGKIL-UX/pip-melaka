@@ -146,11 +146,13 @@ export function AssistantPanel() {
 
   return (
     <>
-      {/* Floating "Ask AI" button */}
+      {/* Floating "Ask AI" button — hidden when panel is open to avoid
+          overlapping the panel's bottom edge (z-index conflict noted by VLM) */}
       <motion.button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-5 right-5 z-[55] h-14 w-14 rounded-full bg-mlk-gradient shadow-lg shadow-mlk/30 flex items-center justify-center text-white hover-lift"
+        className={`fixed bottom-5 right-5 z-[55] h-14 w-14 rounded-full bg-mlk-gradient shadow-lg shadow-mlk/30 flex items-center justify-center text-white hover-lift transition-opacity ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
         aria-label={open ? "Close AI assistant" : "Open AI assistant"}
+        aria-hidden={open}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ scale: 0, rotate: -90 }}

@@ -1,0 +1,1911 @@
+{
+  "contract_id": "PIP.VOTER.SOURCE.P134.V1.0",
+  "contract_type": "pip_voter_source_contract",
+  "version": "1.0.0",
+  "status": "active_candidate",
+  "generated_at_utc": "2026-07-07T12:06:41+00:00",
+  "title": {
+    "bm": "Kontrak Sumber Data Pemilih P134",
+    "en": "P134 Voter Data Source Contract"
+  },
+  "description": {
+    "bm": "Kontrak sumber khusus bagi set data pemilih P134 yang telah dinyahpengenal sebelum kemasukan ke PIP.",
+    "en": "Source-specific contract for the P134 voter dataset pseudonymised before PIP ingestion."
+  },
+  "source_scope": {
+    "source_name": "P134.MT.71416",
+    "constituency_code": "P134",
+    "source_file_name": "P134.MT.71416 (raw demo PIP).xlsx",
+    "source_file_sha256": "91be655e9cc1171365abbe62025cb770db8a81666e6360d51439d6bffb556651",
+    "worksheet_name": "P134.MT.71416.demo",
+    "worksheet_dimension": "A1:AO71416",
+    "record_count": 71415,
+    "physical_source_field_count": 41,
+    "expected_source_field_count": 41,
+    "source_schema_mode": "pseudonymised_41_field",
+    "raw_source_immutable": true
+  },
+  "source_baseline_assertions": {
+    "VTR_ID": {
+      "missing_count": 0,
+      "unique_count": 71415,
+      "pattern": "^VTR_P134\\.\\d{5,}$",
+      "pattern_exception_count": 0
+    },
+    "VTR_LABEL": {
+      "missing_count": 0,
+      "unique_count": 71378,
+      "duplicates_allowed": true
+    },
+    "electoral_geography_code_name_pattern": {
+      "pattern": "^\\d+\\..+$",
+      "exception_counts": {
+        "LOKALITI": 0,
+        "DM": 0,
+        "DUN": 0,
+        "PARLIMEN": 0,
+        "NEGERI": 0
+      }
+    },
+    "observed_controlled_values": {
+      "JANTINA": [
+        "L",
+        "P"
+      ],
+      "UMUR2": [
+        "18A",
+        "21A",
+        "40A",
+        "60A"
+      ],
+      "AGAMA": [
+        "ISLAM",
+        "BUDDHA",
+        "HINDU",
+        "KRISTIAN",
+        "TIADA AGAMA",
+        "TIADA MAKLUMAT",
+        "SIKHISM",
+        "BAHAI",
+        "LAIN-LAIN AGAMA"
+      ],
+      "SIKAP_observed_nonblank": [
+        "P",
+        "H",
+        "K",
+        "-"
+      ]
+    },
+    "baseline_is_observational_not_semantic_codebook": true
+  },
+  "privacy_model": {
+    "privacy_posture": "pseudonymised_source",
+    "direct_identity_fields_removed_before_ingestion": true,
+    "privacy_removed_field_count": 15,
+    "privacy_removed_fields": [
+      {
+        "field_name": "IC",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "IC_LAMA",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "IC_PERSONEL",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "IC_SPOUSE",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "NAMA",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "NO_TEL_HF",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "NOAHLI",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "CATATAN",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "NO_RUMAH",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "ALAMAT1",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "ALAMAT2",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "ALAMAT3",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "POSKOD",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "BANGSA",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      },
+      {
+        "field_name": "AGAMA",
+        "status": "not_provided_by_source",
+        "removal_reason": "privacy_removed_before_PIP_ingestion",
+        "expected_in_source": false,
+        "must_not_be_reconstructed": true
+      }
+    ],
+    "prohibitions": [
+      "do_not_reconstruct_removed_IC_fields",
+      "do_not_reconstruct_NAMA",
+      "do_not_reconstruct_NO_TEL_HF",
+      "do_not_treat_VTR_LABEL_as_real_name",
+      "do_not_expose_VTR_ID_as_public_graph_id",
+      "do_not_send_identity_or_political_fields_to_geocoding_provider"
+    ]
+  },
+  "identity_model": {
+    "source_identity_field": "VTR_ID",
+    "source_identity_role": "pseudonymous_source_identity",
+    "masked_label_field": "VTR_LABEL",
+    "canonical_identity_field": "VOTER_ID_HASH",
+    "canonical_identity_derivation": {
+      "algorithm": "HMAC-SHA256",
+      "input": "normalized VTR_ID",
+      "secret": "PIP_VOTER_HASH_SALT",
+      "output_prefix": "VOTER_",
+      "stable_secret_required": true
+    },
+    "deduplication_priority": [
+      "VTR_ID",
+      "VOTER_ID_HASH"
+    ],
+    "deduplication_prohibitions": [
+      "VTR_LABEL"
+    ]
+  },
+  "schema": {
+    "expected_source_field_count": 41,
+    "source_fields": [
+      "VTR_ID",
+      "VTR_LABEL",
+      "JANTINA",
+      "UMUR",
+      "KAUM",
+      "UMUR2",
+      "TAHUN_LAHIR",
+      "PROFESSION",
+      "LOKALITI",
+      "DM",
+      "DUN",
+      "PARLIMEN",
+      "NEGERI",
+      "NO_RUMAH",
+      "ALAMAT1",
+      "ALAMAT2",
+      "ALAMAT3",
+      "POSKOD",
+      "ALAMAT_BANDAR",
+      "ALAMAT_NEGERI",
+      "BANGSA",
+      "KAUM2",
+      "KOD_UMUR",
+      "KOD_UMUR2",
+      "AGAMA",
+      "LOKALITIPRU14",
+      "DUNPRU14",
+      "PARLIMENPRU14",
+      "KODNPRU14",
+      "KODKATEGORI",
+      "FLG_UMNO",
+      "NAMANEGERICAW",
+      "NAMABAHAGIAN",
+      "NAMACAWANGAN",
+      "KODCAWANGAN",
+      "KATEGORIPEMILIH",
+      "STATUSPEMILIH",
+      "KODPARTI",
+      "SIKAP",
+      "STATUS",
+      "KAWASAN_LUAR"
+    ],
+    "field_mappings": [
+      {
+        "source_field": "VTR_ID",
+        "canonical_field": "VTR_ID",
+        "parameter_name_bm": "ID Pemilih Pseudonim",
+        "parameter_name_en": "Pseudonymous Voter ID",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "pseudonymous_source_identity",
+        "sensitivity_class": "confidential_pseudonymous_identifier",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "preserve_exact_text"
+        ],
+        "validation_rules": [
+          "must_be_non_blank",
+          "must_be_unique_within_source",
+          "must_match_source_pattern",
+          "must_not_be_reconstructed_to_ic"
+        ],
+        "ontology_target": "Voter.sourcePseudonymousId",
+        "pattern": "^VTR_P134\\.\\d{5,}$",
+        "notes": "Primary source identity key. Derive VOTER_ID_HASH with HMAC-SHA256 using stable PIP_VOTER_HASH_SALT; never use VTR_ID directly as public graph ID."
+      },
+      {
+        "source_field": "VTR_LABEL",
+        "canonical_field": "VTR_LABEL",
+        "parameter_name_bm": "Label Pemilih Tersamar",
+        "parameter_name_en": "Masked Voter Label",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "masked_display_label",
+        "sensitivity_class": "confidential_masked_label",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "preserve_exact_text"
+        ],
+        "validation_rules": [
+          "must_be_non_blank",
+          "duplicates_allowed",
+          "must_not_be_used_for_deduplication"
+        ],
+        "ontology_target": "Voter.maskedLabel",
+        "notes": "Display/diagnostic label only. Not a natural-person name and not a canonical identity."
+      },
+      {
+        "source_field": "JANTINA",
+        "canonical_field": "JANTINA",
+        "parameter_name_bm": "Jantina",
+        "parameter_name_en": "Gender",
+        "data_type": "gender",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "demographic_gender",
+        "sensitivity_class": "demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "controlled_mapping_only"
+        ],
+        "validation_rules": [
+          "must_be_in_enum"
+        ],
+        "ontology_target": "Voter.gender",
+        "enum_values": [
+          "L",
+          "P"
+        ]
+      },
+      {
+        "source_field": "UMUR",
+        "canonical_field": "UMUR",
+        "parameter_name_bm": "Umur",
+        "parameter_name_en": "Age",
+        "data_type": "integer",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "demographic_age",
+        "sensitivity_class": "demographic",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "parse_integer"
+        ],
+        "validation_rules": [
+          "review_if_outside_18_120",
+          "cross_validate_with_TAHUN_LAHIR",
+          "do_not_auto_correct_outlier"
+        ],
+        "ontology_target": "Voter.age",
+        "min_value": 18,
+        "max_value": 120
+      },
+      {
+        "source_field": "KAUM",
+        "canonical_field": "KAUM",
+        "parameter_name_bm": "Kod Kaum",
+        "parameter_name_en": "Ethnic Group Code",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "demographic_ethnic_code",
+        "sensitivity_class": "sensitive_demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "preserve_code"
+        ],
+        "validation_rules": [
+          "do_not_infer_semantics_without_codebook"
+        ],
+        "ontology_target": "Voter.ethnicGroupCode"
+      },
+      {
+        "source_field": "UMUR2",
+        "canonical_field": "UMUR2",
+        "parameter_name_bm": "Kumpulan Umur 2",
+        "parameter_name_en": "Age Group 2",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "demographic_age_band",
+        "sensitivity_class": "demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "preserve_code"
+        ],
+        "validation_rules": [
+          "must_be_in_enum"
+        ],
+        "ontology_target": "Voter.ageGroup2",
+        "enum_values": [
+          "18A",
+          "21A",
+          "40A",
+          "60A"
+        ]
+      },
+      {
+        "source_field": "TAHUN_LAHIR",
+        "canonical_field": "TAHUN_LAHIR",
+        "parameter_name_bm": "Tahun Lahir",
+        "parameter_name_en": "Birth Year",
+        "data_type": "integer",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "demographic_birth_year",
+        "sensitivity_class": "demographic",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "parse_integer"
+        ],
+        "validation_rules": [
+          "cross_validate_with_UMUR",
+          "review_if_age_difference_exceeds_2_years"
+        ],
+        "ontology_target": "Voter.birthYear",
+        "min_value": 1900,
+        "max_value": 2026
+      },
+      {
+        "source_field": "PROFESSION",
+        "canonical_field": "PROFESSION",
+        "parameter_name_bm": "Profesion",
+        "parameter_name_en": "Profession",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "socioeconomic_profession",
+        "sensitivity_class": "socioeconomic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "do_not_impute",
+          "reduce_profession_profile_confidence_when_missing"
+        ],
+        "ontology_target": "Voter.profession"
+      },
+      {
+        "source_field": "LOKALITI",
+        "canonical_field": "LOKALITI",
+        "parameter_name_bm": "Lokaliti",
+        "parameter_name_en": "Locality",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "electoral_locality",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "preserve_original",
+          "trim",
+          "collapse_whitespace"
+        ],
+        "validation_rules": [
+          "must_match_code_dot_name_pattern",
+          "validate_LOKALITI_to_DM_hierarchy"
+        ],
+        "ontology_target": "Locality.sourceLabel",
+        "pattern": "^\\d+\\..+$",
+        "gps_role": "primary_locality_context"
+      },
+      {
+        "source_field": "DM",
+        "canonical_field": "DM",
+        "parameter_name_bm": "Daerah Mengundi",
+        "parameter_name_en": "Polling District",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "electoral_polling_district",
+        "sensitivity_class": "location",
+        "aliases": [
+          "PDM",
+          "DAERAH_MENGUNDI"
+        ],
+        "codebook_required": true,
+        "normalization_rules": [
+          "preserve_original",
+          "trim",
+          "collapse_whitespace"
+        ],
+        "validation_rules": [
+          "must_match_code_dot_name_pattern",
+          "validate_DM_to_DUN_hierarchy"
+        ],
+        "ontology_target": "PollingDistrict.sourceLabel",
+        "pattern": "^\\d+\\..+$",
+        "gps_role": "electoral_district_context"
+      },
+      {
+        "source_field": "DUN",
+        "canonical_field": "DUN",
+        "parameter_name_bm": "Dewan Undangan Negeri",
+        "parameter_name_en": "State Constituency",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "electoral_state_constituency",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "preserve_original",
+          "trim",
+          "collapse_whitespace"
+        ],
+        "validation_rules": [
+          "must_match_code_dot_name_pattern",
+          "validate_DUN_to_PARLIMEN_hierarchy"
+        ],
+        "ontology_target": "StateConstituency.sourceLabel",
+        "pattern": "^\\d+\\..+$",
+        "gps_role": "state_constituency_context"
+      },
+      {
+        "source_field": "PARLIMEN",
+        "canonical_field": "PARLIMEN",
+        "parameter_name_bm": "Kawasan Parlimen",
+        "parameter_name_en": "Parliamentary Constituency",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "electoral_parliamentary_constituency",
+        "sensitivity_class": "location",
+        "aliases": [
+          "PARLIAMENT"
+        ],
+        "codebook_required": true,
+        "normalization_rules": [
+          "preserve_original",
+          "trim",
+          "collapse_whitespace"
+        ],
+        "validation_rules": [
+          "must_match_code_dot_name_pattern",
+          "validate_PARLIMEN_to_NEGERI_hierarchy"
+        ],
+        "ontology_target": "ParliamentaryConstituency.sourceLabel",
+        "pattern": "^\\d+\\..+$",
+        "gps_role": "parliamentary_context"
+      },
+      {
+        "source_field": "NEGERI",
+        "canonical_field": "NEGERI",
+        "parameter_name_bm": "Negeri",
+        "parameter_name_en": "State",
+        "data_type": "string",
+        "required": true,
+        "nullable": false,
+        "semantic_role": "electoral_state",
+        "sensitivity_class": "location",
+        "aliases": [
+          "STATE"
+        ],
+        "codebook_required": true,
+        "normalization_rules": [
+          "preserve_original",
+          "trim",
+          "collapse_whitespace"
+        ],
+        "validation_rules": [
+          "must_match_code_dot_name_pattern"
+        ],
+        "ontology_target": "State.sourceLabel",
+        "pattern": "^\\d+\\..+$",
+        "gps_role": "target_state_context"
+      },
+      {
+        "source_field": "NO_RUMAH",
+        "canonical_field": "NO_RUMAH",
+        "parameter_name_bm": "Nombor Rumah/Premis",
+        "parameter_name_en": "House/Premise Number",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_premise_number",
+        "sensitivity_class": "precise_location",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "trim",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "exclude_from_provider_query_by_default"
+        ],
+        "ontology_target": "Address.premiseNumber",
+        "gps_role": "excluded_by_default_precise_component"
+      },
+      {
+        "source_field": "ALAMAT1",
+        "canonical_field": "ALAMAT1",
+        "parameter_name_bm": "Alamat Baris 1",
+        "parameter_name_en": "Address Line 1",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_line_1",
+        "sensitivity_class": "precise_location",
+        "aliases": [
+          "ADDRESS",
+          "STREET"
+        ],
+        "codebook_required": false,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "preserve_original_semantics"
+        ],
+        "validation_rules": [
+          "safe_geocoder_query_strip_premise_number_by_default"
+        ],
+        "ontology_target": "Address.line1",
+        "gps_role": "primary_address_context"
+      },
+      {
+        "source_field": "ALAMAT2",
+        "canonical_field": "ALAMAT2",
+        "parameter_name_bm": "Alamat Baris 2",
+        "parameter_name_en": "Address Line 2",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_line_2",
+        "sensitivity_class": "precise_location",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "preserve_original_semantics"
+        ],
+        "validation_rules": [],
+        "ontology_target": "Address.line2",
+        "gps_role": "secondary_address_context"
+      },
+      {
+        "source_field": "ALAMAT3",
+        "canonical_field": "ALAMAT3",
+        "parameter_name_bm": "Alamat Baris 3",
+        "parameter_name_en": "Address Line 3",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_line_3",
+        "sensitivity_class": "precise_location",
+        "aliases": [],
+        "codebook_required": false,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "preserve_original_semantics"
+        ],
+        "validation_rules": [],
+        "ontology_target": "Address.line3",
+        "gps_role": "secondary_address_context"
+      },
+      {
+        "source_field": "POSKOD",
+        "canonical_field": "POSKOD",
+        "parameter_name_bm": "Poskod",
+        "parameter_name_en": "Postcode",
+        "data_type": "postcode",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_postcode",
+        "sensitivity_class": "location",
+        "aliases": [
+          "POSTCODE",
+          "ZIP"
+        ],
+        "codebook_required": false,
+        "normalization_rules": [
+          "store_as_text",
+          "trim"
+        ],
+        "validation_rules": [
+          "review_non_five_digit_values",
+          "do_not_auto_pad_ambiguous_values"
+        ],
+        "ontology_target": "Address.postcode",
+        "pattern": "^\\d{5}$",
+        "gps_role": "postcode_context"
+      },
+      {
+        "source_field": "ALAMAT_BANDAR",
+        "canonical_field": "ALAMAT_BANDAR",
+        "parameter_name_bm": "Bandar Alamat",
+        "parameter_name_en": "Address City/Town",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_city",
+        "sensitivity_class": "location",
+        "aliases": [
+          "CITY",
+          "TOWN"
+        ],
+        "codebook_required": false,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "uppercase"
+        ],
+        "validation_rules": [
+          "controlled_spelling_review"
+        ],
+        "ontology_target": "Address.city",
+        "gps_role": "city_context"
+      },
+      {
+        "source_field": "ALAMAT_NEGERI",
+        "canonical_field": "ALAMAT_NEGERI",
+        "parameter_name_bm": "Negeri Alamat",
+        "parameter_name_en": "Address State",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "address_state",
+        "sensitivity_class": "location",
+        "aliases": [
+          "ADDRESS_STATE"
+        ],
+        "codebook_required": false,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "uppercase"
+        ],
+        "validation_rules": [
+          "cross_validate_with_NEGERI_when_comparable"
+        ],
+        "ontology_target": "Address.state",
+        "gps_role": "address_state_context"
+      },
+      {
+        "source_field": "BANGSA",
+        "canonical_field": "BANGSA",
+        "parameter_name_bm": "Bangsa / Deskripsi Etnik",
+        "parameter_name_en": "Ethnicity Descriptor",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "demographic_ethnicity_descriptor",
+        "sensitivity_class": "sensitive_demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "do_not_infer_missing_values"
+        ],
+        "ontology_target": "Voter.ethnicityDescriptor"
+      },
+      {
+        "source_field": "KAUM2",
+        "canonical_field": "KAUM2",
+        "parameter_name_bm": "Kategori Kaum 2",
+        "parameter_name_en": "Ethnic Group 2",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "demographic_ethnic_group_2",
+        "sensitivity_class": "sensitive_demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "preserve_code",
+          "uppercase_except_source_anomaly_review"
+        ],
+        "validation_rules": [
+          "codebook_required",
+          "review_case_anomalies"
+        ],
+        "ontology_target": "Voter.ethnicGroup2"
+      },
+      {
+        "source_field": "KOD_UMUR",
+        "canonical_field": "KOD_UMUR",
+        "parameter_name_bm": "Kod Umur",
+        "parameter_name_en": "Age Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "demographic_age_code",
+        "sensitivity_class": "demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "preserve_code"
+        ],
+        "validation_rules": [],
+        "ontology_target": "Voter.ageCode"
+      },
+      {
+        "source_field": "KOD_UMUR2",
+        "canonical_field": "KOD_UMUR2",
+        "parameter_name_bm": "Kod Kumpulan Umur 2",
+        "parameter_name_en": "Age Group 2 Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "demographic_age_group_2_code",
+        "sensitivity_class": "demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "preserve_code"
+        ],
+        "validation_rules": [],
+        "ontology_target": "Voter.ageGroup2Code"
+      },
+      {
+        "source_field": "AGAMA",
+        "canonical_field": "AGAMA",
+        "parameter_name_bm": "Agama",
+        "parameter_name_en": "Religion",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "demographic_religion",
+        "sensitivity_class": "sensitive_demographic",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "controlled_vocabulary_review",
+          "do_not_infer_missing_values"
+        ],
+        "ontology_target": "Voter.religion"
+      },
+      {
+        "source_field": "LOKALITIPRU14",
+        "canonical_field": "LOKALITIPRU14",
+        "parameter_name_bm": "Kod Lokaliti PRU14",
+        "parameter_name_en": "GE14 Locality Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "historical_electoral_locality_code",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_leading_zeroes"
+        ],
+        "validation_rules": [],
+        "ontology_target": "HistoricalElectoralSnapshot.GE14.localityCode"
+      },
+      {
+        "source_field": "DUNPRU14",
+        "canonical_field": "DUNPRU14",
+        "parameter_name_bm": "Kod DUN PRU14",
+        "parameter_name_en": "GE14 State Constituency Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "historical_electoral_dun_code",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_leading_zeroes"
+        ],
+        "validation_rules": [],
+        "ontology_target": "HistoricalElectoralSnapshot.GE14.dunCode"
+      },
+      {
+        "source_field": "PARLIMENPRU14",
+        "canonical_field": "PARLIMENPRU14",
+        "parameter_name_bm": "Kod Parlimen PRU14",
+        "parameter_name_en": "GE14 Parliamentary Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "historical_electoral_parliament_code",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_leading_zeroes"
+        ],
+        "validation_rules": [],
+        "ontology_target": "HistoricalElectoralSnapshot.GE14.parliamentCode"
+      },
+      {
+        "source_field": "KODNPRU14",
+        "canonical_field": "KODNPRU14",
+        "parameter_name_bm": "Kod Negeri PRU14",
+        "parameter_name_en": "GE14 State Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "historical_electoral_state_code",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_leading_zeroes"
+        ],
+        "validation_rules": [],
+        "ontology_target": "HistoricalElectoralSnapshot.GE14.stateCode"
+      },
+      {
+        "source_field": "KODKATEGORI",
+        "canonical_field": "KODKATEGORI",
+        "parameter_name_bm": "Kod Kategori",
+        "parameter_name_en": "Category Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "source_category_code",
+        "sensitivity_class": "internal",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_code"
+        ],
+        "validation_rules": [
+          "do_not_infer_semantics_without_codebook"
+        ],
+        "ontology_target": "Voter.categoryCode"
+      },
+      {
+        "source_field": "FLG_UMNO",
+        "canonical_field": "FLG_UMNO",
+        "parameter_name_bm": "Penanda UMNO",
+        "parameter_name_en": "UMNO Flag",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "political_membership_or_affiliation_flag",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_source_nulls"
+        ],
+        "validation_rules": [
+          "do_not_infer_blank_as_false_without_codebook"
+        ],
+        "ontology_target": "PoliticalProfile.umnoFlag",
+        "notes": "Treat as sensitive political data. Preserve source value and source lineage."
+      },
+      {
+        "source_field": "NAMANEGERICAW",
+        "canonical_field": "NAMANEGERICAW",
+        "parameter_name_bm": "Nama Negeri Struktur Cawangan",
+        "parameter_name_en": "Branch-Structure State Name",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "organisation_branch_state_name",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "uppercase",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [],
+        "ontology_target": "OrganisationBranch.stateName"
+      },
+      {
+        "source_field": "NAMABAHAGIAN",
+        "canonical_field": "NAMABAHAGIAN",
+        "parameter_name_bm": "Nama Bahagian",
+        "parameter_name_en": "Division Name",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "organisation_division_name",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "uppercase",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [],
+        "ontology_target": "OrganisationDivision.name"
+      },
+      {
+        "source_field": "NAMACAWANGAN",
+        "canonical_field": "NAMACAWANGAN",
+        "parameter_name_bm": "Nama Cawangan",
+        "parameter_name_en": "Branch Name",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "organisation_branch_name",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "unicode_nfkc",
+          "trim",
+          "collapse_whitespace",
+          "uppercase",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [],
+        "ontology_target": "OrganisationBranch.name"
+      },
+      {
+        "source_field": "KODCAWANGAN",
+        "canonical_field": "KODCAWANGAN",
+        "parameter_name_bm": "Kod Cawangan",
+        "parameter_name_en": "Branch Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "organisation_branch_code",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_leading_zeroes",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [],
+        "ontology_target": "OrganisationBranch.code"
+      },
+      {
+        "source_field": "KATEGORIPEMILIH",
+        "canonical_field": "KATEGORIPEMILIH",
+        "parameter_name_bm": "Kategori Pemilih",
+        "parameter_name_en": "Voter Category",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "voter_category_code",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_code"
+        ],
+        "validation_rules": [
+          "do_not_infer_semantics_without_codebook"
+        ],
+        "ontology_target": "PoliticalProfile.voterCategory"
+      },
+      {
+        "source_field": "STATUSPEMILIH",
+        "canonical_field": "STATUSPEMILIH",
+        "parameter_name_bm": "Status Pemilih",
+        "parameter_name_en": "Voter Status",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "voter_status_code",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_code"
+        ],
+        "validation_rules": [
+          "do_not_infer_semantics_without_codebook"
+        ],
+        "ontology_target": "PoliticalProfile.voterStatus"
+      },
+      {
+        "source_field": "KODPARTI",
+        "canonical_field": "KODPARTI",
+        "parameter_name_bm": "Kod Parti",
+        "parameter_name_en": "Party Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "political_party_code",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_code",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "do_not_infer_party_from_other_attributes"
+        ],
+        "ontology_target": "PoliticalProfile.partyCode"
+      },
+      {
+        "source_field": "SIKAP",
+        "canonical_field": "SIKAP",
+        "parameter_name_bm": "Sikap",
+        "parameter_name_en": "Disposition",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "political_disposition_code",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "nullify_placeholder_token_dash"
+        ],
+        "validation_rules": [
+          "preserve_P_H_K_codes",
+          "do_not_infer_semantics_without_codebook"
+        ],
+        "ontology_target": "PoliticalProfile.dispositionCode"
+      },
+      {
+        "source_field": "STATUS",
+        "canonical_field": "STATUS",
+        "parameter_name_bm": "Status",
+        "parameter_name_en": "Status",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "source_status_code",
+        "sensitivity_class": "highly_sensitive_political",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "trim",
+          "uppercase",
+          "preserve_code",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "do_not_infer_semantics_without_codebook"
+        ],
+        "ontology_target": "PoliticalProfile.statusCode"
+      },
+      {
+        "source_field": "KAWASAN_LUAR",
+        "canonical_field": "KAWASAN_LUAR",
+        "parameter_name_bm": "Kawasan Luar",
+        "parameter_name_en": "External Area Code",
+        "data_type": "string",
+        "required": false,
+        "nullable": true,
+        "semantic_role": "external_area_code",
+        "sensitivity_class": "location",
+        "aliases": [],
+        "codebook_required": true,
+        "normalization_rules": [
+          "store_as_text",
+          "trim",
+          "preserve_code",
+          "nullify_placeholder_tokens"
+        ],
+        "validation_rules": [
+          "sparse_field",
+          "do_not_impute"
+        ],
+        "ontology_target": "Voter.externalAreaCode"
+      }
+    ]
+  },
+  "hierarchy_contract": {
+    "hierarchy_order": [
+      "NEGERI",
+      "PARLIMEN",
+      "DUN",
+      "DM",
+      "LOKALITI"
+    ],
+    "child_to_parent_rules": [
+      {
+        "child_field": "LOKALITI",
+        "parent_field": "DM",
+        "conflict_action": "quarantine_or_review"
+      },
+      {
+        "child_field": "DM",
+        "parent_field": "DUN",
+        "conflict_action": "quarantine_or_review"
+      },
+      {
+        "child_field": "DUN",
+        "parent_field": "PARLIMEN",
+        "conflict_action": "quarantine_or_review"
+      },
+      {
+        "child_field": "PARLIMEN",
+        "parent_field": "NEGERI",
+        "conflict_action": "quarantine_or_review"
+      }
+    ],
+    "silent_auto_rewrite_allowed": false
+  },
+  "profiling_contract": {
+    "read_only": true,
+    "required_checks": [
+      "source_file_sha256",
+      "worksheet_inventory",
+      "row_count",
+      "column_count",
+      "field_order",
+      "missing_required_fields",
+      "unknown_fields",
+      "VTR_ID_missing",
+      "VTR_ID_duplicates",
+      "VTR_ID_pattern",
+      "VTR_LABEL_missing",
+      "VTR_LABEL_duplicate_distribution",
+      "null_distribution",
+      "age_range",
+      "UMUR_vs_TAHUN_LAHIR_consistency",
+      "postcode_format",
+      "placeholder_tokens",
+      "electoral_hierarchy_conflicts",
+      "code_dot_name_format",
+      "GPS_presence",
+      "privacy_removed_fields_absent"
+    ],
+    "privacy_gate": {
+      "fail_if_any_present": [
+        "IC",
+        "IC_LAMA",
+        "IC_PERSONEL",
+        "IC_SPOUSE",
+        "NAMA",
+        "NO_TEL_HF",
+        "NOAHLI",
+        "CATATAN"
+      ]
+    },
+    "identity_gate": {
+      "VTR_ID_missing_max": 0,
+      "VTR_ID_duplicate_max": 0,
+      "VTR_ID_pattern_exception_max": 0
+    }
+  },
+  "cleansing_contract": {
+    "default_mode": "safe_then_standard",
+    "safe_deterministic_actions": [
+      "unicode_nfkc",
+      "trim_outer_whitespace",
+      "collapse_duplicate_whitespace",
+      "normalize_configured_null_tokens",
+      "preserve_codes_as_text",
+      "preserve_leading_zeroes",
+      "nullify_dash_placeholder_only_where_field_rule_allows"
+    ],
+    "must_not_auto_correct": [
+      "VTR_ID",
+      "VTR_LABEL",
+      "electoral_hierarchy_values",
+      "political_code_semantics",
+      "party_code_semantics",
+      "disposition_code_semantics",
+      "status_code_semantics",
+      "age_outliers_without_evidence",
+      "ambiguous_postcodes"
+    ],
+    "quarantine_triggers": [
+      "VTR_ID_missing",
+      "VTR_ID_duplicate",
+      "identity_conflict",
+      "electoral_hierarchy_conflict",
+      "required_field_missing",
+      "unresolved_critical_schema_error"
+    ]
+  },
+  "derived_fields": [
+    {
+      "derived_field": "VOTER_ID_HASH",
+      "parameter_name_bm": "Hash ID Pemilih Kanonik",
+      "parameter_name_en": "Canonical Voter ID Hash",
+      "data_type": "string",
+      "derivation": "HMAC-SHA256(normalized VTR_ID, PIP_VOTER_HASH_SALT)",
+      "source_dependencies": [
+        "VTR_ID"
+      ],
+      "required_for_graph": true,
+      "privacy_rule": "Never expose raw VTR_ID as public graph identifier."
+    },
+    {
+      "derived_field": "LOKALITI_CODE",
+      "parameter_name_bm": "Kod Lokaliti Terbitan",
+      "parameter_name_en": "Derived Lokaliti Code",
+      "data_type": "string",
+      "derivation": "split LOKALITI at first '.' and preserve left component as text",
+      "source_dependencies": [
+        "LOKALITI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "LOKALITI_NAME",
+      "parameter_name_bm": "Nama Lokaliti Terbitan",
+      "parameter_name_en": "Derived Lokaliti Name",
+      "data_type": "string",
+      "derivation": "split LOKALITI at first '.' and preserve right component",
+      "source_dependencies": [
+        "LOKALITI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "DM_CODE",
+      "parameter_name_bm": "Kod Dm Terbitan",
+      "parameter_name_en": "Derived Dm Code",
+      "data_type": "string",
+      "derivation": "split DM at first '.' and preserve left component as text",
+      "source_dependencies": [
+        "DM"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "DM_NAME",
+      "parameter_name_bm": "Nama Dm Terbitan",
+      "parameter_name_en": "Derived Dm Name",
+      "data_type": "string",
+      "derivation": "split DM at first '.' and preserve right component",
+      "source_dependencies": [
+        "DM"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "DUN_CODE",
+      "parameter_name_bm": "Kod Dun Terbitan",
+      "parameter_name_en": "Derived Dun Code",
+      "data_type": "string",
+      "derivation": "split DUN at first '.' and preserve left component as text",
+      "source_dependencies": [
+        "DUN"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "DUN_NAME",
+      "parameter_name_bm": "Nama Dun Terbitan",
+      "parameter_name_en": "Derived Dun Name",
+      "data_type": "string",
+      "derivation": "split DUN at first '.' and preserve right component",
+      "source_dependencies": [
+        "DUN"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "PARLIMEN_CODE",
+      "parameter_name_bm": "Kod Parlimen Terbitan",
+      "parameter_name_en": "Derived Parlimen Code",
+      "data_type": "string",
+      "derivation": "split PARLIMEN at first '.' and preserve left component as text",
+      "source_dependencies": [
+        "PARLIMEN"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "PARLIMEN_NAME",
+      "parameter_name_bm": "Nama Parlimen Terbitan",
+      "parameter_name_en": "Derived Parlimen Name",
+      "data_type": "string",
+      "derivation": "split PARLIMEN at first '.' and preserve right component",
+      "source_dependencies": [
+        "PARLIMEN"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "NEGERI_CODE",
+      "parameter_name_bm": "Kod Negeri Terbitan",
+      "parameter_name_en": "Derived Negeri Code",
+      "data_type": "string",
+      "derivation": "split NEGERI at first '.' and preserve left component as text",
+      "source_dependencies": [
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "NEGERI_NAME",
+      "parameter_name_bm": "Nama Negeri Terbitan",
+      "parameter_name_en": "Derived Negeri Name",
+      "data_type": "string",
+      "derivation": "split NEGERI at first '.' and preserve right component",
+      "source_dependencies": [
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_LATITUDE",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_LATITUDE",
+      "parameter_name_en": "Derived GPS Field: GPS_LATITUDE",
+      "data_type": "number",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_LONGITUDE",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_LONGITUDE",
+      "parameter_name_en": "Derived GPS Field: GPS_LONGITUDE",
+      "data_type": "number",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_POINT",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_POINT",
+      "parameter_name_en": "Derived GPS Field: GPS_POINT",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_STATUS",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_STATUS",
+      "parameter_name_en": "Derived GPS Field: GPS_STATUS",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_PROVIDER",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_PROVIDER",
+      "parameter_name_en": "Derived GPS Field: GPS_PROVIDER",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_SOURCE",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_SOURCE",
+      "parameter_name_en": "Derived GPS Field: GPS_SOURCE",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_QUALITY",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_QUALITY",
+      "parameter_name_en": "Derived GPS Field: GPS_QUALITY",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_CONFIDENCE",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_CONFIDENCE",
+      "parameter_name_en": "Derived GPS Field: GPS_CONFIDENCE",
+      "data_type": "number",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_BOUNDARY_STATUS",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_BOUNDARY_STATUS",
+      "parameter_name_en": "Derived GPS Field: GPS_BOUNDARY_STATUS",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_QUERY_TOKEN",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_QUERY_TOKEN",
+      "parameter_name_en": "Derived GPS Field: GPS_QUERY_TOKEN",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_MATCH_DISPLAY_NAME",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_MATCH_DISPLAY_NAME",
+      "parameter_name_en": "Derived GPS Field: GPS_MATCH_DISPLAY_NAME",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_CANDIDATE_COUNT",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_CANDIDATE_COUNT",
+      "parameter_name_en": "Derived GPS Field: GPS_CANDIDATE_COUNT",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_MANUAL_REVIEW_REQUIRED",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_MANUAL_REVIEW_REQUIRED",
+      "parameter_name_en": "Derived GPS Field: GPS_MANUAL_REVIEW_REQUIRED",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_REVIEW_REASON",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_REVIEW_REASON",
+      "parameter_name_en": "Derived GPS Field: GPS_REVIEW_REASON",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_EVIDENCE_REF",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_EVIDENCE_REF",
+      "parameter_name_en": "Derived GPS Field: GPS_EVIDENCE_REF",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_LINEAGE_REF",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_LINEAGE_REF",
+      "parameter_name_en": "Derived GPS Field: GPS_LINEAGE_REF",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_UPDATED_AT_UTC",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_UPDATED_AT_UTC",
+      "parameter_name_en": "Derived GPS Field: GPS_UPDATED_AT_UTC",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    },
+    {
+      "derived_field": "GPS_ERROR",
+      "parameter_name_bm": "Medan GPS Terbitan: GPS_ERROR",
+      "parameter_name_en": "Derived GPS Field: GPS_ERROR",
+      "data_type": "string",
+      "derivation": "pip-voter-gps-enricher-v1.0.py",
+      "source_dependencies": [
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "LOKALITI",
+        "DM",
+        "DUN",
+        "PARLIMEN",
+        "POSKOD",
+        "ALAMAT_BANDAR",
+        "ALAMAT_NEGERI",
+        "NEGERI"
+      ],
+      "replace_source_field": false
+    }
+  ],
+  "gps_enrichment_contract": {
+    "engine": "pip-voter-gps-enricher-v1.0.py",
+    "stage_position": "after_CLEANSE_GATE_before_TRANSFORM",
+    "default_safe_query_mode": true,
+    "provider_query_allowed_fields": [
+      "ALAMAT1",
+      "ALAMAT2",
+      "ALAMAT3",
+      "LOKALITI",
+      "DM",
+      "DUN",
+      "PARLIMEN",
+      "POSKOD",
+      "ALAMAT_BANDAR",
+      "ALAMAT_NEGERI",
+      "NEGERI"
+    ],
+    "provider_query_forbidden_fields": [
+      "VTR_ID",
+      "VTR_LABEL",
+      "JANTINA",
+      "UMUR",
+      "KAUM",
+      "TAHUN_LAHIR",
+      "AGAMA",
+      "FLG_UMNO",
+      "KATEGORIPEMILIH",
+      "STATUSPEMILIH",
+      "KODPARTI",
+      "SIKAP",
+      "STATUS"
+    ],
+    "premise_number_policy": "NO_RUMAH excluded by default",
+    "evidence_fields": [
+      "GPS_EVIDENCE_REF",
+      "GPS_LINEAGE_REF"
+    ],
+    "manual_review_required_for_approximate_fallback": true
+  },
+  "integration_contract": {
+    "master_ontology": "pip-voter-intelligence-ontology-v1.0.json",
+    "profiler": "pip-voter-data-profiler-v1.0.py",
+    "cleanser": "pip-voter-data-cleanser-v1.0.py",
+    "gps_enricher": "pip-voter-gps-enricher-v1.0.py",
+    "transformer": "pip-voter-intelligence-transformer-v1.0.js",
+    "pipeline": "pip-voter-intelligence-pipeline-v1.1.js",
+    "network_graph_identity": "VOTER_ID_HASH",
+    "digital_brain_identity": "VOTER_ID_HASH",
+    "s2d360_identity": "VOTER_ID_HASH",
+    "lineage_required": true,
+    "confidence_required": true,
+    "evidence_refs_required": true
+  },
+  "compatibility": {
+    "contract_is_machine_readable": true,
+    "recursive_field_mapping_loader_compatible": true,
+    "physical_field_count": 41,
+    "important_note": "Current v1.0 profiler/cleanser strict mode was originally hard-coded for 47 source fields. This 41-field contract is valid for non-strict contract loading, but strict execution requires a source-count-aware patch before use.",
+    "required_next_engineering_patch": [
+      "make profiler strict source-field count contract-driven",
+      "make cleanser strict source-field count contract-driven",
+      "derive VOTER_ID_HASH from VTR_ID",
+      "make transformer identity derivation accept VTR_ID",
+      "make pipeline expected source-field count read from source contract"
+    ]
+  },
+  "contract_history": [
+    {
+      "version": "1.0.1-mlk",
+      "change": "Added 7 PDPA fields (NO_RUMAH, ALAMAT1-3, POSKOD, BANGSA, AGAMA) to privacy_removed_fields per ENGINE-INTEGRATION.md \u00a710.2 (gate 7).",
+      "added_fields": [
+        "NO_RUMAH",
+        "ALAMAT1",
+        "ALAMAT2",
+        "ALAMAT3",
+        "POSKOD",
+        "BANGSA",
+        "AGAMA"
+      ]
+    }
+  ]
+}

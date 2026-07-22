@@ -1,0 +1,447 @@
+{
+  "state": "Melaka",
+  "state_code": "04",
+  "towns": [
+    {
+      "name": "Bandar Melaka",
+      "postcode": "75000",
+      "lat": 2.1944,
+      "lng": 102.2491,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N16"
+    },
+    {
+      "name": "Bukit Beruang",
+      "postcode": "75450",
+      "lat": 2.2463,
+      "lng": 102.2819,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N14"
+    },
+    {
+      "name": "Ayer Keroh",
+      "postcode": "75460",
+      "lat": 2.2636,
+      "lng": 102.2757,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N14"
+    },
+    {
+      "name": "Batu Berendam",
+      "postcode": "75350",
+      "lat": 2.2326,
+      "lng": 102.2522,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N17"
+    },
+    {
+      "name": "Klebang Besar",
+      "postcode": "75200",
+      "lat": 2.2236,
+      "lng": 102.23,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N17"
+    },
+    {
+      "name": "Tanjung Kling",
+      "postcode": "76400",
+      "lat": 2.2206,
+      "lng": 102.1819,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N18"
+    },
+    {
+      "name": "Paya Rumput",
+      "postcode": "76450",
+      "lat": 2.2469,
+      "lng": 102.1919,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N19"
+    },
+    {
+      "name": "Bukit Katil",
+      "postcode": "75150",
+      "lat": 2.2064,
+      "lng": 102.2836,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N09"
+    },
+    {
+      "name": "Bemban",
+      "postcode": "75260",
+      "lat": 2.1964,
+      "lng": 102.3164,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N13"
+    },
+    {
+      "name": "Ayer Molek",
+      "postcode": "75460",
+      "lat": 2.2236,
+      "lng": 102.2636,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N10"
+    },
+    {
+      "name": "Bandar Hilir",
+      "postcode": "75000",
+      "lat": 2.1889,
+      "lng": 102.2467,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N12"
+    },
+    {
+      "name": "Kesidang",
+      "postcode": "75100",
+      "lat": 2.2136,
+      "lng": 102.2486,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N11"
+    },
+    {
+      "name": "Kota Laksamana",
+      "postcode": "75200",
+      "lat": 2.1964,
+      "lng": 102.24,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N15"
+    },
+    {
+      "name": "Alor Gajah",
+      "postcode": "78000",
+      "lat": 2.3786,
+      "lng": 102.2106,
+      "district": "Alor Gajah",
+      "parliament": "P135",
+      "dun": "N07"
+    },
+    {
+      "name": "Masjid Tanah",
+      "postcode": "78300",
+      "lat": 2.3583,
+      "lng": 102.0833,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N02"
+    },
+    {
+      "name": "Kuala Linggi",
+      "postcode": "78200",
+      "lat": 2.4167,
+      "lng": 102.0667,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N01"
+    },
+    {
+      "name": "Tanjung Bidara",
+      "postcode": "78300",
+      "lat": 2.3167,
+      "lng": 102.05,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N02"
+    },
+    {
+      "name": "Ayer Limau",
+      "postcode": "78300",
+      "lat": 2.3267,
+      "lng": 102.1,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N03"
+    },
+    {
+      "name": "Lendu",
+      "postcode": "78000",
+      "lat": 2.3467,
+      "lng": 102.13,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N04"
+    },
+    {
+      "name": "Taboh Naning",
+      "postcode": "78000",
+      "lat": 2.3667,
+      "lng": 102.16,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N05"
+    },
+    {
+      "name": "Durian Tunggal",
+      "postcode": "76100",
+      "lat": 2.3067,
+      "lng": 102.22,
+      "district": "Alor Gajah",
+      "parliament": "P135",
+      "dun": "N08"
+    },
+    {
+      "name": "Kelebang",
+      "postcode": "78000",
+      "lat": 2.3967,
+      "lng": 102.19,
+      "district": "Alor Gajah",
+      "parliament": "P135",
+      "dun": "N06"
+    },
+    {
+      "name": "Gadek",
+      "postcode": "78000",
+      "lat": 2.3867,
+      "lng": 102.23,
+      "district": "Alor Gajah",
+      "parliament": "P135",
+      "dun": "N07"
+    },
+    {
+      "name": "Jasin",
+      "postcode": "77000",
+      "lat": 2.3106,
+      "lng": 102.4269,
+      "district": "Jasin",
+      "parliament": "P138",
+      "dun": "N23"
+    },
+    {
+      "name": "Bemban (Jasin)",
+      "postcode": "77200",
+      "lat": 2.2767,
+      "lng": 102.36,
+      "district": "Jasin",
+      "parliament": "P138",
+      "dun": "N20"
+    },
+    {
+      "name": "Asahan",
+      "postcode": "77100",
+      "lat": 2.3467,
+      "lng": 102.38,
+      "district": "Jasin",
+      "parliament": "P138",
+      "dun": "N21"
+    },
+    {
+      "name": "Naning",
+      "postcode": "77000",
+      "lat": 2.3267,
+      "lng": 102.4,
+      "district": "Jasin",
+      "parliament": "P138",
+      "dun": "N22"
+    },
+    {
+      "name": "Krubong",
+      "postcode": "75260",
+      "lat": 2.2267,
+      "lng": 102.34,
+      "district": "Jasin",
+      "parliament": "P139",
+      "dun": "N24"
+    },
+    {
+      "name": "Pengkalan Batu",
+      "postcode": "75460",
+      "lat": 2.2467,
+      "lng": 102.35,
+      "district": "Jasin",
+      "parliament": "P139",
+      "dun": "N25"
+    },
+    {
+      "name": "Padang Temu",
+      "postcode": "75050",
+      "lat": 2.1867,
+      "lng": 102.33,
+      "district": "Jasin",
+      "parliament": "P139",
+      "dun": "N26"
+    },
+    {
+      "name": "Bukit Baru",
+      "postcode": "75150",
+      "lat": 2.1967,
+      "lng": 102.31,
+      "district": "Jasin",
+      "parliament": "P139",
+      "dun": "N27"
+    },
+    {
+      "name": "Tangga Batu",
+      "postcode": "76100",
+      "lat": 2.2567,
+      "lng": 102.2,
+      "district": "Jasin",
+      "parliament": "P139",
+      "dun": "N28"
+    },
+    {
+      "name": "Sungai Udang",
+      "postcode": "76250",
+      "lat": 2.2636,
+      "lng": 102.1056,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N02"
+    },
+    {
+      "name": "Lubok China",
+      "postcode": "78100",
+      "lat": 2.3967,
+      "lng": 102.09,
+      "district": "Alor Gajah",
+      "parliament": "P134",
+      "dun": "N03"
+    },
+    {
+      "name": "Pulau Sebang",
+      "postcode": "77500",
+      "lat": 2.4567,
+      "lng": 102.23,
+      "district": "Alor Gajah",
+      "parliament": "P135",
+      "dun": "N06"
+    },
+    {
+      "name": "Rembia",
+      "postcode": "78000",
+      "lat": 2.4067,
+      "lng": 102.2,
+      "district": "Alor Gajah",
+      "parliament": "P135",
+      "dun": "N07"
+    },
+    {
+      "name": "Paya Rumput (south)",
+      "postcode": "76300",
+      "lat": 2.2469,
+      "lng": 102.1819,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N19"
+    },
+    {
+      "name": "Telok Mas",
+      "postcode": "75050",
+      "lat": 2.1767,
+      "lng": 102.32,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N12"
+    },
+    {
+      "name": "Bertam Hulu",
+      "postcode": "75460",
+      "lat": 2.2867,
+      "lng": 102.27,
+      "district": "Melaka Tengah",
+      "parliament": "P135",
+      "dun": "N08"
+    },
+    {
+      "name": "Bukit Rambai",
+      "postcode": "75250",
+      "lat": 2.2467,
+      "lng": 102.19,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N17"
+    },
+    {
+      "name": "Parit Melana",
+      "postcode": "75460",
+      "lat": 2.2367,
+      "lng": 102.27,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N09"
+    },
+    {
+      "name": "Taman Merdeka",
+      "postcode": "75350",
+      "lat": 2.2167,
+      "lng": 102.26,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N15"
+    },
+    {
+      "name": "Peringgit",
+      "postcode": "75350",
+      "lat": 2.2167,
+      "lng": 102.27,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N16"
+    },
+    {
+      "name": "Bachang",
+      "postcode": "75360",
+      "lat": 2.2367,
+      "lng": 102.27,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N09"
+    },
+    {
+      "name": "Tengkera",
+      "postcode": "75200",
+      "lat": 2.1967,
+      "lng": 102.23,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N16"
+    },
+    {
+      "name": "Pengkalan Rama",
+      "postcode": "75400",
+      "lat": 2.2067,
+      "lng": 102.26,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N16"
+    },
+    {
+      "name": "Ujong Pasir",
+      "postcode": "75050",
+      "lat": 2.1867,
+      "lng": 102.28,
+      "district": "Melaka Tengah",
+      "parliament": "P137",
+      "dun": "N15"
+    },
+    {
+      "name": "Semabok",
+      "postcode": "75050",
+      "lat": 2.1767,
+      "lng": 102.29,
+      "district": "Melaka Tengah",
+      "parliament": "P136",
+      "dun": "N12"
+    },
+    {
+      "name": "Bukit Senjuh",
+      "postcode": "76100",
+      "lat": 2.2567,
+      "lng": 102.19,
+      "district": "Melaka Tengah",
+      "parliament": "P139",
+      "dun": "N28"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "source_archive_sha256": "65623e788d1de0c2678e0f964fbbb35fcad762440000fd2f17573b68da64c69b",
+  "archive_segments": {
+    "pipML-app1.zip": 27678875,
+    "pipML-app1.z01": 47185920,
+    "pipML-app1.z02": 47185920,
+    "pipML-app1.z03": 47185920,
+    "total_bytes": 169229635
+  },
+  "script_versions": {
+    "profiler": "1.1.0",
+    "cleanser": "1.1.0",
+    "transformer": "1.0.0",
+    "orchestrator": "1.1.0"
+  },
+  "runtime": {
+    "node": "v24.18.0",
+    "python": "3.x (invoked via child_process.spawn)",
+    "pandas": "2.x (assumed installed)",
+    "openpyxl": "3.x (assumed installed)"
+  },
+  "entry_points": [
+    "python engine/pip-voter-data-profiler-v1.1.py <xlsx> --ontology <contract> --output-dir profile-out --strict-contract",
+    "python engine/pip-voter-data-cleanser-v1.1.py <xlsx> --ontology <contract> --output-dir clean-out --mode standard --strict-contract",
+    "node engine/pip-voter-intelligence-transformer-v1.0.js --input clean-out/voter-cleaned.jsonl --contract <contract> --output-dir transform-out --self-check"
+  ],
+  "salt_rotated": true,
+  "salt_sha256": "e10a94ee952517e12d3ee6a125724c175fa5e4510e43324264f548c8768eca7d",
+  "exposed_salt_dead": true,
+  "exposed_salt_value_prefix": "9fad3e8f",
+  "ethnicity_bug_fixed": true,
+  "ethnicity_bug_fix_location": "engine/pip-voter-intelligence-transformer-v1.0.js:170 (normalizeEthnicity field list reordered: [\"KAUM2\",\"KAUM\",\"BANGSA\"] -> [\"BANGSA\",\"KAUM2\",\"KAUM\"])",
+  "privacy_regression_fixed": true,
+  "privacy_regression_fix_location": "engine/contracts/pip-voter-source-contract-p134-v1.0.json:privacy_model.privacy_removed_fields (added 7 fields: NO_RUMAH, ALAMAT1, ALAMAT2, ALAMAT3, POSKOD, BANGSA, AGAMA; count 8 -> 15)",
+  "orchestrator_present": true,
+  "orchestrator_path": "engine/pip-voter-intelligence-pipeline-v1.1.js",
+  "orchestrator_lines": 196,
+  "audit_passed": false,
+  "audit_samples": [],
+  "audit_note": "Gate 9 audit requires ground-truth verification of 3+ locality records against raw SPR voter xlsx. Pending user-provided raw voter xlsx files (PDPA-sensitive, never shipped). Until then, all engine outputs ship as Proxy evidence tier per ENGINE-INTEGRATION.md §6.5 rule 3.",
+  "verified": false,
+  "verified_at": null,
+  "gates_summary": {
+    "gate_1_archive_sha256": true,
+    "gate_2_script_versions": true,
+    "gate_3_runtime": true,
+    "gate_4_entry_points": true,
+    "gate_5_salt_rotated": true,
+    "gate_6_ethnicity_bug_fixed": true,
+    "gate_7_privacy_regression_fixed": true,
+    "gate_8_orchestrator_present": true,
+    "gate_9_audit_passed": false,
+    "closed": 8,
+    "total": 9
+  },
+  "generated_at": "2026-07-16T23:40:49Z",
+  "generated_by": "PIP-MLK Phase 1 (main orchestrator)"
+}

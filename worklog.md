@@ -2882,3 +2882,66 @@ Added 245+ new i18n keys × 2 locales = 490+ new translation entries across 5 na
 2. **Wire remaining 11 tabs** — each is ~150-400 lines; estimate ~30-50 new keys per tab = ~400 new keys total
 3. **Add `<html lang>` dynamic attribute** — currently static "en"; should update to "ms" when locale changes (SEO + screen reader)
 4. **Test on production CF Workers deployment** — verify translations work in production build (client-side Context should be fine, but worth confirming after the next `git push` triggers CF deploy)
+
+---
+Task ID: ZINDEX-MAP-DRAWER-FIX
+Agent: main (Z.ai Code)
+Task: Fix 2D map drawer + AI panel rendering behind map (z-index stacking bug)
+
+## Current project status description/assessment
+
+User reported (with VLM screenshot evidence) that clicking a DUN/Parliament on the
+2D map opens the detail drawer BEHIND the map, and clicking the AI assistant button
+opens the chat panel BEHIND the map. VLM analysis confirmed the Map Layers panel,
+search dropdown, legend, and seat summary widgets (all z-[1000]/z-[1001]) were
+rendering ON TOP of the drawer (z-50) and AI panel (z-50).
+
+## Root cause
+
+The 2D map container `<div>` did not create a stacking context. CSS z-index values
+only apply within the same stacking context. Without `isolation: isolate` on the
+map container, the floating widgets' z-[1000] values "leaked" to the page level
+and competed directly with the drawer/AI panel's z-50 values — z-[1000] > z-50,
+so the widgets won and covered the drawer/panel.
+
+## Current goals/completed modifications/verification results
+
+### Fix applied
+1. **`isolate` on map containers** — Added Tailwind `isolate` class (CSS
+   `isolation: isolate`) to create a stacking context boundary:
+   - `src/components/tabs/map-2d-tab.tsx` — map container div
+   - `src/components/tabs/map-3d-tab.tsx` — 3D canvas container div
+   - `src/components/map-2d/map-2d.tsx` — fullscreen map variant
+
+   Now all z-[1000]/z-[1001] values inside the map are scoped to the map only.
+   The drawer and AI panel (rendered at page level outside the map) always
+   render above the entire map container.
+
+2. **Clean z-index hierarchy** — Established a consistent stacking order:
+   - AI assistant toggle button: z-[55] (above header z-30, below panel)
+   - AI assistant panel: z-[65] (above toggle, below drawer backdrop)
+   - DUN drawer backdrop: z-[60] (above AI panel, below drawer panel)
+   - DUN drawer panel: z-[80] (above everything except command palette
+     z-[100] and onboarding tour z-[9999])
+
+### Verification results (VLM + agent-browser E2E)
+- **DUN drawer test**: Searched "Taboh" → clicked N05 Taboh Naning result →
+  drawer opened on right side. VLM confirmed:
+  - "Drawer is correctly rendered as an overlay. Map content behind is
+    blurred/darkened, indicating the drawer is sitting in a higher z-index
+    layer above the map canvas." ✅
+  - "The drawer covers the area where floating widgets would typically
+    reside, and no map widgets are overlapping or appearing on top of the
+    drawer's content." ✅
+  - Drawer showed full DUN details: Taboh Naning, P134, N05, Masjid Tanah,
+    election results (PRN15/GE14/GE15), analytics section ✅
+- **AI panel test**: Clicked AI assistant button → panel opened. VLM confirmed:
+  - "The AI assistant panel is clearly rendered above the 2D map canvas." ✅
+  - "Map Layers panel, Search bar, Coalition legend, and map statistics bar
+    are all correctly positioned behind the AI assistant panel." ✅
+- `bun run lint`: 0 errors, 3 warnings (all pre-existing)
+- No runtime errors in browser console
+
+## Commit
+5d5c5dd — fix: 2D map drawer + AI panel appear above map (z-index stacking fix)
+Pushed to origin/main. CF Workers auto-deploy triggered.

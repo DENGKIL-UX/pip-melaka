@@ -725,7 +725,7 @@ export function Map3DTab() {
         </div>
 
         {/* 3D canvas container */}
-        <div className="relative rounded-lg border border-slate-700 overflow-hidden" style={{ height: 540 }}>
+        <div className="relative isolate rounded-lg border border-slate-700 overflow-hidden" style={{ height: 540 }}>
           <div
             ref={mountRef}
             className="w-full h-full"

@@ -732,8 +732,12 @@ export function Map2DTab() {
           </span>
         </div>
 
-        {/* Map container */}
-        <div className="relative rounded-lg border border-border overflow-hidden" style={{ height: 540 }}>
+        {/* Map container — `isolate` creates a stacking context so the high
+            z-index values used by floating map widgets (z-[1000], z-[1001])
+            are scoped INSIDE this container. Without this, those z-[1000]
+            values leak to the page level and render on top of the DUN drawer
+            (z-50) and AI assistant panel (z-50), hiding them behind the map. */}
+        <div className="relative isolate rounded-lg border border-border overflow-hidden" style={{ height: 540 }}>
           <div ref={containerRef} className="w-full h-full" style={{ background: "#e5e7eb" }} />
 
           {/* Map statistics overlay — top-center floating pill */}

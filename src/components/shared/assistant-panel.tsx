@@ -149,7 +149,7 @@ export function AssistantPanel() {
       {/* Floating "Ask AI" button */}
       <motion.button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full bg-mlk-gradient shadow-lg shadow-mlk/30 flex items-center justify-center text-white hover-lift"
+        className="fixed bottom-5 right-5 z-[55] h-14 w-14 rounded-full bg-mlk-gradient shadow-lg shadow-mlk/30 flex items-center justify-center text-white hover-lift"
         aria-label={open ? "Close AI assistant" : "Open AI assistant"}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -179,7 +179,7 @@ export function AssistantPanel() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="fixed bottom-24 right-5 z-50 w-[400px] h-[500px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] flex flex-col rounded-xl border border-mlk/30 bg-background/95 backdrop-blur-md shadow-2xl shadow-mlk/20 overflow-hidden"
+            className="fixed bottom-24 right-5 z-[65] w-[400px] h-[500px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] flex flex-col rounded-xl border border-mlk/30 bg-background/95 backdrop-blur-md shadow-2xl shadow-mlk/20 overflow-hidden"
             role="dialog"
             aria-label="PIP-MLK AI Assistant"
           >

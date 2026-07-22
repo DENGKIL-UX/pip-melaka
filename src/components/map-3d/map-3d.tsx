@@ -65,6 +65,9 @@ import {
 } from "./extrusions";
 import { buildScatter, indexDunCentroids, type LocalityRow, type BuiltScatter } from "./scatter";
 import { buildHudRing, type BuiltHudRing } from "./hud-ring";
+import { buildRipples, type BuiltRipple } from "./ripple-effects";
+import { buildFlyLines, type BuiltFlyLines, type FlyLineTarget } from "./fly-lines";
+import { buildChaseLight, type BuiltChaseLight } from "./chase-light";
 import {
   buildDunLabels,
   buildParlimenLabels,
@@ -138,6 +141,9 @@ interface BuiltScene {
   parlimenOutlines: BuiltParlimenOutline[];
   scatter: BuiltScatter | null;
   hudRing: BuiltHudRing;
+  ripples: BuiltRipple;
+  flyLines: BuiltFlyLines;
+  chaseLight: BuiltChaseLight;
   dunLabels: BuiltLabel[];
   parlimenLabels: BuiltLabel[];
   /** Map: extrusion index by `parlCode|dunCode` for O(1) morph updates. */
@@ -313,9 +319,35 @@ export function Map3D({ className }: Map3DProps) {
           : null;
         if (scatter) scene.add(scatter.mesh);
 
-        // ── Layer 6: HUD ring ────────────────────────────────────────────────
+        // ── Layer 6: HUD ring (segmented ticked design) ─────────────────
         const hudRing = buildHudRing(THREE);
-        scene.add(hudRing.mesh);
+        scene.add(hudRing.group);
+
+        // ── Layer 6b: Chase light (outer-contour animated border) ──────────
+        // Per three-scope-map-skill: animated THREE.Line segments around the
+        // perimeter. Bright head + fading trail travels around the ring.
+        const chaseLight = buildChaseLight(THREE);
+        scene.add(chaseLight.group);
+
+        // ── Layer 6c: Ripple effects (expanding rings from map center) ─────
+        // Per three-scope-map-skill: ripple effects from a source point.
+        // Source = Melaka center (0,0 in scene coords).
+        const ripples = buildRipples(THREE, { source: [0, 0] });
+        scene.add(ripples.group);
+
+        // ── Layer 6d: Fly lines (arced paths from center to parliaments) ───
+        // Per three-scope-map-skill: fly lines from source (capital) to targets.
+        // Source = Melaka center; Targets = 6 parliament centroids.
+        const flyLineTargets: FlyLineTarget[] = data.parlimenFC.features.map((f) => {
+          const c = geometryCentroid3D(f.geometry);
+          // geometryCentroid3D returns [x, z] (2-tuple), NOT [x, y, z]
+          return { x: c[0], z: c[1], label: f.properties.parliament_name };
+        });
+        const flyLines = buildFlyLines(THREE, {
+          source: [0, 0],
+          targets: flyLineTargets,
+        });
+        scene.add(flyLines.group);
 
         // ── Layer 7 + 8: Labels (rebuilt on every morph) ─────────────────────
         // Build once with initial state — the morph effect updates positions.
@@ -345,6 +377,9 @@ export function Map3D({ className }: Map3DProps) {
           parlimenOutlines,
           scatter,
           hudRing,
+          ripples,
+          flyLines,
+          chaseLight,
           dunLabels,
           parlimenLabels,
           extrusionIndex,
@@ -428,6 +463,12 @@ export function Map3D({ className }: Map3DProps) {
 
           // HUD ring rotation (skipped if prefers-reduced-motion).
           hudRing.update(dt, !builtRef.current?.prefersReducedMotion);
+          // Chase light animation.
+          chaseLight.update(dt, !builtRef.current?.prefersReducedMotion);
+          // Ripple effects.
+          ripples.update(dt, !builtRef.current?.prefersReducedMotion);
+          // Fly line comets.
+          flyLines.update(dt, !builtRef.current?.prefersReducedMotion);
 
           // OrbitControls damping.
           bundle.controls?.update();
@@ -597,8 +638,41 @@ export function Map3D({ className }: Map3DProps) {
             scatter.mesh.geometry.dispose();
             (scatter.mesh.material as import("three").Material).dispose();
           }
-          hudRing.mesh.geometry.dispose();
-          (hudRing.mesh.material as import("three").Material).dispose();
+          // HUD ring group (torus + ticks + accent arc) — dispose children.
+          const THREE = bundle.THREE;
+          hudRing.group.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.geometry.dispose();
+              (child.material as import("three").Material).dispose();
+            } else if (child instanceof THREE.Line) {
+              child.geometry.dispose();
+              (child.material as import("three").Material).dispose();
+            }
+          });
+          // Chase light segments.
+          chaseLight.group.traverse((child) => {
+            if (child instanceof THREE.Line) {
+              child.geometry.dispose();
+              (child.material as import("three").Material).dispose();
+            }
+          });
+          // Ripple rings.
+          ripples.group.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.geometry.dispose();
+              (child.material as import("three").Material).dispose();
+            }
+          });
+          // Fly lines (comets + arc lines).
+          flyLines.group.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.geometry.dispose();
+              (child.material as import("three").Material).dispose();
+            } else if (child instanceof THREE.Line) {
+              child.geometry.dispose();
+              (child.material as import("three").Material).dispose();
+            }
+          });
           for (const l of [...dunLabels, ...parlimenLabels]) {
             (l.sprite.material as import("three").SpriteMaterial).dispose();
           }

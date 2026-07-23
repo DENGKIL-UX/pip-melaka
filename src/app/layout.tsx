@@ -17,6 +17,18 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Polyfill: __name is an esbuild helper used by next-themes' inline
+            anti-FOUC script. On CF Workers/OpenNext, the helper isn't available
+            in the inline HTML script context, causing "ReferenceError: __name
+            is not defined" which breaks the entire page. This no-op polyfill
+            runs before the theme script and prevents the crash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: 'if(typeof window!=="undefined"&&typeof window.__name==="undefined"){window.__name=function(f){return f;};}',
+          }}
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"

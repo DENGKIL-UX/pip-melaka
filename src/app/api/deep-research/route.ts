@@ -272,10 +272,10 @@ export async function POST(req: NextRequest) {
   // Try CF Workers AI with circuit breaker
   if (isCFConfigured()) {
     try {
-      const wrapped = async () => cfChatCompletion(messages, { temperature: 0.4, max_tokens: 800 });
-      const result = await circuitBreaker("deep-research", RESEARCH_CIRCUIT, wrapped);
+      const wrapped = async () => cfChatCompletion(messages);
+      const cfResult = await circuitBreaker("deep-research", wrapped, RESEARCH_CIRCUIT);
       return NextResponse.json({
-        response: result,
+        response: cfResult.response,
         sources: sources.map((s) => s.name),
         evidence_tiers: sources.map((s) => s.tier),
         source_count: sources.length,

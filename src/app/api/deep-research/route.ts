@@ -55,13 +55,50 @@ async function fetchJsonl(base: string, path: string): Promise<unknown[]> {
 }
 
 /**
+ * Fetch live data from ElectionData.MY REST API (api.electiondata.my/v1/*).
+ * Uses the ELECTIONDATA_API_TOKEN env var (set as CF Worker secret).
+ * Falls back to null if token not configured or API fails.
+ *
+ * Endpoints:
+ *   - parties/results: coalition vote shares by election
+ *   - seats/dropdown: seat metadata
+ *   - candidates: per-candidate results
+ */
+async function fetchElectionDataLive(endpoint: string, params?: Record<string, string>): Promise<unknown | null> {
+  const token = process.env.ELECTIONDATA_API_TOKEN;
+  if (!token) return null;
+  try {
+    const url = new URL(`https://api.electiondata.my/v1/${endpoint}`);
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    }
+    const res = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Human-readable label for election type param. */
+function election_type_label(t: string): string {
+  return t === "parlimen" ? "Parliament" : "DUN";
+}
+
+/**
  * Gather ALL verified data sources for comprehensive synthesis.
  * This is the "deep research" part — pulls everything available.
  */
 async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
   const sources: DataSource[] = [];
 
-  // 1. Elections (Verified)
+  // 1. Elections (Verified) — local static data
   const el = (await fetchJson(baseUrl, "elections/melaka-elections.json")) as {
     elections?: Array<{
       id: string; name: string; date: string; headline_fact: string;
@@ -75,7 +112,41 @@ async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
       `  Parliament: ${JSON.stringify(e.parliament_summary ?? {})}\n` +
       `  DUN: ${JSON.stringify(e.dun_summary ?? {})}`
     ).join("\n\n");
-    sources.push({ name: "Elections (ElectionData.MY)", tier: "Verified", content });
+    sources.push({ name: "Elections — Static (ElectionData.MY data lake)", tier: "Verified", content });
+  }
+
+  // 1b. Elections — LIVE from ElectionData.MY REST API (if token configured)
+  // Pulls fresh coalition vote-share data for BN, PH, PN across all elections.
+  // API returns { results: [...] } wrapper.
+  const coalitionUids = ["001-BN", "002-PH", "003-PN"];
+  const liveLines: string[] = [];
+  for (const uid of coalitionUids) {
+    for (const electionType of ["parlimen", "dun"] as const) {
+      const rawData = await fetchElectionDataLive("parties/results", {
+        type: "coalition",
+        uid,
+        state: "Melaka",
+        election_type: electionType,
+      }) as { results?: Array<{
+        known_as?: string; election_name?: string; date?: string;
+        seats_won?: number; seats_total?: number; votes_perc?: number;
+      }> } | null;
+      const data = rawData?.results;
+      if (data?.length) {
+        data.forEach((r) => {
+          liveLines.push(
+            `${r.known_as} ${r.election_name} (${r.date}) ${election_type_label(electionType)}: ${r.votes_perc?.toFixed(1)}% votes, ${r.seats_won}/${r.seats_total} seats`
+          );
+        });
+      }
+    }
+  }
+  if (liveLines.length > 0) {
+    sources.push({
+      name: "Elections — LIVE (ElectionData.MY REST API)",
+      tier: "Verified",
+      content: `Live coalition trends from api.electiondata.my/v1/parties/results:\n${liveLines.join("\n")}`,
+    });
   }
 
   // 2. DPT churn (Verified)

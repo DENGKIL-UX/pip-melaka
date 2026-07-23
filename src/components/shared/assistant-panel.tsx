@@ -13,6 +13,8 @@ interface ChatMessage {
   rag_used?: boolean;
   source?: string;
   evidence_tier?: "Verified" | "Proxy" | "Partial";
+  deep_research?: boolean;
+  source_count?: number;
 }
 
 interface AssistantResponse {
@@ -20,6 +22,10 @@ interface AssistantResponse {
   rag_used: boolean;
   source: string;
   evidence_tier: "Verified" | "Proxy" | "Partial";
+  sources?: string[];
+  evidence_tiers?: string[];
+  source_count?: number;
+  mode?: string;
 }
 
 const SUGGESTED_QUESTIONS = [
@@ -29,6 +35,15 @@ const SUGGESTED_QUESTIONS = [
   "Which DUN has the highest senior dependency?",
   "What's the DPT churn for Melaka in 2026?",
   "What is Melaka's median household income?",
+];
+
+// Deep Research quick-action prompts — inspired by awesome-llm-apps'
+// "AI Deep Research Agent" multi-step synthesis pattern.
+const DEEP_RESEARCH_PROMPTS = [
+  "Analyze N05 Taboh Naning risk profile",
+  "Compare PRN15 vs GE15 swing analysis",
+  "Which DUNs are most likely to flip in PRN16?",
+  "Full Melaka political intelligence brief",
 ];
 
 function tierColor(tier?: string): string {
@@ -79,6 +94,7 @@ export function AssistantPanel() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [cfModel, setCfModel] = useState(CF_MODELS[0].id);
+  const [deepResearch, setDeepResearch] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
@@ -108,13 +124,16 @@ export function AssistantPanel() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/assistant", {
+      // Deep Research mode: call /api/deep-research for multi-source synthesis
+      // Regular mode: call /api/assistant for keyword-routed single-source RAG
+      const endpoint = deepResearch ? "/api/deep-research" : "/api/assistant";
+      const reqBody = deepResearch
+        ? { question: q }
+        : { messages: history.map((m) => ({ role: m.role, content: m.content })), model: cfModel };
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: history.map((m) => ({ role: m.role, content: m.content })),
-          model: cfModel,
-        }),
+        body: JSON.stringify(reqBody),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as AssistantResponse;
@@ -123,9 +142,11 @@ export function AssistantPanel() {
         {
           role: "assistant",
           content: data.response,
-          rag_used: data.rag_used,
-          source: data.source,
+          rag_used: data.rag_used ?? deepResearch,
+          source: data.sources ? `${data.sources.length} sources` : data.source,
           evidence_tier: data.evidence_tier,
+          deep_research: deepResearch,
+          source_count: data.source_count,
         },
       ]);
     } catch (e) {
@@ -191,18 +212,36 @@ export function AssistantPanel() {
                 <Sparkles className="h-4 w-4 text-mlk flex-shrink-0" />
                 <div className="min-w-0">
                   <div className="text-xs font-semibold truncate">PIP-MLK AI Assistant</div>
-                  <div className="text-[9px] text-muted-foreground truncate">RAG-enhanced · Truth Above All</div>
+                  <div className="text-[9px] text-muted-foreground truncate">
+                    {deepResearch ? "Deep Research · multi-source synthesis" : "RAG-enhanced · Truth Above All"}
+                  </div>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-muted-foreground hover:text-mlk"
-                onClick={() => setOpen(false)}
-                aria-label="Close panel"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
+              <div className="flex items-center gap-1">
+                {/* Deep Research mode toggle — inspired by awesome-llm-apps +
+                    DeepTutor. Multi-source synthesis pulls ALL data sources. */}
+                <button
+                  onClick={() => setDeepResearch((v) => !v)}
+                  className={`text-[9px] px-2 py-1 rounded-md font-medium transition-colors ${
+                    deepResearch
+                      ? "bg-mlk text-white"
+                      : "text-muted-foreground hover:text-mlk hover:bg-mlk/10 border border-mlk/30"
+                  }`}
+                  aria-label="Toggle Deep Research mode"
+                  title="Deep Research: pulls ALL data sources for comprehensive synthesis"
+                >
+                  Deep Research
+                </button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-mlk"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close panel"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
 
             {/* Message history */}
@@ -216,26 +255,37 @@ export function AssistantPanel() {
               {loading && (
                 <div className="self-start flex items-center gap-2 text-xs text-muted-foreground px-3 py-2 bg-muted rounded-lg border border-mlk/20 w-fit">
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-mlk" />
-                  Querying RAG context…
+                  {deepResearch ? "Synthesizing across all data sources…" : "Querying RAG context…"}
                 </div>
               )}
             </div>
 
-            {/* Suggested questions */}
+            {/* Suggested questions / Deep Research prompts */}
             {messages.length <= 1 && (
               <div className="px-3 py-2 border-t border-mlk/20 bg-background/80">
-                <div className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1.5">Suggested</div>
+                <div className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1.5">
+                  {deepResearch ? "Deep Research Prompts" : "Suggested"}
+                </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {SUGGESTED_QUESTIONS.map((q) => (
+                  {(deepResearch ? DEEP_RESEARCH_PROMPTS : SUGGESTED_QUESTIONS).map((q) => (
                     <button
                       key={q}
                       onClick={() => send(q)}
-                      className="text-[10px] px-2 py-1 rounded-full border border-mlk/30 text-foreground hover:bg-mlk/10 hover:text-mlk hover:border-mlk transition-colors"
+                      className={`text-[10px] px-2 py-1 rounded-full border transition-colors ${
+                        deepResearch
+                          ? "border-mlk/50 text-mlk hover:bg-mlk hover:text-white"
+                          : "border-mlk/30 text-foreground hover:bg-mlk/10 hover:text-mlk hover:border-mlk"
+                      }`}
                     >
                       {q}
                     </button>
                   ))}
                 </div>
+                {deepResearch && (
+                  <div className="text-[8px] text-muted-foreground mt-1.5 italic">
+                    Pulls ALL data sources (Elections + DPT + Demographics + S2D + Overview) for comprehensive synthesis. 3 req/min limit.
+                  </div>
+                )}
               </div>
             )}
 

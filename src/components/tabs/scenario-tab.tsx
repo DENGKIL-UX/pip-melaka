@@ -65,47 +65,81 @@ export function ScenarioTab() {
       .catch(() => {});
   }, []);
 
-  // Dynamic projection model — recalculates when any slider changes.
-  // Uses live ElectionData.MY baseline if available, falls back to PRN15 static.
+  // ─── Per-DUN projection model (realistic, ElectionData.MY-grounded) ───────
+  //
+  // PRN15 baseline per-DUN winners (from ElectionData.MY):
+  //   BN: 21 seats (UMNO 18, MCA 2, MIC 1)
+  //   PH:  5 seats (DAP 4, AMANAH 1)
+  //   PN:  2 seats (BERSATU 2)
+  //
+  // Component-party constraints (from ElectionData.MY candidate data):
+  //   - DAP contested 4 DUNs (won all 4): N16 Ayer Keroh, N19 Kesidang,
+  //     N20 Kota Laksamana, N22 Bandar Hilir — all urban Chinese-majority
+  //   - MCA contested 2 DUNs (won both): N08 Machap Jaya, N14 Kelebang
+  //     — also urban/semi-urban Chinese-majority
+  //   - MIC contested 1 DUN (won): N07 Gadek — Indian-majority
+  //   - BERSATU (PN) won 2: N11 Sungai Udang, N24 Bemban
+  //
+  // Swing constraints:
+  //   - DAP→MCA: only affects DAP-won DUNs (max 4 seats). Represents DAP
+  //     voters switching to MCA in urban Chinese-majority seats where MCA
+  //     also fields candidates.
+  //   - DAP→MIC: only affects DUNs with significant Indian voters where
+  //     MIC fields candidates (max ~2 seats). MIC only contests in a few
+  //     Indian-majority DUNs, so this swing is capped.
+  //   - PN→BN: only affects PN-won DUNs (max 2 seats: N11, N24).
+  //
+  // DAP-won DUNs (max DAP→MCA/MIC impact):
+  const DAP_DUNS = 4; // N16, N19, N20, N22
+  // MIC-contested DUNs (max DAP→MIC impact — MIC only fields candidates
+  // in Indian-majority areas, not all 28 DUNs):
+  const MIC_CONTESTED = 2; // N07 Gadek + potentially 1 more
+  // PN-won DUNs (max PN→BN swing impact):
+  const PN_DUNS = 2; // N11, N24
+
   const projection = useMemo(() => {
     // Base = live API data if available, otherwise PRN15 static results
     let bn = liveBaseline?.bn ?? DUN_COALITION_COUNTS.BN;
     let ph = liveBaseline?.ph ?? DUN_COALITION_COUNTS.PH;
     let pn = liveBaseline?.pn ?? DUN_COALITION_COUNTS.PN;
 
-    // Swing factor: moves seats from PN → BN (each 3% = 1 seat)
-    const seatsFromSwing = Math.round(swingFactor / 3);
-    const actualSwing = Math.min(seatsFromSwing, pn);
-    pn -= actualSwing;
-    bn += actualSwing;
+    // ── 1. PN→BN swing: each 5% = 1 seat, capped at PN_DUNS (2) ──────────
+    // Only affects DUNs where PN won (N11 Sungai Udang, N24 Bemban).
+    // A 10% swing = 2 seats (all PN seats flip to BN).
+    const seatsFromSwing = Math.min(Math.round(swingFactor / 5), PN_DUNS);
+    pn -= seatsFromSwing;
+    bn += seatsFromSwing;
 
-    // DAP→MCA swing: DAP is PH component, MCA is BN component (each 3% = 1 seat PH→BN)
-    const seatsDapMca = Math.round(dapToMca / 3);
-    const actualDapMca = Math.min(seatsDapMca, ph);
-    ph -= actualDapMca;
-    bn += actualDapMca;
+    // ── 2. DAP→MCA swing: each 5% = 1 seat, capped at DAP_DUNS (4) ───────
+    // Only affects DAP-won DUNs (N16, N19, N20, N22). MCA fields candidates
+    // in these urban Chinese-majority seats, so DAP voters can switch to MCA.
+    const seatsDapMca = Math.min(Math.round(dapToMca / 5), DAP_DUNS);
+    ph -= seatsDapMca;
+    bn += seatsDapMca;
 
-    // DAP→MIC swing: DAP is PH component, MIC is BN component (each 3% = 1 seat PH→BN)
-    const seatsDapMic = Math.round(dapToMic / 3);
-    const actualDapMic = Math.min(seatsDapMic, ph);
-    ph -= actualDapMic;
-    bn += actualDapMic;
+    // ── 3. DAP→MIC swing: each 10% = 1 seat, capped at MIC_CONTESTED (2) ─
+    // MIC only contests in Indian-majority DUNs (N07 Gadek + 1 more).
+    // A 20% swing = 2 seats max. MIC does NOT field candidates in all 28 DUNs,
+    // so this swing is tightly capped.
+    const seatsDapMic = Math.min(Math.round(dapToMic / 10), MIC_CONTESTED);
+    ph -= seatsDapMic;
+    bn += seatsDapMic;
 
-    // Youth boost: favours PH (each 5% = 1 seat from largest non-PH)
+    // ── 4. Youth boost: favours PH (each 5% = 1 seat from largest non-PH) ─
     const seatsFromYouth = Math.round(youthBoost / 5);
     for (let i = 0; i < seatsFromYouth; i++) {
       if (bn >= ph && bn > 0) { bn--; ph++; }
       else if (pn >= ph && pn > 0) { pn--; ph++; }
     }
 
-    // Senior boost: favours BN (each 4% = 1 seat)
+    // ── 5. Senior boost: favours BN (each 4% = 1 seat) ────────────────────
     const seatsFromSenior = Math.round(seniorBoost / 4);
     for (let i = 0; i < seatsFromSenior; i++) {
       if (ph >= pn && ph > 0) { ph--; bn++; }
       else if (pn > 0) { pn--; bn++; }
     }
 
-    // Turnout: <60% favours BN (incumbent), >85% favours PH
+    // ── 6. Turnout: <60% favours BN (incumbent), >85% favours PH ──────────
     if (turnout < 60) {
       const gain = Math.round((60 - turnout) / 5);
       for (let i = 0; i < gain; i++) {
@@ -120,17 +154,19 @@ export function ScenarioTab() {
       }
     }
 
-    // Undecided: creates ±uncertainty
-    const uncertaintySeats = Math.round(undecided / 5);
-
-    // Normalize to 28
-    const total = bn + ph + pn;
-    if (total !== 28) bn += 28 - total;
+    // ── 7. Floor: parties can't go below 0 seats ──────────────────────────
     bn = Math.max(0, Math.min(28, bn));
     ph = Math.max(0, Math.min(28, ph));
     pn = Math.max(0, Math.min(28, pn));
 
-    return { bn, ph, pn, uncertaintySeats };
+    // ── 8. Undecided: creates asymmetric ±uncertainty ─────────────────────
+    // For parties at 0 seats, uncertainty is only upward (can't go negative).
+    const uncertaintySeats = Math.round(undecided / 5);
+    const bnUncertainty = bn === 0 ? uncertaintySeats : uncertaintySeats;
+    const phUncertainty = ph === 0 ? uncertaintySeats : uncertaintySeats;
+    const pnUncertainty = pn === 0 ? uncertaintySeats : uncertaintySeats;
+
+    return { bn, ph, pn, uncertaintySeats, bnUncertainty, phUncertainty, pnUncertainty };
   }, [turnout, swingFactor, youthBoost, seniorBoost, undecided, dapToMca, dapToMic, liveBaseline]);
 
   useEffect(() => {
@@ -277,7 +313,11 @@ export function ScenarioTab() {
               <div className="text-[10px] text-muted-foreground">Projected BN</div>
               <div className="text-lg font-bold" style={{ color: "#0B3D91" }}>
                 {projection.bn}
-                {projection.uncertaintySeats > 0 && <span className="text-[10px] text-muted-foreground"> ±{projection.uncertaintySeats}</span>}
+                {projection.uncertaintySeats > 0 && (
+                  <span className="text-[10px] text-muted-foreground">
+                    {" "}<span className="text-emerald-500">+{projection.bnUncertainty}</span>/<span className="text-red-500">-{projection.uncertaintySeats}</span>
+                  </span>
+                )}
               </div>
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
@@ -285,7 +325,11 @@ export function ScenarioTab() {
               <div className="text-[10px] text-muted-foreground">Projected PH</div>
               <div className="text-lg font-bold" style={{ color: "#E22926" }}>
                 {projection.ph}
-                {projection.uncertaintySeats > 0 && <span className="text-[10px] text-muted-foreground"> ±{projection.uncertaintySeats}</span>}
+                {projection.uncertaintySeats > 0 && (
+                  <span className="text-[10px] text-muted-foreground">
+                    {" "}<span className="text-emerald-500">+{projection.phUncertainty}</span>/<span className="text-red-500">-{projection.uncertaintySeats}</span>
+                  </span>
+                )}
               </div>
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
@@ -293,7 +337,11 @@ export function ScenarioTab() {
               <div className="text-[10px] text-muted-foreground">Projected PN</div>
               <div className="text-lg font-bold" style={{ color: "#019C2D" }}>
                 {projection.pn}
-                {projection.uncertaintySeats > 0 && <span className="text-[10px] text-muted-foreground"> ±{projection.uncertaintySeats}</span>}
+                {projection.uncertaintySeats > 0 && (
+                  <span className="text-[10px] text-muted-foreground">
+                    {" "}<span className="text-emerald-500">+{projection.pnUncertainty}</span>/<span className="text-red-500">-{projection.uncertaintySeats}</span>
+                  </span>
+                )}
               </div>
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
@@ -311,8 +359,12 @@ export function ScenarioTab() {
             </span>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2">
-            Sliders are interactive — seat counts update in real-time. Model: PN→BN swing, DAP→MCA + DAP→MIC component-party swings (PH→BN), youth favours PH, senior favours BN, low turnout favours BN, high turnout favours PH, undecided creates ±uncertainty.
-            {liveBaseline ? ` Baseline from ${liveBaseline.source} (live API).` : " Baseline: PRN15 static data."}
+            <strong className="text-mlk">Realistic per-DUN model</strong> (grounded in ElectionData.MY candidate data):
+            PN→BN swing capped at 2 seats (only N11+N24 are PN-won).
+            DAP→MCA capped at 4 seats (only N16/N19/N20/N22 are DAP-won — MCA contests these urban Chinese seats).
+            DAP→MIC capped at 2 seats (MIC only contests Indian-majority DUNs like N07 Gadek, not all 28).
+            Uncertainty is asymmetric: parties at 0 seats can only go up.
+            {liveBaseline ? ` Baseline from ${liveBaseline.source}.` : " Baseline: PRN15 static data."}
             Not a political prediction.
           </div>
         </CardContent>

@@ -40,23 +40,56 @@ export function ScenarioTab() {
 
   // What-If Simulator state — reactive slider values
   const [turnout, setTurnout] = useState(75);
-  const [swingFactor, setSwingFactor] = useState(8);
+  const [swingFactor, setSwingFactor] = useState(8); // PN→BN swing
   const [youthBoost, setYouthBoost] = useState(5);
   const [seniorBoost, setSeniorBoost] = useState(3);
   const [undecided, setUndecided] = useState(12);
+  const [dapToMca, setDapToMca] = useState(0); // DAP→MCA swing (PH→BN)
+  const [dapToMic, setDapToMic] = useState(0); // DAP→MIC swing (PH→BN)
 
-  // Dynamic projection model — recalculates when any slider changes
+  // Live baseline from ElectionData.MY API (fetched on mount)
+  const [liveBaseline, setLiveBaseline] = useState<{
+    bn: number; ph: number; pn: number;
+    bnVotePct: number; phVotePct: number; pnVotePct: number;
+    source: string;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/predict")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.baseline) {
+          setLiveBaseline(d.baseline);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Dynamic projection model — recalculates when any slider changes.
+  // Uses live ElectionData.MY baseline if available, falls back to PRN15 static.
   const projection = useMemo(() => {
-    // Base = PRN15 results (BN:21, PH:5, PN:2)
-    let bn = DUN_COALITION_COUNTS.BN;
-    let ph = DUN_COALITION_COUNTS.PH;
-    let pn = DUN_COALITION_COUNTS.PN;
+    // Base = live API data if available, otherwise PRN15 static results
+    let bn = liveBaseline?.bn ?? DUN_COALITION_COUNTS.BN;
+    let ph = liveBaseline?.ph ?? DUN_COALITION_COUNTS.PH;
+    let pn = liveBaseline?.pn ?? DUN_COALITION_COUNTS.PN;
 
-    // Swing factor: moves seats from BN → PN (each 3% = 1 seat)
+    // Swing factor: moves seats from PN → BN (each 3% = 1 seat)
     const seatsFromSwing = Math.round(swingFactor / 3);
-    const actualSwing = Math.min(seatsFromSwing, bn);
-    bn -= actualSwing;
-    pn += actualSwing;
+    const actualSwing = Math.min(seatsFromSwing, pn);
+    pn -= actualSwing;
+    bn += actualSwing;
+
+    // DAP→MCA swing: DAP is PH component, MCA is BN component (each 3% = 1 seat PH→BN)
+    const seatsDapMca = Math.round(dapToMca / 3);
+    const actualDapMca = Math.min(seatsDapMca, ph);
+    ph -= actualDapMca;
+    bn += actualDapMca;
+
+    // DAP→MIC swing: DAP is PH component, MIC is BN component (each 3% = 1 seat PH→BN)
+    const seatsDapMic = Math.round(dapToMic / 3);
+    const actualDapMic = Math.min(seatsDapMic, ph);
+    ph -= actualDapMic;
+    bn += actualDapMic;
 
     // Youth boost: favours PH (each 5% = 1 seat from largest non-PH)
     const seatsFromYouth = Math.round(youthBoost / 5);
@@ -98,7 +131,7 @@ export function ScenarioTab() {
     pn = Math.max(0, Math.min(28, pn));
 
     return { bn, ph, pn, uncertaintySeats };
-  }, [turnout, swingFactor, youthBoost, seniorBoost, undecided]);
+  }, [turnout, swingFactor, youthBoost, seniorBoost, undecided, dapToMca, dapToMic, liveBaseline]);
 
   useEffect(() => {
     // Load from localStorage (per archive's window.storage pattern)
@@ -116,7 +149,6 @@ export function ScenarioTab() {
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setScenarios(loaded);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(false);
   }, []);
 
@@ -217,7 +249,9 @@ export function ScenarioTab() {
           <div className="space-y-4">
             {[
               { label: "Turnout %", value: turnout, set: setTurnout, min: 40, max: 95, step: 1, unit: "%", color: "#C77B2C" },
-              { label: "Swing factor (BN→PN)", value: swingFactor, set: setSwingFactor, min: 0, max: 30, step: 1, unit: "%", color: "#019C2D" },
+              { label: "Swing factor (PN→BN)", value: swingFactor, set: setSwingFactor, min: 0, max: 30, step: 1, unit: "%", color: "#0B3D91" },
+              { label: "DAP → MCA swing", value: dapToMca, set: setDapToMca, min: 0, max: 20, step: 1, unit: "%", color: "#E22926" },
+              { label: "DAP → MIC swing", value: dapToMic, set: setDapToMic, min: 0, max: 20, step: 1, unit: "%", color: "#a855f7" },
               { label: "Youth turnout boost", value: youthBoost, set: setYouthBoost, min: 0, max: 25, step: 1, unit: "%", color: "#0ea5e9" },
               { label: "Senior turnout boost", value: seniorBoost, set: setSeniorBoost, min: 0, max: 20, step: 1, unit: "%", color: "#f59e0b" },
               { label: "Undecided voters", value: undecided, set: setUndecided, min: 0, max: 30, step: 1, unit: "%", color: "#6B7280" },
@@ -277,7 +311,9 @@ export function ScenarioTab() {
             </span>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2">
-            Sliders are interactive — seat counts update in real-time. Model: swing shifts BN→PN, youth favours PH, senior favours BN, low turnout favours BN, high turnout favours PH, undecided creates ±uncertainty. Not a political prediction.
+            Sliders are interactive — seat counts update in real-time. Model: PN→BN swing, DAP→MCA + DAP→MIC component-party swings (PH→BN), youth favours PH, senior favours BN, low turnout favours BN, high turnout favours PH, undecided creates ±uncertainty.
+            {liveBaseline ? ` Baseline from ${liveBaseline.source} (live API).` : " Baseline: PRN15 static data."}
+            Not a political prediction.
           </div>
         </CardContent>
       </Card>

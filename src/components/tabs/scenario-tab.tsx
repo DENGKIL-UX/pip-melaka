@@ -346,6 +346,40 @@ export function ScenarioTab() {
               <div className="text-[9px] text-muted-foreground">seats</div>
             </div>
           </div>
+          {/* Visual seat distribution — stacked bar chart */}
+          <div className="mt-4">
+            <div className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1.5">Seat Distribution (28 total)</div>
+            <div className="flex h-6 rounded-md overflow-hidden border border-border/40">
+              <div
+                className="flex items-center justify-center text-[9px] font-bold text-white transition-all duration-300"
+                style={{ width: `${(projection.bn / 28) * 100}%`, backgroundColor: "#0B3D91" }}
+                title={`BN: ${projection.bn} seats`}
+              >
+                {projection.bn > 0 && projection.bn}
+              </div>
+              <div
+                className="flex items-center justify-center text-[9px] font-bold text-white transition-all duration-300"
+                style={{ width: `${(projection.ph / 28) * 100}%`, backgroundColor: "#E22926" }}
+                title={`PH: ${projection.ph} seats`}
+              >
+                {projection.ph > 0 && projection.ph}
+              </div>
+              <div
+                className="flex items-center justify-center text-[9px] font-bold text-white transition-all duration-300"
+                style={{ width: `${(projection.pn / 28) * 100}%`, backgroundColor: "#019C2D" }}
+                title={`PN: ${projection.pn} seats`}
+              >
+                {projection.pn > 0 && projection.pn}
+              </div>
+            </div>
+            {/* Baseline comparison bar */}
+            <div className="flex h-3 rounded-sm overflow-hidden border border-border/20 mt-1 opacity-60">
+              <div style={{ width: `${(DUN_COALITION_COUNTS.BN / 28) * 100}%`, backgroundColor: "#0B3D91" }} />
+              <div style={{ width: `${(DUN_COALITION_COUNTS.PH / 28) * 100}%`, backgroundColor: "#E22926" }} />
+              <div style={{ width: `${(DUN_COALITION_COUNTS.PN / 28) * 100}%`, backgroundColor: "#019C2D" }} />
+            </div>
+            <div className="text-[8px] text-muted-foreground mt-0.5 text-center">↑ Projected · ↓ Baseline (PRN15)</div>
+          </div>
           {/* Change indicator — shows base vs projected */}
           <div className="flex items-center justify-center gap-3 mt-3 text-[10px]">
             <span className="text-muted-foreground">Base (PRN15): BN {DUN_COALITION_COUNTS.BN} / PH {DUN_COALITION_COUNTS.PH} / PN {DUN_COALITION_COUNTS.PN}</span>
@@ -357,6 +391,25 @@ export function ScenarioTab() {
               {" / "}
               <span style={{ color: "#019C2D" }}>PN {projection.pn}</span>
             </span>
+          </div>
+          {/* Reset button */}
+          <div className="flex justify-center mt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[10px] text-muted-foreground hover:text-mlk h-7"
+              onClick={() => {
+                setTurnout(75);
+                setSwingFactor(8);
+                setYouthBoost(5);
+                setSeniorBoost(3);
+                setUndecided(12);
+                setDapToMca(0);
+                setDapToMic(0);
+              }}
+            >
+              <RefreshCw className="h-3 w-3 me-1" /> Reset to defaults
+            </Button>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2">
             <strong className="text-mlk">Realistic per-DUN model</strong> (grounded in ElectionData.MY candidate data):

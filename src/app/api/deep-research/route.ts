@@ -35,7 +35,8 @@ interface DataSource {
 
 async function fetchJson(base: string, path: string): Promise<unknown | null> {
   try {
-    const res = await fetch(`${base}/data/${path}`, { cache: "no-store" });
+    const url = base ? `${base}/data/${path}` : `/data/${path}`;
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -45,7 +46,8 @@ async function fetchJson(base: string, path: string): Promise<unknown | null> {
 
 async function fetchJsonl(base: string, path: string): Promise<unknown[]> {
   try {
-    const res = await fetch(`${base}/data/${path}`, { cache: "no-store" });
+    const url = base ? `${base}/data/${path}` : `/data/${path}`;
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return [];
     const txt = await res.text();
     return txt.trim().split("\n").filter(Boolean).map((l) => JSON.parse(l));

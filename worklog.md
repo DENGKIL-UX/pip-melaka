@@ -3098,3 +3098,78 @@ deployed:
 2. The CSP headers will be served correctly (with unsafe-eval)
 3. After setting the ELECTIONDATA_API_TOKEN secret, the deep-research
    endpoint will pull live data from api.electiondata.my
+
+---
+Task ID: QA-ROUND-1
+Agent: main (Z.ai Code)
+Task: Sync to 89ffdc6, QA assessment, fix bugs, add features
+
+## Current project status description/assessment
+
+Synced workspace to commit 89ffdc6 (What-If Simulator realistic per-DUN model).
+Ran comprehensive QA via agent-browser + curl on both local dev and production.
+
+### Production QA results (pip-melaka.ritz-analytics.workers.dev)
+- ✅ Page loads 200 OK — `__name` polyfill confirmed working (no more crash)
+- ✅ Deep Research API works on production — returns full LLM synthesis (mode: "deep-research", not fallback). CF Workers AI (Llama 3.1 8B) successfully synthesizes structured intelligence briefs.
+- ✅ /api/predict works on production — returns live BN validation from ElectionData.MY REST API (38.39% vote share)
+- ⚠️ Deep Research returns only 2 sources on production (Elections LIVE + S2D) instead of 6 — local static data fetches fail on CF Workers due to subrequest limitations. The live API data still provides comprehensive synthesis.
+
+### Local dev QA results
+- ✅ All 19 dashboard tabs load without errors
+- ✅ Scenarios tab What-If Simulator logic confirmed realistic (DAP→MIC at 20% gives BN 23, not 28)
+- ✅ 3D map renders with enhanced effects (HUD ring, chase light, ripples, fly lines)
+- ✅ AI Assistant Deep Research mode toggles correctly
+- ✅ i18n EN/BM toggle works across all wired tabs
+- ✅ Lint: 0 errors, 3 warnings (pre-existing)
+
+## Current goals/completed modifications/verification results
+
+### Enhancements implemented (commit 112329a)
+
+1. **Visual stacked bar chart** for seat distribution (What-If Simulator)
+   - BN (blue #0B3D91), PH (red #E22926), PN (green #019C2D) proportional bars
+   - Seat count labels inside each bar segment
+   - 300ms smooth transition animations on bar width changes
+   - Baseline comparison bar below (faded opacity, shows PRN15 baseline)
+   - "↑ Projected · ↓ Baseline (PRN15)" label
+
+2. **"Reset to defaults" button**
+   - Restores all 7 sliders to default values (75/8/0/0/5/3/12)
+   - RefreshCw icon, ghost variant, subtle styling
+
+3. **Deep-research fetch fix**
+   - Updated fetchJson/fetchJsonl to use relative URLs when base is empty
+   - Helps CF Workers subrequest resolution for static data files
+
+### VLM verification
+- Stacked bar chart visible with BN 23/PH 5/PN 0 ✅
+- Baseline comparison bar visible ✅
+- Reset button visible ✅
+- Production page loads without __name crash ✅
+- Deep Research returns full LLM synthesis on production ✅
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Deep Research sources on production (medium priority)
+Production returns only 2 sources (live API + S2D) instead of 6 because CF Workers
+can't fetch its own origin via subrequest for static data files. Options:
+- a) Embed the static data directly in the route (import JSON at build time)
+- b) Use the ASSETS binding to read files directly (requires OpenNext config)
+- c) Accept the 2-source fallback (live API data is the most valuable anyway)
+
+### 2. Remaining i18n unwiring (11 tabs)
+The following tabs still have English-only internal content:
+- analysis-tab, risk-socioeconomic-tab, compare-tab, governance-tab, s2d-360-tab,
+  scraper-tab, public-communication-tab, incident-casebook-tab, scenario-tab,
+  predictive-tab, alerts-tab, dual-layer-tab
++ selected-dun-drawer.tsx (546 lines), command-palette.tsx, quick-actions.tsx
+
+### 3. Cron job coordination
+The scheduled 15-min cron job may make conflicting changes. Need to coordinate
+to avoid git rebase conflicts (already happened once with assistant-panel.tsx).
+
+### Priority recommendations
+1. Wire i18n into selected-dun-drawer.tsx (opened from multiple tabs)
+2. Wire i18n into remaining 11 tabs (batch approach)
+3. Fix deep-research to read static data via build-time imports

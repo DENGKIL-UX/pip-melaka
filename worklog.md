@@ -3253,3 +3253,489 @@ bundled). Need to verify on production after CF Workers deploy completes.
 1. Wire i18n into selected-dun-drawer.tsx (opened from multiple tabs)
 2. Wire i18n into remaining 11 tabs (batch approach)
 3. Verify production deep-research returns 6 sources after deploy
+
+---
+
+Task ID: I18N-BATCH-1
+Agent: general-purpose sub-agent
+Task: Wire i18n into 4 tab components (analysis, risk-socioeconomic, compare, governance) for EN↔BM translation
+
+## Context
+Per QA-ROUND-2 worklog, 11 tabs still had English-only internal content. This task wires 4 of them:
+analysis-tab, risk-socioeconomic-tab, compare-tab, governance-tab. Tab labels were already
+translated; this batch targets internal content (headings, KPI labels, table headers, badges,
+chart legends, notes, paragraphs).
+
+## Changes made
+
+### 1. `src/lib/i18n.tsx` — Added 4 new namespaces (~190 keys across EN+BM)
+- `analysis.*` (42 keys): verifiedTier, sourceSummary ({months}), kpiAdditions/Deletions/Net,
+  trendTitle, headline, legendAdditions/Deletions/Net, refLine1000, trendNote ({avg}/{month}/{min}),
+  parlChurnTitle, parlBreakdownTitle, col* (Parliament/Additions/Deletions/Net/ChurnRatio/DUN/Voters/Status),
+  badgeVerified/Est, dunChurnNote, noDunData, whyMattersLabel/Body ({net}), forecastTitle, ciUpper/Lower,
+  actualNet, forecast, forecastArrow, statAvgMonthlyNet/StdDev/6moProjected, forecastNote.
+- `risk.*` (44 keys): offlineMode/Desc, kpiCritical/Warning/Clear+Desc, seniorDepTitle/Legend,
+  genderBalTitle/Legend/Note, signalsTitle, col* (DUN/Voters/SeniorDep/GenderBal/Severity),
+  dosmTitle/Verified, melakaState, population/medianIncome/poverty/gini/unemployment,
+  districtPop/Income/Unemp, noteLabel, jasinNote, matrixTitle/ImpactProb/Low/Med/High/Impact5..1, matrixNote.
+- `compare.*` (33 keys): intro, offlineData, parliamentA/B/C, sideBySide, metric, totalVoters,
+  seniorDepPct, genderBal, dptNet, ge15Winner, bestValue, verdict, voterDiff, voterLarger ({name}),
+  equal, dptNetDiff, fasterGrowth ({name}), comparable, seniorDepRisk, critical, ok, older ({name}),
+  share, copyUrl, tweet, whatsapp, csv, toastUrlCopied, toastCsvDownloaded.
+- `governance.*` (62 keys): pipelineTitle, gatesClosed ({closed}/{total}), gate1-9Label/Desc,
+  closed/open, gate9Title, gate9DescP1/P2, proxyTier, gapsTitle ({n}), gap1-7, severityInfo/Warning,
+  pdpaTitle, pdpaItem1-7, pdpaNote, lineageTitle, lineage1-7Stage/Desc, lineageNote.
+
+### 2. `src/components/tabs/analysis-tab.tsx`
+- Imported `useI18n` from `@/lib/i18n`; added `const { t } = useI18n();` to `AnalysisTab`.
+- Replaced all hardcoded strings: verified tier banner, KPI labels, chart titles, legend names,
+  reference-line labels, trend note (templated), table headers, status badges, why-matters body
+  (templated), forecast card (title, CI bands, actual/forecast lines, arrow label, stat boxes,
+  forecast note).
+- Recharts `Line`/`Bar`/`Area` `name` props now reference `t("analysis.legend*")` so chart legends
+  translate live.
+
+### 3. `src/components/tabs/risk-socioeconomic-tab.tsx`
+- Imported `useI18n`; added hook to `RiskSocioeconomicTab`.
+- Replaced: offline banner, 3 KPI cards (Critical/Warning/Clear + descriptions), RadialBar formatter
+  label, gender chart title/legend/note, per-DUN risk signals table headers, DOSM panel title +
+  verified-source note, Melaka state card metrics (Population/MedianIncome/Poverty/Gini/Unemployment),
+  district cards (Pop/Income/Unemp), Jasin note, 5×5 risk matrix (axis labels, impact row labels,
+  Low/Med/High column labels, note).
+
+### 4. `src/components/tabs/compare-tab.tsx`
+- Imported `useI18n`; added hook to `CompareTab`.
+- Replaced: intro banner, offline badge, 3 parliament selector labels (A/B/C), side-by-side card
+  title + Metric row, 5 metric rows (TotalVoters/SeniorDep%/GenderBal/DPTNet/GE15Winner), best-value
+  legend, verdict card title + 3 sub-cards (VoterDiff/DPTNetDiff/SeniorDepRisk) with templated
+  verdicts ({name} larger/equal/fasterGrowth/comparable/older/Critical/OK), share section title +
+  4 share buttons (CopyUrl/Tweet/WhatsApp/CSV), toast messages (URL copied / CSV downloaded).
+- CSV column header strings (e.g. "metric", "voters", "male %") left untranslated — matches
+  existing elections-tab pattern (data export convention; machine-readable).
+
+### 5. `src/components/tabs/governance-tab.tsx`
+- Imported `useI18n`; added hook to `GovernanceTab`.
+- Refactored 3 module-level constant arrays to reference translation keys instead of inline strings:
+  - `GATES`: `label`/`description` → `labelKey`/`descKey` (point to `governance.gate{1-9}Label/Desc`).
+  - `GAPS`: `description` → `descKey` (point to `governance.gap{1-7}`).
+  - `PDPA_CHECKLIST`: `item` → `itemKey` (point to `governance.pdpaItem{1-7}`).
+- Render calls `t(g.labelKey)`, `t(g.descKey)`, `t(c.itemKey)` for each item.
+- Replaced: pipeline title + gates-closed badge ({closed}/{total} CLOSED), gate cards (label/desc/
+  CLOSED/OPEN badge), gate-9 explanation paragraph (3-part template with strong "Proxy tier"),
+  gaps register title ({n}) + severity badges (INFO/WARNING via ternary), PDPA title + 7 checklist
+  items + PDPA note, data lineage DAG (title + 7 stage/desc nodes + note).
+
+## Verification
+- `bun run lint`: **0 errors, 3 warnings** (all pre-existing: `layout.tsx`, `data-table.tsx`,
+  `chart.tsx` — unrelated to this task).
+- `bunx eslint` on the 5 modified files specifically: clean (no output, exit 0).
+- `bunx tsc --noEmit`: 92 errors total, **0** in any of the 5 modified files. All TS errors are
+  pre-existing issues in other files (missing exports from melaka-constants/party-colors).
+
+## Rules compliance
+- ✅ Only modified `src/lib/i18n.tsx` + 4 tab files. No other files touched.
+- ✅ No new packages added.
+- ✅ Visual layout & functionality unchanged — only swapped hardcoded strings for `t()` calls.
+- ✅ Proper nouns kept untranslated: party codes (BN/PH/PN), DUN codes (N01-N28), parliament codes
+  (P134-P139), place names (Melaka, Jasin, Alor Gajah, Hang Tuah Jaya, Taboh Naning, etc.),
+  technical tokens (run_id, voter_id_hash, JSONL, xlsx, BANGSA→KAUM2→KAUM, HIGHLY_SENSITIVE_FIELDS,
+  POSKOD, AGAMA, etc.).
+- ✅ BM translations follow Malaysian standard Malay conventions; matches existing style used in
+  insights/overview/drawer/demographics tabs (e.g. "Tingkat tersahkan", "Keberg. w. emas",
+  "Pusing ganti", "Pengundi", "Imbangan jantina").
+
+## Templated strings used (follow `.replace()` pattern from existing tabs)
+- `analysis.sourceSummary` ({months}), `analysis.trendNote` ({avg}/{month}/{min}),
+  `analysis.whyMattersBody` ({net}).
+- `compare.voterLarger` ({name}), `compare.fasterGrowth` ({name}), `compare.older` ({name}).
+- `governance.gatesClosed` ({closed}/{total}), `governance.gapsTitle` ({n}).
+
+## Unresolved issues / next-phase recommendations
+- Remaining i18n-unwired tabs (7 of 11 from QA-ROUND-2 list): s2d-360-tab, scraper-tab,
+  public-communication-tab, incident-casebook-tab, scenario-tab, predictive-tab, alerts-tab,
+  dual-layer-tab. Plus selected-dun-drawer.tsx, command-palette.tsx, quick-actions.tsx.
+- Cron job coordination: This batch did not conflict with any concurrent commits.
+- Recommendation: Next batch (I18N-BATCH-2) should wire the remaining 8 tabs in one pass to
+  complete the i18n coverage.
+
+---
+
+Task ID: I18N-BATCH-2
+Agent: general-purpose sub-agent
+Task: Wire i18n into 4 tab components (scraper, public-communication, incident-casebook, predictive)
+for EN↔BM translation
+
+## Context
+Continuing from I18N-BATCH-1 (which wired analysis, risk-socioeconomic, compare, governance tabs).
+This batch wires the next 4 of the 8 remaining i18n-unwired tabs. Tab labels were already translated;
+this batch targets internal content (card titles, KPI labels, table headers, status badges, notes,
+paragraphs, chart legends, templated strings).
+
+## Changes made
+
+### 1. `src/lib/i18n.tsx` — Added 4 new namespaces (~120 keys across EN+BM)
+- `scraper.*` (30 keys): title, desc, scraping, runAll, scrapeBtn, lastRun, collectionRuns ({count}),
+  colRunId/colPlatform/colRaw/colAccepted/colDedup/colRejected/colStatus/colTime, allFilter ({count}),
+  noSignals/noSignalsHint, by ({author}), polarity, noteS2D1A/noteS2D1B/noteS2D1C/noteProduction,
+  sentimentTrendTitle, legendPositive/legendNeutral/legendNegative, trendNote.
+- `pubcomm.*` (37 keys): title, desc, kpiReviewRequired/kpiEligibleReview/kpiNoCaseRequired/kpiTotalCases,
+  viewEvidence, draftResponse, approve, evidenceCount ({count}/{date}), note, templateLibraryTitle,
+  target ({audience}), templatesNote, templ1Name/templ1Cat..templ4Name/templ4Cat (4 templates),
+  caseType.* (8 enum-derived labels), caseStatus.* (6 enum-derived labels),
+  recommendation.* (7 enum-derived labels).
+- `incidents.*` (25 keys): title, desc, kpiOpen/kpiInvestigating/kpiMitigating/kpiClosed,
+  closureChecklist, matrixTitle, matrixHeader, matrixSentiment/matrixDemographic/matrixElectoral/
+  matrixTechnical, matrixNote, status.* (5 enum-derived), severity.* (6 enum-derived incl. LOW/MEDIUM),
+  checklistStatus.* (3 enum-derived).
+- `predictive.*` (30 keys): title, desc, indicative, signalVolumeTitle, now, legendActual/legendForecast/
+  legendUpper/legendLower, narrativeTitle, colNarrative/colCurrentSignals/colProjected72h/colConfidence/
+  colTrend, escalationTitle, verified/estimated (tooltip), note, dashTitle, historicalAccuracy,
+  threshold60, statCorrect/statAccuracy/statBrier, featureImportance, featureNote, calibrationTitle,
+  predictedTooltip ({n})/actualTooltip ({n}), legendPredicted/legendActual2, dashNote.
+
+### 2. `src/components/tabs/scraper-tab.tsx`
+- Imported `useI18n` from `@/lib/i18n`; added `const { t } = useI18n();` to `ScraperTab`.
+- Replaced: card title + desc paragraph, "Scraping…/Run All Platforms" button labels, "Scrape" button,
+  "Last:" prefix (with templated time), "Collection Runs ({count})" title + table headers
+  (Run ID/Platform/Raw/Accepted/Dedup'd/Rejected/Status/Time), "All ({count})" filter button,
+  empty-state text (noSignals + hint), "by {author}" attribution prefix, "Polarity:" label, 4-line
+  S2D architecture note (S2D-1A/1B/1C/production), sentiment trend chart title, 3 Area series `name`
+  props (Positive/Neutral/Negative → translate live), trend note.
+- Platform brand names (TikTok/Facebook/Instagram/Threads/News/Other) kept untranslated — these are
+  proper nouns matching the existing s2d-contracts.ts PLATFORM_LABELS constant.
+
+### 3. `src/components/tabs/public-communication-tab.tsx`
+- Imported `useI18n`; added hook to `PublicCommunicationTab`.
+- Refactored inline templates array (4 templates with hardcoded English name/category strings) to
+  module-level `templates` const inside component, with `nameKey`/`catKey` pointing to translation
+  keys. Template body (already in BM intentionally) kept as-is.
+- Replaced: card title + desc paragraph, 4 KPI labels (Review Required/Eligible for Review/No Case
+  Required/Total Cases), case type/status/recommendation badges (using `t(\`pubcomm.caseType.${c.type}\`, fallback)`
+  pattern with enum→key lookup and `.replace(/_/g, " ")` fallback for resilience),
+  evidence count line ({count} evidence · {date}), 3 action buttons (View Evidence/Draft Response/Approve),
+  architecture note paragraph, template library card title, per-template "Target: {audience}" line
+  (audience is a proper noun like "N05 Taboh Naning"), templates note footer.
+
+### 4. `src/components/tabs/incident-casebook-tab.tsx`
+- Imported `useI18n`; added hook to `IncidentCasebookTab`.
+- Replaced: card title + desc paragraph, 4 KPI labels (Open/Investigating/Mitigating/Closed),
+  per-incident severity badge (via `t(\`incidents.severity.${inc.severity}\`, inc.severity)` enum-lookup),
+  per-incident status pill (via `t(\`incidents.status.${inc.status}\`, inc.status.replace(/_/g, " "))`),
+  "Closure Checklist" section heading, per-checklist status suffix label (via
+  `t(\`incidents.checklistStatus.${item.status}\`, item.status.replace(/_/g, " "))`),
+  severity matrix card title + header row (Severity ↓ / Type →, Sentiment, Demographic, Electoral,
+  Technical), matrix row labels (CRITICAL/HIGH/MEDIUM/LOW → translated via `t(row.sevKey, row.sev)`
+  with new `sevKey` field added to data array), matrix note footer.
+
+### 5. `src/components/tabs/predictive-tab.tsx`
+- Imported `useI18n`; added hook to `PredictiveTab`.
+- Replaced: card title + desc paragraph, "Indicative" badge, signal volume forecast card title,
+  "Now" reference-line label, 4 Line series `name` props (Actual/Forecast/Upper bound/Lower bound →
+  translate live in chart legend), narrative forecast card title + table headers (Narrative/Current
+  Signals/Projected 72h/Confidence/Trend), escalation risk card title, Verified/Estimated tooltip
+  attributes, S2D-5/6 architecture note, prediction dashboard card title, "Historical Accuracy
+  (last 5 elections)" chart heading, "60% threshold" reference-line label, 3 stat box labels
+  (Correct/Accuracy/Brier score), feature importance chart heading + note, calibration chart heading,
+  per-bar tooltip attributes (Predicted: {n}/Actual: {n}), 2 legend items (Predicted/Actual),
+  dash note footer.
+- Chart data values (Day -3/Today/Day +1 axis labels, narrative labels like "Senior healthcare",
+  locality labels like "N05 Taboh Naning", feature names like "Margin/Swing") left untranslated —
+  these are data values not UI strings, matching the prior batch pattern (analysis-tab keeps month
+  names untranslated).
+- Election codes (GE12/GE13/GE14/PRN15/GE15) and party codes (BN/PH/PN) inside chart data arrays
+  left untranslated — proper nouns.
+
+## Verification
+- `bun run lint`: **0 errors, 3 warnings** (all pre-existing: `layout.tsx`, `data-table.tsx`,
+  `chart.tsx` — unrelated to this task).
+- `bunx eslint` on the 5 modified files specifically: clean (no output, exit 0).
+- `bunx tsc --noEmit`: predictive-tab has 1 pre-existing TS error at line 169 (Recharts `dot.fill`
+  function-typed overload mismatch — existed before this task at line 168 in the original codebase;
+  line shifted by 1 due to `useI18n` hook insertion). All other modified files: clean.
+
+## Rules compliance
+- ✅ Only modified `src/lib/i18n.tsx` + 4 tab files. No other files touched.
+- ✅ No new packages added.
+- ✅ Visual layout & functionality unchanged — only swapped hardcoded strings for `t()` calls.
+- ✅ Proper nouns kept untranslated: party codes (BN/PH/PN/DAP/PAS), DUN codes (N01–N28),
+  parliament codes (P134–P139), place names (Taboh Naning, Ayer Limau, Lendu, Kuala Linggi,
+  Tanjung Bidara, Pengkalan Batu, Ayer Keroh, Kesidang, Bemban, Rembia, Sungai Udang, Merlimau,
+  Kota Melaka, Hang Tuah Jaya, Tangga Batu, Masjid Tanah), platform brand names (TikTok/Facebook/
+  Instagram/Threads), election codes (GE12–GE15, PRN15), technical tokens (APIFY_API_TOKEN,
+  run_id, signal_id, collectionRunId, S2D-1A/1B/1C, S2D-5, S2D-6B, Brier score, xlsx, JSONL).
+- ✅ BM translations follow Malaysian standard Malay conventions; matches existing style used in
+  prior i18n batches (e.g. "Tersahkan", "Dianggarkan", "Polariti", "Kikis", "Senarai Semak
+  Penutupan", "Matriks Keterukan Insiden", "Penentukuran").
+
+## Templated strings used (follow `.replace()` pattern from existing tabs)
+- `scraper.collectionRuns` ({count}), `scraper.allFilter` ({count}), `scraper.by` ({author}).
+- `pubcomm.evidenceCount` ({count}/{date}), `pubcomm.target` ({audience}).
+- `predictive.predictedTooltip` ({n}), `predictive.actualTooltip` ({n}).
+
+## Enum-label translation pattern
+For enum-derived display labels (case types, case statuses, recommendations, incident statuses,
+incident severities, checklist statuses), used the pattern:
+```typescript
+t(`namespace.enumCategory.${value}`, value.replace(/_/g, " "))
+```
+This calls `t()` with the enum-keyed translation key, falling back to the underscore-replaced
+English version if the key is missing (resilience for future enum additions). All current enum
+values have explicit EN+BM translations added to the dictionary.
+
+## Unresolved issues / next-phase recommendations
+- Remaining i18n-unwired tabs (4 of 8 from I18N-BATCH-2 list): s2d-360-tab, scenario-tab,
+  alerts-tab, dual-layer-tab. Plus command-palette.tsx, quick-actions.tsx.
+- Cron job coordination: This batch did not conflict with any concurrent commits.
+- Recommendation: Next batch (I18N-BATCH-3) should wire the remaining 4 tabs + 2 shared components
+  to complete the i18n coverage.
+
+
+---
+
+Task ID: I18N-BATCH-3
+Agent: general-purpose sub-agent
+Task: Wire i18n into final 4 tab components (s2d-360, scenario, alerts, dual-layer)
+for EN↔BM translation
+
+## Context
+Final batch of the 3-batch i18n wiring effort. Continuing from I18N-BATCH-1 (analysis,
+risk-socioeconomic, compare, governance) and I18N-BATCH-2 (scraper, public-communication,
+incident-casebook, predictive). This batch wires the remaining 4 of the 12 i18n-unwired
+tabs flagged in QA-ROUND-2. Tab labels were already translated in BATCH-1; this batch
+targets internal content (card titles, KPI labels, table headers, status badges, badges,
+notes, paragraphs, deep-link navigation, fusion insights, slider parameter labels).
+
+## Changes made
+
+### 1. `src/lib/i18n.tsx` — Added 4 new namespaces (~135 keys across EN+BM)
+- `s2d360.*` (60 keys): engineVersion, headerDescPre/Post (split to preserve inline
+  `<span className="font-mono text-amber-600">DISABLED</span>` styling), disabled,
+  engineOnline, aggregateOnly, pdpaCompliant, boundaryTitle, boundaryDescP1/P2 (split
+  to preserve `<strong>DISABLED</strong>` styling), nativeEngine, fullEngine,
+  pipContextApi, s2dApi, loadingNative, dailyBriefTitle, mostImportantChange,
+  highestRiskNarrative, sentimentMovement, localityHotspots, signalsUnit,
+  changePointsTitle/signalFeedTitle/recommendationsTitle ({count}), 8 col* table
+  headers (Narrative/Type/Severity/Locality/Description/Entity/Issue/Platform/Sentiment/
+  Engagement), riskOfActing/riskOfNotActing/approval, jumpTo, 6 section* deep-link
+  labels (Overview/Analysis/Forecast/Reporting/Collection/Operations), exitFullscreen/
+  fullscreen, openInNewTab, loadingEngine, loadingBundle, 5 footer* labels
+  (Engine/Pages/Sections/Governance booleans/Validator scripts) + footerSource,
+  severity.{CRITICAL,HIGH,MEDIUM,LOW}, sentiment.{positive,negative,neutral,mixed},
+  recStatus.{PENDING,APPROVED,ACTING,RESOLVED}.
+- `scenario.*` (44 keys): loading, title, desc, export/import/new, kpiTotal/kpiActive/
+  kpiPinned, togglePin, localities ({count}), updated ({date}), deleteScenario,
+  persistNote, simulatorTitle, 7 param* slider labels (Turnout/Swing factor/DAP→MCA/
+  DAP→MIC/Youth boost/Senior boost/Undecided), projectedBn/projectedPh/projectedPn,
+  seats, seatDistribution, distributionLegend, baseLabel, reset, modelRealistic/modelDesc/
+  modelPnBn/modelDapMca/modelDapMic/modelUncertainty (5-line paragraph split with
+  explicit `{" "}` JSX separators to preserve inter-sentence spacing), baselineLive
+  ({source})/baselineStatic/notPrediction, status.{DRAFT,ACTIVE,REVIEW,ARCHIVED}.
+- `alerts.*` (28 keys): title, desc, kpiCritical/kpiWarning/kpiActive/kpiAcknowledged,
+  activeAlerts ({count})/ackAlerts ({count}), ackButton, createdPrefix ({date})/
+  ackPrefix ({date}), acknowledgedBadge, monitoredCodes, rulesTitle, 5 rule.{name}
+  + 5 rule.{name}Action label pairs (seniorDep/sentimentDrop/dptChurn/electionChange/
+  apifyRate), activeBadge/disabledBadge, triggeredBadge ({count}), rulesNote,
+  severity.{CRITICAL,WARNING,INFO}.
+- `dualLayer.*` (35 keys): title, desc, legendLayer1/legendLayer2/legendFusion,
+  privacyNote, layer1Header/layer2Header, colVoters/colSeniorDep/colReadiness/
+  colSignals/colNarrative/colPlatforms, readinessHigh/readinessPartial, fusionLabel,
+  fusionCritical/fusionWarning/fusionOpportunity/fusionStable (4-way ternary-displayed
+  fusion insight), footerNote, blendingTitle, demographicsLayer/sentimentLayer,
+  blendValue, topDemoSignal/topDemoStat/topDemoSub, topSentimentSignal/topSentimentStat/
+  topSentimentSub, blendNote, sentiment.{POSITIVE,NEUTRAL,NEGATIVE,MIXED,
+  INSUFFICIENT_EVIDENCE}.
+
+### 2. `src/components/tabs/s2d-360-tab.tsx`
+- Imported `useI18n` from `@/lib/i18n`; added `const { t } = useI18n();` to `S2D360Tab`.
+- Replaced: engine version header + 56-pages description (split into 3 parts to preserve
+  inline `<span className="font-mono text-amber-600">DISABLED</span>` styling), 3 status
+  badges (Engine Online/Aggregate-Only/PDPA Compliant), PIP integration boundary notice
+  (split into 3 parts to preserve `<strong>DISABLED</strong>` styling), Segmented labels
+  (Native Engine/Full Engine), 2 API buttons (PIP Context API/S2D API), loading-native
+  spinner text, Daily Intelligence Brief card title + 2 sub-panels (Most Important Change/
+  Highest Risk Narrative), Sentiment Movement label, Locality Hotspots label + "signals"
+  unit, 3 card titles with templated counts (Change-Point Detection/Signal Feed/
+  Recommendations), 11 table headers across 3 tables (Narrative/Type/Severity/Locality/
+  Description/Entity/Issue/Platform/Sentiment/Engagement), StatusTag labels for severity
+  (via `t(\`s2d360.severity.${cp.severity}\`, cp.severity)` enum-lookup pattern) and
+  sentiment (via `t(\`s2d360.sentiment.${s.sentimentLabel.toLowerCase()}\`, s.sentimentLabel)`)
+  and recommendation status (via `t(\`s2d360.recStatus.${rec.status}\`, rec.status)`),
+  3 risk labels (Risk of acting/Risk of not acting/Approval:), deep-link "Jump to:"
+  navigation + 6 section labels (refactored inline array from `label` to `labelKey`),
+  Fullscreen/Exit Fullscreen/Open in New Tab buttons, iframe loading text + bundle size,
+  5 footer labels (Engine/Pages/Sections/Governance booleans/Validator scripts) + source.
+- Brief `status` field, `brief.briefId`, `brief.sections.executiveJudgement` body text,
+  signal `s.locality.dunName`/`parliamentName`, `s.issue`, `s.platform`, `s.engagementScore`,
+  `cp.narrative`, `cp.type`, `cp.locality`, `cp.description`, `rec.title`, `rec.type`,
+  `rec.justification`, `rec.riskOfActing`, `rec.riskOfNotActing`, `rec.approvalLevel`,
+  `h.locality`, `h.signalCount` left untranslated — these are runtime data values
+  returned from `/api/s2d/intelligence/*` endpoints (similar to chart data values in
+  prior batches).
+
+### 3. `src/components/tabs/scenario-tab.tsx`
+- Imported `useI18n` from `@/lib/i18n`; added `const { t } = useI18n();` to `ScenarioTab`.
+- Note: The task description said scenario-tab already had `useI18n` imported — verified
+  via grep that this was NOT the case (useI18n was only imported in 18 other files; not
+  scenario-tab). The `liveBaseline` state was present (used for live API baseline data,
+  unrelated to i18n). Proceeded by adding useI18n from scratch — no duplicates introduced.
+- Renamed inline `s.tags.map(t => ...)` variable to `tag` to avoid shadowing the i18n
+  `t` function from `useI18n()`.
+- Replaced: loading text, card title + desc paragraph, 3 action buttons (Export/Import/
+  New), 3 KPI labels (Total Scenarios/Active/Pinned), toggle pin aria-label, "Updated
+  {date}" prefix (templated), "{count} localities" badge (templated), delete-scenario
+  aria-label, persist-note footer, What-If Simulator card title, 7 slider parameter labels
+  (refactored inline array from `label` to `labelKey`), 3 projection labels (Projected
+  BN/PH/PN) + 3 "seats" unit labels, Seat Distribution heading, baseline-legend "↑
+  Projected · ↓ Baseline (PRN15)", Base (PRN15): label, Reset-to-defaults button,
+  6-line realistic-model description paragraph (split across `modelRealistic`/`modelDesc`/
+  `modelPnBn`/`modelDapMca`/`modelDapMic`/`modelUncertainty` keys with explicit `{" "}`
+  JSX separators to preserve inter-sentence spacing), baseline-live/static conditional
+  text + "Not a political prediction" footer.
+- Scenario status pill (DRAFT/ACTIVE/REVIEW/ARCHIVED) translated via
+  `t(\`scenario.status.${s.workflow_status}\`, s.workflow_status)` enum-lookup pattern —
+  `STATUS_COLORS` lookup still keyed by raw status string (kept raw for color lookup).
+- SEED_SCENARIOS data (scenario names like "P134 Senior Healthcare Focus", descriptions,
+  tag arrays) left untranslated — these are seeded data values (similar to chart labels
+  in predictive-tab which left narrative/locality labels untranslated).
+
+### 4. `src/components/tabs/alerts-tab.tsx`
+- Imported `useI18n` from `@/lib/i18n`; added `const { t } = useI18n();` to `AlertsTab`.
+- Refactored inline alert-rules array (5 rules with hardcoded English name/action
+  strings) to module-level `ALERT_RULES` const with `nameKey`/`actionKey` pointing to
+  translation keys. `rule` field (SQL-like expression like "senior_dependency_percent
+  >= 30") kept untranslated — technical token, similar to POSKOD/BANGSA/JSONL in prior
+  batches.
+- Replaced: card title + desc paragraph, 4 KPI labels (Critical/Warning/Active/
+  Acknowledged), Active Alerts ({count}) heading, alert severity badge (via
+  `t(\`alerts.severity.${alert.severity}\`, alert.severity)` enum-lookup; SEVERITY_CONFIG
+  color lookup kept raw), Acknowledge alert aria-label, "Created {date}" prefix
+  (templated), Acknowledged ({count}) heading, ACKNOWLEDGED badge, "Acknowledged {date}"
+  prefix (templated), Monitored Alert Codes (11) heading, Alert Rules card title, per-rule
+  name + action labels, Active/Disabled badges, "{count} triggered" badge (templated),
+  rules-note footer.
+- ALERT_CODES reference grid (SYSTEM_HEALTH_UNAVAILABLE, AUTHENTICATION_COMPONENT_DEGRADED,
+  etc.) left untranslated — these are technical system-monitoring enum codes with
+  `font-mono` styling, similar to other technical tokens (run_id, JSONL, xlsx,
+  APIFY_API_TOKEN) left untranslated in prior batches. Display shows
+  `code.replace(/_/g, " ")` which converts to human-readable form.
+
+### 5. `src/components/tabs/dual-layer-tab.tsx`
+- Imported `useI18n` from `@/lib/i18n`; added `const { t } = useI18n();` to `DualLayerTab`.
+- Replaced: card title + desc paragraph, 3 legend labels (Layer 1: Population (Engine)/
+  Layer 2: Signal (S2D)/Fusion (Dual-Layer)), privacy-protections notice, Layer 1
+  header, 3 layer-1 column labels (Voters/Senior dep/Readiness), HIGH/PARTIAL readiness
+  states, Layer 2 header, 3 layer-2 column labels (Signals/Narrative/Platforms),
+  Fusion: label, 4-way ternary fusion insight (CRITICAL/WARNING/OPPORTUNITY/STABLE —
+  displayed based on `loc.senior_pct` and `loc.sentiment`), footer note, Layer Blending
+  card title, Demographics Layer/Sentiment Layer labels, 50%/50% blend value, Top
+  Demographic Signal stat box (label + stat + sub), Top Sentiment Signal stat box
+  (label + stat + sub), blend-note footer.
+- Per-locality sentiment badge (POSITIVE/NEUTRAL/NEGATIVE/MIXED/INSUFFICIENT_EVIDENCE)
+  translated via `t(\`dualLayer.sentiment.${loc.sentiment}\`, loc.sentiment)` enum-lookup
+  pattern — `SENTIMENT_COLORS` lookup kept keyed by raw sentiment string.
+- P134_LOCALITIES data (locality names like "TMN SERI AMAN", dun_name like "Taboh
+  Naning", narrative like "Senior healthcare access") left untranslated — these are
+  seeded locality data values (proper nouns + narrative labels), matching the prior
+  batches' pattern of leaving data values untranslated.
+
+## Verification
+- `bun run lint`: **0 errors, 3 warnings** (all pre-existing: `layout.tsx`,
+  `data-table.tsx`, `chart.tsx` — unrelated to this task; same as BATCH-1 and BATCH-2).
+- `bunx eslint` on the 5 modified files specifically: clean (no output, exit 0).
+- `bunx tsc --noEmit`: 92 errors total, **0** in any of the 5 modified files. All TS
+  errors are pre-existing issues in other files (skeletons, socioeconomic-panel,
+  elections-tab, predictive-tab line 169 Recharts `dot.fill` overload mismatch — same
+  pre-existing count as BATCH-2).
+
+## Rules compliance
+- ✅ Only modified `src/lib/i18n.tsx` + 4 tab files. No other files touched.
+- ✅ No new packages added.
+- ✅ Visual layout & functionality unchanged — only swapped hardcoded strings for
+  `t()` calls. Inline styling (e.g. `<span className="font-mono text-amber-600">DISABLED</span>`
+  in s2d-360 header, `<strong>DISABLED</strong>` in boundary notice) preserved by
+  splitting the strings into Pre/P1 + status + Post/P2 translation keys.
+- ✅ Proper nouns kept untranslated: party codes (BN/PH/PN/DAP/MCA/MIC/UMNO/AMANAH/
+  BERSATU), DUN codes (N01–N28), parliament codes (P134–P139), place names (Taboh
+  Naning, Ayer Limau, Kuala Linggi, Tanjung Bidara, Lendu, Gadek, Bemban, Sungai Udang,
+  Masjid Tanah, Hang Tuah Jaya), election codes (PRN15, GE14, GE15), platform brand
+  names (TikTok/Facebook/Instagram/Threads), technical tokens (POSKOD, BANGSA, AGAMA,
+  APIFY_API_TOKEN, run_id, JSONL, xlsx, voter_id_hash, locality-intelligence.jsonl,
+  pip-scenario-sync-engine.js, pip-scenario-sharing.js, pip-360-dual-layer-locality-context.js,
+  pip-operational-alert-contract.js, S2D360Engine.clean.jsx, ALERT_CODES enum values
+  like SYSTEM_HEALTH_UNAVAILABLE, SQL-like rule expressions like
+  "senior_dependency_percent >= 30"), API endpoint paths (/api/s2d/intelligence/*,
+  /api/pip/aggregate-context, /s2d-360/).
+- ✅ BM translations follow Malaysian standard Malay conventions; matches existing style
+  used in prior i18n batches (e.g. "Tersahkan", "Diakui", "Amaran Aktif", "Kritikal",
+  "Lapisan-Dual", "Adunan Lapisan", "Pertanyaan", "Penentukuran").
+
+## Templated strings used (follow `.replace()` pattern from existing tabs)
+- `s2d360.changePointsTitle` ({count}), `s2d360.signalFeedTitle` ({count}),
+  `s2d360.recommendationsTitle` ({count}).
+- `scenario.localities` ({count}), `scenario.updated` ({date}), `scenario.baselineLive`
+  ({source}).
+- `alerts.activeAlerts` ({count}), `alerts.ackAlerts` ({count}),
+  `alerts.createdPrefix` ({date}), `alerts.ackPrefix` ({date}),
+  `alerts.triggeredBadge` ({count}).
+
+## Enum-label translation pattern (same as I18N-BATCH-2)
+For enum-derived display labels (scenario workflow_status, alert severity, change-point
+severity, signal sentimentLabel, recommendation status, dual-layer sentiment), used the
+resilience pattern:
+```typescript
+t(`namespace.enumCategory.${value}`, value)
+```
+- Scenario status: `t(\`scenario.status.${s.workflow_status}\`, s.workflow_status)` —
+  DRAFT/ACTIVE/REVIEW/ARCHIVED all have explicit EN+BM translations.
+- Alert severity: `t(\`alerts.severity.${alert.severity}\`, alert.severity)` —
+  CRITICAL/WARNING/INFO translated.
+- Change-point severity: `t(\`s2d360.severity.${cp.severity}\`, cp.severity)` —
+  CRITICAL/HIGH/MEDIUM/LOW translated.
+- Signal sentimentLabel: `t(\`s2d360.sentiment.${s.sentimentLabel.toLowerCase()}\`, s.sentimentLabel)`
+  — positive/negative/neutral/mixed translated (uses `.toLowerCase()` because the API
+  returns "Positive"/"Negative" capitalized).
+- Recommendation status: `t(\`s2d360.recStatus.${rec.status}\`, rec.status)` —
+  PENDING/APPROVED/ACTING/RESOLVED translated.
+- Dual-layer sentiment: `t(\`dualLayer.sentiment.${loc.sentiment}\`, loc.sentiment)` —
+  POSITIVE/NEUTRAL/NEGATIVE/MIXED/INSUFFICIENT_EVIDENCE translated.
+
+For all enum-based lookups, the underlying data values are still used for color/style
+configuration (e.g. `STATUS_COLORS[s.workflow_status]`, `SEVERITY_CONFIG[alert.severity]`,
+`SENTIMENT_COLORS[loc.sentiment]`) — only the displayed label is translated.
+
+## Inline-array refactor pattern (same as I18N-BATCH-1 governance-tab)
+For inline arrays with hardcoded English string fields, refactored to module-level const
+with `*Key` field pointing to translation keys:
+- `alerts-tab.tsx`: `ALERT_RULES` array moved to module level; `name`/`action` fields
+  → `nameKey`/`actionKey`. Render calls `t(rule.nameKey)`, `t(rule.actionKey)`.
+- `scenario-tab.tsx`: inline slider-params array kept inline (uses setters from hooks);
+  `label` field → `labelKey`. Render calls `t(param.labelKey)`.
+- `s2d-360-tab.tsx`: inline deep-link sections array kept inline; `label` field →
+  `labelKey`. Render calls `t(section.labelKey)`.
+
+## Inline-styling preservation pattern (new in this batch)
+For long-form text with inline emphasis (e.g. `<strong>` tags, `<span>` styling), the
+translation string was split into Pre/P1 + emphasis-token + Post/P2 keys so the JSX
+can render the styling:
+```jsx
+{t("s2d360.headerDescPre")}
+<span className="font-mono text-amber-600">{t("s2d360.disabled")}</span>
+{t("s2d360.headerDescPost")}
+```
+Used for: s2d-360 header description (DISABLED span), s2d-360 boundary notice
+(strong DISABLED), scenario realistic-model paragraph (5 keys joined with explicit
+`{" "}` JSX whitespace separators to preserve inter-sentence spacing that JSX would
+otherwise collapse when adjacent elements have no whitespace).
+
+## Unresolved issues / next-phase recommendations
+- All 12 originally-flagged tabs now have i18n wired (BATCH-1: 4 tabs, BATCH-2: 4 tabs,
+  BATCH-3: 4 tabs — complete coverage).
+- Remaining i18n-unwired shared components (per I18N-BATCH-2 unresolved list):
+  `command-palette.tsx`, `quick-actions.tsx`. These are floating overlay components
+  triggered by keyboard shortcut (Cmd+K) and the quick-actions strip on the overview
+  tab respectively — small surface area (~10-15 strings each).
+- Recommendation: A future BATCH-4 could wire these 2 shared components to complete
+  100% i18n coverage of the dashboard surface area. Alternatively, they could be
+  left as English-only (operator-facing UI), matching the `aria-label` convention used
+  elsewhere.
+- Cron job coordination: This batch did not conflict with any concurrent commits.

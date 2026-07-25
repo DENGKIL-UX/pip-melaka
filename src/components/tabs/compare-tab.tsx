@@ -8,6 +8,7 @@ import { ArrowLeftRight, Copy, Twitter, MessageCircle, FileSpreadsheet, Users, B
 import { PARLIAMENTS } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { DUN_FALLBACK, DPT_FALLBACK } from "@/lib/fallback-data";
+import { useI18n } from "@/lib/i18n";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
@@ -33,6 +34,7 @@ function StatRow({ label, a, b, highlight }: { label: string; a: string; b: stri
 }
 
 export function CompareTab() {
+  const { t } = useI18n();
   const [duns, setDuns] = useState<DunRecord[]>([]);
   const [dpt, setDpt] = useState<DptData | null>(null);
   const [offline, setOffline] = useState(false);
@@ -88,7 +90,7 @@ export function CompareTab() {
   const onCopyUrl = () => {
     const url = `${window.location.origin}/?compare=${codeA}-${codeB}`;
     navigator.clipboard?.writeText(url);
-    showToast("URL copied");
+    showToast(t("compare.toastUrlCopied"));
   };
   const onTweet = () => { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`PIP-MLK compare: ${a.name} vs ${b.name}`)}&url=${encodeURIComponent(window.location.href)}`, "_blank"); };
   const onWhatsApp = () => { window.open(`https://wa.me/?text=${encodeURIComponent(`PIP-MLK compare ${a.name} vs ${b.name}: ${window.location.href}`)}`, "_blank"); };
@@ -100,7 +102,7 @@ export function CompareTab() {
     const link = document.createElement("a");
     link.href = url; link.download = `compare-${a.code}-vs-${b.code}.csv`; link.click();
     URL.revokeObjectURL(url);
-    showToast("CSV downloaded");
+    showToast(t("compare.toastCsvDownloaded"));
   };
 
   return (
@@ -108,10 +110,10 @@ export function CompareTab() {
       <Card className="border-mlk/20">
         <CardContent className="p-3 flex items-center gap-2 text-xs text-muted-foreground">
           <ArrowLeftRight className="h-4 w-4 text-mlk flex-shrink-0" />
-          <span>Compare two parliaments side by side. P134 has full engine data; P135–P139 use summary fallbacks pending raw SPR rolls.</span>
+          <span>{t("compare.intro")}</span>
           {offline && (
             <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
-              <WifiOff className="h-2.5 w-2.5" /> offline data
+              <WifiOff className="h-2.5 w-2.5" /> {t("compare.offlineData")}
             </span>
           )}
         </CardContent>
@@ -120,21 +122,21 @@ export function CompareTab() {
       {/* Selectors — §7.6: Third comparison slot */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
         <div>
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">Parliament A</label>
+          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">{t("compare.parliamentA")}</label>
           <Select value={codeA} onValueChange={setCodeA}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div>
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">Parliament B</label>
+          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">{t("compare.parliamentB")}</label>
           <Select value={codeB} onValueChange={setCodeB}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div>
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">Parliament C (optional)</label>
+          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">{t("compare.parliamentC")}</label>
           <Select value={codeC} onValueChange={setCodeC}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
@@ -145,11 +147,11 @@ export function CompareTab() {
       {/* Side-by-side — §7.6: Extended to 3 columns with auto-highlight */}
       <Card className="border-mlk/30">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> Side-by-side comparison</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> {t("compare.sideBySide")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className={`grid gap-2 py-2 border-b border-mlk/20 text-[10px] uppercase tracking-wide text-muted-foreground ${c ? "grid-cols-4" : "grid-cols-3"}`}>
-            <div>Metric</div>
+            <div>{t("compare.metric")}</div>
             <div className="text-right text-mlk font-semibold">P{a.code} {a.name}</div>
             <div className="text-right text-mlk font-semibold">P{b.code} {b.name}</div>
             {c && <div className="text-right text-mlk font-semibold">P{c.code} {c.name}</div>}
@@ -164,31 +166,31 @@ export function CompareTab() {
             return (
               <>
                 <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">Total voters</div>
+                  <div className="text-muted-foreground">{t("compare.totalVoters")}</div>
                   <div className={`text-right font-mono ${a.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{a.voters.toLocaleString()}</div>
                   <div className={`text-right font-mono ${b.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{b.voters.toLocaleString()}</div>
                   {c && <div className={`text-right font-mono ${c.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{c.voters.toLocaleString()}</div>}
                 </div>
                 <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">Senior dep %</div>
+                  <div className="text-muted-foreground">{t("compare.seniorDepPct")}</div>
                   <div className={`text-right font-mono ${a.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{a.seniorDep.toFixed(1)}%</div>
                   <div className={`text-right font-mono ${b.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{b.seniorDep.toFixed(1)}%</div>
                   {c && <div className={`text-right font-mono ${c.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{c.seniorDep.toFixed(1)}%</div>}
                 </div>
                 <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">Gender balance</div>
+                  <div className="text-muted-foreground">{t("compare.genderBal")}</div>
                   <div className={`text-right font-mono ${a.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{a.genderBal.toFixed(1)}</div>
                   <div className={`text-right font-mono ${b.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{b.genderBal.toFixed(1)}</div>
                   {c && <div className={`text-right font-mono ${c.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{c.genderBal.toFixed(1)}</div>}
                 </div>
                 <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">DPT net</div>
+                  <div className="text-muted-foreground">{t("compare.dptNet")}</div>
                   <div className={`text-right font-mono ${(a.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{a.dpt?.net ?? 0}</div>
                   <div className={`text-right font-mono ${(b.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{b.dpt?.net ?? 0}</div>
                   {c && <div className={`text-right font-mono ${(c.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{c.dpt?.net ?? 0}</div>}
                 </div>
                 <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 text-xs`}>
-                  <div className="text-muted-foreground">GE15 winner</div>
+                  <div className="text-muted-foreground">{t("compare.ge15Winner")}</div>
                   <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[a.ge15Winner] }}>{a.ge15Winner}</span></div>
                   <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[b.ge15Winner] }}>{b.ge15Winner}</span></div>
                   {c && <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[c.ge15Winner] }}>{c.ge15Winner}</span></div>}
@@ -197,32 +199,32 @@ export function CompareTab() {
             );
           })()}
           <div className="text-[9px] text-muted-foreground mt-2 flex items-center gap-1">
-            <span className="text-emerald-600 font-bold">●</span> = best value (auto-highlighted)
+            <span className="text-emerald-600 font-bold">●</span> {t("compare.bestValue")}
           </div>
         </CardContent>
       </Card>
 
       {/* Verdict */}
       <Card className="border-mlk/30 bg-mlk-radial">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> Verdict</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> {t("compare.verdict")}</CardTitle></CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div className="rounded-md border border-border/40 p-3">
-              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Building2 className="h-3 w-3" /> Voter diff</div>
+              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Building2 className="h-3 w-3" /> {t("compare.voterDiff")}</div>
               <div className="text-lg font-bold text-mlk">{voterDiff > 0 ? "+" : ""}{voterDiff.toLocaleString()}</div>
-              <div className="text-[10px] text-muted-foreground">{voterDiff > 0 ? `${a.name} larger` : voterDiff < 0 ? `${b.name} larger` : "equal"}</div>
+              <div className="text-[10px] text-muted-foreground">{voterDiff > 0 ? t("compare.voterLarger").replace("{name}", a.name) : voterDiff < 0 ? t("compare.voterLarger").replace("{name}", b.name) : t("compare.equal")}</div>
             </div>
             <div className="rounded-md border border-border/40 p-3">
-              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> DPT net diff</div>
+              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> {t("compare.dptNetDiff")}</div>
               <div className="text-lg font-bold text-mlk">{((a.dpt?.net ?? 0) - (b.dpt?.net ?? 0)).toLocaleString()}</div>
-              <div className="text-[10px] text-muted-foreground">{(a.dpt?.net ?? 0) > (b.dpt?.net ?? 0) ? `${a.name} faster growth` : "comparable"}</div>
+              <div className="text-[10px] text-muted-foreground">{(a.dpt?.net ?? 0) > (b.dpt?.net ?? 0) ? t("compare.fasterGrowth").replace("{name}", a.name) : t("compare.comparable")}</div>
             </div>
             <div className="rounded-md border border-border/40 p-3">
-              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Users className="h-3 w-3" /> Senior dep risk</div>
+              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Users className="h-3 w-3" /> {t("compare.seniorDepRisk")}</div>
               <div className="text-lg font-bold" style={{ color: a.seniorDep >= 30 || b.seniorDep >= 30 ? "#dc2626" : "#16a34a" }}>
-                {a.seniorDep >= 30 || b.seniorDep >= 30 ? "CRITICAL" : "OK"}
+                {a.seniorDep >= 30 || b.seniorDep >= 30 ? t("compare.critical") : t("compare.ok")}
               </div>
-              <div className="text-[10px] text-muted-foreground">{a.seniorDep > b.seniorDep ? `${a.name} older` : `${b.name} older`}</div>
+              <div className="text-[10px] text-muted-foreground">{a.seniorDep > b.seniorDep ? t("compare.older").replace("{name}", a.name) : t("compare.older").replace("{name}", b.name)}</div>
             </div>
           </div>
         </CardContent>
@@ -231,12 +233,12 @@ export function CompareTab() {
       {/* Share buttons */}
       <Card className="border-mlk/20">
         <CardContent className="p-3">
-          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Share comparison</div>
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">{t("compare.share")}</div>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onCopyUrl}><Copy className="h-3.5 w-3.5 me-1" /> Copy URL</Button>
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onTweet}><Twitter className="h-3.5 w-3.5 me-1" /> Tweet</Button>
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onWhatsApp}><MessageCircle className="h-3.5 w-3.5 me-1" /> WhatsApp</Button>
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onCsv}><FileSpreadsheet className="h-3.5 w-3.5 me-1" /> CSV</Button>
+            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onCopyUrl}><Copy className="h-3.5 w-3.5 me-1" /> {t("compare.copyUrl")}</Button>
+            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onTweet}><Twitter className="h-3.5 w-3.5 me-1" /> {t("compare.tweet")}</Button>
+            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onWhatsApp}><MessageCircle className="h-3.5 w-3.5 me-1" /> {t("compare.whatsapp")}</Button>
+            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onCsv}><FileSpreadsheet className="h-3.5 w-3.5 me-1" /> {t("compare.csv")}</Button>
           </div>
           {toast && <div className="text-[10px] text-emerald-600 mt-2">{toast}</div>}
         </CardContent>

@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ShieldAlert, Heart, Users, DollarSign, Home, Scale, Info, WifiOff } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import { DUN_FALLBACK, DOSM_FALLBACK } from "@/lib/fallback-data";
+import { useI18n } from "@/lib/i18n";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
@@ -33,6 +34,7 @@ function seniorTier(pct: number): "critical" | "warning" | "clear" {
 }
 
 export function RiskSocioeconomicTab() {
+  const { t } = useI18n();
   const [duns, setDuns] = useState<DunRecord[] | null>(null);
   const [dosm, setDosm] = useState<DosmData | null>(null);
   const [offline, setOffline] = useState(false);
@@ -73,8 +75,8 @@ export function RiskSocioeconomicTab() {
         <Card className="border-amber-500/40 bg-amber-500/5">
           <CardContent className="p-3 flex items-center gap-2 text-xs">
             <WifiOff className="h-4 w-4 text-amber-600 flex-shrink-0" />
-            <span className="text-amber-700 dark:text-amber-300 font-medium">Offline data mode.</span>
-            <span className="text-muted-foreground">Live fetch failed (dev server may have restarted) — showing cached inline snapshot of P134 DUN + DOSM data.</span>
+            <span className="text-amber-700 dark:text-amber-300 font-medium">{t("risk.offlineMode")}</span>
+            <span className="text-muted-foreground">{t("risk.offlineDesc")}</span>
           </CardContent>
         </Card>
       )}
@@ -82,33 +84,33 @@ export function RiskSocioeconomicTab() {
       {/* Risk KPI summary */}
       <div className="grid grid-cols-3 gap-3">
         <Card className="border-red-500/30 hover-lift"><CardContent className="p-4">
-          <div className="flex items-center justify-between mb-1"><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Critical</span><ShieldAlert className="h-4 w-4 text-red-600" /></div>
+          <div className="flex items-center justify-between mb-1"><span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t("risk.kpiCritical")}</span><ShieldAlert className="h-4 w-4 text-red-600" /></div>
           <div className="text-2xl font-bold text-red-600">{critical.length}</div>
-          <div className="text-[10px] text-muted-foreground">Senior dep ≥30%</div>
+          <div className="text-[10px] text-muted-foreground">{t("risk.kpiCriticalDesc")}</div>
         </CardContent></Card>
         <Card className="border-amber-500/30 hover-lift"><CardContent className="p-4">
-          <div className="flex items-center justify-between mb-1"><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Warning</span><Heart className="h-4 w-4 text-amber-600" /></div>
+          <div className="flex items-center justify-between mb-1"><span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t("risk.kpiWarning")}</span><Heart className="h-4 w-4 text-amber-600" /></div>
           <div className="text-2xl font-bold text-amber-600">{warning.length}</div>
-          <div className="text-[10px] text-muted-foreground">Senior dep ≥25%</div>
+          <div className="text-[10px] text-muted-foreground">{t("risk.kpiWarningDesc")}</div>
         </CardContent></Card>
         <Card className="border-emerald-500/30 hover-lift"><CardContent className="p-4">
-          <div className="flex items-center justify-between mb-1"><span className="text-[10px] uppercase tracking-wide text-muted-foreground">Clear</span><Users className="h-4 w-4 text-emerald-600" /></div>
+          <div className="flex items-center justify-between mb-1"><span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t("risk.kpiClear")}</span><Users className="h-4 w-4 text-emerald-600" /></div>
           <div className="text-2xl font-bold text-emerald-600">{clear.length}</div>
-          <div className="text-[10px] text-muted-foreground">Below threshold</div>
+          <div className="text-[10px] text-muted-foreground">{t("risk.kpiClearDesc")}</div>
         </CardContent></Card>
       </div>
 
       {/* Radial + gender charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <Card className="border-mlk/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> Senior dep by DUN</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> {t("risk.seniorDepTitle")}</CardTitle></CardHeader>
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <RadialBarChart innerRadius="20%" outerRadius="100%" data={radialData} startAngle={90} endAngle={-270}>
                   <PolarAngleAxis type="number" domain={[0, 40]} tick={{ fontSize: 9 }} />
                   <RadialBar background dataKey="pct" cornerRadius={6} />
-                  <Tooltip contentStyle={{ fontSize: 11 }} formatter={(v: number) => [`${v.toFixed(1)}%`, "Senior dep"]} />
+                  <Tooltip contentStyle={{ fontSize: 11 }} formatter={(v: number) => [`${v.toFixed(1)}%`, t("risk.seniorDepLegend")]} />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: 9 }} />
                 </RadialBarChart>
               </ResponsiveContainer>
@@ -116,7 +118,7 @@ export function RiskSocioeconomicTab() {
           </CardContent>
         </Card>
         <Card className="border-mlk/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> Gender balance by DUN</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> {t("risk.genderBalTitle")}</CardTitle></CardHeader>
           <CardContent>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -125,27 +127,27 @@ export function RiskSocioeconomicTab() {
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-15} textAnchor="end" height={50} interval={0} />
                   <YAxis tick={{ fontSize: 10 }} domain={[80, 100]} />
                   <Tooltip contentStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="balance" name="Gender balance" fill="#C77B2C" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="balance" name={t("risk.genderBalLegend")} fill="#C77B2C" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="text-[10px] text-muted-foreground text-center mt-1">100 = perfect male/female parity</div>
+            <div className="text-[10px] text-muted-foreground text-center mt-1">{t("risk.genderBalNote")}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Per-DUN risk signals */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm">Per-DUN risk signals</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">{t("risk.signalsTitle")}</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-[10px]">DUN</TableHead>
-                <TableHead className="text-[10px] text-right">Voters</TableHead>
-                <TableHead className="text-[10px] text-right">Senior dep</TableHead>
-                <TableHead className="text-[10px] text-right">Gender bal</TableHead>
-                <TableHead className="text-[10px]">Severity</TableHead>
+                <TableHead className="text-[10px]">{t("risk.colDun")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("risk.colVoters")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("risk.colSeniorDep")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("risk.colGenderBal")}</TableHead>
+                <TableHead className="text-[10px]">{t("risk.colSeverity")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -172,20 +174,20 @@ export function RiskSocioeconomicTab() {
 
       {/* DOSM panel */}
       <Card className="border-mlk/30">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Scale className="h-4 w-4 text-mlk" /> DOSM socioeconomic panel</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Scale className="h-4 w-4 text-mlk" /> {t("risk.dosmTitle")}</CardTitle></CardHeader>
         <CardContent>
-          <div className="text-[10px] text-muted-foreground mb-3 flex items-center gap-2"><Info className="h-3 w-3 text-mlk" /> Verified tier · source: DOSM Census 2020 + HIES 2022.</div>
+          <div className="text-[10px] text-muted-foreground mb-3 flex items-center gap-2"><Info className="h-3 w-3 text-mlk" /> {t("risk.dosmVerified")}</div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             {/* State card */}
             <Card className="border-mlk/40 bg-mlk-radial">
               <CardContent className="p-3">
-                <div className="text-[10px] uppercase tracking-wide text-mlk font-semibold mb-2">Melaka (state)</div>
+                <div className="text-[10px] uppercase tracking-wide text-mlk font-semibold mb-2">{t("risk.melakaState")}</div>
                 <div className="space-y-1.5 text-[10px]">
-                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Home className="h-3 w-3" /> Population</span><span className="font-mono">{dosm.state.population.toLocaleString()}</span></div>
-                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><DollarSign className="h-3 w-3" /> Median income</span><span className="font-mono">RM{dosm.state.median_household_income.toLocaleString()}</span></div>
-                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3" /> Poverty</span><span className="font-mono">{dosm.state.poverty_rate}%</span></div>
-                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Scale className="h-3 w-3" /> Gini</span><span className="font-mono">{dosm.state.gini_coefficient.toFixed(3)}</span></div>
-                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" /> Unemployment</span><span className="font-mono">{dosm.state.unemployment_rate}%</span></div>
+                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Home className="h-3 w-3" /> {t("risk.population")}</span><span className="font-mono">{dosm.state.population.toLocaleString()}</span></div>
+                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><DollarSign className="h-3 w-3" /> {t("risk.medianIncome")}</span><span className="font-mono">RM{dosm.state.median_household_income.toLocaleString()}</span></div>
+                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3" /> {t("risk.poverty")}</span><span className="font-mono">{dosm.state.poverty_rate}%</span></div>
+                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Scale className="h-3 w-3" /> {t("risk.gini")}</span><span className="font-mono">{dosm.state.gini_coefficient.toFixed(3)}</span></div>
+                  <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" /> {t("risk.unemployment")}</span><span className="font-mono">{dosm.state.unemployment_rate}%</span></div>
                 </div>
               </CardContent>
             </Card>
@@ -195,45 +197,45 @@ export function RiskSocioeconomicTab() {
                 <CardContent className="p-3">
                   <div className="text-[10px] uppercase tracking-wide text-mlk font-semibold mb-2">{d.name}</div>
                   <div className="space-y-1.5 text-[10px]">
-                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Home className="h-3 w-3" /> Pop</span><span className="font-mono">{d.population.toLocaleString()}</span></div>
-                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><DollarSign className="h-3 w-3" /> Income</span><span className="font-mono">RM{d.median_income.toLocaleString()}</span></div>
-                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3" /> Poverty</span><span className={`font-mono ${d.poverty_rate >= 0.7 ? "text-amber-600" : ""}`}>{d.poverty_rate}%</span></div>
-                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Scale className="h-3 w-3" /> Gini</span><span className={`font-mono ${d.gini >= 0.4 ? "text-amber-600" : ""}`}>{d.gini.toFixed(3)}</span></div>
-                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" /> Unemp</span><span className="font-mono">{d.unemployment}%</span></div>
+                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Home className="h-3 w-3" /> {t("risk.districtPop")}</span><span className="font-mono">{d.population.toLocaleString()}</span></div>
+                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><DollarSign className="h-3 w-3" /> {t("risk.districtIncome")}</span><span className="font-mono">RM{d.median_income.toLocaleString()}</span></div>
+                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3" /> {t("risk.poverty")}</span><span className={`font-mono ${d.poverty_rate >= 0.7 ? "text-amber-600" : ""}`}>{d.poverty_rate}%</span></div>
+                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Scale className="h-3 w-3" /> {t("risk.gini")}</span><span className={`font-mono ${d.gini >= 0.4 ? "text-amber-600" : ""}`}>{d.gini.toFixed(3)}</span></div>
+                    <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" /> {t("risk.districtUnemp")}</span><span className="font-mono">{d.unemployment}%</span></div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
           <div className="text-[10px] text-muted-foreground mt-3">
-            <strong className="text-mlk">Note:</strong> Jasin district has highest poverty (0.8%) + highest Gini (0.405) — flagged as INFO signal in S2D console.
+            <strong className="text-mlk">{t("risk.noteLabel")}</strong> {t("risk.jasinNote")}
           </div>
         </CardContent>
       </Card>
 
       {/* §7.5: Risk Matrix — 5×5 probability×impact grid */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> Risk Matrix — DUN-level (5×5)</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-mlk" /> {t("risk.matrixTitle")}</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-[10px] border-collapse">
               <thead>
                 <tr>
-                  <th className="p-1 text-muted-foreground text-left">Impact ↓ / Probability →</th>
-                  <th className="p-1 text-center font-semibold text-muted-foreground">1<br/><span className="text-[8px]">Low</span></th>
+                  <th className="p-1 text-muted-foreground text-left">{t("risk.matrixImpactProb")}</th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">1<br/><span className="text-[8px]">{t("risk.matrixLow")}</span></th>
                   <th className="p-1 text-center font-semibold text-muted-foreground">2</th>
-                  <th className="p-1 text-center font-semibold text-muted-foreground">3<br/><span className="text-[8px]">Med</span></th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">3<br/><span className="text-[8px]">{t("risk.matrixMed")}</span></th>
                   <th className="p-1 text-center font-semibold text-muted-foreground">4</th>
-                  <th className="p-1 text-center font-semibold text-muted-foreground">5<br/><span className="text-[8px]">High</span></th>
+                  <th className="p-1 text-center font-semibold text-muted-foreground">5<br/><span className="text-[8px]">{t("risk.matrixHigh")}</span></th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { impact: 5, label: "5 — Critical", color: "#dc2626" },
-                  { impact: 4, label: "4 — High", color: "#ea580c" },
-                  { impact: 3, label: "3 — Medium", color: "#f59e0b" },
-                  { impact: 2, label: "2 — Low", color: "#84cc16" },
-                  { impact: 1, label: "1 — Minimal", color: "#22c55e" },
+                  { impact: 5, label: t("risk.matrixImpact5"), color: "#dc2626" },
+                  { impact: 4, label: t("risk.matrixImpact4"), color: "#ea580c" },
+                  { impact: 3, label: t("risk.matrixImpact3"), color: "#f59e0b" },
+                  { impact: 2, label: t("risk.matrixImpact2"), color: "#84cc16" },
+                  { impact: 1, label: t("risk.matrixImpact1"), color: "#22c55e" },
                 ].map((row) => (
                   <tr key={row.impact}>
                     <td className="p-1 font-semibold text-right" style={{ color: row.color }}>{row.label}</td>
@@ -268,7 +270,7 @@ export function RiskSocioeconomicTab() {
             </table>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2">
-            Probability = senior dependency tier · Impact = voter density · Cells show DUN codes in that risk zone
+            {t("risk.matrixNote")}
           </div>
         </CardContent>
       </Card>

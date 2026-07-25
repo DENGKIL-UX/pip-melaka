@@ -31,6 +31,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ExternalLink, Maximize2, ShieldCheck, AlertCircle, Loader2, Database, Activity, TrendingUp, Brain, FileText, Zap } from "lucide-react";
 import { Segmented } from "@/components/ui/segmented";
 import { PartyTag, StatusTag } from "@/components/ui/party-tag";
+import { useI18n } from "@/lib/i18n";
 
 // Types for the native engine API responses
 interface NativeBrief {
@@ -82,6 +83,7 @@ interface NativeRecommendation {
 }
 
 export function S2D360Tab() {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [view, setView] = useState<"native" | "full">("native");
@@ -129,21 +131,21 @@ export function S2D360Tab() {
         <CardContent className="p-3 flex items-center gap-3 flex-wrap">
           <ShieldCheck className="h-5 w-5 text-mlk flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-mlk">S2D-360 Intelligence Engine v1.0.0</div>
+            <div className="text-sm font-semibold text-mlk">{t("s2d360.engineVersion")}</div>
             <div className="text-[10px] text-muted-foreground mt-0.5">
-              56 pages · 8 sections · Identity firewall active · PIP boundary: <span className="font-mono text-amber-600">DISABLED</span> (read-only)
+              {t("s2d360.headerDescPre")}<span className="font-mono text-amber-600">{t("s2d360.disabled")}</span>{t("s2d360.headerDescPost")}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-[9px] border-emerald-500/40 text-emerald-600 dark:text-emerald-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse me-1" />
-              Engine Online
+              {t("s2d360.engineOnline")}
             </Badge>
             <Badge variant="outline" className="text-[9px] border-mlk/40 text-mlk">
-              Aggregate-Only
+              {t("s2d360.aggregateOnly")}
             </Badge>
             <Badge variant="outline" className="text-[9px] border-amber-500/40 text-amber-700 dark:text-amber-300">
-              PDPA Compliant
+              {t("s2d360.pdpaCompliant")}
             </Badge>
           </div>
         </CardContent>
@@ -154,10 +156,8 @@ export function S2D360Tab() {
         <CardContent className="p-2.5 flex items-start gap-2">
           <AlertCircle className="h-3.5 w-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="text-[10px] text-amber-700 dark:text-amber-300 leading-relaxed">
-            <strong>PIP Integration Boundary:</strong> The S2D engine operates with a strict aggregate-only data contract.
-            No individual voter data enters S2D — the identity firewall (28 rejected keys + 9 regex patterns)
-            blocks any PII at the adapter layer. PIP context fusion is currently <strong>DISABLED</strong> by default.
-            Enabling it is a deliberate operator decision post-release.
+            <strong>{t("s2d360.boundaryTitle")}</strong>{" "}
+            {t("s2d360.boundaryDescP1")}<strong>{t("s2d360.disabled")}</strong>{t("s2d360.boundaryDescP2")}
           </div>
         </CardContent>
       </Card>
@@ -168,21 +168,21 @@ export function S2D360Tab() {
           value={view}
           onChange={(v) => setView(v)}
           options={[
-            { value: "native" as const, label: "Native Engine", icon: Zap },
-            { value: "full" as const, label: "Full Engine (56 pages)", icon: ExternalLink },
+            { value: "native" as const, label: t("s2d360.nativeEngine"), icon: Zap },
+            { value: "full" as const, label: t("s2d360.fullEngine"), icon: ExternalLink },
           ]}
         />
         <div className="flex items-center gap-2">
           <a href="/api/pip/aggregate-context?level=DUN&code=05&parliamentCode=134" target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-mlk/30">
               <Database className="h-3 w-3" />
-              PIP Context API
+              {t("s2d360.pipContextApi")}
             </Button>
           </a>
           <a href="/api/s2d/intelligence" target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-mlk/30">
               <Activity className="h-3 w-3" />
-              S2D API
+              {t("s2d360.s2dApi")}
             </Button>
           </a>
         </div>
@@ -193,7 +193,7 @@ export function S2D360Tab() {
         <div className="space-y-3">
           {nativeLoading ? (
             <Card className="border-mlk/20"><CardContent className="p-8 flex items-center justify-center text-sm text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin me-2 text-mlk" /> Loading native engine data…
+              <Loader2 className="h-5 w-5 animate-spin me-2 text-mlk" /> {t("s2d360.loadingNative")}
             </CardContent></Card>
           ) : (
             <>
@@ -202,7 +202,7 @@ export function S2D360Tab() {
                 <Card className="border-mlk/30 bg-mlk-radial">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-mlk" /> Daily Intelligence Brief
+                      <FileText className="h-4 w-4 text-mlk" /> {t("s2d360.dailyBriefTitle")}
                       <Badge className="text-[9px] bg-mlk text-white border-transparent ms-1">{brief.status}</Badge>
                       <span className="text-[9px] text-muted-foreground font-mono ms-auto">{brief.briefId}</span>
                     </CardTitle>
@@ -211,17 +211,17 @@ export function S2D360Tab() {
                     <div className="text-xs leading-relaxed">{brief.sections.executiveJudgement}</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <div className="rounded-md border border-mlk/20 bg-background/60 p-2">
-                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Most Important Change</div>
+                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide mb-1">{t("s2d360.mostImportantChange")}</div>
                         <div className="text-xs">{brief.sections.mostImportantChange}</div>
                       </div>
                       <div className="rounded-md border border-red-500/20 bg-red-500/5 p-2">
-                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Highest Risk Narrative</div>
+                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide mb-1">{t("s2d360.highestRiskNarrative")}</div>
                         <div className="text-xs">{brief.sections.highestRiskNarrative}</div>
                       </div>
                     </div>
                     {/* Sentiment movement */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[9px] text-muted-foreground uppercase tracking-wide">Sentiment Movement:</span>
+                      <span className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("s2d360.sentimentMovement")}</span>
                       {brief.sections.politicalEntitySentimentMovement.map((e) => (
                         <span key={e.entity} className="inline-flex items-center gap-1 text-[10px]">
                           <PartyTag coalition={e.entity as "BN" | "PH" | "PN"} size="xs" />
@@ -232,11 +232,11 @@ export function S2D360Tab() {
                     {/* Locality hotspots */}
                     {brief.sections.localityHotspots.length > 0 && (
                       <div>
-                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Locality Hotspots</div>
+                        <div className="text-[9px] text-muted-foreground uppercase tracking-wide mb-1">{t("s2d360.localityHotspots")}</div>
                         <div className="flex gap-2 flex-wrap">
                           {brief.sections.localityHotspots.map((h) => (
                             <div key={h.locality} className="rounded-md border border-mlk/20 bg-background/60 px-2 py-1 text-[10px]">
-                              <span className="font-medium">{h.locality}</span>: {h.signalCount} signals
+                              <span className="font-medium">{h.locality}</span>: {h.signalCount} {t("s2d360.signalsUnit")}
                             </div>
                           ))}
                         </div>
@@ -250,16 +250,16 @@ export function S2D360Tab() {
               {/* Change Points */}
               {changePoints.length > 0 && (
                 <Card className="border-mlk/20">
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> Change-Point Detection ({changePoints.length})</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> {t("s2d360.changePointsTitle").replace("{count}", String(changePoints.length))}</CardTitle></CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-[10px]">Narrative</TableHead>
-                          <TableHead className="text-[10px]">Type</TableHead>
-                          <TableHead className="text-[10px]">Severity</TableHead>
-                          <TableHead className="text-[10px]">Locality</TableHead>
-                          <TableHead className="text-[10px]">Description</TableHead>
+                          <TableHead className="text-[10px]">{t("s2d360.colNarrative")}</TableHead>
+                          <TableHead className="text-[10px]">{t("s2d360.colType")}</TableHead>
+                          <TableHead className="text-[10px]">{t("s2d360.colSeverity")}</TableHead>
+                          <TableHead className="text-[10px]">{t("s2d360.colLocality")}</TableHead>
+                          <TableHead className="text-[10px]">{t("s2d360.colDescription")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -267,7 +267,7 @@ export function S2D360Tab() {
                           <TableRow key={i}>
                             <TableCell className="text-[10px] font-medium">{cp.narrative}</TableCell>
                             <TableCell><Badge variant="outline" className="text-[9px]">{cp.type}</Badge></TableCell>
-                            <TableCell><StatusTag status={cp.severity === "CRITICAL" ? "error" : cp.severity === "HIGH" ? "warning" : "success"} label={cp.severity} /></TableCell>
+                            <TableCell><StatusTag status={cp.severity === "CRITICAL" ? "error" : cp.severity === "HIGH" ? "warning" : "success"} label={t(`s2d360.severity.${cp.severity}`, cp.severity)} /></TableCell>
                             <TableCell className="text-[10px]">{cp.locality}</TableCell>
                             <TableCell className="text-[10px] text-muted-foreground">{cp.description}</TableCell>
                           </TableRow>
@@ -281,18 +281,18 @@ export function S2D360Tab() {
               {/* Signals */}
               {signals.length > 0 && (
                 <Card className="border-mlk/20">
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Activity className="h-4 w-4 text-mlk" /> Signal Feed ({signals.length})</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Activity className="h-4 w-4 text-mlk" /> {t("s2d360.signalFeedTitle").replace("{count}", String(signals.length))}</CardTitle></CardHeader>
                   <CardContent>
                     <div className="max-h-64 overflow-y-auto scrollbar-mlk">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="text-[10px]">Locality</TableHead>
-                            <TableHead className="text-[10px]">Entity</TableHead>
-                            <TableHead className="text-[10px]">Issue</TableHead>
-                            <TableHead className="text-[10px]">Platform</TableHead>
-                            <TableHead className="text-[10px]">Sentiment</TableHead>
-                            <TableHead className="text-[10px] text-right">Engagement</TableHead>
+                            <TableHead className="text-[10px]">{t("s2d360.colLocality")}</TableHead>
+                            <TableHead className="text-[10px]">{t("s2d360.colEntity")}</TableHead>
+                            <TableHead className="text-[10px]">{t("s2d360.colIssue")}</TableHead>
+                            <TableHead className="text-[10px]">{t("s2d360.colPlatform")}</TableHead>
+                            <TableHead className="text-[10px]">{t("s2d360.colSentiment")}</TableHead>
+                            <TableHead className="text-[10px] text-right">{t("s2d360.colEngagement")}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -302,7 +302,7 @@ export function S2D360Tab() {
                               <TableCell><PartyTag coalition={s.politicalEntity as "BN" | "PH" | "PN"} size="xs" /></TableCell>
                               <TableCell className="text-[10px]">{s.issue}</TableCell>
                               <TableCell className="text-[10px] font-mono">{s.platform}</TableCell>
-                              <TableCell><StatusTag status={s.sentimentLabel === "Positive" ? "success" : s.sentimentLabel === "Negative" ? "error" : "default"} label={s.sentimentLabel} /></TableCell>
+                              <TableCell><StatusTag status={s.sentimentLabel === "Positive" ? "success" : s.sentimentLabel === "Negative" ? "error" : "default"} label={t(`s2d360.sentiment.${s.sentimentLabel.toLowerCase()}`, s.sentimentLabel)} /></TableCell>
                               <TableCell className="text-[10px] text-right font-mono">{s.engagementScore}</TableCell>
                             </TableRow>
                           ))}
@@ -316,7 +316,7 @@ export function S2D360Tab() {
               {/* Recommendations */}
               {recommendations.length > 0 && (
                 <Card className="border-mlk/20">
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Brain className="h-4 w-4 text-mlk" /> Recommendations ({recommendations.length})</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Brain className="h-4 w-4 text-mlk" /> {t("s2d360.recommendationsTitle").replace("{count}", String(recommendations.length))}</CardTitle></CardHeader>
                   <CardContent className="space-y-2">
                     {recommendations.map((rec) => (
                       <div key={rec.recommendationId} className="rounded-md border border-mlk/20 bg-background/60 p-2.5">
@@ -324,14 +324,14 @@ export function S2D360Tab() {
                           <span className="text-xs font-medium">{rec.title}</span>
                           <div className="flex items-center gap-1">
                             <Badge variant="outline" className="text-[9px] border-mlk/40 text-mlk">{rec.type}</Badge>
-                            <StatusTag status={rec.status === "PENDING" ? "processing" : "success"} label={rec.status} />
+                            <StatusTag status={rec.status === "PENDING" ? "processing" : "success"} label={t(`s2d360.recStatus.${rec.status}`, rec.status)} />
                           </div>
                         </div>
                         <div className="text-[10px] text-muted-foreground">{rec.justification}</div>
                         <div className="flex gap-3 mt-1 text-[9px] text-muted-foreground">
-                          <span>Risk of acting: <span className="text-foreground">{rec.riskOfActing}</span></span>
-                          <span>Risk of not acting: <span className="text-foreground">{rec.riskOfNotActing}</span></span>
-                          <span>Approval: <span className="text-mlk font-medium">{rec.approvalLevel}</span></span>
+                          <span>{t("s2d360.riskOfActing")} <span className="text-foreground">{rec.riskOfActing}</span></span>
+                          <span>{t("s2d360.riskOfNotActing")} <span className="text-foreground">{rec.riskOfNotActing}</span></span>
+                          <span>{t("s2d360.approval")} <span className="text-mlk font-medium">{rec.approvalLevel}</span></span>
                         </div>
                       </div>
                     ))}
@@ -349,23 +349,23 @@ export function S2D360Tab() {
         <div className="flex items-center justify-between gap-2 flex-wrap">
           {/* §7.8: Deep link navigation — quick section access */}
           <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[10px] text-muted-foreground me-1">Jump to:</span>
+            <span className="text-[10px] text-muted-foreground me-1">{t("s2d360.jumpTo")}</span>
             {[
-              { label: "Overview", hash: "/overview" },
-              { label: "Analysis", hash: "/analysis" },
-              { label: "Forecast", hash: "/forecasting" },
-              { label: "Reporting", hash: "/reporting" },
-              { label: "Collection", hash: "/collection" },
-              { label: "Operations", hash: "/operations" },
+              { labelKey: "s2d360.sectionOverview", hash: "/overview" },
+              { labelKey: "s2d360.sectionAnalysis", hash: "/analysis" },
+              { labelKey: "s2d360.sectionForecast", hash: "/forecasting" },
+              { labelKey: "s2d360.sectionReporting", hash: "/reporting" },
+              { labelKey: "s2d360.sectionCollection", hash: "/collection" },
+              { labelKey: "s2d360.sectionOperations", hash: "/operations" },
             ].map((section) => (
               <button
-                key={section.label}
+                key={section.labelKey}
                 onClick={() => setDeepLink(section.hash)}
                 className={`px-2 py-0.5 rounded text-[9px] font-medium transition-colors ${
                   deepLink === section.hash ? "bg-mlk text-white" : "text-muted-foreground hover:bg-muted/60"
                 }`}
               >
-                {section.label}
+                {t(section.labelKey)}
               </button>
             ))}
           </div>
@@ -377,12 +377,12 @@ export function S2D360Tab() {
               onClick={() => setFullscreen(!fullscreen)}
             >
               <Maximize2 className="h-3 w-3" />
-              {fullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              {fullscreen ? t("s2d360.exitFullscreen") : t("s2d360.fullscreen")}
             </Button>
             <a href="/s2d-360/" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-mlk/30">
                 <ExternalLink className="h-3 w-3" />
-                Open in New Tab
+                {t("s2d360.openInNewTab")}
               </Button>
             </a>
           </div>
@@ -395,8 +395,8 @@ export function S2D360Tab() {
             <div className="absolute inset-0 flex items-center justify-center bg-muted/30 z-10">
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="h-6 w-6 animate-spin text-mlk" />
-                <span className="text-xs text-muted-foreground">Loading S2D-360 Intelligence Engine…</span>
-                <span className="text-[9px] text-muted-foreground/60">56 pages · 3.3MB bundle</span>
+                <span className="text-xs text-muted-foreground">{t("s2d360.loadingEngine")}</span>
+                <span className="text-[9px] text-muted-foreground/60">{t("s2d360.loadingBundle")}</span>
               </div>
             </div>
           )}
@@ -417,13 +417,13 @@ export function S2D360Tab() {
       <Card className="border-mlk/20">
         <CardContent className="p-2 text-[9px] text-muted-foreground flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-3">
-            <span>Engine: <strong className="text-foreground">v1.0.0</strong></span>
-            <span>Pages: <strong className="text-foreground">56</strong></span>
-            <span>Sections: <strong className="text-foreground">8</strong></span>
-            <span>Governance booleans: <strong className="text-foreground">22</strong></span>
-            <span>Validator scripts: <strong className="text-foreground">100+</strong></span>
+            <span>{t("s2d360.footerEngine")} <strong className="text-foreground">v1.0.0</strong></span>
+            <span>{t("s2d360.footerPages")} <strong className="text-foreground">56</strong></span>
+            <span>{t("s2d360.footerSections")} <strong className="text-foreground">8</strong></span>
+            <span>{t("s2d360.footerGovBooleans")} <strong className="text-foreground">22</strong></span>
+            <span>{t("s2d360.footerValidators")} <strong className="text-foreground">100+</strong></span>
           </div>
-          <span className="text-muted-foreground/60">Source: s2d-engine/src/S2D360Engine.clean.jsx</span>
+          <span className="text-muted-foreground/60">{t("s2d360.footerSource")}</span>
         </CardContent>
       </Card>
     </div>

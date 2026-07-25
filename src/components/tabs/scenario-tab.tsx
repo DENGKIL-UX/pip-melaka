@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Layers, Save, Upload, Download, RefreshCw, Trash2, Pin, Sliders } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { DUN_SUMMARY, DUN_COALITION_COUNTS } from "@/lib/dun-summary";
+import { useI18n } from "@/lib/i18n";
 
 interface Scenario {
   id: string;
@@ -35,6 +36,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function ScenarioTab() {
+  const { t } = useI18n();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -213,7 +215,7 @@ export function ScenarioTab() {
   };
 
   if (loading) {
-    return <Card className="border-mlk/20"><CardContent className="p-8 text-center text-muted-foreground animate-pulse">Loading scenarios…</CardContent></Card>;
+    return <Card className="border-mlk/20"><CardContent className="p-8 text-center text-muted-foreground animate-pulse">{t("scenario.loading")}</CardContent></Card>;
   }
 
   const pinnedCount = scenarios.filter(s => s.pinned).length;
@@ -227,22 +229,22 @@ export function ScenarioTab() {
           <div className="flex items-center gap-2">
             <Layers className="h-5 w-5 text-mlk" />
             <div>
-              <CardTitle className="text-base">Scenario Management — Sync, Share, Persist</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">Per archive: pip-scenario-sync-engine.js + pip-scenario-sharing.js. localStorage persistence.</p>
+              <CardTitle className="text-base">{t("scenario.title")}</CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("scenario.desc")}</p>
             </div>
           </div>
           <div className="flex gap-1">
-            <Button variant="outline" size="sm" className="text-xs" onClick={exportScenarios}><Download className="h-3 w-3 me-1" /> Export</Button>
-            <Button variant="outline" size="sm" className="text-xs"><Upload className="h-3 w-3 me-1" /> Import</Button>
-            <Button variant="outline" size="sm" className="text-xs"><Save className="h-3 w-3 me-1" /> New</Button>
+            <Button variant="outline" size="sm" className="text-xs" onClick={exportScenarios}><Download className="h-3 w-3 me-1" /> {t("scenario.export")}</Button>
+            <Button variant="outline" size="sm" className="text-xs"><Upload className="h-3 w-3 me-1" /> {t("scenario.import")}</Button>
+            <Button variant="outline" size="sm" className="text-xs"><Save className="h-3 w-3 me-1" /> {t("scenario.new")}</Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-mlk">{scenarios.length}</div><div className="text-[10px] text-muted-foreground">Total Scenarios</div></div>
-          <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-emerald-600">{activeCount}</div><div className="text-[10px] text-muted-foreground">Active</div></div>
-          <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-amber-600">{pinnedCount}</div><div className="text-[10px] text-muted-foreground">Pinned</div></div>
+          <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-mlk">{scenarios.length}</div><div className="text-[10px] text-muted-foreground">{t("scenario.kpiTotal")}</div></div>
+          <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-emerald-600">{activeCount}</div><div className="text-[10px] text-muted-foreground">{t("scenario.kpiActive")}</div></div>
+          <div className="rounded-md border p-3 text-center"><div className="text-2xl font-bold text-amber-600">{pinnedCount}</div><div className="text-[10px] text-muted-foreground">{t("scenario.kpiPinned")}</div></div>
         </div>
         <div className="space-y-2">
           {scenarios.map(s => (
@@ -250,20 +252,20 @@ export function ScenarioTab() {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Button variant="ghost" size="icon" className="h-5 w-5 p-0" onClick={() => togglePin(s.id)} aria-label="Toggle pin">
+                    <Button variant="ghost" size="icon" className="h-5 w-5 p-0" onClick={() => togglePin(s.id)} aria-label={t("scenario.togglePin")}>
                       <Pin className={`h-3 w-3 ${s.pinned ? "fill-mlk text-mlk" : "text-muted-foreground"}`} />
                     </Button>
                     <span className="text-sm font-medium">{s.name}</span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${STATUS_COLORS[s.workflow_status] || ""}`}>{s.workflow_status}</span>
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${STATUS_COLORS[s.workflow_status] || ""}`}>{t(`scenario.status.${s.workflow_status}`, s.workflow_status)}</span>
                   </div>
                   <div className="text-xs text-muted-foreground">{s.description}</div>
                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                    <Badge variant="outline" className="text-[9px]">{s.locality_count} localities</Badge>
-                    {s.tags.map(t => <Badge key={t} variant="outline" className="text-[8px] text-mlk border-mlk/20">{t}</Badge>)}
-                    <span className="text-[9px] text-muted-foreground">Updated {new Date(s.updated_at).toLocaleDateString()}</span>
+                    <Badge variant="outline" className="text-[9px]">{t("scenario.localities").replace("{count}", String(s.locality_count))}</Badge>
+                    {s.tags.map(tag => <Badge key={tag} variant="outline" className="text-[8px] text-mlk border-mlk/20">{tag}</Badge>)}
+                    <span className="text-[9px] text-muted-foreground">{t("scenario.updated").replace("{date}", new Date(s.updated_at).toLocaleDateString())}</span>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => deleteScenario(s.id)} aria-label="Delete scenario">
+                <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => deleteScenario(s.id)} aria-label={t("scenario.deleteScenario")}>
                   <Trash2 className="h-3 w-3 text-red-500" />
                 </Button>
               </div>
@@ -271,7 +273,7 @@ export function ScenarioTab() {
           ))}
         </div>
         <div className="mt-3 text-[10px] text-muted-foreground text-center">
-          Scenarios persist to localStorage (per archive's window.storage pattern). Export/Import for cross-device sync.
+          {t("scenario.persistNote")}
         </div>
       </CardContent>
     </Card>
@@ -279,22 +281,22 @@ export function ScenarioTab() {
       {/* §7.12: What-If Simulator — DYNAMIC projection with reactive sliders */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><Sliders className="h-4 w-4 text-mlk" /> What-If Simulator — Parameter Sliders</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><Sliders className="h-4 w-4 text-mlk" /> {t("scenario.simulatorTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {[
-              { label: "Turnout %", value: turnout, set: setTurnout, min: 40, max: 95, step: 1, unit: "%", color: "#C77B2C" },
-              { label: "Swing factor (PN→BN)", value: swingFactor, set: setSwingFactor, min: 0, max: 30, step: 1, unit: "%", color: "#0B3D91" },
-              { label: "DAP → MCA swing", value: dapToMca, set: setDapToMca, min: 0, max: 20, step: 1, unit: "%", color: "#E22926" },
-              { label: "DAP → MIC swing", value: dapToMic, set: setDapToMic, min: 0, max: 20, step: 1, unit: "%", color: "#a855f7" },
-              { label: "Youth turnout boost", value: youthBoost, set: setYouthBoost, min: 0, max: 25, step: 1, unit: "%", color: "#0ea5e9" },
-              { label: "Senior turnout boost", value: seniorBoost, set: setSeniorBoost, min: 0, max: 20, step: 1, unit: "%", color: "#f59e0b" },
-              { label: "Undecided voters", value: undecided, set: setUndecided, min: 0, max: 30, step: 1, unit: "%", color: "#6B7280" },
+              { labelKey: "scenario.paramTurnout", value: turnout, set: setTurnout, min: 40, max: 95, step: 1, unit: "%", color: "#C77B2C" },
+              { labelKey: "scenario.paramSwing", value: swingFactor, set: setSwingFactor, min: 0, max: 30, step: 1, unit: "%", color: "#0B3D91" },
+              { labelKey: "scenario.paramDapMca", value: dapToMca, set: setDapToMca, min: 0, max: 20, step: 1, unit: "%", color: "#E22926" },
+              { labelKey: "scenario.paramDapMic", value: dapToMic, set: setDapToMic, min: 0, max: 20, step: 1, unit: "%", color: "#a855f7" },
+              { labelKey: "scenario.paramYouth", value: youthBoost, set: setYouthBoost, min: 0, max: 25, step: 1, unit: "%", color: "#0ea5e9" },
+              { labelKey: "scenario.paramSenior", value: seniorBoost, set: setSeniorBoost, min: 0, max: 20, step: 1, unit: "%", color: "#f59e0b" },
+              { labelKey: "scenario.paramUndecided", value: undecided, set: setUndecided, min: 0, max: 30, step: 1, unit: "%", color: "#6B7280" },
             ].map((param, i) => (
               <div key={i}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium">{param.label}</span>
+                  <span className="text-xs font-medium">{t(param.labelKey)}</span>
                   <span className="text-xs font-mono font-bold" style={{ color: param.color }}>{param.value}{param.unit}</span>
                 </div>
                 <Slider
@@ -310,7 +312,7 @@ export function ScenarioTab() {
           </div>
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="rounded-md border border-mlk/20 p-2 text-center">
-              <div className="text-[10px] text-muted-foreground">Projected BN</div>
+              <div className="text-[10px] text-muted-foreground">{t("scenario.projectedBn")}</div>
               <div className="text-lg font-bold" style={{ color: "#0B3D91" }}>
                 {projection.bn}
                 {projection.uncertaintySeats > 0 && (
@@ -319,10 +321,10 @@ export function ScenarioTab() {
                   </span>
                 )}
               </div>
-              <div className="text-[9px] text-muted-foreground">seats</div>
+              <div className="text-[9px] text-muted-foreground">{t("scenario.seats")}</div>
             </div>
             <div className="rounded-md border border-mlk/20 p-2 text-center">
-              <div className="text-[10px] text-muted-foreground">Projected PH</div>
+              <div className="text-[10px] text-muted-foreground">{t("scenario.projectedPh")}</div>
               <div className="text-lg font-bold" style={{ color: "#E22926" }}>
                 {projection.ph}
                 {projection.uncertaintySeats > 0 && (
@@ -331,10 +333,10 @@ export function ScenarioTab() {
                   </span>
                 )}
               </div>
-              <div className="text-[9px] text-muted-foreground">seats</div>
+              <div className="text-[9px] text-muted-foreground">{t("scenario.seats")}</div>
             </div>
             <div className="rounded-md border border-mlk/20 p-2 text-center">
-              <div className="text-[10px] text-muted-foreground">Projected PN</div>
+              <div className="text-[10px] text-muted-foreground">{t("scenario.projectedPn")}</div>
               <div className="text-lg font-bold" style={{ color: "#019C2D" }}>
                 {projection.pn}
                 {projection.uncertaintySeats > 0 && (
@@ -343,12 +345,12 @@ export function ScenarioTab() {
                   </span>
                 )}
               </div>
-              <div className="text-[9px] text-muted-foreground">seats</div>
+              <div className="text-[9px] text-muted-foreground">{t("scenario.seats")}</div>
             </div>
           </div>
           {/* Visual seat distribution — stacked bar chart */}
           <div className="mt-4">
-            <div className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1.5">Seat Distribution (28 total)</div>
+            <div className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1.5">{t("scenario.seatDistribution")}</div>
             <div className="flex h-6 rounded-md overflow-hidden border border-border/40">
               <div
                 className="flex items-center justify-center text-[9px] font-bold text-white transition-all duration-300"
@@ -378,11 +380,11 @@ export function ScenarioTab() {
               <div style={{ width: `${(DUN_COALITION_COUNTS.PH / 28) * 100}%`, backgroundColor: "#E22926" }} />
               <div style={{ width: `${(DUN_COALITION_COUNTS.PN / 28) * 100}%`, backgroundColor: "#019C2D" }} />
             </div>
-            <div className="text-[8px] text-muted-foreground mt-0.5 text-center">↑ Projected · ↓ Baseline (PRN15)</div>
+            <div className="text-[8px] text-muted-foreground mt-0.5 text-center">{t("scenario.distributionLegend")}</div>
           </div>
           {/* Change indicator — shows base vs projected */}
           <div className="flex items-center justify-center gap-3 mt-3 text-[10px]">
-            <span className="text-muted-foreground">Base (PRN15): BN {DUN_COALITION_COUNTS.BN} / PH {DUN_COALITION_COUNTS.PH} / PN {DUN_COALITION_COUNTS.PN}</span>
+            <span className="text-muted-foreground">{t("scenario.baseLabel")} BN {DUN_COALITION_COUNTS.BN} / PH {DUN_COALITION_COUNTS.PH} / PN {DUN_COALITION_COUNTS.PN}</span>
             <span className="text-mlk font-semibold">→</span>
             <span className="font-semibold">
               <span style={{ color: "#0B3D91" }}>BN {projection.bn}</span>
@@ -408,17 +410,17 @@ export function ScenarioTab() {
                 setDapToMic(0);
               }}
             >
-              <RefreshCw className="h-3 w-3 me-1" /> Reset to defaults
+              <RefreshCw className="h-3 w-3 me-1" /> {t("scenario.reset")}
             </Button>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2">
-            <strong className="text-mlk">Realistic per-DUN model</strong> (grounded in ElectionData.MY candidate data):
-            PN→BN swing capped at 2 seats (only N11+N24 are PN-won).
-            DAP→MCA capped at 4 seats (only N16/N19/N20/N22 are DAP-won — MCA contests these urban Chinese seats).
-            DAP→MIC capped at 2 seats (MIC only contests Indian-majority DUNs like N07 Gadek, not all 28).
-            Uncertainty is asymmetric: parties at 0 seats can only go up.
-            {liveBaseline ? ` Baseline from ${liveBaseline.source}.` : " Baseline: PRN15 static data."}
-            Not a political prediction.
+            <strong className="text-mlk">{t("scenario.modelRealistic")}</strong> {t("scenario.modelDesc")}{" "}
+            {t("scenario.modelPnBn")}{" "}
+            {t("scenario.modelDapMca")}{" "}
+            {t("scenario.modelDapMic")}{" "}
+            {t("scenario.modelUncertainty")}
+            {liveBaseline ? t("scenario.baselineLive").replace("{source}", liveBaseline.source) : t("scenario.baselineStatic")}
+            {t("scenario.notPrediction")}
           </div>
         </CardContent>
       </Card>

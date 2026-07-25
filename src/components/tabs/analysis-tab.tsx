@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { TrendingUp, TrendingDown, PlusCircle, MinusCircle, Info, Star, WifiOff, Grid3x3 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Area, AreaChart, ComposedChart } from "recharts";
 import { DPT_FALLBACK } from "@/lib/fallback-data";
+import { useI18n } from "@/lib/i18n";
 
 interface DptData {
   evidence_tier: string;
@@ -36,6 +37,7 @@ function Kpi({ icon: Icon, label, value, color }: { icon: React.ComponentType<{ 
 }
 
 export function AnalysisTab() {
+  const { t } = useI18n();
   const [data, setData] = useState<DptData | null>(null);
   const [offline, setOffline] = useState(false);
 
@@ -61,30 +63,30 @@ export function AnalysisTab() {
       <Card className="border-mlk/20">
         <CardContent className="p-3 flex items-center gap-2 text-xs">
           <Info className="h-4 w-4 text-mlk" />
-          <span><strong className="text-mlk">Verified tier.</strong> {data.source}. {data.months.length} months of SPR DPT Pameran PDFs (Jan–May 2026).</span>
+          <span><strong className="text-mlk">{t("analysis.verifiedTier")}</strong> {data.source}. {t("analysis.sourceSummary").replace("{months}", String(data.months.length))}</span>
           {offline ? (
             <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
-              <WifiOff className="h-2.5 w-2.5" /> offline data
+              <WifiOff className="h-2.5 w-2.5" /> {t("analysis.offlineData")}
             </span>
           ) : (
-            <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk flex items-center gap-1"><Star className="h-2.5 w-2.5" /> Melaka unique feature</Badge>
+            <Badge variant="outline" className="ms-auto text-[9px] border-mlk/40 text-mlk flex items-center gap-1"><Star className="h-2.5 w-2.5" /> {t("analysis.uniqueFeature")}</Badge>
           )}
         </CardContent>
       </Card>
 
       {/* KPI row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <Kpi icon={PlusCircle} label="Additions (5 mo)" value={`+${data.total_additions.toLocaleString()}`} color="#16a34a" />
-        <Kpi icon={MinusCircle} label="Deletions (5 mo)" value={`−${data.total_deletions.toLocaleString()}`} color="#dc2626" />
-        <Kpi icon={TrendingUp} label="Net change" value={`+${data.total_net.toLocaleString()}`} color="#C77B2C" />
+        <Kpi icon={PlusCircle} label={t("analysis.kpiAdditions")} value={`+${data.total_additions.toLocaleString()}`} color="#16a34a" />
+        <Kpi icon={MinusCircle} label={t("analysis.kpiDeletions")} value={`−${data.total_deletions.toLocaleString()}`} color="#dc2626" />
+        <Kpi icon={TrendingUp} label={t("analysis.kpiNet")} value={`+${data.total_net.toLocaleString()}`} color="#C77B2C" />
       </div>
 
       {/* 5-month trend HEADLINE */}
       <Card className="border-mlk/30 bg-mlk-radial">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-mlk" /> 5-month DPT trend
-            <Badge className="text-[9px] bg-mlk text-white border-transparent ms-1">HEADLINE</Badge>
+            <TrendingUp className="h-4 w-4 text-mlk" /> {t("analysis.trendTitle")}
+            <Badge className="text-[9px] bg-mlk text-white border-transparent ms-1">{t("analysis.headline")}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -96,23 +98,25 @@ export function AnalysisTab() {
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip contentStyle={{ fontSize: 11 }} />
                 <Legend wrapperStyle={{ fontSize: 10 }} />
-                <ReferenceLine y={1000} stroke="#C77B2C" strokeDasharray="4 4" label={{ value: "1,000 net", fontSize: 9, fill: "#C77B2C" }} />
-                <Line type="monotone" dataKey="additions" name="Additions" stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="deletions" name="Deletions" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="net" name="Net" stroke="#C77B2C" strokeWidth={3} dot={{ r: 4 }} />
+                <ReferenceLine y={1000} stroke="#C77B2C" strokeDasharray="4 4" label={{ value: t("analysis.refLine1000"), fontSize: 9, fill: "#C77B2C" }} />
+                <Line type="monotone" dataKey="additions" name={t("analysis.legendAdditions")} stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="deletions" name={t("analysis.legendDeletions")} stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="net" name={t("analysis.legendNet")} stroke="#C77B2C" strokeWidth={3} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div className="text-[10px] text-muted-foreground mt-2">
-            Net additions remain positive across all 5 months — average MoM delta {data.per_month.reduce((s, m) => s + m.mom_delta, 0) / data.per_month.length}/mo.
-            Lowest net month: {data.per_month.reduce((a, b) => b.net < a.net ? b : a).month} ({Math.min(...data.per_month.map((m) => m.net))} net).
+            {t("analysis.trendNote")
+              .replace("{avg}", String(data.per_month.reduce((s, m) => s + m.mom_delta, 0) / data.per_month.length))
+              .replace("{month}", data.per_month.reduce((a, b) => b.net < a.net ? b : a).month)
+              .replace("{min}", String(Math.min(...data.per_month.map((m) => m.net))))}
           </div>
         </CardContent>
       </Card>
 
       {/* Per-parliament bar chart */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm">Per-parliament churn</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">{t("analysis.parlChurnTitle")}</CardTitle></CardHeader>
         <CardContent>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -122,9 +126,9 @@ export function AnalysisTab() {
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip contentStyle={{ fontSize: 11 }} />
                 <Legend wrapperStyle={{ fontSize: 10 }} />
-                <Bar dataKey="additions" name="Additions" fill="#16a34a" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="deletions" name="Deletions" fill="#dc2626" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="net" name="Net" fill="#C77B2C" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="additions" name={t("analysis.legendAdditions")} fill="#16a34a" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="deletions" name={t("analysis.legendDeletions")} fill="#dc2626" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="net" name={t("analysis.legendNet")} fill="#C77B2C" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -133,16 +137,16 @@ export function AnalysisTab() {
 
       {/* Per-parliament table */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm">Per-parliament breakdown</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">{t("analysis.parlBreakdownTitle")}</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-[10px]">Parliament</TableHead>
-                <TableHead className="text-[10px] text-right">Additions</TableHead>
-                <TableHead className="text-[10px] text-right">Deletions</TableHead>
-                <TableHead className="text-[10px] text-right">Net</TableHead>
-                <TableHead className="text-[10px] text-right">Churn ratio</TableHead>
+                <TableHead className="text-[10px]">{t("analysis.colParliament")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("analysis.colAdditions")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("analysis.colDeletions")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("analysis.colNet")}</TableHead>
+                <TableHead className="text-[10px] text-right">{t("analysis.colChurnRatio")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -167,7 +171,7 @@ export function AnalysisTab() {
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Grid3x3 className="h-4 w-4 text-mlk" /> Per-DUN churn (all 28 state constituencies)
+            <Grid3x3 className="h-4 w-4 text-mlk" /> {t("analysis.dunChurnTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -177,13 +181,13 @@ export function AnalysisTab() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-[10px]">DUN</TableHead>
-                      <TableHead className="text-[10px]">Parliament</TableHead>
-                      <TableHead className="text-[10px] text-right">Additions</TableHead>
-                      <TableHead className="text-[10px] text-right">Deletions</TableHead>
-                      <TableHead className="text-[10px] text-right">Net</TableHead>
-                      <TableHead className="text-[10px] text-right">Voters</TableHead>
-                      <TableHead className="text-[10px]">Status</TableHead>
+                      <TableHead className="text-[10px]">{t("analysis.colDun")}</TableHead>
+                      <TableHead className="text-[10px]">{t("analysis.colParliament")}</TableHead>
+                      <TableHead className="text-[10px] text-right">{t("analysis.colAdditions")}</TableHead>
+                      <TableHead className="text-[10px] text-right">{t("analysis.colDeletions")}</TableHead>
+                      <TableHead className="text-[10px] text-right">{t("analysis.colNet")}</TableHead>
+                      <TableHead className="text-[10px] text-right">{t("analysis.colVoters")}</TableHead>
+                      <TableHead className="text-[10px]">{t("analysis.colStatus")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -200,7 +204,7 @@ export function AnalysisTab() {
                         <TableCell className="text-[10px] text-right font-mono">{d.voters > 0 ? d.voters.toLocaleString() : "—"}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className={`text-[9px] ${d.verified ? "border-emerald-500/40 text-emerald-600" : "border-amber-500/40 text-amber-600"}`}>
-                            {d.verified ? "Verified" : "Est."}
+                            {d.verified ? t("analysis.badgeVerified") : t("analysis.badgeEst")}
                           </Badge>
                         </TableCell>
                       </TableRow>
@@ -209,11 +213,11 @@ export function AnalysisTab() {
                 </Table>
               </div>
               <div className="text-[9px] text-muted-foreground mt-2 italic">
-                P134 DUN churn is weighted by verified voter counts. P135–P139 churn is distributed equally across DUNs (estimate pending raw SPR data). 5 verified / 23 estimated.
+                {t("analysis.dunChurnNote")}
               </div>
             </>
           ) : (
-            <div className="text-xs text-muted-foreground p-4">No per-DUN data available.</div>
+            <div className="text-xs text-muted-foreground p-4">{t("analysis.noDunData")}</div>
           )}
         </CardContent>
       </Card>
@@ -222,9 +226,7 @@ export function AnalysisTab() {
         <CardContent className="p-3 text-[10px] text-muted-foreground flex items-start gap-2">
           <TrendingDown className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-mlk" />
           <div>
-            <strong className="text-mlk">Why this matters:</strong> Continuous positive net churn in P137 Hang Tuah Jaya (highest net {data.per_parliament.find((p) => p.parliament_code === "137")?.net}) suggests
-            urban in-migration; combined with the PRN15 BN landslide, indicates shifting voter base requiring re-canvass before GE16.
-            DUN-level churn data (above) enables targeted voter registration monitoring at the constituency level.
+            <strong className="text-mlk">{t("analysis.whyMattersLabel")}</strong> {t("analysis.whyMattersBody").replace("{net}", String(data.per_parliament.find((p) => p.parliament_code === "137")?.net ?? 0))}
           </div>
         </CardContent>
       </Card>
@@ -232,7 +234,7 @@ export function AnalysisTab() {
       {/* §7.4: Forecast extension with 95% confidence interval shading */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> DPT Forecast — 6-month projection with 95% CI</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> {t("analysis.forecastTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           {(() => {
@@ -263,33 +265,31 @@ export function AnalysisTab() {
                     <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
                     <Tooltip contentStyle={{ fontSize: 11 }} />
                     <Legend wrapperStyle={{ fontSize: 10 }} />
-                    {/* CI shading */}
-                    <Area dataKey="upper" stroke="none" fill="#C77B2C" fillOpacity={0.08} name="95% CI upper" />
-                    <Area dataKey="lower" stroke="none" fill="#C77B2C" fillOpacity={0.08} name="95% CI lower" />
+                    <Area dataKey="upper" stroke="none" fill="#C77B2C" fillOpacity={0.08} name={t("analysis.ciUpper")} />
+                    <Area dataKey="lower" stroke="none" fill="#C77B2C" fillOpacity={0.08} name={t("analysis.ciLower")} />
                     {/* Actual line */}
-                    <Line dataKey="actual" stroke="#C77B2C" strokeWidth={2} dot={{ r: 3 }} name="Actual net churn" connectNulls={false} />
+                    <Line dataKey="actual" stroke="#C77B2C" strokeWidth={2} dot={{ r: 3 }} name={t("analysis.actualNet")} connectNulls={false} />
                     {/* Forecast line (dashed) */}
-                    <Line dataKey="forecast" stroke="#0ea5e9" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} name="Forecast" connectNulls={false} />
-                    <ReferenceLine x="F+1" stroke="var(--border)" strokeDasharray="2 2" label={{ value: "Forecast →", position: "top", fontSize: 9, fill: "var(--muted-foreground)" }} />
+                    <Line dataKey="forecast" stroke="#0ea5e9" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} name={t("analysis.forecast")} connectNulls={false} />
+                    <ReferenceLine x="F+1" stroke="var(--border)" strokeDasharray="2 2" label={{ value: t("analysis.forecastArrow"), position: "top", fontSize: 9, fill: "var(--muted-foreground)" }} />
                   </ComposedChart>
                 </ResponsiveContainer>
                 <div className="grid grid-cols-3 gap-2 mt-3 text-[10px]">
                   <div className="rounded-md border border-mlk/20 p-2 text-center">
-                    <div className="text-muted-foreground">Avg monthly net</div>
+                    <div className="text-muted-foreground">{t("analysis.statAvgMonthlyNet")}</div>
                     <div className="text-lg font-bold text-mlk">+{Math.round(avgNet).toLocaleString()}</div>
                   </div>
                   <div className="rounded-md border border-mlk/20 p-2 text-center">
-                    <div className="text-muted-foreground">Std deviation</div>
+                    <div className="text-muted-foreground">{t("analysis.statStdDev")}</div>
                     <div className="text-lg font-bold text-amber-600">±{Math.round(stdDev).toLocaleString()}</div>
                   </div>
                   <div className="rounded-md border border-mlk/20 p-2 text-center">
-                    <div className="text-muted-foreground">6mo projected net</div>
+                    <div className="text-muted-foreground">{t("analysis.stat6moProjected")}</div>
                     <div className="text-lg font-bold text-emerald-600">+{Math.round(avgNet * 6).toLocaleString()}</div>
                   </div>
                 </div>
                 <div className="text-[9px] text-muted-foreground mt-2">
-                  Forecast uses simple linear extrapolation with widening 95% confidence interval (±1.96σ).
-                  Shaded area represents uncertainty range. Not a political prediction — purely demographic trend.
+                  {t("analysis.forecastNote")}
                 </div>
               </>
             );

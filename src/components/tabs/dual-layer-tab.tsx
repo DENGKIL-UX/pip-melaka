@@ -6,6 +6,7 @@ import { Layers3, Users, Signal, ShieldCheck } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { SENTIMENT, TREND, PLATFORMS } from "@/lib/s2d-contracts";
 import { SEED_LOCALITY_SIGNAL_MAP } from "@/lib/s2d-seed-data";
+import { useI18n } from "@/lib/i18n";
 
 // Real P134 locality intelligence (from engine data)
 const P134_LOCALITIES = [
@@ -23,6 +24,7 @@ const SENTIMENT_COLORS: Record<string, string> = {
 const PLATFORM_ICONS: Record<string, string> = { TIKTOK: "🎵", FACEBOOK: "📘", INSTAGRAM: "📷", THREADS: "🧵", NEWS: "📰", OTHER: "🔗" };
 
 export function DualLayerTab() {
+  const { t } = useI18n();
   return (
     <div className="space-y-3">
     <Card className="border-mlk/20">
@@ -30,9 +32,9 @@ export function DualLayerTab() {
         <div className="flex items-center gap-2">
           <Layers3 className="h-5 w-5 text-mlk" />
           <div>
-            <CardTitle className="text-base">Dual-Layer Locality Context — Population + Signal Fusion</CardTitle>
+            <CardTitle className="text-base">{t("dualLayer.title")}</CardTitle>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Per archive: pip-360-dual-layer-locality-context.js. Fuses engine demographics (Layer 1) with S2D signals (Layer 2) per locality.
+              {t("dualLayer.desc")}
             </p>
           </div>
         </div>
@@ -42,22 +44,22 @@ export function DualLayerTab() {
         <div className="flex items-center gap-4 mb-4 text-xs">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded bg-blue-500/30 border border-blue-500/40" />
-            <span className="text-muted-foreground">Layer 1: Population (Engine)</span>
+            <span className="text-muted-foreground">{t("dualLayer.legendLayer1")}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded bg-amber-500/30 border border-amber-500/40" />
-            <span className="text-muted-foreground">Layer 2: Signal (S2D)</span>
+            <span className="text-muted-foreground">{t("dualLayer.legendLayer2")}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded bg-mlk/30 border border-mlk/40" />
-            <span className="text-muted-foreground">Fusion (Dual-Layer)</span>
+            <span className="text-muted-foreground">{t("dualLayer.legendFusion")}</span>
           </div>
         </div>
 
         {/* Privacy notice */}
         <div className="rounded-md border border-emerald-500/20 bg-emerald-500/5 p-2.5 mb-4 text-[10px] text-muted-foreground">
           <ShieldCheck className="h-3 w-3 inline me-1 text-emerald-500" />
-          Privacy protections active: No targeting · No prediction · No voter preference inference · No election prediction · No individual targeting · No affiliation inference
+          {t("dualLayer.privacyNote")}
         </div>
 
         {/* Dual-layer locality cards */}
@@ -73,7 +75,7 @@ export function DualLayerTab() {
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5">N{loc.dun} {loc.dun_name} · P134 Masjid Tanah</div>
                 </div>
-                <Badge variant="outline" className="text-[9px]" style={{ color: SENTIMENT_COLORS[loc.sentiment], borderColor: "currentColor" }}>{loc.sentiment}</Badge>
+                <Badge variant="outline" className="text-[9px]" style={{ color: SENTIMENT_COLORS[loc.sentiment], borderColor: "currentColor" }}>{t(`dualLayer.sentiment.${loc.sentiment}`, loc.sentiment)}</Badge>
               </div>
 
               {/* Dual layers */}
@@ -82,12 +84,12 @@ export function DualLayerTab() {
                 <div className="p-3 bg-blue-500/5">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Users className="h-3 w-3 text-blue-500" />
-                    <span className="text-[10px] uppercase font-semibold text-blue-600">Layer 1: Population</span>
+                    <span className="text-[10px] uppercase font-semibold text-blue-600">{t("dualLayer.layer1Header")}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div><div className="text-[9px] text-muted-foreground">Voters</div><div className="font-mono font-bold">{loc.voters.toLocaleString()}</div></div>
-                    <div><div className="text-[9px] text-muted-foreground">Senior dep</div><div className={`font-mono font-bold ${loc.senior_pct >= 30 ? "text-red-600" : loc.senior_pct >= 25 ? "text-amber-600" : "text-emerald-600"}`}>{loc.senior_pct}%</div></div>
-                    <div><div className="text-[9px] text-muted-foreground">Readiness</div><div className="font-mono text-[10px]">{loc.senior_pct >= 30 ? "HIGH" : "PARTIAL"}</div></div>
+                    <div><div className="text-[9px] text-muted-foreground">{t("dualLayer.colVoters")}</div><div className="font-mono font-bold">{loc.voters.toLocaleString()}</div></div>
+                    <div><div className="text-[9px] text-muted-foreground">{t("dualLayer.colSeniorDep")}</div><div className={`font-mono font-bold ${loc.senior_pct >= 30 ? "text-red-600" : loc.senior_pct >= 25 ? "text-amber-600" : "text-emerald-600"}`}>{loc.senior_pct}%</div></div>
+                    <div><div className="text-[9px] text-muted-foreground">{t("dualLayer.colReadiness")}</div><div className="font-mono text-[10px]">{loc.senior_pct >= 30 ? t("dualLayer.readinessHigh") : t("dualLayer.readinessPartial")}</div></div>
                   </div>
                 </div>
 
@@ -95,46 +97,46 @@ export function DualLayerTab() {
                 <div className="p-3 bg-amber-500/5">
                   <div className="flex items-center gap-1.5 mb-2">
                     <Signal className="h-3 w-3 text-amber-500" />
-                    <span className="text-[10px] uppercase font-semibold text-amber-600">Layer 2: Signal</span>
+                    <span className="text-[10px] uppercase font-semibold text-amber-600">{t("dualLayer.layer2Header")}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div><div className="text-[9px] text-muted-foreground">Signals</div><div className="font-mono font-bold">{loc.signal_count}</div></div>
-                    <div><div className="text-[9px] text-muted-foreground">Narrative</div><div className="font-mono text-[10px] truncate">{loc.narrative}</div></div>
-                    <div><div className="text-[9px] text-muted-foreground">Platforms</div><div className="text-sm">{loc.platforms.map(p => PLATFORM_ICONS[p] || "").join(" ")}</div></div>
+                    <div><div className="text-[9px] text-muted-foreground">{t("dualLayer.colSignals")}</div><div className="font-mono font-bold">{loc.signal_count}</div></div>
+                    <div><div className="text-[9px] text-muted-foreground">{t("dualLayer.colNarrative")}</div><div className="font-mono text-[10px] truncate">{loc.narrative}</div></div>
+                    <div><div className="text-[9px] text-muted-foreground">{t("dualLayer.colPlatforms")}</div><div className="text-sm">{loc.platforms.map(p => PLATFORM_ICONS[p] || "").join(" ")}</div></div>
                   </div>
                 </div>
               </div>
 
               {/* Fusion insight */}
               <div className="p-2 bg-mlk/5 border-t border-mlk/20 text-[10px] text-muted-foreground">
-                <span className="text-mlk font-semibold">Fusion:</span>{" "}
+                <span className="text-mlk font-semibold">{t("dualLayer.fusionLabel")}</span>{" "}
                 {loc.senior_pct >= 30 && loc.sentiment === SENTIMENT.NEGATIVE
-                  ? "CRITICAL — High senior dependency + negative sentiment. Immediate action required."
+                  ? t("dualLayer.fusionCritical")
                   : loc.senior_pct >= 25 && loc.signal_count > 10
-                  ? "WARNING — Moderate senior dependency + active signal volume. Monitor closely."
+                  ? t("dualLayer.fusionWarning")
                   : loc.sentiment === SENTIMENT.POSITIVE
-                  ? "OPPORTUNITY — Positive sentiment. Amplification opportunity."
-                  : "STABLE — No immediate action required."}
+                  ? t("dualLayer.fusionOpportunity")
+                  : t("dualLayer.fusionStable")}
               </div>
             </div>
           ))}
         </div>
 
         <div className="mt-3 text-[10px] text-muted-foreground text-center">
-          5 of 368 P134 localities shown. Full dual-layer fusion available when all locality-intelligence.jsonl records are loaded.
+          {t("dualLayer.footerNote")}
         </div>
       </CardContent>
     </Card>
 
       {/* §7.16: Layer blending — opacity slider between two layers */}
       <Card className="border-mlk/20">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Layers3 className="h-4 w-4 text-mlk" /> Layer Blending — Demographics × Sentiment</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Layers3 className="h-4 w-4 text-mlk" /> {t("dualLayer.blendingTitle")}</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-mlk">Demographics Layer</span>
-              <span className="font-mono text-muted-foreground" id="blend-val">50% / 50%</span>
-              <span className="font-medium text-sky-600">Sentiment Layer</span>
+              <span className="font-medium text-mlk">{t("dualLayer.demographicsLayer")}</span>
+              <span className="font-mono text-muted-foreground" id="blend-val">{t("dualLayer.blendValue")}</span>
+              <span className="font-medium text-sky-600">{t("dualLayer.sentimentLayer")}</span>
             </div>
             <Slider defaultValue={[50]} min={0} max={100} step={5} className="w-full" aria-label="Layer blend opacity" />
             <div className="h-3 rounded-full overflow-hidden flex">
@@ -143,19 +145,18 @@ export function DualLayerTab() {
             </div>
             <div className="grid grid-cols-2 gap-2 mt-2">
               <div className="rounded-md border border-mlk/20 p-2">
-                <div className="text-[10px] text-muted-foreground mb-1">Top Demographic Signal</div>
-                <div className="text-xs font-semibold">Senior dependency 25.9% (N01)</div>
-                <div className="text-[9px] text-muted-foreground">WARNING threshold breached</div>
+                <div className="text-[10px] text-muted-foreground mb-1">{t("dualLayer.topDemoSignal")}</div>
+                <div className="text-xs font-semibold">{t("dualLayer.topDemoStat")}</div>
+                <div className="text-[9px] text-muted-foreground">{t("dualLayer.topDemoSub")}</div>
               </div>
               <div className="rounded-md border border-sky-500/20 p-2">
-                <div className="text-[10px] text-muted-foreground mb-1">Top Sentiment Signal</div>
-                <div className="text-xs font-semibold">Negative sentiment 45% (N05)</div>
-                <div className="text-[9px] text-muted-foreground">Trending on TikTok</div>
+                <div className="text-[10px] text-muted-foreground mb-1">{t("dualLayer.topSentimentSignal")}</div>
+                <div className="text-xs font-semibold">{t("dualLayer.topSentimentStat")}</div>
+                <div className="text-[9px] text-muted-foreground">{t("dualLayer.topSentimentSub")}</div>
               </div>
             </div>
             <div className="text-[9px] text-muted-foreground">
-              Slider controls the blend weight between demographic risk (amber) and sentiment signals (blue).
-              Adjust to focus on one layer or find correlations.
+              {t("dualLayer.blendNote")}
             </div>
           </div>
         </CardContent>

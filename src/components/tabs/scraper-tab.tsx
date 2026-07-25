@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Radar, Play, RefreshCw, Database, Filter, Globe2, TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { PLATFORMS } from "@/lib/s2d-contracts";
+import { useI18n } from "@/lib/i18n";
 
 const PLATFORM_ICONS: Record<string, string> = { TIKTOK: "🎵", FACEBOOK: "📘", INSTAGRAM: "📷", THREADS: "🧵", NEWS: "📰", OTHER: "🔗" };
 const PLATFORM_LABELS: Record<string, string> = { TIKTOK: "TikTok", FACEBOOK: "Facebook", INSTAGRAM: "Instagram", THREADS: "Threads", NEWS: "News", OTHER: "Other" };
@@ -36,6 +37,7 @@ interface CollectionRun {
 }
 
 export function ScraperTab() {
+  const { t } = useI18n();
   const [signals, setSignals] = useState<ScrapedSignal[]>([]);
   const [runs, setRuns] = useState<CollectionRun[]>([]);
   const [scraping, setScraping] = useState(false);
@@ -137,15 +139,14 @@ export function ScraperTab() {
             <div className="flex items-center gap-2">
               <Radar className="h-5 w-5 text-mlk" />
               <div>
-                <CardTitle className="text-base">Apify Social Media Scraper — Collection Pipeline (S2D-1A/1B/1C)</CardTitle>
+                <CardTitle className="text-base">{t("scraper.title")}</CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Per S2D Architecture: Apify → Signal → Normalise → Deduplicate → Evidence Store.
-                  Platforms: TikTok, Facebook, Instagram, Threads, News.
+                  {t("scraper.desc")}
                 </p>
               </div>
             </div>
             <Button onClick={scrapeAll} disabled={scraping} className="bg-mlk text-white hover:bg-mlk-amber-dark">
-              {scraping ? <><RefreshCw className="h-4 w-4 me-1 animate-spin" /> Scraping…</> : <><Play className="h-4 w-4 me-1" /> Run All Platforms</>}
+              {scraping ? <><RefreshCw className="h-4 w-4 me-1 animate-spin" /> {t("scraper.scraping")}</> : <><Play className="h-4 w-4 me-1" /> {t("scraper.runAll")}</>}
             </Button>
           </div>
         </CardHeader>
@@ -161,9 +162,9 @@ export function ScraperTab() {
                   <div className="text-lg font-bold text-mlk">{count}</div>
                   <div className="text-[10px] text-muted-foreground">{PLATFORM_LABELS[p]}</div>
                   <Button variant="ghost" size="sm" className="h-5 text-[9px] mt-1" onClick={() => runScrape(p)} disabled={scraping}>
-                    <Play className="h-2 w-2 me-0.5" /> Scrape
+                    <Play className="h-2 w-2 me-0.5" /> {t("scraper.scrapeBtn")}
                   </Button>
-                  {lastRun && <div className="text-[8px] text-muted-foreground/70 mt-0.5">Last: {new Date(lastRun.startedAt).toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" })}</div>}
+                  {lastRun && <div className="text-[8px] text-muted-foreground/70 mt-0.5">{t("scraper.lastRun")} {new Date(lastRun.startedAt).toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" })}</div>}
                 </div>
               );
             })}
@@ -172,11 +173,11 @@ export function ScraperTab() {
           {/* Collection runs history */}
           {runs.length > 0 && (
             <Card className="border-mlk/10 mb-4">
-              <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Database className="h-4 w-4 text-mlk" /> Collection Runs ({runs.length})</CardTitle></CardHeader>
+              <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Database className="h-4 w-4 text-mlk" /> {t("scraper.collectionRuns").replace("{count}", String(runs.length))}</CardTitle></CardHeader>
               <CardContent>
                 <div className="overflow-x-auto scrollbar-mlk">
                   <table className="w-full text-xs">
-                    <thead><tr className="border-b"><th className="text-start p-2">Run ID</th><th className="text-start p-2">Platform</th><th className="text-end p-2">Raw</th><th className="text-end p-2">Accepted</th><th className="text-end p-2">Dedup'd</th><th className="text-end p-2">Rejected</th><th className="text-start p-2">Status</th><th className="text-start p-2">Time</th></tr></thead>
+                    <thead><tr className="border-b"><th className="text-start p-2">{t("scraper.colRunId")}</th><th className="text-start p-2">{t("scraper.colPlatform")}</th><th className="text-end p-2">{t("scraper.colRaw")}</th><th className="text-end p-2">{t("scraper.colAccepted")}</th><th className="text-end p-2">{t("scraper.colDedup")}</th><th className="text-end p-2">{t("scraper.colRejected")}</th><th className="text-start p-2">{t("scraper.colStatus")}</th><th className="text-start p-2">{t("scraper.colTime")}</th></tr></thead>
                     <tbody>
                       {runs.slice(0, 10).map(r => (
                         <tr key={r.runId} className="border-b border-border/30 hover:bg-muted/30">
@@ -200,7 +201,7 @@ export function ScraperTab() {
           {/* Platform filter */}
           <div className="flex items-center gap-2 mb-3">
             <Filter className="h-3 w-3 text-muted-foreground" />
-            <button onClick={() => setPlatformFilter("ALL")} className={`px-2 py-0.5 rounded text-[10px] ${platformFilter === "ALL" ? "bg-mlk text-white" : "text-muted-foreground hover:bg-muted"}`}>All ({signals.length})</button>
+            <button onClick={() => setPlatformFilter("ALL")} className={`px-2 py-0.5 rounded text-[10px] ${platformFilter === "ALL" ? "bg-mlk text-white" : "text-muted-foreground hover:bg-muted"}`}>{t("scraper.allFilter").replace("{count}", String(signals.length))}</button>
             {Object.values(PLATFORMS).filter(p => p !== PLATFORMS.OTHER).map(p => (
               <button key={p} onClick={() => setPlatformFilter(p)} className={`px-2 py-0.5 rounded text-[10px] ${platformFilter === p ? "bg-mlk text-white" : "text-muted-foreground hover:bg-muted"}`}>
                 {PLATFORM_ICONS[p]} {PLATFORM_LABELS[p]} ({signals.filter(s => s.platform === p).length})
@@ -213,8 +214,8 @@ export function ScraperTab() {
             {filteredSignals.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 <Globe2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No signals collected yet.</p>
-                <p className="text-xs mt-1">Click "Run All Platforms" to start collection.</p>
+                <p className="text-sm">{t("scraper.noSignals")}</p>
+                <p className="text-xs mt-1">{t("scraper.noSignalsHint")}</p>
               </div>
             ) : (
               filteredSignals.map(s => (
@@ -224,14 +225,14 @@ export function ScraperTab() {
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-medium">{s.source.text}</div>
                       <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                        <span className="text-[9px] text-muted-foreground">by {s.source.authorLabel}</span>
+                        <span className="text-[9px] text-muted-foreground">{t("scraper.by").replace("{author}", s.source.authorLabel)}</span>
                         <Badge variant="outline" className="text-[9px]" style={{ color: SENTIMENT_COLORS[s.classification.sentimentLabel] || "#6B7280", borderColor: "currentColor" }}>{s.classification.sentimentLabel}</Badge>
                         <Badge variant="outline" className="text-[9px] text-mlk border-mlk/20">{s.classification.primaryIssue}</Badge>
                         {s.geography.dunCode && <Badge variant="outline" className="text-[9px] font-mono">N{s.geography.dunCode}</Badge>}
                         <span className="text-[9px] text-muted-foreground">
                           👁 {s.metrics.views.toLocaleString()} · ❤ {s.metrics.likes.toLocaleString()} · 💬 {s.metrics.comments.toLocaleString()} · 🔄 {s.metrics.shares.toLocaleString()}
                         </span>
-                        <span className="text-[9px] text-muted-foreground/70">Polarity: {s.classification.sentimentPolarity > 0 ? "+" : ""}{s.classification.sentimentPolarity}</span>
+                        <span className="text-[9px] text-muted-foreground/70">{t("scraper.polarity")} {s.classification.sentimentPolarity > 0 ? "+" : ""}{s.classification.sentimentPolarity}</span>
                         <span className="text-[9px] text-muted-foreground/70">{new Date(s.source.publishedAt).toLocaleDateString()}</span>
                       </div>
                       <div className="text-[8px] text-muted-foreground/50 mt-0.5 font-mono">{s.signalId} · {s.collectionRunId}</div>
@@ -243,10 +244,10 @@ export function ScraperTab() {
           </div>
 
           <div className="mt-3 text-[10px] text-muted-foreground text-center">
-            Per S2D-1A: Signal model with platform/source/metrics/classification/geography fields.
-            Per S2D-1B: Collection runs with raw/accepted/dedup'd/rejected counts.
-            Per S2D-1C: Deduplication via exact URL, text fingerprint, near-duplicate similarity.
-            Production: Set APIFY_API_TOKEN env var to enable live Apify collection. Sandbox: synthetic signals.
+            {t("scraper.noteS2D1A")}<br />
+            {t("scraper.noteS2D1B")}<br />
+            {t("scraper.noteS2D1C")}<br />
+            {t("scraper.noteProduction")}
           </div>
         </CardContent>
       </Card>
@@ -254,7 +255,7 @@ export function ScraperTab() {
       {/* §7.9: Sentiment trend chart */}
       <Card className="border-mlk/20">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> Sentiment Trend — 14-day rolling</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-mlk" /> {t("scraper.sentimentTrendTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
@@ -269,13 +270,13 @@ export function ScraperTab() {
               <XAxis dataKey="day" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
               <YAxis tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
               <Tooltip contentStyle={{ fontSize: 11 }} />
-              <Area dataKey="positive" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.3} name="Positive" />
-              <Area dataKey="neutral" stackId="1" stroke="#C77B2C" fill="#C77B2C" fillOpacity={0.3} name="Neutral" />
-              <Area dataKey="negative" stackId="1" stroke="#EF4444" fill="#EF4444" fillOpacity={0.3} name="Negative" />
+              <Area dataKey="positive" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.3} name={t("scraper.legendPositive")} />
+              <Area dataKey="neutral" stackId="1" stroke="#C77B2C" fill="#C77B2C" fillOpacity={0.3} name={t("scraper.legendNeutral")} />
+              <Area dataKey="negative" stackId="1" stroke="#EF4444" fill="#EF4444" fillOpacity={0.3} name={t("scraper.legendNegative")} />
             </AreaChart>
           </ResponsiveContainer>
           <div className="text-[9px] text-muted-foreground mt-2">
-            Synthetic data for demo. Production: populated from Apify collection runs with sentiment classification.
+            {t("scraper.trendNote")}
           </div>
         </CardContent>
       </Card>

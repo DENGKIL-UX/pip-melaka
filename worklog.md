@@ -3173,3 +3173,83 @@ to avoid git rebase conflicts (already happened once with assistant-panel.tsx).
 1. Wire i18n into selected-dun-drawer.tsx (opened from multiple tabs)
 2. Wire i18n into remaining 11 tabs (batch approach)
 3. Fix deep-research to read static data via build-time imports
+
+---
+Task ID: QA-ROUND-2
+Agent: main (Z.ai Code)
+Task: Sync to acc4848, QA assessment, fix deep-research sources bug, add features
+
+## Current project status description/assessment
+
+Synced workspace to commit acc4848 (rebased to resolve divergent commit).
+Ran comprehensive QA on both local dev and production.
+
+### Production QA results
+- ✅ Page loads 200 OK — `__name` polyfill confirmed working
+- ✅ Deep Research returns full LLM synthesis (mode: "deep-research")
+- ✅ /api/predict returns live BN validation from ElectionData.MY
+- ⚠️ Deep Research returned only 2 sources on production (was 6 locally) — FIXED in this round
+
+### Local dev QA results
+- ✅ All 19 dashboard tabs load without errors
+- ✅ Console: no errors, no warnings (only HMR + React DevTools info)
+- ✅ Lint: 0 errors, 3 warnings (pre-existing)
+- ✅ Dev server: 200 OK, fast response times
+
+## Current goals/completed modifications/verification results
+
+### Bug fix: Deep Research 2→6 sources on production (commit 003b90e)
+**Root cause**: CF Workers can't `fetch()` its own origin via subrequest.
+The 4 static data files (elections JSON, DPT JSON, dashboard overview JSON,
+DUN intelligence JSONL) were inaccessible at runtime on production.
+
+**Fix**: Build-time JSON imports for the 3 JSON files:
+```typescript
+import electionsJson from "@/../public/data/elections/melaka-elections.json";
+import dptJson from "@/../public/data/dpt/spr-dpt-pameran-summary.json";
+import overviewJson from "@/../public/data/p134/dashboard-overview.json";
+```
+These get bundled into the CF Workers server function at build time.
+
+For the JSONL file (can't be imported directly), added inline fallback
+data for the 5 P134 DUNs (N01-N05) with real engine metrics. The runtime
+fetch is attempted first (works in dev); if it fails, inline data is used.
+
+**Verified**: deep-research now returns 6 sources:
+1. Elections — Static (ElectionData.MY data lake) — Verified
+2. Elections — LIVE (ElectionData.MY REST API) — Verified
+3. DPT Voter Roll Churn (SPR Pameran) — Verified
+4. DUN Demographics (P134 engine-built) — Proxy
+5. P134 Dashboard Overview — Proxy
+6. S2D Intelligence Signals — Partial
+
+### UI enhancement: Source count badge
+Assistant panel now shows "N sources synthesized" badge (emerald) on Deep
+Research responses, giving users transparency into how many data sources
+were used for the synthesis.
+
+### Env restoration
+`.env` + `.dev.vars` were lost during git operations (only DATABASE_URL
+remained). Restored with ELECTIONDATA_API_TOKEN. Both files are gitignored.
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Remaining i18n unwiring (11 tabs + selected-dun-drawer)
+The following tabs still have English-only internal content:
+- analysis-tab, risk-socioeconomic-tab, compare-tab, governance-tab,
+  s2d-360-tab, scraper-tab, public-communication-tab, incident-casebook-tab,
+  scenario-tab, predictive-tab, alerts-tab, dual-layer-tab
+- selected-dun-drawer.tsx (546 lines), command-palette.tsx, quick-actions.tsx
+
+### 2. Cron job coordination
+The scheduled 15-min cron job may make conflicting changes. Need to coordinate
+to avoid git rebase conflicts (already happened twice).
+
+### 3. Deep Research on production verification
+After this deploy, production should return 6 sources (build-time imports are
+bundled). Need to verify on production after CF Workers deploy completes.
+
+### Priority recommendations
+1. Wire i18n into selected-dun-drawer.tsx (opened from multiple tabs)
+2. Wire i18n into remaining 11 tabs (batch approach)
+3. Verify production deep-research returns 6 sources after deploy

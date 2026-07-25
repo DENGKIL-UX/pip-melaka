@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { useI18n } from "@/lib/i18n";
 import { PARTY_COLORS, MLK_ACCENT } from "@/lib/party-colors";
 import { getDunName, PARLIAMENTS } from "@/lib/melaka-constants";
 import { DUN_SUMMARY, getDunByCode, type DunSummary } from "@/lib/dun-summary";
@@ -162,6 +163,7 @@ function ElectionResultCard({
 export function SelectedDunDrawer() {
   const selectedDun = useDashboardStore((s) => s.selectedDun);
   const setSelectedDun = useDashboardStore((s) => s.setSelectedDun);
+  const { t } = useI18n();
   const [dunRecord, setDunRecord] = useState<DunRecord | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -270,7 +272,7 @@ export function SelectedDunDrawer() {
               <button
                 onClick={() => setSelectedDun(null)}
                 className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-mlk hover:bg-mlk/10 transition-colors"
-                aria-label="Close drawer"
+                aria-label={t("drawer.close")}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -281,7 +283,7 @@ export function SelectedDunDrawer() {
               {loading && (
                 <div className="flex items-center justify-center h-32 text-muted-foreground gap-2 text-xs">
                   <Loader2 className="h-4 w-4 animate-spin text-mlk" />
-                  Loading DUN intelligence…
+                  {t("drawer.loading")}
                 </div>
               )}
 
@@ -296,17 +298,17 @@ export function SelectedDunDrawer() {
                         </Badge>
                         {isSwing && (
                           <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-mlk bg-mlk/10 px-1.5 py-0.5 rounded-full">
-                            <Repeat2 className="w-2.5 h-2.5" /> Swing
+                            <Repeat2 className="w-2.5 h-2.5" /> {t("drawer.swing")}
                           </span>
                         )}
                         {dunSummary.isMarginal && (
                           <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-red-600 dark:text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded-full">
-                            <AlertTriangle className="w-2.5 h-2.5" /> Marginal
+                            <AlertTriangle className="w-2.5 h-2.5" /> {t("drawer.marginal")}
                           </span>
                         )}
                         {dunSummary.isSafe && (
                           <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
-                            <ShieldAlert className="w-2.5 h-2.5" /> Safe
+                            <ShieldAlert className="w-2.5 h-2.5" /> {t("drawer.safe")}
                           </span>
                         )}
                       </div>
@@ -314,7 +316,7 @@ export function SelectedDunDrawer() {
                         {dunSummary.dunName}
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-1">
-                        {dunSummary.parliamentName} · {dunSummary.district} district
+                        {dunSummary.parliamentName} · {dunSummary.district} {t("drawer.district")}
                       </div>
                     </div>
                   )}
@@ -323,14 +325,14 @@ export function SelectedDunDrawer() {
                   {hasElectionData && dunSummary && (
                     <div>
                       <div className="text-[10px] uppercase tracking-wide text-mlk font-semibold mb-1.5 flex items-center gap-1">
-                        <Vote className="h-3 w-3" /> Election Results
+                        <Vote className="h-3 w-3" /> {t("drawer.electionResults")}
                       </div>
 
                       {/* PRN15 (most recent state election) */}
                       <div className="space-y-2">
                         <ElectionResultCard
-                          label="PRN15 · 2021 State Election"
-                          date="20 Nov 2021"
+                          label={t("drawer.prn15Label")}
+                          date={t("drawer.prn15Date")}
                           result={dunSummary.prn15}
                           isSwing={isSwing}
                           prevCoalition={dunSummary.ge14.coalition}
@@ -338,8 +340,8 @@ export function SelectedDunDrawer() {
 
                         {/* GE14 (2018) */}
                         <ElectionResultCard
-                          label="GE14 · 2018 General Election"
-                          date="9 May 2018"
+                          label={t("drawer.ge14Label")}
+                          date={t("drawer.ge14Date")}
                           result={dunSummary.ge14}
                           isSwing={false}
                         />
@@ -348,17 +350,17 @@ export function SelectedDunDrawer() {
                         {parliament && (
                           <div className="rounded-md border border-mlk/20 p-2.5 bg-background">
                             <div className="flex items-center justify-between gap-2 mb-1">
-                              <span className="text-[11px] font-semibold">GE15 · 2022 Parliament</span>
-                              <span className="text-[9px] text-muted-foreground">19 Nov 2022</span>
+                              <span className="text-[11px] font-semibold">{t("drawer.ge15Label")}</span>
+                              <span className="text-[9px] text-muted-foreground">{t("drawer.ge15Date")}</span>
                               <span
                                 className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
                                 style={{ backgroundColor: coalitionColor(parliament.ge15Winner) }}
                               >
-                                {parliament.ge15Winner} WON
+                                {parliament.ge15Winner} {t("drawer.ge15Won")}
                               </span>
                             </div>
                             <div className="text-[9px] text-amber-600 dark:text-amber-400 mb-1">
-                              ⚠ GE15 was federal-only — no DUN ballot. Showing parliament result.
+                              {t("drawer.ge15Note")}
                             </div>
                             <div className="text-[10px] text-muted-foreground">
                               P{parliament.code} {parliament.name} → {parliament.ge15Winner}
@@ -373,25 +375,25 @@ export function SelectedDunDrawer() {
                   {hasElectionData && dunSummary && (
                     <div>
                       <div className="text-[10px] uppercase tracking-wide text-mlk font-semibold mb-1.5 flex items-center gap-1">
-                        <BarChart3 className="h-3 w-3" /> Analytics
+                        <BarChart3 className="h-3 w-3" /> {t("drawer.analytics")}
                       </div>
                       <StatRow
                         icon={Trophy}
-                        label="Incumbent (PRN15)"
+                        label={t("drawer.incumbent")}
                         value={`${dunSummary.prn15.coalition} · ${dunSummary.prn15.party}`}
                         sub={dunSummary.prn15.candidate}
                         accent
                       />
                       <StatRow
                         icon={Vote}
-                        label="PRN15 margin of victory"
+                        label={t("drawer.prn15Margin")}
                         value={`${dunSummary.prn15.marginPct.toFixed(1)}pp`}
-                        sub={`${dunSummary.prn15.votes.toLocaleString()} votes · ${dunSummary.prn15.votesPct.toFixed(1)}% vote share`}
+                        sub={`${dunSummary.prn15.votes.toLocaleString()} ${t("drawer.votes")} · ${dunSummary.prn15.votesPct.toFixed(1)}% ${t("drawer.voteShare")}`}
                       />
                       {isSwing && (
                         <StatRow
                           icon={TrendingDown}
-                          label="Swing direction"
+                          label={t("drawer.swingDirection")}
                           value={`${dunSummary.ge14.coalition} → ${dunSummary.prn15.coalition}`}
                           sub={`GE14 ${dunSummary.ge14.coalition} won → PRN15 ${dunSummary.prn15.coalition} won`}
                           accent
@@ -399,12 +401,12 @@ export function SelectedDunDrawer() {
                       )}
                       <StatRow
                         icon={AlertTriangle}
-                        label="Seat classification"
+                        label={t("drawer.seatClassification")}
                         value={
-                          dunSummary.isMarginal ? "Marginal (<5pp)" :
-                          dunSummary.isSafe ? "Safe (>20pp)" : "Moderate (5-20pp)"
+                          dunSummary.isMarginal ? t("drawer.marginalClass") :
+                          dunSummary.isSafe ? t("drawer.safeClass") : t("drawer.moderateClass")
                         }
-                        sub={`Margin: ${dunSummary.prn15.marginPct.toFixed(1)}pp`}
+                        sub={`${t("drawer.margin")}: ${dunSummary.prn15.marginPct.toFixed(1)}pp`}
                       />
                     </div>
                   )}
@@ -413,36 +415,36 @@ export function SelectedDunDrawer() {
                   {hasDemographics && dunRecord && (
                     <div>
                       <div className="text-[10px] uppercase tracking-wide text-mlk font-semibold mb-1.5 flex items-center gap-1">
-                        <Users className="h-3 w-3" /> Demographics (P134 verified)
+                        <Users className="h-3 w-3" /> {t("drawer.demographicsP134")}
                       </div>
                       <StatRow
                         icon={Users}
-                        label="Total voters"
+                        label={t("drawer.totalVoters")}
                         value={dunRecord.metrics.total_voters.toLocaleString()}
-                        sub={`Profile completeness ${dunRecord.metrics.profile_completeness_score.toFixed(2)}%`}
+                        sub={`${t("drawer.profileCompleteness")} ${dunRecord.metrics.profile_completeness_score.toFixed(2)}%`}
                         accent
                       />
                       <StatRow
                         icon={Users}
-                        label="Male voters"
+                        label={t("drawer.maleVoters")}
                         value={`${dunRecord.metrics.male_voters.toLocaleString()} (${dunRecord.metrics.male_percent.toFixed(1)}%)`}
                       />
                       <StatRow
                         icon={Users}
-                        label="Female voters"
+                        label={t("drawer.femaleVoters")}
                         value={`${dunRecord.metrics.female_voters.toLocaleString()} (${dunRecord.metrics.female_percent.toFixed(1)}%)`}
                       />
                       <StatRow
                         icon={Heart}
-                        label="Senior dependency (56+)"
+                        label={t("drawer.seniorDependency")}
                         value={`${dunRecord.metrics.senior_dependency_percent.toFixed(1)}%`}
-                        sub={`${dunRecord.metrics.senior_voters_56_plus.toLocaleString()} of ${dunRecord.metrics.known_age_voters.toLocaleString()} known-age voters`}
+                        sub={`${dunRecord.metrics.senior_voters_56_plus.toLocaleString()} ${t("drawer.of")} ${dunRecord.metrics.known_age_voters.toLocaleString()} ${t("drawer.knownAgeVoters")}`}
                       />
                       <StatRow
                         icon={Scale}
-                        label="Gender balance score"
+                        label={t("drawer.genderBalanceScore")}
                         value={dunRecord.metrics.gender_balance_score.toFixed(2)}
-                        sub="100 = perfect male/female parity"
+                        sub={t("drawer.genderBalanceNote")}
                       />
 
                       {/* Senior dep tier badge */}
@@ -464,9 +466,9 @@ export function SelectedDunDrawer() {
                             />
                             <div>
                               <span className={`font-semibold ${seniorColor(dunRecord.metrics.senior_dependency_percent)}`}>
-                                {tier === "critical" ? "CRITICAL" : "WARNING"}
+                                {tier === "critical" ? t("drawer.critical") : t("drawer.warning")}
                               </span>{" "}
-                              — senior dependency {tier === "critical" ? "≥30%" : "≥25%"} threshold breached.
+                              — {t("drawer.seniorDependency")} {tier === "critical" ? "≥30%" : "≥25%"} {t("drawer.thresholdBreached")}
                             </div>
                           </div>
                         );
@@ -476,7 +478,7 @@ export function SelectedDunDrawer() {
                       {dunRecord.distributions?.age_band_counts && (
                         <div className="mt-3">
                           <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">
-                            Age band distribution
+                            {t("drawer.ageBandDistribution")}
                           </div>
                           <div className="space-y-1">
                             {Object.entries(dunRecord.distributions.age_band_counts)
@@ -500,7 +502,7 @@ export function SelectedDunDrawer() {
                               })}
                           </div>
                           <div className="text-[9px] text-muted-foreground mt-1">
-                            Dominant: {dunRecord.metrics.dominant_age_group} · Ethnicity: {dunRecord.metrics.dominant_ethnicity_group}
+                            {t("drawer.dominant")}: {dunRecord.metrics.dominant_age_group} · {t("drawer.ethnicity")}: {dunRecord.metrics.dominant_ethnicity_group}
                           </div>
                         </div>
                       )}
@@ -512,11 +514,9 @@ export function SelectedDunDrawer() {
                     <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2">
                       <ShieldAlert className="h-4 w-4 flex-shrink-0 mt-0.5" />
                       <div>
-                        <div className="font-semibold mb-0.5">Demographics pending</div>
+                        <div className="font-semibold mb-0.5">{t("drawer.demographicsPending")}</div>
                         <div>
-                          Only P134 DUNs (N01–N05) have verified demographics from the engine.
-                          P135–P139 (N06–N28) are pending raw SPR voter data.
-                          Election results above are fully verified from ElectionData.MY.
+                          {t("drawer.demographicsPendingDesc")}
                         </div>
                       </div>
                     </div>
@@ -526,12 +526,12 @@ export function SelectedDunDrawer() {
                   <div className="text-[9px] text-muted-foreground pt-2 border-t border-mlk/10">
                     <div className="flex items-center gap-1 mb-1">
                       <Building2 className="h-2.5 w-2.5" />
-                      Evidence tier: <span className="text-mlk">Verified</span> — ElectionData.MY ballot counts
+                      {t("drawer.evidenceTier")} <span className="text-mlk">{t("drawer.verified")}</span> — {t("drawer.electiondataBallotCounts")}
                     </div>
                     {hasDemographics && (
                       <div className="flex items-center gap-1">
                         <Users className="h-2.5 w-2.5" />
-                        Demographics: <span className="text-mlk">Engine P134</span> — 8/9 provenance gates closed
+                        {t("drawer.demographicsEngine")} <span className="text-mlk">{t("drawer.engineP134")}</span> — {t("drawer.gatesClosed")}
                       </div>
                     )}
                   </div>

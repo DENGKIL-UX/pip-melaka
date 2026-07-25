@@ -83,6 +83,12 @@ function AssistantBubble({ msg }: { msg: ChatMessage }) {
               <span className="truncate">{msg.source}</span>
             </Badge>
           )}
+          {msg.deep_research && msg.source_count && (
+            <Badge variant="outline" className="text-[9px] py-0 px-1.5 h-4 gap-0.5 border-emerald-500/40 text-emerald-600 dark:text-emerald-400">
+              <Sparkles className="h-2.5 w-2.5" />
+              {msg.source_count} sources synthesized
+            </Badge>
+          )}
         </div>
       )}
     </div>

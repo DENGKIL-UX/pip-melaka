@@ -17,6 +17,13 @@ import { rateLimit } from "@/lib/rate-limiter";
 import { circuitBreaker, CircuitOpenError } from "@/lib/circuit-breaker";
 import { cfChatCompletion, isCFConfigured, type CFChatMessage } from "@/lib/cloudflare-ai";
 
+// Build-time JSON imports — these get bundled into the server function,
+// eliminating the need for runtime fetch() to self-origin (which fails on
+// CF Workers due to subrequest-to-self limitations).
+import electionsJson from "@/../public/data/elections/melaka-elections.json";
+import dptJson from "@/../public/data/dpt/spr-dpt-pameran-summary.json";
+import overviewJson from "@/../public/data/p134/dashboard-overview.json";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -100,16 +107,16 @@ function election_type_label(t: string): string {
 async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
   const sources: DataSource[] = [];
 
-  // 1. Elections (Verified) — local static data
-  const el = (await fetchJson(baseUrl, "elections/melaka-elections.json")) as {
+  // 1. Elections (Verified) — build-time imported JSON (works on CF Workers)
+  const el = electionsJson as {
     elections?: Array<{
       id: string; name: string; date: string; headline_fact: string;
       parliament_summary?: Record<string, number> | null;
       dun_summary?: Record<string, number> | null;
     }>;
-  } | null;
-  if (el?.elections?.length) {
-    const content = el.elections.map((e) =>
+  };
+  if (el.elections?.length) {
+    const content = el.elections.map((e: any) =>
       `${e.id} (${e.date}): ${e.headline_fact}\n` +
       `  Parliament: ${JSON.stringify(e.parliament_summary ?? {})}\n` +
       `  DUN: ${JSON.stringify(e.dun_summary ?? {})}`
@@ -151,12 +158,12 @@ async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
     });
   }
 
-  // 2. DPT churn (Verified)
-  const dpt = (await fetchJson(baseUrl, "dpt/spr-dpt-pameran-summary.json")) as {
+  // 2. DPT churn (Verified) — build-time imported JSON
+  const dpt = dptJson as {
     total_additions?: number; total_deletions?: number; total_net?: number;
     per_parliament?: Array<{ parliament_code: string; parliament_name: string; additions: number; deletions: number; net: number }>;
-  } | null;
-  if (dpt) {
+  };
+  if (dpt.total_additions != null) {
     const content = `DPT Churn Jan-May 2026:\n` +
       `Total: +${dpt.total_additions} / -${dpt.total_deletions} / net +${dpt.total_net}\n` +
       `Per-parliament: ${(dpt.per_parliament ?? []).map((p) => `P${p.parliament_code} ${p.parliament_name}: +${p.additions}/-${p.deletions}/net+${p.net}`).join("; ")}`;
@@ -164,7 +171,8 @@ async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
   }
 
   // 3. DUN demographics (Proxy — engine-built P134)
-  const duns = (await fetchJsonl(baseUrl, "p134/dun-intelligence.jsonl")) as Array<{
+  // Try runtime fetch first (works in dev); fall back to inline data (production)
+  let duns = (await fetchJsonl(baseUrl, "p134/dun-intelligence.jsonl")) as Array<{
     geography?: { parliament_code?: string; dun_code?: string; dun_name?: string };
     metrics?: {
       total_voters?: number; male_voters?: number; female_voters?: number;
@@ -174,6 +182,17 @@ async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
       profile_completeness_score?: number;
     };
   }>;
+  // Fallback: inline DUN data (from P134 engine output) for production where
+  // fetch to self-origin fails on CF Workers
+  if (duns.length === 0) {
+    duns = [
+      { geography: { parliament_code: "134", dun_code: "01", dun_name: "Kuala Linggi" }, metrics: { total_voters: 15313, male_percent: 49.34, female_percent: 50.66, senior_dependency_percent: 25.92, gender_balance_score: 98.67, dominant_age_group: "30_39", dominant_ethnicity_group: "MELAYU" } },
+      { geography: { parliament_code: "134", dun_code: "02", dun_name: "Tanjung Bidara" }, metrics: { total_voters: 14723, male_percent: 50.12, female_percent: 49.88, senior_dependency_percent: 24.15, gender_balance_score: 99.52, dominant_age_group: "40_49", dominant_ethnicity_group: "MELAYU" } },
+      { geography: { parliament_code: "134", dun_code: "03", dun_name: "Ayer Limau" }, metrics: { total_voters: 13708, male_percent: 49.78, female_percent: 50.22, senior_dependency_percent: 27.70, gender_balance_score: 99.12, dominant_age_group: "50_55", dominant_ethnicity_group: "MELAYU" } },
+      { geography: { parliament_code: "134", dun_code: "04", dun_name: "Lendu" }, metrics: { total_voters: 13891, male_percent: 48.92, female_percent: 51.08, senior_dependency_percent: 22.41, gender_balance_score: 95.77, dominant_age_group: "21_29", dominant_ethnicity_group: "MELAYU" } },
+      { geography: { parliament_code: "134", dun_code: "05", dun_name: "Taboh Naning" }, metrics: { total_voters: 13780, male_percent: 49.56, female_percent: 50.44, senior_dependency_percent: 30.60, gender_balance_score: 95.80, dominant_age_group: "56_plus", dominant_ethnicity_group: "MELAYU" } },
+    ];
+  }
   if (duns.length > 0) {
     const content = duns.map((d) => {
       const g = d.geography ?? {}; const m = d.metrics ?? {};
@@ -182,11 +201,11 @@ async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
     sources.push({ name: "DUN Demographics (P134 engine-built)", tier: "Proxy", content });
   }
 
-  // 4. Dashboard overview (Proxy)
-  const overview = (await fetchJson(baseUrl, "p134/dashboard-overview.json")) as {
+  // 4. Dashboard overview (Proxy) — build-time imported JSON
+  const overview = overviewJson as {
     overview?: { metrics?: Record<string, number> };
-  } | null;
-  if (overview?.overview?.metrics) {
+  };
+  if (overview.overview?.metrics) {
     const m = overview.overview.metrics;
     const content = `P134 Overview: voters=${m.total_voters}, male=${m.male_voters}, female=${m.female_voters}, senior_dep=${m.senior_dependency_percent}%, gender_bal=${m.gender_balance_score}, completeness=${m.profile_completeness_score}%`;
     sources.push({ name: "P134 Dashboard Overview", tier: "Proxy", content });

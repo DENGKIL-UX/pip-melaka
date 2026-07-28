@@ -3739,3 +3739,64 @@ otherwise collapse when adjacent elements have no whitespace).
   left as English-only (operator-facing UI), matching the `aria-label` convention used
   elsewhere.
 - Cron job coordination: This batch did not conflict with any concurrent commits.
+
+---
+Task ID: QA-ROUND-3
+Agent: main (Z.ai Code)
+Task: Sync to cda9915, QA assessment, verify i18n across all tabs
+
+## Current project status description/assessment
+
+Synced workspace to commit cda9915 (all 12 remaining tabs i18n-wired).
+Ran comprehensive QA via agent-browser in BM mode.
+
+### QA Results (BM mode)
+- ✅ All 19 tab labels display in BM (Gambaran Keseluruhan, Peta 2D, etc.)
+- ✅ Risk+Socio tab: KRITIKAL/AMARAN/SELAMAT badges, Isyarat risiko per-DUN,
+  Panel sosioekonomi DOSM, Matriks Risiko 5×5 — all BM ✅
+- ✅ Governance tab: Aliran data, Pintu 9, PDPA Akta 709 — all BM ✅
+- ✅ S2D 360 tab: Enjin Kecerdasan S2D-360, Dinding identiti, Sempadan PIP — all BM ✅
+- ✅ Alerts tab: Amaran Operasi, Pemantauan Sistem Langsung, 11 kod amaran — all BM ✅
+- ✅ No console errors, no runtime errors
+- ✅ Lint: 0 errors, 3 warnings (pre-existing)
+- ✅ Dev server: 200 OK
+
+### Production verification
+- ✅ Deep Research returns 6 sources (build-time JSON imports working)
+- ✅ __name polyfill working (page loads 200 OK)
+- ✅ /api/predict returns live BN validation
+
+## Current goals/completed modifications/verification results
+
+All next-phase recommendations from QA Round 2 have been completed:
+1. ✅ Wire i18n into selected-dun-drawer.tsx (50 keys)
+2. ✅ Wire i18n into 11 remaining tabs (470 keys across 3 batches)
+3. ✅ Verify production deep-research returns 6 sources
+
+Full i18n coverage: all 19 dashboard tabs + landing page + drawer + onboarding.
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Remaining optional i18n (low priority)
+- command-palette.tsx (~10-15 strings) — operator-facing UI
+- quick-actions.tsx (~5-10 strings) — toolbar buttons
+- These are low-traffic overlay components; English-only is acceptable.
+
+### 2. Cron job coordination
+The scheduled 15-min cron job may make conflicting changes. Need to
+coordinate to avoid git rebase conflicts.
+
+### 3. Feature opportunities
+The platform is now feature-complete with:
+- 19 dashboard tabs with full i18n
+- 2D + 3D maps with enhanced visual effects
+- AI Assistant with Deep Research mode (6 sources, LLM synthesis)
+- What-If Simulator with realistic per-DUN model
+- ElectionData.MY live API integration
+- Full EN/BM language toggle
+
+Potential new features:
+- Export/share scenario projections as PDF
+- Historical election comparison timeline
+- Voter turnout heatmap overlay on 2D map
+- S2D signal alert notifications (WebSocket)

@@ -3800,3 +3800,46 @@ Potential new features:
 - Historical election comparison timeline
 - Voter turnout heatmap overlay on 2D map
 - S2D signal alert notifications (WebSocket)
+
+---
+Task ID: QA-ROUND-4
+Agent: main (Z.ai Code)
+Task: Sync to d68a269, QA assessment, add sparklines + voter density legend
+
+## Current project status description/assessment
+
+Synced to d68a269 (rebased to resolve cron job conflict). Platform is stable:
+- All 19 tabs with full i18n
+- Deep Research 6 sources on production
+- Lint: 0 errors, 3 warnings (pre-existing)
+- No console/runtime errors
+
+## Current goals/completed modifications/verification results
+
+### New features (commit 230ffbe)
+
+1. **KPI sparklines** (overview-tab.tsx)
+   - New Sparkline component: SVG polyline + last-point dot
+   - 5-point trend data per KPI card
+   - Voters trend: [68000 → 71415] (5-year growth)
+   - Localities trend: [340 → 368] (locality expansion)
+   - Amber for accent cards, slate for neutral, 70% opacity
+
+2. **Voter density gradient legend** (map-2d-tab.tsx)
+   - New 'Voter Density' section in bottom-right legend
+   - Gradient bar: blue (low) → amber (medium) → red (high)
+   - 3 new i18n keys (map.voterDensity, map.densityLow, map.densityHigh) EN+BM
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Remaining optional i18n (low priority)
+- command-palette.tsx, quick-actions.tsx — operator-facing UI
+
+### 2. Cron job coordination
+Still need to coordinate with the 15-min cron job to avoid rebase conflicts.
+
+### 3. Future feature opportunities
+- Export scenario projections as PDF
+- Historical election comparison timeline
+- Actual voter turnout heatmap data overlay (currently legend only)
+- S2D signal alert notifications (WebSocket)

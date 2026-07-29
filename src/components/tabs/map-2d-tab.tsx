@@ -873,6 +873,15 @@ export function Map2DTab() {
                   <span>{t("map.legendNoData")}</span>
                 </div>
               </div>
+              {/* Voter density gradient legend */}
+              <div className="mt-3 pt-2 border-t border-border/40">
+                <div className="text-[9px] text-muted-foreground mb-1">{t("map.voterDensity")}</div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[8px] text-muted-foreground">{t("map.densityLow")}</span>
+                  <div className="flex-1 h-2 rounded-full" style={{ background: "linear-gradient(90deg, #1e3a5f, #C77B2C, #ef4444)" }} />
+                  <span className="text-[8px] text-muted-foreground">{t("map.densityHigh")}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

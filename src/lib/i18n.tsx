@@ -160,6 +160,9 @@ const translations: Record<Locale, Record<string, string>> = {
     // Map legend
     "map.legendTitle": "Coalition",
     "map.legendNoData": "No Data",
+    "map.voterDensity": "Voter Density",
+    "map.densityLow": "Low",
+    "map.densityHigh": "High",
     "map.statsParliaments": "Parliaments",
     "map.statsDun": "DUN",
     "map.statsVoters": "voters",
@@ -1162,6 +1165,9 @@ const translations: Record<Locale, Record<string, string>> = {
     // Map legend
     "map.legendTitle": "Gabungan",
     "map.legendNoData": "Tiada Data",
+    "map.voterDensity": "Kepadatan Pengundi",
+    "map.densityLow": "Rendah",
+    "map.densityHigh": "Tinggi",
     "map.statsParliaments": "Parlimen",
     "map.statsDun": "DUN",
     "map.statsVoters": "pengundi",

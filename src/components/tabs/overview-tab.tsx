@@ -386,17 +386,23 @@ export function OverviewTab() {
         </div>
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions — enhanced with gradient hover + descriptions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { tab: "map-2d" as const, label: t("overview.viewMap"), icon: MapIcon },
-          { tab: "map-3d" as const, label: t("overview.view3D"), icon: Box },
-          { tab: "compare" as const, label: t("overview.viewCompare"), icon: ArrowLeftRight },
-          { tab: "s2d" as const, label: t("overview.viewS2D"), icon: Activity },
-        ].map(({ tab, label, icon: Icon }) => (
-          <Button key={tab} variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk h-auto py-3 flex flex-col gap-1" onClick={() => setActiveTab(tab)}>
-            <Icon className="h-5 w-5" />
-            <span className="text-xs">{label}</span>
+          { tab: "map-2d" as const, label: t("overview.viewMap"), icon: MapIcon, desc: "28 DUN boundaries", color: "#0ea5e9" },
+          { tab: "map-3d" as const, label: t("overview.view3D"), icon: Box, desc: "3D extruded map", color: "#C77B2C" },
+          { tab: "compare" as const, label: t("overview.viewCompare"), icon: ArrowLeftRight, desc: "3-way analysis", color: "#10B981" },
+          { tab: "s2d" as const, label: t("overview.viewS2d"), icon: Activity, desc: "9-phase loop", color: "#8B5CF6" },
+        ].map(({ tab, label, icon: Icon, desc, color }) => (
+          <Button
+            key={tab}
+            variant="outline"
+            className="border-mlk/30 hover:border-mlk/60 hover:bg-mlk/10 hover:text-mlk h-auto py-3 flex flex-col gap-1 group transition-all duration-200 hover:shadow-md"
+            onClick={() => setActiveTab(tab)}
+          >
+            <Icon className="h-5 w-5 transition-transform group-hover:scale-110" style={{ color }} />
+            <span className="text-xs font-medium">{label}</span>
+            <span className="text-[9px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">{desc}</span>
           </Button>
         ))}
       </div>

@@ -4279,3 +4279,68 @@ when doing large refactors here.
    (currently dead) — it's the last of the "future opportunities" from
    FEATURES-ROUND-1 still untouched.
 
+
+---
+Task ID: QA-ROUND-8
+Agent: main (Z.ai Code)
+Task: Sync to b00d80c, QA assessment, implement U3+U4 grouped nav
+
+## Current project status description/assessment
+
+Synced to commit b00d80c (SSR landing page fix). Platform is stable:
+- tsc: 0 errors ✅
+- lint: 0 errors, 3 warnings (pre-existing) ✅
+- Production SSR: 83KB landing page (was 10KB spinner) ✅
+- Counter values in SSR HTML: 6, 28, 3, 71,415 ✅
+- All 8 API routes working on production (no fs errors) ✅
+- Deep Research: 6 sources with LLM synthesis ✅
+- No console errors, no runtime errors ✅
+
+VLM-verified landing page: "real numbers displayed... 6 Parliaments, 28 DUN
+Seats, 71,415 verified voters... amber text highly readable... professional"
+
+## Current goals/completed modifications/verification results
+
+### U3+U4 — Grouped tab navigation + mobile dropdown (commit a5f7ce4)
+Replaced 19 flat tabs with 6 labeled groups:
+- **Overview** (1 tab)
+- **Maps** (2D Map, 3D Map)
+- **Elections** (Elections, Demographics, DPT Analysis, Compare)
+- **Intelligence** (S2D Console, S2D 360, Scraper, Insights, Predictive)
+- **Operations** (Public Comm, Incidents, Scenarios, Alerts, Dual-Layer)
+- **Governance** (Risk + Socio, Governance)
+
+Desktop: grouped tablist with group labels + vertical dividers
+Mobile: <select> dropdown with <optgroup> per group (replaces icon-only buttons)
+
+Styling details:
+- Group dividers: w-px h-5 bg-border/40
+- Group labels: text-[9px] uppercase tracking-wide text-muted-foreground/60
+- Mobile select: border-mlk/30 + amber focus styling
+- Compact tab sizing: px-2.5 py-1.5 text-xs with h-3.5 icons
+
+### All UX audit items status
+- U1 SSR counters: ✅ Fixed (b00d80c — removed mounted gate)
+- U2 WCAG contrast: ✅ Fixed (7b3fea4 — #A55A1F light / #E89B45 dark)
+- U3 Grouped nav: ✅ Fixed (a5f7ce4 — 6 groups with labels)
+- U4 Mobile nav: ✅ Fixed (a5f7ce4 — select dropdown with optgroups)
+- U5 Arrow-key tabs: ✅ Fixed (7b3fea4 — onKeyDown + roving tabindex)
+- U6 Empty states: Future (low priority)
+- U7-U9 Polish: Future (low priority)
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Remaining UX items (low priority)
+- U6: Wire EmptyState component into remaining 17 tabs
+- U7: Onboarding onComplete callback
+- U8: Landing/header density polish
+- U9: Inline glossary for acronyms
+
+### 2. CSS consolidation
+globals.css has duplicate definitions (.glass, .pulse-dot, etc.) —
+low priority, no functional impact.
+
+### 3. Future feature opportunities
+- S2D signal alert notifications (WebSocket)
+- PDF export of intelligence brief
+- Voter turnout heatmap with actual SPR data

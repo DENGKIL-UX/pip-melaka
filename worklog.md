@@ -4019,3 +4019,72 @@ The command palette's `keywords` field on each tab entry is still English-only (
 
 ### 3. No remaining i18n debt
 This was the final batch. All hardcoded English UI strings identified in the prior QA rounds (worklog entries QA-ROUND-3 through QA-ROUND-6) have been resolved.
+
+---
+Task ID: FEATURES-ROUND-1
+Agent: main (Z.ai Code)
+Task: Implement all 4 next-phase recommendations
+
+## Current project status description/assessment
+
+All 4 next-phase recommendations from QA Round 6 have been implemented:
+1. ✅ i18n into command-palette.tsx + quick-actions.tsx — i18n rollout 100% complete
+2. ✅ Voter density heatmap overlay on 2D map — real data, toggleable
+3. ✅ Scenario CSV export — downloads all parameters + projections
+4. ✅ Historical election comparison timeline — 3-column visual side-by-side
+
+## Current goals/completed modifications/verification results
+
+### 1. i18n complete (commit 2c7b747, subagent I18N-BATCH-4)
+- 21 new keys (cmd.* 11 + qa.* 10) in EN+BM
+- command-palette.tsx: search placeholder, section headings, empty state, hints
+- quick-actions.tsx: toolbar button labels via labelKey pattern
+- **Entire visible UI is now localizable** — landing, dashboard, all 19 tabs,
+  DUN drawer, onboarding, command palette, quick-action toolbar
+
+### 2. Voter density heatmap overlay (map-2d-tab.tsx)
+- New 'Voter density heatmap' layer in Map Layers panel (defaultOff)
+- When enabled: DUN boundaries colored by voter count from PRN15 data
+  - <8000 voters: dark blue (#1e3a5f, low density)
+  - 8000-12000: amber (#C77B2C, medium density)
+  - >12000: red (#ef4444, high density)
+- fillOpacity 0.75 for strong visual contrast
+- Matches the existing voter density gradient legend
+- Uses real DUN_SUMMARY prn15.votes data
+
+### 3. Scenario CSV export (scenario-tab.tsx)
+- 'Export CSV' button next to 'Reset to defaults'
+- Downloads all 7 slider values + projected BN/PH/PN seats + uncertainty
+- Includes baseline source + ISO timestamp
+- Filename: pip-mlk-scenario-{timestamp}.csv
+- Uses Blob + URL.createObjectURL pattern (client-side, no API needed)
+
+### 4. Election comparison timeline (elections-tab.tsx)
+- New card between HistoricalTrendsCard and election tabs
+- 3-column grid: GE14 / PRN15 / GE15 side-by-side
+- Each column: date, election ID, parliament stacked bar (proportional),
+  DUN stacked bar, headline fact
+- Party colors: BN blue, PH red, PN green
+- Quick visual comparison of coalition changes across 3 elections
+
+### Verification
+- Lint: 0 errors, 3 warnings (pre-existing)
+- 7 files changed, 305 insertions, 53 deletions
+
+## Unresolved issues / risks / next-phase recommendations
+
+### All originally recommended features are now implemented.
+The platform is feature-complete with:
+- 19 dashboard tabs with 100% i18n coverage (EN/BM)
+- 2D + 3D maps with enhanced visual effects + heatmap overlay
+- AI Assistant with Deep Research mode (6 sources, LLM synthesis)
+- What-If Simulator with realistic per-DUN model + CSV export
+- ElectionData.MY live API integration
+- Election comparison timeline
+- Full EN/BM language toggle across entire UI
+
+### Future opportunities (not yet started)
+- S2D signal alert notifications (WebSocket)
+- PDF export of full intelligence brief
+- BM-localized search keywords in command palette
+- Voter turnout heatmap with actual SPR turnout data (currently uses voter count as proxy)

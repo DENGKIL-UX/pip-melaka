@@ -1063,6 +1063,64 @@ export function ElectionsTab() {
       {/* Historical trends card — always visible at top */}
       <HistoricalTrendsCard />
 
+      {/* Election comparison timeline — visual side-by-side of 3 elections */}
+      <Card className="border-mlk/20 bg-mlk-radial">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <History className="h-4 w-4 text-mlk" /> {t("elections.comparisonTimeline", "Election Comparison Timeline")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {data.map((e) => {
+              const parl = e.parliament_summary;
+              const dun = e.dun_summary;
+              const totalParl = parl ? (parl.BN || 0) + (parl.PH || 0) + (parl.PN || 0) : 0;
+              const totalDun = dun ? (dun.BN || 0) + (dun.PH || 0) + (dun.PN || 0) : 0;
+              return (
+                <div key={e.id} className="rounded-lg border border-mlk/20 p-3 bg-background/50">
+                  <div className="text-[10px] font-mono text-muted-foreground mb-1">{e.date}</div>
+                  <div className="text-sm font-bold text-mlk mb-2">{e.id}</div>
+                  {parl && (
+                    <div className="mb-2">
+                      <div className="text-[9px] text-muted-foreground mb-1">Parliament ({totalParl})</div>
+                      <div className="flex h-3 rounded-sm overflow-hidden">
+                        <div style={{ width: `${((parl.BN || 0) / totalParl) * 100}%`, backgroundColor: "#0B3D91" }} title={`BN: ${parl.BN || 0}`} />
+                        <div style={{ width: `${((parl.PH || 0) / totalParl) * 100}%`, backgroundColor: "#E22926" }} title={`PH: ${parl.PH || 0}`} />
+                        <div style={{ width: `${((parl.PN || 0) / totalParl) * 100}%`, backgroundColor: "#019C2D" }} title={`PN: ${parl.PN || 0}`} />
+                      </div>
+                      <div className="flex justify-between text-[8px] mt-0.5">
+                        <span style={{ color: "#0B3D91" }}>BN {parl.BN || 0}</span>
+                        <span style={{ color: "#E22926" }}>PH {parl.PH || 0}</span>
+                        <span style={{ color: "#019C2D" }}>PN {parl.PN || 0}</span>
+                      </div>
+                    </div>
+                  )}
+                  {dun && (
+                    <div>
+                      <div className="text-[9px] text-muted-foreground mb-1">DUN ({totalDun})</div>
+                      <div className="flex h-3 rounded-sm overflow-hidden">
+                        <div style={{ width: `${((dun.BN || 0) / totalDun) * 100}%`, backgroundColor: "#0B3D91" }} title={`BN: ${dun.BN || 0}`} />
+                        <div style={{ width: `${((dun.PH || 0) / totalDun) * 100}%`, backgroundColor: "#E22926" }} title={`PH: ${dun.PH || 0}`} />
+                        <div style={{ width: `${((dun.PN || 0) / totalDun) * 100}%`, backgroundColor: "#019C2D" }} title={`PN: ${dun.PN || 0}`} />
+                      </div>
+                      <div className="flex justify-between text-[8px] mt-0.5">
+                        <span style={{ color: "#0B3D91" }}>BN {dun.BN || 0}</span>
+                        <span style={{ color: "#E22926" }}>PH {dun.PH || 0}</span>
+                        <span style={{ color: "#019C2D" }}>PN {dun.PN || 0}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-[9px] text-muted-foreground mt-2 italic truncate" title={e.headline_fact}>
+                    {e.headline_fact}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="PRN15">
         <TabsList className="w-full justify-start">
           {data.map((e) => <TabsTrigger key={e.id} value={e.id} className="text-xs">{e.id}</TabsTrigger>)}

@@ -394,8 +394,8 @@ export function ScenarioTab() {
               <span style={{ color: "#019C2D" }}>PN {projection.pn}</span>
             </span>
           </div>
-          {/* Reset button */}
-          <div className="flex justify-center mt-2">
+          {/* Reset + Export buttons */}
+          <div className="flex justify-center gap-2 mt-2">
             <Button
               variant="ghost"
               size="sm"
@@ -411,6 +411,40 @@ export function ScenarioTab() {
               }}
             >
               <RefreshCw className="h-3 w-3 me-1" /> {t("scenario.reset")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[10px] text-muted-foreground hover:text-mlk h-7"
+              onClick={() => {
+                const csv = [
+                  "Parameter,Value",
+                  `Turnout %,${turnout}`,
+                  `Swing factor (PN→BN) %,${swingFactor}`,
+                  `DAP→MCA swing %,${dapToMca}`,
+                  `DAP→MIC swing %,${dapToMic}`,
+                  `Youth turnout boost %,${youthBoost}`,
+                  `Senior turnout boost %,${seniorBoost}`,
+                  `Undecided voters %,${undecided}`,
+                  "",
+                  "Projection,Seats,Uncertainty",
+                  `BN,${projection.bn},±${projection.uncertaintySeats}`,
+                  `PH,${projection.ph},±${projection.uncertaintySeats}`,
+                  `PN,${projection.pn},±${projection.uncertaintySeats}`,
+                  "",
+                  `Baseline,${liveBaseline ? liveBaseline.source : "PRN15 static"}`,
+                  `Generated,${new Date().toISOString()}`,
+                ].join("\n");
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `pip-mlk-scenario-${Date.now()}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download className="h-3 w-3 me-1" /> Export CSV
             </Button>
           </div>
           <div className="text-[9px] text-muted-foreground mt-2">

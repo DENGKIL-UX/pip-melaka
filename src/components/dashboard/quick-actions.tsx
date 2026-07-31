@@ -8,43 +8,45 @@
  */
 import { Button } from "@/components/ui/button";
 import { Download, Filter, RefreshCw, Maximize2, Settings } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 import type { DashboardTab } from "@/stores/dashboard-store";
 
 interface QuickAction {
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  labelKey: string;
   handler?: () => void;
 }
 
 const TAB_ACTIONS: Partial<Record<DashboardTab, QuickAction[]>> = {
   "map-2d": [
-    { icon: Filter, label: "Layers" },
-    { icon: RefreshCw, label: "Reset" },
-    { icon: Maximize2, label: "Fullscreen" },
+    { icon: Filter, labelKey: "qa.layers" },
+    { icon: RefreshCw, labelKey: "qa.reset" },
+    { icon: Maximize2, labelKey: "qa.fullscreen" },
   ],
   "map-3d": [
-    { icon: RefreshCw, label: "Reset Camera" },
-    { icon: Maximize2, label: "Fullscreen" },
+    { icon: RefreshCw, labelKey: "qa.resetCamera" },
+    { icon: Maximize2, labelKey: "qa.fullscreen" },
   ],
   elections: [
-    { icon: Download, label: "Export CSV" },
-    { icon: Filter, label: "Filter" },
+    { icon: Download, labelKey: "qa.exportCsv" },
+    { icon: Filter, labelKey: "qa.filter" },
   ],
   overview: [
-    { icon: RefreshCw, label: "Refresh" },
-    { icon: Download, label: "Export" },
+    { icon: RefreshCw, labelKey: "qa.refresh" },
+    { icon: Download, labelKey: "qa.export" },
   ],
   demographics: [
-    { icon: Download, label: "Export" },
-    { icon: Settings, label: "Configure" },
+    { icon: Download, labelKey: "qa.export" },
+    { icon: Settings, labelKey: "qa.configure" },
   ],
   analysis: [
-    { icon: Download, label: "Export Report" },
-    { icon: Filter, label: "Filter" },
+    { icon: Download, labelKey: "qa.exportReport" },
+    { icon: Filter, labelKey: "qa.filter" },
   ],
 };
 
 export function QuickActions({ tab }: { tab: DashboardTab }) {
+  const { t } = useI18n();
   const actions = TAB_ACTIONS[tab] || [];
 
   if (actions.length === 0) return null;
@@ -55,14 +57,14 @@ export function QuickActions({ tab }: { tab: DashboardTab }) {
         const Icon = action.icon;
         return (
           <Button
-            key={action.label}
+            key={action.labelKey}
             variant="outline"
             size="sm"
             className="glass text-xs gap-1.5 h-8"
             onClick={action.handler}
           >
             <Icon className="w-3.5 h-3.5" />
-            {action.label}
+            {t(action.labelKey)}
           </Button>
         );
       })}
@@ -78,7 +80,7 @@ export function QuickActions({ tab }: { tab: DashboardTab }) {
         }}
       >
         <Download className="w-3.5 h-3.5" />
-        Export
+        {t("qa.export")}
       </Button>
     </div>
   );

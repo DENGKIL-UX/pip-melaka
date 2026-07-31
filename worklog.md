@@ -3930,3 +3930,92 @@ Still need to coordinate with the 15-min cron job to avoid rebase conflicts.
 - Historical election comparison timeline
 - Actual voter turnout heatmap data overlay (currently legend only)
 - S2D signal alert notifications (WebSocket)
+
+---
+Task ID: I18N-BATCH-4
+Agent: general-purpose sub agent
+Task: Wire i18n into the final 2 shared overlay components (command-palette + quick-actions) so their content translates EN<->BM when the language toggle is switched.
+
+## Current project status description/assessment
+
+Final batch of the i18n rollout. The 2 remaining operator-facing overlay components (`src/components/shared/command-palette.tsx` + `src/components/dashboard/quick-actions.tsx`) were the last hardcoded-English surfaces in the app. Both are now wired to the React Context i18n system at `src/lib/i18n.tsx`. With this batch closed, every visible UI surface across the platform (landing, dashboard, 19 tabs, DUN drawer, onboarding tour, command palette, quick-action toolbar) honours the EN<->BM language toggle.
+
+## Current goals/completed modifications/verification results
+
+### New translation keys added to `src/lib/i18n.tsx`
+Added to BOTH `en` and `ms` dictionaries, appended after the `dualLayer.*` namespace block:
+
+**Command palette (`cmd.*` -- 11 keys)**
+- `cmd.dialogAriaLabel`: "Command palette" / "Palet arahan"
+- `cmd.searchPlaceholder`: "Search tabs, parliaments, DUNs, keywords..." / "Cari tab, parlimen, DUN, kata kunci..."
+- `cmd.searchAriaLabel`: "Search commands" / "Cari arahan"
+- `cmd.noResults`: 'No results for "{query}"' / 'Tiada hasil untuk "{query}"'
+- `cmd.sectionNavigation`: "Navigation" / "Navigasi"
+- `cmd.sectionParliaments`: "Parliaments" / "Parlimen"
+- `cmd.votersUnit`: "voters" / "pengundi"
+- `cmd.pendingData`: "pending data" / "data tertangguh"
+- `cmd.footerNavigate`: "navigate" / "navigasi"
+- `cmd.footerSelect`: "select" / "pilih"
+- `cmd.footerClose`: "close" / "tutup"
+
+**Quick actions (`qa.*` -- 10 keys)**
+- `qa.layers`: "Layers" / "Lapisan"
+- `qa.reset`: "Reset" / "Set semula"
+- `qa.fullscreen`: "Fullscreen" / "Skrin penuh"
+- `qa.resetCamera`: "Reset Camera" / "Set semula kamera"
+- `qa.exportCsv`: "Export CSV" / "Eksport CSV"
+- `qa.filter`: "Filter" / "Tapis"
+- `qa.refresh`: "Refresh" / "Segarkan"
+- `qa.export`: "Export" / "Eksport"
+- `qa.configure`: "Configure" / "Konfigur"
+- `qa.exportReport`: "Export Report" / "Eksport Laporan"
+
+### `src/components/shared/command-palette.tsx`
+- Imported `useI18n` from `@/lib/i18n` and added `const { t } = useI18n();`
+- Tab labels: refactored `tabCommands` array field from `label: "Overview"` (hardcoded English) to `labelKey: "tab.overview"` (reference to existing `tab.*` namespace). Per the rules, tab names are already translated via `tab.*` keys, so reused those keys rather than duplicating under `cmd.*`. Resolved via `label: t(c.labelKey)` in the `tabItems` mapping. Added `t` to `useMemo` deps so labels re-resolve on locale change.
+- Parliament subtitle: `"voters"` -> `t("cmd.votersUnit")`, `"pending data"` -> `t("cmd.pendingData")`. District name + DUN count + "DUN" acronym left untranslated (proper nouns).
+- Dialog `aria-label="Command palette"` -> `aria-label={t("cmd.dialogAriaLabel")}`
+- Search input `placeholder` + `aria-label` -> `t("cmd.searchPlaceholder")` / `t("cmd.searchAriaLabel")`
+- Empty-state message: `No results for "{query}"` -> `t("cmd.noResults").replace("{query}", query)` (follows the existing pattern used by `pubcomm.evidenceCount`, `s2d360.signalFeedTitle`, etc.)
+- Section headers: `Navigation ({n})` / `Parliaments ({n})` -> `t("cmd.sectionNavigation")` / `t("cmd.sectionParliaments")` (count left as inline expression)
+- Footer kbd hint text: `navigate . select . close` -> `t("cmd.footerNavigate")` / `t("cmd.footerSelect")` / `t("cmd.footerClose")` (kbd glyphs arrows, enter, esc left as-is)
+- Left untouched: tab `keywords` strings (search index terms, not visible UI -- translating would require adding BM keyword variants, out of scope for "swap hardcoded strings for t() calls") and the local `const t = setTimeout(...)` binding inside the focus effect (pre-existing shadowing of the i18n `t` in that scope, no functional impact since the timeout ID is never used as a translator).
+
+### `src/components/dashboard/quick-actions.tsx`
+- Imported `useI18n` from `@/lib/i18n` and added `const { t } = useI18n();`
+- Refactored `QuickAction` interface field from `label: string` (English text) to `labelKey: string` (translation key) -- keeps `TAB_ACTIONS` as a module-level constant with key references resolved at render time.
+- All 10 hardcoded action labels mapped to `qa.*` keys (Layers/Reset/Fullscreen/Reset Camera/Export CSV/Filter/Refresh/Export/Configure/Export Report).
+- Render loop: `{action.label}` -> `{t(action.labelKey)}`; React `key` switched from `action.label` to `action.labelKey` for stability across locale changes.
+- Bottom "Export" dropdown button: visible text -> `t("qa.export")`. The `querySelector('[aria-label="Export"]')` integration hook left untouched (not a visible string, references external export buttons).
+- The tabs without quick-actions (s2d, s2d-360, scraper, public-comm, incidents, scenarios, predictive, insights, alerts, dual-layer, governance, compare, risk) are unchanged -- they return `null` early.
+
+### Verification
+- `bun run lint` -- **0 errors, 3 warnings (all pre-existing, unrelated to this batch)**:
+  - `src/app/layout.tsx:27` -- `react/no-danger` (pre-existing)
+  - `src/components/shared/data-table.tsx:71` -- `react-hooks/incompatible-library` (TanStack Table, pre-existing)
+  - `src/components/ui/chart.tsx:83` -- `react/no-danger` (pre-existing)
+- No new packages added.
+- No files other than `src/lib/i18n.tsx` + the 2 component files were touched.
+- Visual layout and functionality preserved -- only hardcoded strings swapped for `t()` calls.
+- Proper nouns preserved untranslated: party codes (BN/PH/PN), parliament codes (P134 etc.), DUN codes (N01-N28), place/district names (Jasin, Alor Gajah, Melaka Tengah, Taboh Naning, etc.), acronyms (DUN, DPT, S2D, KBD, KPI), tab names (reused existing `tab.*` namespace rather than duplicating).
+
+### i18n rollout status -- COMPLETE
+All visible UI surfaces now honour the EN<->BM language toggle:
+- Landing page (hero, trust section, metrics strip, footer)
+- Dashboard shell (header tooltips, language toggle)
+- All 19 dashboard tabs (overview, 2D/3D maps, elections, demographics, analysis, risk, compare, s2d, s2d-360, scraper, public-comm, incidents, scenarios, predictive, insights, alerts, dual-layer, governance)
+- DUN drawer (election results, swing/marginal/safe badges)
+- Onboarding tour (5-step intro overlay)
+- Command palette (this batch)
+- Quick actions toolbar (this batch)
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Search keyword localization (low priority, future enhancement)
+The command palette's `keywords` field on each tab entry is still English-only (`"home dashboard summary kpi"` etc.). These are search-index tokens used for fuzzy matching, not visible UI. If BM-first operators need to search using BM terms (e.g., "rumah" instead of "home"), a future enhancement could add localized keyword variants. Out of scope for this batch since translating visible strings was the directive.
+
+### 2. Number formatting locale (low priority, future enhancement)
+`p.totalVoters.toLocaleString()` in the parliament subtitle uses the runtime's default locale. On most browsers/environments this produces "71,415" (en-US grouping). For full BM consistency, this could be `p.totalVoters.toLocaleString(locale === "ms" ? "ms-MY" : "en-US")`. Minor cosmetic issue -- both locales use comma grouping for thousands.
+
+### 3. No remaining i18n debt
+This was the final batch. All hardcoded English UI strings identified in the prior QA rounds (worklog entries QA-ROUND-3 through QA-ROUND-6) have been resolved.

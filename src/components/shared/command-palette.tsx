@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Search, ArrowRight, LayoutDashboard, Map as MapIcon, Box, Vote, Users, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, Brain, Radar, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, ShieldCheck, Building2, ChevronRight } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { PARLIAMENTS } from "@/lib/melaka-constants";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type CommandKind = "tab" | "parliament";
@@ -24,36 +25,37 @@ export function CommandPalette() {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const { setActiveTab, setSelectedParliament, landed, setLanded } = useDashboardStore();
+  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const commands = useMemo<CommandItem[]>(() => {
-    const tabCommands: Array<{ id: DashboardTab; label: string; hint: string; icon: React.ComponentType<{ className?: string }>; keywords: string }> = [
-      { id: "overview", label: "Overview", hint: "Alt+1", icon: LayoutDashboard, keywords: "home dashboard summary kpi" },
-      { id: "map-2d", label: "2D Map", hint: "Alt+2", icon: MapIcon, keywords: "map leaflet choropleth dun grid" },
-      { id: "map-3d", label: "3D Map", hint: "Alt+3", icon: Box, keywords: "3d three.js extrusion timeline morph" },
-      { id: "elections", label: "Elections", hint: "Alt+4", icon: Vote, keywords: "ge14 prn15 ge15 election result bn ph pn swing" },
-      { id: "demographics", label: "Demographics", hint: "Alt+5", icon: Users, keywords: "voter age gender ethnicity engine pyramid" },
-      { id: "analysis", label: "DPT Analysis", hint: "Alt+6", icon: TrendingUp, keywords: "dpt churn additions deletions trend" },
-      { id: "risk", label: "Risk + Socioeconomic", hint: "Alt+7", icon: ShieldAlert, keywords: "risk senior dependency gini poverty dosm" },
-      { id: "compare", label: "Compare", hint: "Alt+8", icon: ArrowLeftRight, keywords: "compare vs parliament side by side" },
-      { id: "s2d", label: "S2D Console", hint: "Alt+9", icon: Activity, keywords: "s2d sensing deciding acting signal" },
-      { id: "s2d-360", label: "S2D 360", hint: "Alt+0", icon: Brain, keywords: "360 command centre signal monitoring sentiment narrative" },
-      { id: "scraper", label: "Scraper", hint: "", icon: Radar, keywords: "apify scraper tiktok facebook instagram threads collection" },
-      { id: "public-comm", label: "Public Comm", hint: "", icon: MessageSquare, keywords: "public communication response case evidence recommendation" },
-      { id: "incidents", label: "Incidents", hint: "", icon: AlertTriangle, keywords: "incident casebook checklist severity" },
-      { id: "scenarios", label: "Scenarios", hint: "", icon: Layers3, keywords: "scenario sync sharing persist localStorage" },
-      { id: "predictive", label: "Predictive", hint: "", icon: Sparkle, keywords: "predictive forecast 72h escalation risk scoring" },
-      { id: "insights", label: "Insights", hint: "", icon: FileText, keywords: "daily intelligence brief executive judgement outlook" },
-      { id: "alerts", label: "Alerts", hint: "", icon: Bell, keywords: "operational alert critical warning system health" },
-      { id: "dual-layer", label: "Dual-Layer", hint: "", icon: Layers3, keywords: "dual layer population signal fusion locality" },
-      { id: "governance", label: "Governance", hint: "Alt+-", icon: ShieldCheck, keywords: "provenance gate pdpa gap audit pipeline" },
+    const tabCommands: Array<{ id: DashboardTab; labelKey: string; hint: string; icon: React.ComponentType<{ className?: string }>; keywords: string }> = [
+      { id: "overview", labelKey: "tab.overview", hint: "Alt+1", icon: LayoutDashboard, keywords: "home dashboard summary kpi" },
+      { id: "map-2d", labelKey: "tab.map2d", hint: "Alt+2", icon: MapIcon, keywords: "map leaflet choropleth dun grid" },
+      { id: "map-3d", labelKey: "tab.map3d", hint: "Alt+3", icon: Box, keywords: "3d three.js extrusion timeline morph" },
+      { id: "elections", labelKey: "tab.elections", hint: "Alt+4", icon: Vote, keywords: "ge14 prn15 ge15 election result bn ph pn swing" },
+      { id: "demographics", labelKey: "tab.demographics", hint: "Alt+5", icon: Users, keywords: "voter age gender ethnicity engine pyramid" },
+      { id: "analysis", labelKey: "tab.analysis", hint: "Alt+6", icon: TrendingUp, keywords: "dpt churn additions deletions trend" },
+      { id: "risk", labelKey: "tab.risk", hint: "Alt+7", icon: ShieldAlert, keywords: "risk senior dependency gini poverty dosm" },
+      { id: "compare", labelKey: "tab.compare", hint: "Alt+8", icon: ArrowLeftRight, keywords: "compare vs parliament side by side" },
+      { id: "s2d", labelKey: "tab.s2d", hint: "Alt+9", icon: Activity, keywords: "s2d sensing deciding acting signal" },
+      { id: "s2d-360", labelKey: "tab.s2d360", hint: "Alt+0", icon: Brain, keywords: "360 command centre signal monitoring sentiment narrative" },
+      { id: "scraper", labelKey: "tab.scraper", hint: "", icon: Radar, keywords: "apify scraper tiktok facebook instagram threads collection" },
+      { id: "public-comm", labelKey: "tab.publicComm", hint: "", icon: MessageSquare, keywords: "public communication response case evidence recommendation" },
+      { id: "incidents", labelKey: "tab.incidents", hint: "", icon: AlertTriangle, keywords: "incident casebook checklist severity" },
+      { id: "scenarios", labelKey: "tab.scenarios", hint: "", icon: Layers3, keywords: "scenario sync sharing persist localStorage" },
+      { id: "predictive", labelKey: "tab.predictive", hint: "", icon: Sparkle, keywords: "predictive forecast 72h escalation risk scoring" },
+      { id: "insights", labelKey: "tab.insights", hint: "", icon: FileText, keywords: "daily intelligence brief executive judgement outlook" },
+      { id: "alerts", labelKey: "tab.alerts", hint: "", icon: Bell, keywords: "operational alert critical warning system health" },
+      { id: "dual-layer", labelKey: "tab.dualLayer", hint: "", icon: Layers3, keywords: "dual layer population signal fusion locality" },
+      { id: "governance", labelKey: "tab.governance", hint: "Alt+-", icon: ShieldCheck, keywords: "provenance gate pdpa gap audit pipeline" },
     ];
 
     const tabItems: CommandItem[] = tabCommands.map((c) => ({
       id: `tab-${c.id}`,
       kind: "tab" as const,
-      label: c.label,
+      label: t(c.labelKey),
       hint: c.hint,
       icon: c.icon,
       keywords: c.keywords,
@@ -70,7 +72,7 @@ export function CommandPalette() {
       id: `parl-${p.code}`,
       kind: "parliament" as const,
       label: `P${p.code} — ${p.name}`,
-      subtitle: `${p.district} · ${p.dunCount} DUN · ${p.totalVoters > 0 ? p.totalVoters.toLocaleString() + " voters" : "pending data"}`,
+      subtitle: `${p.district} · ${p.dunCount} DUN · ${p.totalVoters > 0 ? p.totalVoters.toLocaleString() + " " + t("cmd.votersUnit") : t("cmd.pendingData")}`,
       icon: Building2,
       keywords: `p${p.code} ${p.name} ${p.district} parliament`,
       action: () => {
@@ -84,7 +86,7 @@ export function CommandPalette() {
     }));
 
     return [...tabItems, ...parliamentItems];
-  }, [landed, setActiveTab, setSelectedParliament, setLanded]);
+  }, [landed, setActiveTab, setSelectedParliament, setLanded, t]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return commands;
@@ -164,7 +166,7 @@ export function CommandPalette() {
     <div
       className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4"
       role="dialog"
-      aria-label="Command palette"
+      aria-label={t("cmd.dialogAriaLabel")}
     >
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -180,9 +182,9 @@ export function CommandPalette() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tabs, parliaments, DUNs, keywords..."
+            placeholder={t("cmd.searchPlaceholder")}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-            aria-label="Search commands"
+            aria-label={t("cmd.searchAriaLabel")}
             role="combobox"
             aria-expanded="true"
             aria-controls="command-list"
@@ -200,14 +202,14 @@ export function CommandPalette() {
         >
           {filtered.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              No results for &quot;{query}&quot;
+              {t("cmd.noResults").replace("{query}", query)}
             </div>
           ) : (
             <>
               {tabs.length > 0 && (
                 <>
                   <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-2 py-1">
-                    Navigation ({tabs.length})
+                    {t("cmd.sectionNavigation")} ({tabs.length})
                   </div>
                   {tabs.map((cmd) => {
                     const idx = absoluteIndex(cmd);
@@ -248,7 +250,7 @@ export function CommandPalette() {
               {parls.length > 0 && (
                 <>
                   <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-2 py-1 mt-1">
-                    Parliaments ({parls.length})
+                    {t("cmd.sectionParliaments")} ({parls.length})
                   </div>
                   {parls.map((cmd) => {
                     const idx = absoluteIndex(cmd);
@@ -293,9 +295,9 @@ export function CommandPalette() {
         {/* Footer */}
         <div className="p-2 border-t border-border text-center">
           <span className="text-[10px] text-muted-foreground">
-            <kbd className="font-mono px-1 py-0.5 rounded border border-border bg-muted">↑↓</kbd> navigate ·{" "}
-            <kbd className="font-mono px-1 py-0.5 rounded border border-border bg-muted">↵</kbd> select ·{" "}
-            <kbd className="font-mono px-1 py-0.5 rounded border border-border bg-muted">esc</kbd> close
+            <kbd className="font-mono px-1 py-0.5 rounded border border-border bg-muted">↑↓</kbd> {t("cmd.footerNavigate")} ·{" "}
+            <kbd className="font-mono px-1 py-0.5 rounded border border-border bg-muted">↵</kbd> {t("cmd.footerSelect")} ·{" "}
+            <kbd className="font-mono px-1 py-0.5 rounded border border-border bg-muted">esc</kbd> {t("cmd.footerClose")}
           </span>
         </div>
       </div>

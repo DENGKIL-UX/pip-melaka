@@ -75,6 +75,7 @@ const LAYERS: LayerDef[] = [
   { id: "par", label: "Parlimen (6)", group: "electoral", defaultOn: true, color: "#f59e0b" },
   { id: "dun", label: "DUN (28)", group: "electoral", defaultOn: true, color: "#38bdf8" },
   { id: "choropleth", label: "Winner choropleth", group: "data", defaultOn: true, color: "#0B3D91" },
+  { id: "heatmap", label: "Voter density heatmap", group: "data", defaultOn: false, color: "#ef4444" },
   { id: "ge15", label: "GE15 parlimen", group: "data", defaultOn: false, color: "#019C2D" },
 ];
 
@@ -584,7 +585,7 @@ export function Map2DTab() {
     applyLayerVisibility();
   }, [applyLayerVisibility]);
 
-  // Update DUN choropleth colors when scenario or choropleth toggle changes.
+  // Update DUN choropleth colors when scenario, choropleth, or heatmap toggle changes.
   // Tooltips read scenarioRef.current (always up-to-date), so no re-bind needed here.
   useEffect(() => {
     const dunLayer = layerRefs.current.dun;
@@ -597,6 +598,22 @@ export function Map2DTab() {
         scenario === "PRN15" ? dunSum?.prn15.coalition :
         scenario === "GE14" ? dunSum?.ge14.coalition :
         null;
+
+      // Heatmap mode: color by voter density (total voters)
+      // Uses a blue→amber→red gradient based on voter count
+      if (layers.heatmap && dunSum) {
+        const voters = dunSum.prn15.votes || 0;
+        // Density thresholds: <8000=low(blue), 8000-12000=medium(amber), >12000=high(red)
+        let heatColor: string;
+        if (voters < 8000) heatColor = "#1e3a5f"; // low — dark blue
+        else if (voters < 12000) heatColor = "#C77B2C"; // medium — amber
+        else heatColor = "#ef4444"; // high — red
+        return {
+          fillColor: heatColor,
+          fillOpacity: 0.75,
+        };
+      }
+
       const color = layers.choropleth ? coalitionColor(winner) : "#38bdf8";
       return {
         fillColor: color,
@@ -609,7 +626,7 @@ export function Map2DTab() {
     if (ge15Layer && layers.ge15) {
       ge15Layer.bringToFront();
     }
-  }, [scenario, layers.choropleth]);
+  }, [scenario, layers.choropleth, layers.heatmap]);
 
   const toggle = (id: string) => {
     setLayers((prev) => ({ ...prev, [id]: !prev[id] }));

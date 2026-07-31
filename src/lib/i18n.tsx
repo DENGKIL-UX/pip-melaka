@@ -1032,6 +1032,31 @@ const translations: Record<Locale, Record<string, string>> = {
     "dualLayer.sentiment.NEGATIVE": "NEGATIVE",
     "dualLayer.sentiment.MIXED": "MIXED",
     "dualLayer.sentiment.INSUFFICIENT_EVIDENCE": "INSUFFICIENT_EVIDENCE",
+
+    // ─── Command palette (operator-facing overlay) ─────────────────────────
+    "cmd.dialogAriaLabel": "Command palette",
+    "cmd.searchPlaceholder": "Search tabs, parliaments, DUNs, keywords...",
+    "cmd.searchAriaLabel": "Search commands",
+    "cmd.noResults": "No results for \"{query}\"",
+    "cmd.sectionNavigation": "Navigation",
+    "cmd.sectionParliaments": "Parliaments",
+    "cmd.votersUnit": "voters",
+    "cmd.pendingData": "pending data",
+    "cmd.footerNavigate": "navigate",
+    "cmd.footerSelect": "select",
+    "cmd.footerClose": "close",
+
+    // ─── Quick actions (per-tab toolbar) ───────────────────────────────────
+    "qa.layers": "Layers",
+    "qa.reset": "Reset",
+    "qa.fullscreen": "Fullscreen",
+    "qa.resetCamera": "Reset Camera",
+    "qa.exportCsv": "Export CSV",
+    "qa.filter": "Filter",
+    "qa.refresh": "Refresh",
+    "qa.export": "Export",
+    "qa.configure": "Configure",
+    "qa.exportReport": "Export Report",
   },
 
   ms: {
@@ -2037,6 +2062,31 @@ const translations: Record<Locale, Record<string, string>> = {
     "dualLayer.sentiment.NEGATIVE": "NEGATIF",
     "dualLayer.sentiment.MIXED": "CAMPURAN",
     "dualLayer.sentiment.INSUFFICIENT_EVIDENCE": "BUKTI_TIDAK_MEMADAI",
+
+    // ─── Command palette (operator-facing overlay) ─────────────────────────
+    "cmd.dialogAriaLabel": "Palet arahan",
+    "cmd.searchPlaceholder": "Cari tab, parlimen, DUN, kata kunci...",
+    "cmd.searchAriaLabel": "Cari arahan",
+    "cmd.noResults": "Tiada hasil untuk \"{query}\"",
+    "cmd.sectionNavigation": "Navigasi",
+    "cmd.sectionParliaments": "Parlimen",
+    "cmd.votersUnit": "pengundi",
+    "cmd.pendingData": "data tertangguh",
+    "cmd.footerNavigate": "navigasi",
+    "cmd.footerSelect": "pilih",
+    "cmd.footerClose": "tutup",
+
+    // ─── Quick actions (per-tab toolbar) ───────────────────────────────────
+    "qa.layers": "Lapisan",
+    "qa.reset": "Set semula",
+    "qa.fullscreen": "Skrin penuh",
+    "qa.resetCamera": "Set semula kamera",
+    "qa.exportCsv": "Eksport CSV",
+    "qa.filter": "Tapis",
+    "qa.refresh": "Segarkan",
+    "qa.export": "Eksport",
+    "qa.configure": "Konfigur",
+    "qa.exportReport": "Eksport Laporan",
   },
 };
 

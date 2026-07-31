@@ -95,6 +95,16 @@ const TABS: Array<{ id: DashboardTab; label: string; i18nKey: string; icon: Reac
   { id: "governance", label: "Governance", i18nKey: "tab.governance", icon: ShieldCheck },
 ];
 
+// Tab groups for the grouped nav — U3 from UX audit
+const TAB_GROUPS: Array<{ label: string; ids: DashboardTab[] }> = [
+  { label: "Overview", ids: ["overview"] },
+  { label: "Maps", ids: ["map-2d", "map-3d"] },
+  { label: "Elections", ids: ["elections", "demographics", "analysis", "compare"] },
+  { label: "Intelligence", ids: ["s2d", "s2d-360", "scraper", "insights", "predictive"] },
+  { label: "Operations", ids: ["public-comm", "incidents", "scenarios", "alerts", "dual-layer"] },
+  { label: "Governance", ids: ["risk", "governance"] },
+];
+
 /**
  * FreshnessIndicator — shows "Updated Xh ago" relative to the build time
  * embedded by next.config.ts (NEXT_PUBLIC_BUILD_TIME). Client-only render
@@ -244,13 +254,37 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
 
         <Separator className="mb-4 bg-mlk/20" />
 
-        {/* Tab navigation — WAI-ARIA tablist with arrow-key navigation */}
+        {/* Tab navigation — grouped with labels (U3) + mobile dropdown (U4) */}
+        {/* Mobile: select dropdown for small screens */}
+        <div className="md:hidden mb-4">
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value as DashboardTab)}
+            className="w-full h-10 rounded-md border border-mlk/30 bg-card px-3 text-sm font-medium focus:border-mlk focus:outline-none focus:ring-1 focus:ring-mlk/20"
+            aria-label="Select dashboard section"
+          >
+            {TAB_GROUPS.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.ids.map((tabId) => {
+                  const tab = TABS.find((t) => t.id === tabId);
+                  if (!tab) return null;
+                  return (
+                    <option key={tabId} value={tabId}>
+                      {t(tab.i18nKey, tab.label)}
+                    </option>
+                  );
+                })}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+
+        {/* Desktop: grouped tablist with arrow-key navigation (U3 + U5) */}
         <nav
-          className="flex flex-wrap gap-1 mb-6"
+          className="hidden md:flex flex-wrap gap-1 mb-6"
           role="tablist"
           aria-label="Dashboard sections"
           onKeyDown={(e) => {
-            // WAI-ARIA tab pattern: ←/→ move focus between tabs
             if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
             e.preventDefault();
             const currentIdx = TABS.findIndex((tab) => tab.id === activeTab);
@@ -258,31 +292,40 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
             const dir = e.key === "ArrowRight" ? 1 : -1;
             const nextIdx = (currentIdx + dir + TABS.length) % TABS.length;
             setActiveTab(TABS[nextIdx].id);
-            // Focus the newly-active tab button
             const tablist = e.currentTarget;
             const buttons = tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]');
             buttons[nextIdx]?.focus();
           }}
         >
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                role="tab"
-                aria-selected={isActive}
-                tabIndex={isActive ? 0 : -1}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-xs sm:text-sm font-medium transition-all ${
-                  isActive ? "bg-mlk text-white shadow-md" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <Icon className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">{t(tab.i18nKey, tab.label)}</span>
-              </button>
-            );
-          })}
+          {TAB_GROUPS.map((group, gi) => (
+            <div key={group.label} className="flex items-center gap-1">
+              {gi > 0 && <div className="w-px h-5 bg-border/40 mx-0.5" />}
+              <span className="text-[9px] uppercase tracking-wide text-muted-foreground/60 px-1 select-none">
+                {group.label}
+              </span>
+              {group.ids.map((tabId) => {
+                const tab = TABS.find((t) => t.id === tabId);
+                if (!tab) return null;
+                const Icon = tab.icon;
+                const isActive = activeTab === tabId;
+                return (
+                  <button
+                    key={tabId}
+                    role="tab"
+                    aria-selected={isActive}
+                    tabIndex={isActive ? 0 : -1}
+                    onClick={() => setActiveTab(tabId)}
+                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                      isActive ? "bg-mlk text-white shadow-md" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{t(tab.i18nKey, tab.label)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* Quick action toolbar */}

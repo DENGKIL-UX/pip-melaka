@@ -3888,3 +3888,45 @@ Still need to coordinate with the 15-min cron job to avoid rebase conflicts.
 - Historical election comparison timeline
 - Actual voter turnout heatmap data overlay (currently legend only)
 - S2D signal alert notifications (WebSocket)
+
+---
+Task ID: QA-ROUND-6
+Agent: main (Z.ai Code)
+Task: Sync to f66f32f, QA assessment, fix 3D map dark mode styling
+
+## Current project status description/assessment
+
+Synced to commit f66f32f. Platform is stable:
+- All 19 tabs load without errors, no console errors
+- Predictive tab S2D-6B RAG bar chart confirmed (VLM: "Red, Amber/Orange, Green")
+- S2D 360 tab: engine content, daily brief, signal feed all visible
+- Lint: 0 errors, 3 warnings (pre-existing)
+
+## Current goals/completed modifications/verification results
+
+### Styling fix (commit 5852732)
+3D map dark mode visibility improved:
+- Canvas background: #0a0f1e → #1a2332 (matches 2D map brightening)
+- Seat summary + height legend overlays: bg-slate-950/90 → glass + border-mlk/30
+  (consistent with 2D map overlay styling, theme-aware)
+- All text-slate-400/500 → text-muted-foreground (adapts to light/dark)
+- Both overlays now use the glass class for consistent backdrop-blur
+
+### VLM verification
+- Predictive tab: "RAG colors clearly visible... Red, Amber/Orange, Green"
+- S2D-6B chart: "prominently visible... effectively color-coded"
+- No visual issues, broken elements, or empty areas detected
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. Remaining optional i18n (low priority)
+- command-palette.tsx, quick-actions.tsx — operator-facing UI
+
+### 2. Cron job coordination
+Still need to coordinate with the 15-min cron job to avoid rebase conflicts.
+
+### 3. Future feature opportunities
+- Export scenario projections as PDF
+- Historical election comparison timeline
+- Actual voter turnout heatmap data overlay (currently legend only)
+- S2D signal alert notifications (WebSocket)

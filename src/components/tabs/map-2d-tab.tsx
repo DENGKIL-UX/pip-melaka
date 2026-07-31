@@ -74,10 +74,16 @@ const LAYERS: LayerDef[] = [
   { id: "adm2", label: "Districts (3)", group: "boundary", defaultOn: true, color: "#7dd3fc" },
   { id: "par", label: "Parlimen (6)", group: "electoral", defaultOn: true, color: "#f59e0b" },
   { id: "dun", label: "DUN (28)", group: "electoral", defaultOn: true, color: "#38bdf8" },
-  { id: "choropleth", label: "Winner choropleth", group: "data", defaultOn: true, color: "#0B3D91" },
-  { id: "heatmap", label: "Voter density heatmap", group: "data", defaultOn: false, color: "#ef4444" },
   { id: "ge15", label: "GE15 parlimen", group: "data", defaultOn: false, color: "#019C2D" },
 ];
+
+// Style toggles — these don't have their own Leaflet layer; they modify
+// the DUN layer's style. Kept separate from LAYERS so applyLayerVisibility
+// doesn't try to add/remove them from the map.
+const STYLE_TOGGLES = [
+  { id: "choropleth", label: "Winner choropleth", defaultOn: true, color: "#0B3D91" },
+  { id: "heatmap", label: "Voter density heatmap", defaultOn: false, color: "#ef4444" },
+] as const;
 
 const SCENARIOS = ["PRN15", "GE14", "GE15"] as const;
 type Scenario = (typeof SCENARIOS)[number];
@@ -154,7 +160,10 @@ export function Map2DTab() {
   const mapRef = useRef<any>(null);
   const layerRefs = useRef<Record<string, any>>({});
   const [layers, setLayers] = useState<Record<string, boolean>>(
-    Object.fromEntries(LAYERS.map((l) => [l.id, l.defaultOn])),
+    Object.fromEntries([
+      ...LAYERS.map((l) => [l.id, l.defaultOn]),
+      ...STYLE_TOGGLES.map((s) => [s.id, s.defaultOn]),
+    ]),
   );
   const [panelOpen, setPanelOpen] = useState(true);
   const [scenario, setScenario] = useState<Scenario>("PRN15");
@@ -246,7 +255,9 @@ export function Map2DTab() {
     scenarioRef.current = scenario;
   }, [scenario]);
 
-  // Stable callback for applying layer visibility
+  // Stable callback for applying layer visibility — ONLY for real Leaflet
+  // layers (adm1, adm2, par, dun, ge15). Style toggles (choropleth, heatmap)
+  // are handled separately by the style-update useEffect.
   const applyLayerVisibility = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -517,7 +528,10 @@ export function Map2DTab() {
           },
         });
         layerRefs.current.dun = dunLayer;
-        layerRefs.current.choropleth = dunLayer; // same layer, choropleth is a style toggle
+        // NOTE: choropleth and heatmap are STYLE toggles, not separate layers.
+        // They modify the DUN layer's style via the style-update useEffect.
+        // Do NOT set layerRefs.current.choropleth = dunLayer (caused the bug
+        // where toggling choropleth off would remove the DUN layer entirely).
 
         // ─── GE15 parlimen layer (separate overlay) ───────────────────────
         const ge15Layer = L.geoJSON(parData as any, {
@@ -812,7 +826,7 @@ export function Map2DTab() {
                 <span className="text-xs font-semibold flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5 text-mlk" />
                   Map Layers
-                  <Badge variant="outline" className="text-[9px] ml-1">{activeCount}/{LAYERS.length}</Badge>
+                  <Badge variant="outline" className="text-[9px] ml-1">{activeCount}/{LAYERS.length + STYLE_TOGGLES.length}</Badge>
                 </span>
                 <Button
                   variant="ghost"
@@ -845,8 +859,27 @@ export function Map2DTab() {
                       <Badge variant="outline" className="text-[8px]">{layer.group}</Badge>
                     </label>
                   ))}
-                  <div className="mt-2 pt-2 border-t border-border text-[9px] text-muted-foreground">
-                    Tip: toggle <strong className="text-mlk">Winner choropleth</strong> to color DUN by coalition
+                  {/* Style toggles — modify DUN layer style, not visibility */}
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <div className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1">Style Overlays</div>
+                    {STYLE_TOGGLES.map((toggleDef) => (
+                      <label
+                        key={toggleDef.id}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/50 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={layers[toggleDef.id]}
+                          onChange={() => toggle(toggleDef.id)}
+                          className="rounded"
+                        />
+                        <span
+                          className="w-3 h-3 rounded-sm border border-black/20"
+                          style={{ backgroundColor: toggleDef.color }}
+                        />
+                        <span className="text-xs flex-1">{toggleDef.label}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
               )}

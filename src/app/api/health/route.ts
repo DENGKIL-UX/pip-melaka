@@ -1,16 +1,22 @@
-// PIP-MLK Health Check — main endpoint.
-// ---------------------------------------
-// GET /api/health returns an aggregate health report:
+// PIP-MLK Health Check — main endpoint (Cloudflare-Workers compatible).
+// --------------------------------------------------------------------
+// GET /api/health returns an aggregate health report.
 //
+// IMPORTANT — no Node `fs` at runtime: the deploy target is Cloudflare
+// Workers, where the `unenv` polyfill throws "fs.X is not implemented yet!".
+// So all data integrity is verified via BUILD-TIME JSON imports (bundled into
+// the worker), and the Prisma/DB check was removed (the app is static-JSON
+// based; there is no database on the serverless runtime).
+//
+// Response:
 //   {
 //     "status":      "healthy" | "degraded" | "unhealthy",
 //     "uptime":      seconds since process start,
-//     "version":     app version (from package.json or env),
+//     "version":     app version (build-time injected),
 //     "requestId":   correlation ID for this probe,
 //     "checks": {
-//       "database": { "status": ..., "latencyMs": ..., "detail": ... },
-//       "engine":   { "status": ..., "detail": ... },
-//       "memory":   { "status": ..., "rssMb": ..., "heapUsedMb": ... }
+//       "data":   { "status": ..., "detail": ... },   // critical
+//       "memory": { "status": ..., "rssMb": ..., ... }
 //     }
 //   }
 //
@@ -19,14 +25,14 @@
 //   - Non-critical check failed → "degraded"  (HTTP 200)
 //   - Critical check failed     → "unhealthy" (HTTP 503)
 //
-// Critical checks: database (a hard dependency for any stateful operation).
-// Non-critical: engine (read-only data files), memory (warn-only).
+// Critical check: data (the engine-built JSON the whole app reads).
 
 import { NextResponse } from "next/server";
-import { promises as fs } from "node:fs";
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { db } from "@/lib/db";
+// Build-time imports — bundled, no runtime fs. (Pattern proven in
+// src/app/api/deep-research/route.ts, which works on Workers.)
+import overviewJson from "@/../public/data/p134/dashboard-overview.json";
+import electionsJson from "@/../public/data/elections/melaka-elections.json";
+import socioeconomicJson from "@/../public/data/socioeconomic/melaka-dosm.json";
 import { logger } from "@/lib/logger";
 import { getMetrics } from "@/lib/metrics";
 import { withRequestId, getRequestId } from "@/lib/request-id";
@@ -35,19 +41,14 @@ import { startSpan, endRouteSpan } from "@/lib/tracing";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// ---------------------------------------------------------------------------
-// App version — read once at module init.
-// ---------------------------------------------------------------------------
-
+// App version — injected at build time (next.config.ts reads package.json via
+// fs at BUILD time, where fs is available, and exposes NEXT_PUBLIC_APP_VERSION).
 function readAppVersion(): string {
-  if (process.env.PIP_MLK_VERSION) return process.env.PIP_MLK_VERSION;
-  try {
-    const pkgPath = path.join(process.cwd(), "package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { version?: string };
-    return pkg.version ?? "unknown";
-  } catch {
-    return "unknown";
-  }
+  return (
+    process.env.NEXT_PUBLIC_APP_VERSION ??
+    process.env.PIP_MLK_VERSION ??
+    "unknown"
+  );
 }
 
 const APP_VERSION = readAppVersion();
@@ -63,7 +64,6 @@ export interface CheckResult {
   status: CheckStatus;
   latencyMs?: number;
   detail: string;
-  /** Optional structured fields (e.g. observed value, threshold). */
   [key: string]: unknown;
 }
 
@@ -73,86 +73,57 @@ export interface HealthReport {
   version: string;
   requestId: string | null;
   checks: {
-    database: CheckResult;
-    engine: CheckResult;
+    data: CheckResult;
     memory: CheckResult;
   };
 }
 
 // ---------------------------------------------------------------------------
-// Individual checks.
+// Data-integrity check (replaces the old Prisma DB check + the fs.stat
+// engine check). Verifies the build-time-imported canonical datasets are
+// present and have the expected shape — catches a broken/incomplete build.
 // ---------------------------------------------------------------------------
 
-async function checkDatabase(): Promise<CheckResult> {
-  const started = Date.now();
-  try {
-    // Simple `SELECT 1` via Prisma's raw query — verifies the client can
-    // open a connection and execute SQL. Does not depend on any model
-    // existing, so it works even on an empty DB.
-    await db.$queryRaw`SELECT 1`;
-    const latencyMs = Date.now() - started;
-    return {
-      status: "pass",
-      latencyMs,
-      detail: "Database connection healthy.",
-    };
-  } catch (err) {
-    const latencyMs = Date.now() - started;
-    return {
-      status: "fail",
-      latencyMs,
-      detail: `Database connection failed: ${err instanceof Error ? err.message : String(err)}`,
-    };
-  }
+interface OverviewShape {
+  overview?: { metrics?: { total_voters?: number } };
+}
+interface ElectionsShape {
+  elections?: unknown[];
+}
+interface SocioeconomicShape {
+  state?: unknown;
 }
 
-async function checkEngine(): Promise<CheckResult> {
-  // The "engine" is the PIP-VOTER-INTELLIGENCE pipeline whose outputs ship
-  // as static JSON/JSONL files under public/data/. We verify that a few
-  // canonical files exist and are non-empty — this catches a broken
-  // deployment where the data files are missing.
-  const requiredFiles = [
-    "p134/dashboard-overview.json",
-    "p134/dun-intelligence.jsonl",
-    "elections/melaka-elections.json",
-    "socioeconomic/melaka-dosm.json",
-  ];
-  const dataDir = path.join(process.cwd(), "public", "data");
-  const missing: string[] = [];
-  const empty: string[] = [];
-  for (const rel of requiredFiles) {
-    try {
-      const full = path.join(dataDir, rel);
-      const stat = await fs.stat(full);
-      if (stat.size === 0) empty.push(rel);
-    } catch {
-      missing.push(rel);
-    }
+function checkData(): CheckResult {
+  const problems: string[] = [];
+
+  const overview = overviewJson as OverviewShape;
+  const voters = overview.overview?.metrics?.total_voters;
+  if (!voters || voters <= 0) problems.push("dashboard-overview.json missing total_voters");
+
+  const elections = electionsJson as ElectionsShape;
+  if (!Array.isArray(elections.elections) || elections.elections.length === 0) {
+    problems.push("melaka-elections.json has no elections array");
   }
-  if (missing.length > 0) {
+
+  const socio = socioeconomicJson as SocioeconomicShape;
+  if (!socio.state) problems.push("melaka-dosm.json missing state data");
+
+  if (problems.length > 0) {
     return {
       status: "fail",
-      detail: `Engine data files missing: ${missing.join(", ")}`,
-      missing,
-    };
-  }
-  if (empty.length > 0) {
-    return {
-      status: "warn",
-      detail: `Engine data files empty: ${empty.join(", ")}`,
-      empty,
+      detail: `Engine data integrity failed: ${problems.join("; ")}`,
     };
   }
   return {
     status: "pass",
-    detail: `All ${requiredFiles.length} engine data files present and non-empty.`,
-    fileCount: requiredFiles.length,
+    detail: `All 3 canonical datasets present (voters=${voters}).`,
+    totalVoters: voters,
   };
 }
 
 function checkMemory(): CheckResult {
-  // Memory check — warns when RSS exceeds 512MB (PIP-MLK has a known OOM
-  // issue on 4GB sandboxes), fails when RSS exceeds 1GB.
+  // process.memoryUsage() is provided by the unenv polyfill on Workers.
   const mem = process.memoryUsage();
   const rssMb = mem.rss / (1024 * 1024);
   const heapUsedMb = mem.heapUsed / (1024 * 1024);
@@ -185,9 +156,8 @@ function checkMemory(): CheckResult {
 function aggregateStatus(checks: HealthReport["checks"]): HealthReport["status"] {
   const all = Object.values(checks);
   if (all.some((c) => c.status === "fail")) {
-    // Database is critical — if it fails, we're unhealthy (503).
-    // Engine + memory failures degrade but don't take us offline.
-    if (checks.database.status === "fail") return "unhealthy";
+    // data is critical — if it fails, we're unhealthy (503).
+    if (checks.data.status === "fail") return "unhealthy";
     return "degraded";
   }
   if (all.some((c) => c.status === "warn")) return "degraded";
@@ -203,9 +173,9 @@ async function handler(): Promise<Response> {
   const started = Date.now();
 
   try {
-    const [database, engine] = await Promise.all([checkDatabase(), checkEngine()]);
+    const data = checkData();
     const memory = checkMemory();
-    const checks: HealthReport["checks"] = { database, engine, memory };
+    const checks: HealthReport["checks"] = { data, memory };
     const status = aggregateStatus(checks);
 
     const report: HealthReport = {
@@ -214,8 +184,7 @@ async function handler(): Promise<Response> {
       version: APP_VERSION,
       requestId: getRequestId(),
       checks: {
-        database: { status: checks.database.status, detail: checks.database.status === "pass" ? "ok" : checks.database.detail },
-        engine: { status: checks.engine.status, detail: checks.engine.status === "pass" ? "ok" : checks.engine.detail },
+        data: { status: checks.data.status, detail: checks.data.status === "pass" ? "ok" : checks.data.detail },
         memory: { status: checks.memory.status, detail: checks.memory.status === "pass" ? "ok" : "memory pressure detected" },
       },
     };
@@ -228,8 +197,7 @@ async function handler(): Promise<Response> {
       status,
       httpStatus,
       durationMs: Date.now() - started,
-      database: database.status,
-      engine: engine.status,
+      data: data.status,
       memory: memory.status,
       routesObserved: m.routes.length,
     });
@@ -247,8 +215,7 @@ async function handler(): Promise<Response> {
         version: APP_VERSION,
         requestId: getRequestId(),
         checks: {
-          database: { status: "fail", detail: "Health check itself errored." },
-          engine: { status: "fail", detail: "Health check itself errored." },
+          data: { status: "fail", detail: "Health check itself errored." },
           memory: { status: "fail", detail: "Health check itself errored." },
         },
         error: err instanceof Error ? err.message : String(err),

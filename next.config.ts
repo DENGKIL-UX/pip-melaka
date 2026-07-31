@@ -1,12 +1,24 @@
 import type { NextConfig } from "next";
+import { readFileSync } from "node:fs";
+
+// Read once at build time (fs is available on the build host; it is NOT
+// available at runtime on Cloudflare Workers — the unenv polyfill throws).
+const APP_VERSION = (() => {
+  try {
+    return (JSON.parse(readFileSync("package.json", "utf8")) as { version?: string }).version ?? "unknown";
+  } catch {
+    return "unknown";
+  }
+})();
 
 const config: NextConfig = {
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
   reactStrictMode: false,
-  // Inject build timestamp at build time for the "Updated Xh ago" freshness indicator
+  // Inject build timestamp + app version at build time for freshness / health.
   env: {
     NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+    NEXT_PUBLIC_APP_VERSION: APP_VERSION,
   },
   // Allow the S2D-360 engine static assets to be served from /s2d-360/
   // and embedded in an iframe on the same origin.

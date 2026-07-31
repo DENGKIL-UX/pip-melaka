@@ -1,0 +1,180 @@
+# PIP-MLK — UI/UX Audit & Refinement Report
+
+**Auditor:** Arena Agent Mode (software-engineer UX review)
+**Scope:** `DENGKIL-UX/pip-melaka` — Next.js 16 / React 19 dashboard, 19 tabs, deployed on Cloudflare Workers.
+**Method:** static code review of all component/UI/i18n/CSS sources + rendered inspection of the live landing page (`fetch_page` against `pip-melaka.ritz-analytics.workers.dev`). (A real-browser pass wasn't possible in this sandbox — browser CDNs are network-blocked; findings below are code-confirmed and several are visible in the live SSR HTML.)
+**Verdict:** **Yes — the UI/UX needs refinements.** The platform is feature-rich and polished in many places, but there are **3 high-impact UX/accessibility issues** and several medium/low polish items worth fixing.
+
+---
+
+## Severity matrix
+
+| # | Finding | Severity | Effort | WCAG |
+|---|---|---|---|---|
+| U1 | Hero stat counters render as **"0"** in SSR/initial paint | 🔴 High | S | — |
+| U2 | `text-mlk` amber **fails WCAG AA contrast** in light mode (3.33:1) | 🔴 High | S | AA 1.4.3 |
+| U3 | **19 flat tabs**, no grouping, icon-only on mobile | 🟠 Medium-High | M | 3.2.3? |
+| U4 | **No mobile nav menu** — 19 icons wrap into ~4 rows | 🟠 Medium | M | — |
+| U5 | **No arrow-key navigation** in the tablist (ARIA tab pattern) | 🟡 Medium | S | 2.4 / APG |
+| U6 | **Empty states rare** (2/19 tabs) — missing data shows blanks | 🟡 Medium | M | — |
+| U7 | **Onboarding `onComplete` is a no-op** (minor leak) | 🟢 Low | S | — |
+| U8 | Landing page density / header badge overload | 🟢 Low | S | — |
+| U9 | Heavy acronym jargon, no inline glossary | 🟢 Low | M | 3.1.5 |
+
+---
+
+## U1 — Hero stat counters show "0" in initial/SSR render  🔴
+
+**Evidence:** `src/components/shared/animated-counter.tsx` initializes `const [display, setDisplay] = useState(0)` and only counts up on the client via `IntersectionObserver`. The live SSR HTML reflects this — the landing page's "Parliaments / DUN Seats / Elections / Voters / GeoJSON Layers / S2D Phases / Gates Closed" all render as **`0`** (and "0/0" for gates).
+
+**Impact:**
+- **First impression looks broken** — a first-time visitor (or anyone on a slow connection before JS hydrates, or with JS disabled) sees a hero full of zeros.
+- **SEO / social previews / crawlers** see zeros, not the real "6 parliaments, 28 DUN, 71,415 voters" story.
+- The count-up animation is a nice touch *on top of* the real value, but the real value must be the baseline.
+
+**Recommendation:** Render the **final value in SSR** and only animate client-side from 0→value after mount. Minimal change:
+```tsx
+// animated-counter.tsx — SSR-safe: start at the real value, animate only on client
+const [display, setDisplay] = useState(value);   // was useState(0)
+useEffect(() => {
+  // only animate if IntersectionObserver fires; reduced-motion already snaps
+  ...
+}, [value]);
+```
+Or split: server renders `{value}`, client overlays the animated span after hydration. Either way, the static HTML must contain the real number.
+
+**Acceptance:** `curl …/ | grep` shows real numbers (6, 28, 71415…), not 0. `prefers-reduced-motion` still snaps instantly.
+
+---
+
+## U2 — `text-mlk` amber fails WCAG AA contrast in light mode  🔴
+
+**Evidence:** The brand amber `#C77B2C` on `#FFFFFF` is **3.33:1** (computed). WCAG AA requires **4.5:1** for normal text, 3.0:1 for large/bold. `text-mlk` is used **207×** across `src/components/tabs/*` + `landing-page.tsx`, very often at **`text-[9px]` / `text-[10px]` / `text-xs`** — squarely "normal/small text", which **fails**. Examples: result-table winner links, KPI sublabels, badges, tooltips.
+
+It's fine in **dark mode** (5.35:1 on `#0f172a`) — the problem is light mode only.
+
+| Color | On white | AA normal (4.5)? |
+|---|---|---|
+| `#C77B2C` (mlk-600, current) | 3.33 | ❌ |
+| `#A55A1F` (mlk-700) | 5.14 | ✅ |
+| `#844816` (mlk-800) | 7.19 | ✅ |
+
+**Recommendation:** Introduce a **text-optimized amber token** that is darker in light mode and stays bright in dark mode — e.g. in `globals.css`:
+```css
+:root      { --mlk-text: #A55A1F; }   /* mlk-700: 5.14:1 on white ✅ */
+.dark      { --mlk-text: #E89B45; }   /* mlk-400: bright on dark ✅ */
+.text-mlk  { color: var(--mlk-text); }   /* override the hardcoded #C77B2C */
+```
+Keep `#C77B2C` for fills/borders/icons/large headings (≥18px bold) where 3:1 suffices. Then sweep the 207 `text-mlk` usages — most can stay (they'll pick up the token automatically); audit the few that pair with `bg-mlk/10` (even lower contrast) and bump those to `--mlk-text` on a slightly stronger `bg-mlk/15`.
+
+**Acceptance:** Axe/lighthouse contrast pass on light mode; no visible brand-color regression in dark mode.
+
+---
+
+## U3 — 19 flat tabs, no grouping  🟠
+
+**Evidence:** `src/components/dashboard.tsx` `TABS` is a flat array of 19 entries: overview, map-2d, map-3d, elections, demographics, analysis, risk, compare, s2d, s2d-360, scraper, public-comm, incidents, scenarios, predictive, insights, alerts, dual-layer, governance. They render as one wrapping `role="tablist"` with no grouping, separators, or section labels.
+
+**Impact:** Cognitive overload; poor discoverability — a user looking for "Predictive" must scan all 19. Related tabs (e.g. the 3 maps, or S2D + S2D-360 + Predictive + Insights) aren't visually adjacent-by-purpose.
+
+**Recommendation:** Group into 5–6 labeled clusters and render grouped (with subtle dividers/eyebrows):
+```
+• Home        : Overview
+• Maps        : 2D Map · 3D Map · Dual-Layer
+• Elections   : Elections · Demographics · DPT Analysis · Risk+Socio · Compare
+• Intelligence: S2D Console · S2D 360 · Predictive · Insights
+• Operations  : Scraper · Public Comm · Incidents · Scenarios · Alerts
+• Governance  : Governance
+```
+Keep the active-tab heading (`h1`) and the command palette (⌘K) as the power-user shortcuts. Grouping improves scanability dramatically and pairs naturally with the mobile menu (U4).
+
+**Acceptance:** Nav shows ≤6 groups; each group ≤5 items; tab findability improves (informal test).
+
+---
+
+## U4 — No mobile nav menu (19 icons wrap into ~4 rows)  🟠
+
+**Evidence:** The nav is `flex flex-wrap`; tab labels use `hidden sm:inline`, so below 640px only icons show. 19 icon-only buttons wrap into roughly 4 rows of icons with no labels — hard to scan, no grouping, eats vertical space on every screen.
+
+**Recommendation:**
+- On mobile (`< md`), collapse the tablist into a **sheet/drawer menu** (the project already has `Sheet`/`Drawer` UI primitives) triggered by a "Sections" button — show grouped tabs **with labels** (ties into U3).
+- Alternatively, a horizontally-scrollable single-row segmented bar with the active tab scrolled into view — but grouping (U3) + a drawer is the better UX for 19 items.
+- Keep the desktop wrapping nav for `≥ md`.
+
+**Acceptance:** On a 375px viewport the nav is one button ("Sections ▾") that opens a labeled, grouped list; no 4-row icon wall.
+
+---
+
+## U5 — No arrow-key navigation in the tablist (ARIA tab pattern)  🟡
+
+**Evidence:** The nav correctly uses `role="tablist"` + `role="tab"` + `aria-selected`, but there is **no `onKeyDown` handler** for `ArrowLeft`/`ArrowRight`/`Home`/`End`. Per the [WAI-ARIA Authoring Practices tab pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/), arrow keys should move focus between tabs. Currently only Tab/mouse work (Tab traverses every tab, which is verbose).
+
+**Recommendation:** Add a keydown handler on the tablist that, on arrow keys, moves `focus()` to the adjacent tab (and optionally activates it). ~20 lines; standard pattern. Also add `tabIndex={isActive ? 0 : -1}` to tabs so only the active tab is in the tab order (roving tabindex).
+
+**Acceptance:** Keyboard-only user can move between tabs with ←/→; roving tabindex verified.
+
+---
+
+## U6 — Empty states are rare (2/19 tabs)  🟡
+
+**Evidence:** Only ~2 tabs reference explicit empty-state text. Most tabs that fetch data show **loading** then **content**, but when a specific subset is empty (e.g. a DUN with no demographics, a coalition filter with no matches, the compare tab with two identical selections, a query that returns 0 rows) the UI tends to show **blanks** rather than a helpful empty state. (The elections `DataQueryCard` does handle "0 rows" well — that's the model to copy.)
+
+**Impact:** Users see empty space and don't know if it's "no data", "loading", or "error".
+
+**Recommendation:** Adopt one reusable `<EmptyState icon title hint action />` component (there's an `empty-state.tsx` in the kit — wire it in) and use it wherever a list/chart could be empty: compare verdict, coalition-filtered tables, incident casebook, bookmarks, S2D signal feed when 0 signals.
+
+**Acceptance:** No tab shows a silent blank; every empty list has an icon + one-line explanation + (where useful) a CTA.
+
+---
+
+## U7 — Onboarding `onComplete` is a no-op  🟢
+
+**Evidence:** `src/components/landing-page.tsx:1283` renders `<OnboardingTour onComplete={() => {}} />`. The tour persists its own "seen" flag internally (`localStorage pip-mlk-onboarded`), so it works — but the no-op callback is misleading and means the parent can't react to completion (e.g. to surface a "Replay tour" entry in the header/help menu).
+
+**Recommendation:** Wire `onComplete` to (a) persist + (b) enable a "Replay tour" action in the ⌘K command palette / header help. Minor.
+
+---
+
+## U8 — Landing density & header badge overload  🟢
+
+**Evidence:** The landing page stacks hero → live metrics strip → marginal-seats watchlist → 6-parliament grid → governance pillars in one long scroll. The dashboard header carries 5+ badges (S2D loop, Provenance 8/9, Voters, ⌘K, Export) plus Language + Theme toggles. Responsive hiding (`hidden md/lg/xl`) is already applied — good — but on mid-size screens it's busy.
+
+**Recommendation:** Add a subtle section-divider rhythm on the landing page (the `.divider-label` utility already exists); consider folding the less-critical header badges into a single "status" popover. Low priority.
+
+---
+
+## U9 — Acronym jargon, no inline glossary  🟢
+
+**Evidence:** The UI assumes domain literacy: DUN, DPT, DM, S2D, PDPA, SPR, GE15, PRN15, Gini, etc. appear throughout with limited explanation for a non-analyst audience.
+
+**Recommendation:** Add a lightweight glossary — either `Info`-tooltip hovers on first occurrence of each acronym, or a single "Glossary" entry in the Governance tab / command palette. The `info-tooltip.tsx` component exists; reuse it. Improves accessibility for non-expert users (and aligns with the "public-facing" positioning in the hero copy).
+
+---
+
+## Suggested refinement order (quick wins first)
+
+1. **U1** (SSR counters) — S, huge first-impression + SEO win. **Do first.**
+2. **U2** (contrast token) — S, accessibility compliance + low risk.
+3. **U5** (arrow-key tabs + roving tabindex) — S, a11y compliance.
+4. **U3 + U4 together** (grouped nav + mobile drawer) — M, the biggest structural UX improvement.
+5. **U6** (empty-state component) — M, consistency.
+6. **U7 / U8 / U9** — polish, batch when convenient.
+
+---
+
+## What's already good (no change needed)
+- Strong, consistent MLK amber-gold design system; rich micro-interactions and loading skeletons.
+- Good i18n (EN/BM) coverage and a tri-state theme toggle.
+- Command palette (⌘K), shortcut cheat-sheet, onboarding tour, DUN drawer, AI assistant — power-user affordances are present and largely accessible (role=dialog, aria-labels, escape handling).
+- Graceful loading (skeletons) and error states in most tabs; offline-data fallbacks.
+- Build-time data integrity + provenance gates surfaced honestly ("Proxy · 8/9").
+- `prefers-reduced-motion` is respected for animations.
+
+---
+
+## Appendix — how to verify each fix (no browser needed)
+- **U1:** `curl -s https://pip-melaka.ritz-analytics.workers.dev/ | grep -o '71,415\|0 Voters'` → must show real numbers.
+- **U2:** run `@axe-core/cli` or Lighthouse "Contrast" on the live URL in light mode; target 0 contrast failures.
+- **U5:** keyboard-only test — focus the tablist, press ←/→.
+- **U3/U4:** responsive check at 375 / 768 / 1280 px.
+- **U6:** trigger an empty state (e.g. compare identical DUNs) and confirm a helpful message renders.

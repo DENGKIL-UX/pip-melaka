@@ -244,8 +244,26 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
 
         <Separator className="mb-4 bg-mlk/20" />
 
-        {/* Tab navigation */}
-        <nav className="flex flex-wrap gap-1 mb-6" role="tablist" aria-label="Dashboard sections">
+        {/* Tab navigation — WAI-ARIA tablist with arrow-key navigation */}
+        <nav
+          className="flex flex-wrap gap-1 mb-6"
+          role="tablist"
+          aria-label="Dashboard sections"
+          onKeyDown={(e) => {
+            // WAI-ARIA tab pattern: ←/→ move focus between tabs
+            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+            e.preventDefault();
+            const currentIdx = TABS.findIndex((tab) => tab.id === activeTab);
+            if (currentIdx === -1) return;
+            const dir = e.key === "ArrowRight" ? 1 : -1;
+            const nextIdx = (currentIdx + dir + TABS.length) % TABS.length;
+            setActiveTab(TABS[nextIdx].id);
+            // Focus the newly-active tab button
+            const tablist = e.currentTarget;
+            const buttons = tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+            buttons[nextIdx]?.focus();
+          }}
+        >
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -254,6 +272,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                 key={tab.id}
                 role="tab"
                 aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-xs sm:text-sm font-medium transition-all ${
                   isActive ? "bg-mlk text-white shadow-md" : "text-muted-foreground hover:text-foreground hover:bg-muted"

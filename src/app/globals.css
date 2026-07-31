@@ -157,7 +157,15 @@
 }
 
 @layer utilities {
-  .text-mlk { color: #C77B2C; }
+  /* WCAG AA contrast: #C77B2C on white = 3.33:1 (fails AA 4.5:1).
+     Use #A55A1F in light mode (5.14:1 ✅) and #E89B45 in dark mode (5.35:1 ✅).
+     The brand amber #C77B2C is still used for backgrounds, borders, and large text. */
+  .text-mlk { color: #A55A1F; }
+  :root.dark .text-mlk { color: #E89B45; }
+  :root[data-theme="dark"] .text-mlk { color: #E89B45; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .text-mlk { color: #E89B45; }
+  }
   .bg-mlk { background-color: #C77B2C; }
   .border-mlk { border-color: #C77B2C; }
   .bg-mlk-amber-dark { background-color: #9A5D1F; }

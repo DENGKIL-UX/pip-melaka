@@ -38,7 +38,10 @@ export function AnimatedCounter({
   className,
   groupSeparator = true,
 }: AnimatedCounterProps) {
-  const [display, setDisplay] = useState(0);
+  // Initialize with the real value so SSR/initial render shows the correct
+  // number (not 0). The animation will replay from 0 → value on scroll-into-view
+  // via IntersectionObserver, but the first paint is correct for SEO + UX.
+  const [display, setDisplay] = useState(value);
   const ref = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
 
@@ -64,6 +67,9 @@ export function AnimatedCounter({
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated.current) {
           hasAnimated.current = true;
+          // Reset to 0 for the count-up animation (initial SSR render shows
+          // the real value; this creates the visual count-up effect on scroll).
+          setDisplay(0);
           const startTime = performance.now() + delay;
 
           const tick = (now: number) => {

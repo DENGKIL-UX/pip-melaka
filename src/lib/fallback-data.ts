@@ -102,6 +102,7 @@ export interface FallbackElection extends FallbackElectionSummary {
     winner_party?: string;
     vote_share: Record<string, number>;
   }>;
+  party_breakdown?: Record<string, number>;
 }
 
 export const ELECTIONS_FALLBACK: FallbackElection[] = [
@@ -209,6 +210,7 @@ export interface FallbackDptData {
   total_additions: number;
   total_deletions: number;
   total_net: number;
+  total_dun?: number;
   months: string[];
   per_month: Array<{ month: string; additions: number; deletions: number; net: number; mom_delta: number }>;
   per_parliament: Array<{
@@ -217,6 +219,17 @@ export interface FallbackDptData {
     additions: number;
     deletions: number;
     net: number;
+  }>;
+  per_dun?: Array<{
+    parliament_code: string;
+    parliament_name: string;
+    dun_code: string;
+    dun_name: string;
+    additions: number;
+    deletions: number;
+    net: number;
+    voters: number;
+    verified: boolean;
   }>;
 }
 

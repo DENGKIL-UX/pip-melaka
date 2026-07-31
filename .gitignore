@@ -27,3 +27,6 @@ tsconfig.tsbuildinfo
 .zscripts/
 # s2d-engine source archive (not the ported TypeScript modules)
 /s2d-engine/
+
+# npm lockfile artifact (project uses bun.lock; generated when bun unavailable)
+package-lock.json

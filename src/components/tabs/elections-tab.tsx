@@ -26,6 +26,7 @@ interface Election {
   parliament_results: Array<{
     parliament_code: string; winner: "PH" | "BN" | "PN";
     winner_party?: string; runner_up_party?: string | null;
+    winner_candidate?: string; winner_votes?: number;
     votes_pct: number; runner_up: string; margin_pct: number;
   }>;
   dun_results: Array<{

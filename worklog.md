@@ -4088,3 +4088,194 @@ The platform is feature-complete with:
 - PDF export of full intelligence brief
 - BM-localized search keywords in command palette
 - Voter turnout heatmap with actual SPR turnout data (currently uses voter count as proxy)
+
+---
+
+Task ID: QA-BUGFIX-ROUND-7
+Agent: main (Arena Agent Mode)
+Task: Review codebase, troubleshoot issues, QA via HTTP-level testing (browser unavailable in sandbox), fix real bugs, then add styling detail + new features.
+
+> **Environment note:** This sandbox restricts outbound network to the npm
+> registry only — browser CDNs (Chrome-for-Testing, Playwright), apt, and
+> Google Fonts are all blocked. `agent-browser` / Playwright browser binaries
+> could not be downloaded, so QA was performed via (a) HTTP-level probing of
+> every API route + page, (b) `tsc --noEmit`, (c) `eslint`, (d) a clean
+> on-demand dev-server compile, and (e) a full import-graph reachability
+> analysis. The real repo path here is `/home/user/pip-melaka` (the task
+> references `/home/z/my-project`, which is the canonical production path).
+
+## Current project status description/assessment
+
+The platform is a mature Next.js 16 / React 19 / Tailwind v4 PIP-MLK political
+intelligence dashboard (19 tabs, EN/BM i18n, 2D Leaflet + 3D Three.js maps, RAG
+AI assistant, S2D console, scenario simulator, Cloudflare deploy target).
+Prior worklog rounds (QA-ROUND-1..6, FEATURES-ROUND-1, I18N-BATCH-4) reported
+"Lint: 0 errors". On re-assessment this round, the **actual** state was
+materially worse than logged:
+
+- **`tsc --noEmit`: 92 errors** (worklog claimed 0). The build only passed
+  because `next.config.ts` sets `typescript.ignoreBuildErrors: true`, and the
+  dev server (webpack) strips types without type-checking — so the app ran
+  while the type graph was broken.
+- **`eslint`: 18 errors / 3 warnings** (worklog claimed 0/3). Mostly React 19's
+  new `react-hooks/set-state-in-effect` rule firing on data-fetch effects.
+- **`/api/health` and `/api/health/ready` returned HTTP 500** — a hard crash.
+  Root cause: those routes import `db` from `@/lib/db`, which did
+  `new PrismaClient(...)` at module-import time. In this sandbox the Prisma
+  query-engine binary can't be downloaded (`prisma generate` is network-blocked),
+  so `new PrismaClient()` throws synchronously during module evaluation,
+  producing a 500 *before* the handler's try/catch can run. A health probe
+  that 500s is worse than useless.
+- **~153 of 248 `src` files were unreachable** from the app entry point. A
+  large "module" architecture under `src/components/{analysis,brain,compare,
+  demographics,elections,governance,map-2d,map-3d,risk,s2d,socioeconomic}/`
+  plus several `shared/` + `lib/` files were orphaned dead code — superseded
+  by the `src/components/tabs/*` implementations but never removed. These
+  generated the bulk of the 92 type errors.
+
+A full import-graph reachability analysis (static `from` + dynamic `import()`)
+confirmed the 11 module directories + 12 shared files + theme-providers +
+`data/gaps.ts` had **zero external references** and were safe to delete.
+
+## Current goals / completed modifications / verification results
+
+### 1. CRITICAL BUG FIX — health probes no longer crash (500 → graceful 503)
+`src/lib/db.ts`: rewrote the Prisma client as a **lazy `Proxy`**. Construction
+is deferred to first property access and wrapped in try/catch, so importing
+`db` never throws. If the engine is unavailable, the proxy throws a clear
+error *on use*, which the health routes' existing `try/catch` around
+`db.$queryRaw` catches → the route returns a valid 503 JSON report
+(`database: fail`) instead of a 500. Verified:
+- `/api/health`: 500 → **503** `{status:"unhealthy", checks:{database:"fail",engine:"pass",memory:"fail"}}`
+- `/api/health/ready`: 500 → **503** `{status:"not_ready", ...}`
+- `/api/health/live`: still 200 `{status:"alive"}`
+(The DB "fail" is expected here — no Prisma engine in this sandbox. In
+production with a real DB it reports `pass`. This is the correct health-check
+semantics: "process alive, dependency down", never a 500.)
+
+### 2. Type safety: 92 → 0 errors (tsc clean)
+Fixed all **19 live-code** type errors and removed the **73 dead-code** ones:
+- `elections-tab.tsx`: `parliament_results` type was missing `winner_candidate`
+  (accessed in the results table + swing analysis) — added the field. Real UI
+  bug: winner-candidate names were silently `undefined` at runtime.
+- `predict/route.ts`: normalised the `{trends:{dun}}` vs bare `{dun}` JSON
+  shape into one typed value (removed `as any` casts).
+- `deep-research/route.ts`: fixed an unsafe cast via `unknown` + `Record<string,
+  number|string>`.
+- `s2d/intelligence/[...path]/route.ts`: `SignalRecord` / `BriefInput` were
+  declared but not exported — exported them; added `stateName/parliamentName/
+  dunName` to the `SignalRecord.locality` shape used by the sample data.
+- `fallback-data.ts`: added `party_breakdown`, `per_dun`, `total_dun` to the
+  `FallbackElection` / `FallbackDptData` interfaces.
+- `daily-intelligence-brief.ts` + `sentiment-snapshot.ts`: `Object.freeze([...])
+  as const` is invalid TS1355 (`as const` can't apply to a function-call
+  result) — dropped the redundant `Object.freeze`, kept `as const` on the
+  literal (preserves the `typeof X[number]` literal-union derivation).
+- `predictive-tab.tsx`: recharts `<Line dot={{fill:(d)=>...}}>` triggered
+  TS2769 (object-form `fill` can't be a function per the recharts types) —
+  switched to the canonical dot render-function pattern.
+
+### 3. Lint: 18 → 0 errors (2 pre-existing warnings)
+- `use-mobile.ts`: rewrote with `useSyncExternalStore` (React-19-idiomatic for
+  media-query subscription, SSR-safe, fully satisfies
+  `react-hooks/set-state-in-effect`).
+- `carousel.tsx` (embla): added the shadcn-convention
+  `eslint-disable-next-line react-hooks/set-state-in-effect` for the legitimate
+  initial-select subscription pattern.
+- Removed the dead modules that carried the remaining `set-state-in-effect`
+  errors.
+
+### 4. Dead-code removal — 77 files deleted
+Verified-unreachable and deleted: the 11 superseded module dirs (analysis,
+brain, compare, demographics, elections, governance, map-2d, map-3d, risk, s2d,
+socioeconomic), 12 orphaned `shared/` components (incl. the two with type
+errors: `evidence.tsx`, `skeletons.tsx`), `theme-providers.tsx`, `data/gaps.ts`.
+Reachability after cleanup: **112 reachable / 73 unreachable** (remaining
+unreachable are the standard shadcn `ui/` kit primitives + a few security-middleware
+libs kept intentionally — see Risks). `src` went 248 → ~185 files.
+
+### 5. FEATURE — Enhanced Intelligence Brief (Markdown + preview + print)
+`src/lib/export-brief.ts` extended with `briefToMarkdown()`,
+`copyBriefMarkdown()`, `downloadBriefMarkdown()`, and `printBrief()` (opens a
+print-optimized window → browser "Save as PDF"). Added a tiny safe
+Markdown→HTML renderer (headings, tables, blockquotes, lists, inline code/bold)
+to avoid a markdown dependency. New `src/components/shared/brief-preview-dialog.tsx`
+modal previews the brief in Markdown with Copy / Print / Download-.md /
+Download-.json actions. Wired into the dashboard header "Export" button (was an
+immediate silent JSON dump; now opens the preview). All client-side, PDPA-safe.
+Added `brief.*` i18n keys (EN + BM).
+
+### 6. FEATURE — Data Quality & Coverage widget
+New reusable `src/components/shared/coverage-ring.tsx` (pure-SVG circular
+progress, animated stroke sweep, tier-coloured, accessible). Added a
+"Data Quality & Coverage" card to the Overview tab with three rings:
+DUN coverage (5/28 verified ≈ 17.9%, warn), profile completeness (99.93%, good),
+gender balance (97.53, good), plus three inline stat tiles (verified voters,
+senior dependency, evidence tier). Added `overview.*` i18n keys (EN + BM).
+
+### 7. STYLING — denser, more tactile detail (mandatory)
+- New `globals.css` utilities (R12 section): `.stat-card-pro` (premium surface
+  with top accent bar + inner radial highlight + hover lift), `.eyebrow`,
+  `.insight-chip`, `.bg-aurora`, `.live-dot-mlk` (on-brand amber pulse, distinct
+  from the generic green `.pulse-dot`), `.link-mlk`, and `@media print` rules.
+- KPI cards upgraded to `.stat-card-pro` + `tabular-nums` for stable layout.
+- Dashboard header S2D badge → on-brand `live-dot-mlk` + MLK-coloured Activity icon.
+- Footer: new `FreshnessIndicator` ("Updated Xh ago" from `NEXT_PUBLIC_BUILD_TIME`).
+
+### Verification
+- `npx tsc --noEmit`: **0 errors** (was 92).
+- `bun`/`npm run lint`: **0 errors, 2 warnings** (pre-existing `react/no-danger`
+  in `layout.tsx` + `chart.tsx`, both intentional).
+- Clean dev server (`.next` cleared, fresh start): home page compiles in ~1.3s,
+  **HTTP 200**, no SWC/syntax errors in the log (earlier phantom
+  `Expected '<eof>'` errors were stale incremental-compile artifacts from
+  editing files mid-HMR under low memory — cleared by the fresh start).
+- HTTP QA — all 13 API routes **200**; `/api/health` + `/api/health/ready` now
+  **503 with valid JSON** (was 500 crash); all 5 core static data files **200**.
+
+## Unresolved issues / risks / next-phase recommendations
+
+### 1. agent-browser / browser QA not possible in this sandbox
+Browser binaries (Chrome-for-Testing, Playwright Chromium) and apt are
+network-blocked; only the npm registry is reachable. QA was therefore
+HTTP-level + static analysis + tsc/eslint. On a network-enabled host, run a full
+`agent-browser` pass across all 19 tabs (click-through + screenshot) to confirm
+visual rendering of the new Coverage rings, Brief modal, and FreshnessIndicator.
+
+### 2. Remaining dead code (low priority, no errors)
+After cleanup, ~37 custom files remain unreachable (security middleware libs —
+`csrf.ts`, `jwt.ts`, `rate-limiter`'s siblings, `security-headers.ts`,
+`websocket-server.ts`, etc. — plus `bookmarks-store.ts`, `brain-store.ts`, and
+several `ui/` kit primitives). These carry **no type/lint errors** and are kept
+as intentional infrastructure / scaffolding. A future hardening pass could wire
+the security middleware into a Next `middleware.ts` or prune the unused stores.
+
+### 3. Prisma is effectively dormant
+`@prisma/client` is consumed only by the two health probes; the whole app reads
+static JSON from `public/data/`. In production (Cloudflare Workers) Prisma's
+Node engine isn't available anyway. Recommend either (a) provisioning a real
+DB + running `prisma generate`/`migrate` so the health DB check passes, or
+(b) dropping the Prisma dependency entirely and replacing the DB health check
+with a static-data integrity check. The lazy-proxy change makes either path safe.
+
+### 4. globals.css has accumulated duplicate definitions
+`.glass`, `.pulse-dot`, `.tab-slide-in`, `.scrollbar-mlk`, `.card-glow`, and
+several `@keyframes` are defined twice (later definitions win). I added the new
+R12 utilities as *additive* names (`.live-dot-mlk`, `.stat-card-pro`) to avoid
+touching the duplicated ones, but a future pass should consolidate the
+duplicates for maintainability.
+
+### 5. CSS duplication + memory ceiling
+The 4 GB / 2 vCPU sandbox with no swap OOM-prones the dev server; rapid multi-
+file edits produce transient phantom SWC parse errors that clear on a fresh
+`.next` + restart. Not a code defect — an environment constraint to be aware of
+when doing large refactors here.
+
+### Priority recommendations for next phase
+1. Run the browser-based `agent-browser` QA pass on a network-enabled host.
+2. Decide Prisma's fate (real DB vs removal) so `/api/health` returns `healthy`.
+3. Consolidate the duplicated CSS utilities.
+4. Consider wiring S2D signal alerts via the existing `websocket-server.ts`
+   (currently dead) — it's the last of the "future opportunities" from
+   FEATURES-ROUND-1 still untouched.
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { QuickActions } from "@/components/dashboard/quick-actions";
@@ -11,7 +11,7 @@ import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote,
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
-import { buildBrief, downloadBrief } from "@/lib/export-brief";
+import { buildBrief, type BriefSnapshot } from "@/lib/export-brief";
 import { OverviewTab } from "@/components/tabs/overview-tab";
 import { ElectionsTab } from "@/components/tabs/elections-tab";
 import { DemographicsTab } from "@/components/tabs/demographics-tab";
@@ -25,6 +25,7 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle, useI18n } from "@/lib/i18n";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { ShortcutCheatSheet } from "@/components/shared/shortcut-cheat-sheet";
+import { BriefPreviewDialog } from "@/components/shared/brief-preview-dialog";
 
 /**
  * §11.5: i18n-aware loading fallback for lazy-loaded tab chunks.
@@ -94,12 +95,49 @@ const TABS: Array<{ id: DashboardTab; label: string; i18nKey: string; icon: Reac
   { id: "governance", label: "Governance", i18nKey: "tab.governance", icon: ShieldCheck },
 ];
 
+/**
+ * FreshnessIndicator — shows "Updated Xh ago" relative to the build time
+ * embedded by next.config.ts (NEXT_PUBLIC_BUILD_TIME). Client-only render
+ * (Dashboard only mounts after the page-level `mounted` guard), so no SSR
+ * hydration mismatch.
+ */
+function FreshnessIndicator() {
+  const bt = process.env.NEXT_PUBLIC_BUILD_TIME;
+  if (!bt) return null;
+  const builtAt = new Date(bt).getTime();
+  if (Number.isNaN(builtAt)) return null;
+  const mins = Math.max(0, Math.floor((Date.now() - builtAt) / 60000));
+  let label: string;
+  if (mins < 1) label = "just now";
+  else if (mins < 60) label = `${mins}m ago`;
+  else if (mins < 1440) label = `${Math.floor(mins / 60)}h ago`;
+  else label = `${Math.floor(mins / 1440)}d ago`;
+  return (
+    <span className="inline-flex items-center gap-1" title={new Date(builtAt).toLocaleString()}>
+      <span className="live-dot-mlk" aria-hidden="true" />
+      Updated {label}
+    </span>
+  );
+}
+
 export function Dashboard({ onExit }: { onExit: () => void }) {
   const { activeTab, setActiveTab } = useDashboardStore();
   const { t } = useI18n();
   const signalsCount = useS2DStore((s) => s.signals.filter(sig => sig.status !== "resolved").length);
   const loopStatus = useS2DStore((s) => s.loopStatus);
   const seedIfEmpty = useS2DStore((s) => s.seedIfEmpty);
+  const [briefOpen, setBriefOpen] = useState(false);
+  const [brief, setBrief] = useState<BriefSnapshot | null>(null);
+
+  const openBrief = () => {
+    setBrief(buildBrief({
+      activeTab: activeTab,
+      totalVoters: TOTAL_VOTERS_P134,
+      dunCount: TOTAL_DUN,
+      s2dSignals: signalsCount,
+    }));
+    setBriefOpen(true);
+  };
 
   // Seed S2D signals on first dashboard mount
   useEffect(() => {
@@ -150,9 +188,9 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] hidden md:inline-flex items-center gap-1.5" aria-label={`${t("header.s2dLoop")}: ${loopStatus}, ${signalsCount} ${t("header.signals")}`}>
-                <span className="pulse-dot" aria-hidden="true" />
-                <Activity className="h-3 w-3" aria-hidden="true" />
+              <Badge variant="outline" className="text-[10px] hidden md:inline-flex items-center gap-1.5 border-mlk/30" aria-label={`${t("header.s2dLoop")}: ${loopStatus}, ${signalsCount} ${t("header.signals")}`}>
+                <span className="live-dot-mlk" aria-hidden="true" />
+                <Activity className="h-3 w-3 text-mlk" aria-hidden="true" />
                 S2D: {loopStatus} · {signalsCount}
               </Badge>
               <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-700 dark:text-amber-300">Provenance: 8/9</Badge>
@@ -177,15 +215,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
                 variant="ghost"
                 size="sm"
                 className="h-9 gap-1.5 text-xs"
-                onClick={() => {
-                  const brief = buildBrief({
-                    activeTab: activeTab,
-                    totalVoters: TOTAL_VOTERS_P134,
-                    dunCount: TOTAL_DUN,
-                    s2dSignals: signalsCount,
-                  });
-                  downloadBrief(brief);
-                }}
+                onClick={openBrief}
                 aria-label={t("header.exportBrief")}
                 title={t("header.exportBrief")}
               >
@@ -277,6 +307,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
           <div><strong className="text-mlk">PIP-MLK</strong> · Political Intelligence Platform · Melaka</div>
           <div className="flex items-center gap-3">
+            <FreshnessIndicator />
             <span className="hidden md:inline">Build-time engine · PDPA Akta 709 compliant</span>
             <Badge variant="outline" className="text-[9px]">{TOTAL_DUN} DUN · 6 Parliaments</Badge>
           </div>
@@ -288,6 +319,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
       <AssistantPanel />
       <CommandPalette />
       <ShortcutCheatSheet />
+      <BriefPreviewDialog brief={brief} open={briefOpen} onOpenChange={setBriefOpen} />
     </div>
   );
 }

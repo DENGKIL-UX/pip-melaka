@@ -58,14 +58,19 @@ export async function GET() {
       cache: "no-store",
     });
     if (res.ok) {
-      cachedTrends = (await res.json()) as { trends?: { dun?: Record<string, CoalitionTrend[]> } };
-      cachedTrends = (cachedTrends as any)?.trends ?? cachedTrends;
+      // The JSON may be either { trends: { dun } } or a bare { dun } — normalise.
+      const raw = (await res.json()) as {
+        trends?: { dun?: Record<string, CoalitionTrend[]> };
+        dun?: Record<string, CoalitionTrend[]>;
+      };
+      const dun = raw.trends?.dun ?? raw.dun;
+      cachedTrends = dun ? { dun } : null;
     }
   } catch {
     // ignore
   }
 
-  const dunTrends = cachedTrends?.dun ?? (cachedTrends as any)?.trends?.dun;
+  const dunTrends = cachedTrends?.dun;
   const bnTrend = dunTrends?.BN?.find((t) => t.election === "SE-15") ?? dunTrends?.BN?.[0];
   const phTrend = dunTrends?.PH?.find((t) => t.election === "SE-15") ?? dunTrends?.PH?.[0];
   const pnTrend = dunTrends?.PN?.find((t) => t.election === "SE-15") ?? dunTrends?.PN?.[0];

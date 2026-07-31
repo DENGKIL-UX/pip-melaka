@@ -8,10 +8,10 @@
  * Ported to TypeScript for PIP-MLK's Next.js runtime.
  */
 
-export const DAILY_SNAPSHOT_DIMENSIONS = Object.freeze([
+export const DAILY_SNAPSHOT_DIMENSIONS = [
   "STATE", "PARLIAMENT", "DUN", "DM", "LOCALITY",
   "POLITICAL_ENTITY", "ISSUE", "PLATFORM", "SOURCE_TYPE", "LANGUAGE",
-]) as const;
+] as const;
 
 export type SnapshotDimension = typeof DAILY_SNAPSHOT_DIMENSIONS[number];
 
@@ -45,14 +45,17 @@ function asPositiveNeutralNegative(label: unknown): "Positive" | "Negative" | "N
   return "";
 }
 
-interface SignalRecord {
+export interface SignalRecord {
   snapshotId?: string;
   canonicalSourceHash?: string;
   sourceRecordId?: string;
   locality?: {
     stateCode?: string;
+    stateName?: string;
     parliamentCode?: string;
+    parliamentName?: string;
     dunCode?: string;
+    dunName?: string;
     dmCode?: string;
     localityCode?: string;
     localityName?: string;

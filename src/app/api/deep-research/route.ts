@@ -202,8 +202,8 @@ async function gatherAllSources(baseUrl: string): Promise<DataSource[]> {
   }
 
   // 4. Dashboard overview (Proxy) — build-time imported JSON
-  const overview = overviewJson as {
-    overview?: { metrics?: Record<string, number> };
+  const overview = overviewJson as unknown as {
+    overview?: { metrics?: Record<string, number | string> };
   };
   if (overview.overview?.metrics) {
     const m = overview.overview.metrics;

@@ -166,7 +166,9 @@ export function PredictiveTab() {
                   <XAxis dataKey="name" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} />
                   <Tooltip contentStyle={{ fontSize: 11 }} />
-                  <Line dataKey="accuracy" stroke="#C77B2C" strokeWidth={2} dot={{ r: 4, fill: (d) => d.payload.accuracy === 100 ? "#10B981" : "#EF4444" }} />
+                  <Line dataKey="accuracy" stroke="#C77B2C" strokeWidth={2} dot={({ cx, cy, payload }: { cx?: number; cy?: number; payload?: { accuracy?: number } }) => (
+                    <circle cx={cx} cy={cy} r={4} fill={payload?.accuracy === 100 ? "#10B981" : "#EF4444"} />
+                  )} />
                   <ReferenceLine y={60} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: t("predictive.threshold60"), fontSize: 8, fill: "#f59e0b" }} />
                 </LineChart>
               </ResponsiveContainer>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff, Grid3x3, LayoutGrid, List } from "lucide-react";
+import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as MapIcon, Box, ArrowLeftRight, Activity, Info, WifiOff, Grid3x3, LayoutGrid, List, Database, CheckCircle2, Gauge } from "lucide-react";
 import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN, DUN_NAMES, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
@@ -12,6 +12,7 @@ import { useI18n } from "@/lib/i18n";
 import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
 import { PartyTag, StatusTag } from "@/components/ui/party-tag";
 import { PartyLogo } from "@/components/shared/party-logo";
+import { CoverageRing } from "@/components/shared/coverage-ring";
 import type { CoalitionCode } from "@/lib/party-metadata";
 
 // Build full DUN list from PARLIAMENTS + DUN_NAMES
@@ -89,14 +90,14 @@ function Sparkline({ data, color = "#C77B2C", width = 60, height = 16 }: { data:
 
 function KpiCard({ icon: Icon, label, value, sub, accent, trend }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub?: string; accent?: boolean; trend?: number[] }) {
   return (
-    <Card className={`hover-lift ${accent ? "border-mlk/40" : ""}`}>
+    <Card className={`stat-card-pro ${accent ? "border-mlk/40" : ""}`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</span>
           <Icon className={`h-4 w-4 ${accent ? "text-mlk" : "text-muted-foreground"}`} />
         </div>
         <div className="flex items-end justify-between gap-2">
-          <div className={`text-xl font-bold ${accent ? "text-mlk" : ""}`}>{value}</div>
+          <div className={`text-xl font-bold tabular ${accent ? "text-mlk" : ""}`}>{value}</div>
           {trend && <Sparkline data={trend} color={accent ? "#C77B2C" : "#64748b"} />}
         </div>
         {sub && <div className="text-[10px] text-muted-foreground mt-0.5">{sub}</div>}
@@ -190,6 +191,78 @@ export function OverviewTab() {
         <KpiCard icon={Layers} label={t("overview.kpiDm")} value={String(gc.dms)} sub={t("overview.kpiDmSub")} />
         <KpiCard icon={MapPin} label={t("overview.kpiLocalities")} value={String(gc.localities)} sub={t("overview.kpiLocalitiesSub")} trend={[340, 348, 355, 362, 368]} />
       </div>
+
+      {/* Data Quality & Coverage — three animated rings showing integrity of the dataset */}
+      {(() => {
+        const verifiedDuns = PARLIAMENTS.filter((p) => p.code === "134").reduce((s, p) => s + p.dunCount, 0);
+        const dunCoverage = (verifiedDuns / TOTAL_DUN) * 100;
+        return (
+          <Card className="border-mlk/25 bg-mlk-radial hover-lift">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Gauge className="h-4 w-4 text-mlk" />
+                {t("overview.dataQualityTitle", "Data Quality & Coverage")}
+                <Badge variant="outline" className="text-[9px] ms-auto border-mlk/30 text-mlk">{t("overview.engineBuilt", "Engine-built")}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 place-items-center py-1">
+                <CoverageRing
+                  value={dunCoverage}
+                  label={t("overview.ringDunCoverage", "DUN coverage")}
+                  sub={`${verifiedDuns} / ${TOTAL_DUN} ${t("overview.verified", "verified")}`}
+                  tier={dunCoverage >= 50 ? "good" : "warn"}
+                  size={104}
+                  delayMs={0}
+                />
+                <CoverageRing
+                  value={m.profile_completeness_score}
+                  label={t("overview.ringCompleteness", "Profile completeness")}
+                  sub={t("overview.ringCompletenessSub", "P134 transformer")}
+                  tier="good"
+                  size={104}
+                  delayMs={120}
+                />
+                <CoverageRing
+                  value={m.gender_balance_score}
+                  label={t("overview.ringGenderBal", "Gender balance")}
+                  sub={t("overview.ringGenderBalSub", "male / female ratio")}
+                  tier={m.gender_balance_score >= 95 ? "good" : "warn"}
+                  size={104}
+                  delayMs={240}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-2.5 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[10px] text-muted-foreground">{t("overview.metricVoters", "Verified voters")}</div>
+                    <div className="text-sm font-bold tabular">{m.total_voters.toLocaleString()}</div>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-mlk/20 bg-mlk/5 p-2.5 flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-mlk flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[10px] text-muted-foreground">{t("overview.metricSeniorDep", "Senior dependency")}</div>
+                    <div className={`text-sm font-bold tabular ${m.senior_dependency_percent >= 25 ? "text-amber-600 dark:text-amber-300" : ""}`}>{m.senior_dependency_percent.toFixed(1)}%</div>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-mlk/20 bg-mlk/5 p-2.5 flex items-center gap-2">
+                  <Database className="h-4 w-4 text-mlk flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[10px] text-muted-foreground">{t("overview.metricEvidence", "Evidence tier")}</div>
+                    <div className="text-sm font-bold">Proxy · 8/9 gates</div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[9px] text-muted-foreground italic mt-2.5 flex items-start gap-1">
+                <Info className="h-3 w-3 flex-shrink-0 mt-0.5 text-mlk" />
+                <span>{t("overview.dataQualityNote", "Coverage reflects DUNs with engine-built voter intelligence (P134). Remaining 23 DUNs use public election results only — see Governance → Gate 9.")}</span>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Elections history + DUN composition */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">

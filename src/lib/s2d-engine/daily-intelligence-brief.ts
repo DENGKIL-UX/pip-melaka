@@ -17,15 +17,15 @@
 
 const ENTITY_CODES = ["BN", "PH", "PN"];
 
-export const S2D_DAILY_BRIEF_STATUSES = Object.freeze([
+export const S2D_DAILY_BRIEF_STATUSES = [
   "AVAILABLE",
   "PARTIAL_DATA",
   "NO_ACCEPTED_DATA",
   "INSUFFICIENT_HISTORY",
   "REVIEW_REQUIRED",
-]) as const;
+] as const;
 
-export const S2D_DAILY_BRIEF_SECTIONS = Object.freeze([
+export const S2D_DAILY_BRIEF_SECTIONS = [
   "executiveJudgement",
   "mostImportantChange",
   "highestRiskNarrative",
@@ -38,7 +38,7 @@ export const S2D_DAILY_BRIEF_SECTIONS = Object.freeze([
   "recommendedActions",
   "evidenceLinks",
   "confidenceAndLimitations",
-]) as const;
+] as const;
 
 const PROHIBITED_INFERENCE_KEYWORDS = [
   "voter support", "vote intention", "approval rating",
@@ -70,7 +70,7 @@ interface BriefSignalRecord {
   evidenceUrl?: string;
 }
 
-interface BriefInput {
+export interface BriefInput {
   reportDate: string;
   generatedAt: string;
   acceptedRecords: BriefSignalRecord[];

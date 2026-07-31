@@ -745,4 +745,109 @@
     --background: oklch(0.145 0 0);
     --card: oklch(0.175 0.005 285);
   }
+
+  /* ═══ R12: Refined detail utilities — denser, more tactile surfaces ═══ */
+
+  /* Premium stat surface with a top accent bar + inner highlight */
+  .stat-card-pro {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .stat-card-pro::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, #C77B2C, #E89B45, #C77B2C);
+    opacity: 0.85;
+  }
+  .stat-card-pro::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120% 80% at 0% 0%, rgba(199, 123, 44, 0.06), transparent 60%);
+    pointer-events: none;
+  }
+  .stat-card-pro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px -12px rgba(199, 123, 44, 0.35);
+  }
+
+  /* Section eyebrow — tiny uppercase label above headings */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C77B2C;
+  }
+
+  /* Compact insight chip — used for inline data-quality / tier hints */
+  .insight-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.3;
+    background: rgba(199, 123, 44, 0.08);
+    color: #A55A1F;
+    border: 1px solid rgba(199, 123, 44, 0.18);
+  }
+  .dark .insight-chip { color: #E89B45; }
+
+  /* Soft aurora glow backdrop for hero / banner areas */
+  .bg-aurora {
+    background:
+      radial-gradient(60% 50% at 15% 10%, rgba(199, 123, 44, 0.10), transparent 70%),
+      radial-gradient(50% 45% at 85% 0%, rgba(232, 155, 69, 0.08), transparent 70%);
+  }
+
+  /* Live activity dot — MLK amber with an expanding ring (kept distinct
+     from the generic .pulse-dot so color stays on-brand). */
+  .live-dot-mlk {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #C77B2C;
+  }
+  .live-dot-mlk::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(199, 123, 44, 0.55);
+    animation: mlk-live-ring 1.6s ease-out infinite;
+  }
+  @keyframes mlk-live-ring {
+    0% { transform: scale(0.75); opacity: 1; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+
+  /* Underline-on-hover for inline action links */
+  .link-mlk {
+    color: #C77B2C;
+    text-decoration: none;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.15s ease;
+  }
+  .link-mlk:hover { border-bottom-color: #C77B2C; }
+
+  /* Print-only rules — keep the brief / reports clean on paper */
+  @media print {
+    header, footer, .no-print, [aria-label="Export intelligence brief as JSON"] { display: none !important; }
+    .app-main { padding: 0 !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .card-mlk-pro, .stat-card-pro { box-shadow: none !important; }
+  }
 }

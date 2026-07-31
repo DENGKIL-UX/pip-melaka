@@ -746,12 +746,12 @@ export function Map3DTab() {
           </span>
         </div>
 
-        {/* 3D canvas container */}
+        {/* 3D canvas container — brightened background for better visibility */}
         <div className="relative isolate rounded-lg border border-slate-700 overflow-hidden" style={{ height: 540 }}>
           <div
             ref={mountRef}
             className="w-full h-full"
-            style={{ background: "#0a0f1e" }}
+            style={{ background: "#1a2332" }}
             role="img"
             aria-label="3D visualization of 28 Melaka DUN extrusions"
           />
@@ -895,13 +895,13 @@ export function Map3DTab() {
 
           {/* Seat summary — bottom-left */}
           <div className="absolute bottom-3 left-3 z-10">
-            <div className="rounded-lg border border-mlk/30 bg-slate-950/90 px-3 py-2 shadow-lg backdrop-blur">
-              <div className="text-[10px] text-slate-400 uppercase mb-1">{scenario} {scenario === "GE15" ? "parlimen" : "DUN"} seats</div>
+            <div className="glass rounded-lg border border-mlk/30 px-3 py-2 shadow-lg backdrop-blur">
+              <div className="text-[10px] text-muted-foreground uppercase mb-1">{scenario} {scenario === "GE15" ? "parlimen" : "DUN"} seats</div>
               <div className="flex gap-3">
                 {Object.entries(seatCounts).map(([party, count]) => (
                   <div key={party} className="text-center">
                     <div className="text-lg font-bold" style={{ color: coalitionColor(party) }}>{count}</div>
-                    <div className="text-[9px] text-slate-400">{party}</div>
+                    <div className="text-[9px] text-muted-foreground">{party}</div>
                   </div>
                 ))}
               </div>
@@ -910,24 +910,24 @@ export function Map3DTab() {
 
           {/* Height legend — bottom-right */}
           <div className="absolute bottom-3 right-3 z-10">
-            <div className="rounded-lg border border-mlk/30 bg-slate-950/90 px-3 py-2 shadow-lg backdrop-blur">
-              <div className="text-[10px] text-slate-400 uppercase mb-1">Height = Margin</div>
+            <div className="glass rounded-lg border border-mlk/30 px-3 py-2 shadow-lg backdrop-blur">
+              <div className="text-[10px] text-muted-foreground uppercase mb-1">Height = Margin</div>
               <div className="flex items-end gap-1">
                 <div className="flex flex-col items-center">
                   <div className="w-3 bg-emerald-500" style={{ height: 8 }} />
-                  <div className="text-[8px] text-slate-400 mt-0.5">Safe</div>
+                  <div className="text-[8px] text-muted-foreground mt-0.5">Safe</div>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="w-3 bg-amber-500" style={{ height: 14 }} />
-                  <div className="text-[8px] text-slate-400 mt-0.5">Mod.</div>
+                  <div className="text-[8px] text-muted-foreground mt-0.5">Mod.</div>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="w-3 bg-orange-500" style={{ height: 18 }} />
-                  <div className="text-[8px] text-slate-400 mt-0.5">Marg.</div>
+                  <div className="text-[8px] text-muted-foreground mt-0.5">Marg.</div>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="w-3 bg-red-500" style={{ height: 24 }} />
-                  <div className="text-[8px] text-slate-400 mt-0.5">Ultra</div>
+                  <div className="text-[8px] text-muted-foreground mt-0.5">Ultra</div>
                 </div>
               </div>
             </div>

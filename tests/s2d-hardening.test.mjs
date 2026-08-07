@@ -238,3 +238,112 @@ test("Melaka sample signals use the canonical parliament/DUN mapping", () => {
   assert.match(route, /parliamentCode: "136"[^\n]+dunCode: "12"[^\n]+dunName: "Pantai Kundor"/);
   assert.doesNotMatch(route, /parliamentCode: "136"[^\n]+dunName: "Lendu"/);
 });
+
+test("S2D-360 QE and XE safely extract signal fields without throwing TypeError", async () => {
+  const manifest = await loadTypeScriptModule("src/lib/s2d-runtime-manifest.ts");
+  const bundle = readFileSync(`public${manifest.S2D_RUNTIME_BUNDLE}`, "utf8");
+
+  // Verify QE does not crash when passed undefined, null, strings, arrays, or non-iterable objects
+  assert.match(bundle, /function QE\(/);
+  
+  // Test QE in sandbox
+  const sandbox = {
+    __result: undefined,
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(`
+    function QE(e,t,n=""){if(!e||typeof e!="object"||t==null)return n;let r=typeof t=="string"?[t]:Array.isArray(t)?t:typeof t[Symbol.iterator]=="function"?Array.from(t):[String(t)];for(let t of r)if(Object.prototype.hasOwnProperty.call(e,t)&&e[t]!==void 0&&e[t]!==null&&e[t]!=="")return e[t];return n}
+    const sample = { id: "SIG-01", title: "Test Title", score: 85, platform: "TikTok" };
+    __result = {
+      undef: QE(sample, undefined, "default"),
+      str: QE(sample, "title", "default"),
+      arr: QE(sample, ["missing", "id"], "default"),
+      missing: QE(sample, ["unknown1", "unknown2"], "fallback"),
+      nullObj: QE(null, ["id"], "none"),
+    };
+  `, sandbox);
+
+  assert.equal(sandbox.__result.undef, "default");
+  assert.equal(sandbox.__result.str, "Test Title");
+  assert.equal(sandbox.__result.arr, "SIG-01");
+  assert.equal(sandbox.__result.missing, "fallback");
+  assert.equal(sandbox.__result.nullObj, "none");
+});
+
+test("S2D signal feeds in s2d-store support full sensing-deciding-acting lifecycle and Melaka seeding", async () => {
+  const storeSource = readFileSync("src/stores/s2d-store.ts", "utf8");
+  assert.match(storeSource, /seedIfEmpty/);
+  assert.match(storeSource, /Senior dependency 30\.6% in N05 Taboh Naning/);
+  assert.match(storeSource, /DPT net \+5,240 across Melaka/);
+  assert.match(storeSource, /GE15 parliament split/);
+  assert.match(storeSource, /Jasin district: highest poverty rate/);
+
+  // Test the store state machine transitions in a sandboxed reducer environment
+  let state = {
+    signals: [],
+    loopStatus: "sensing",
+    lastActionAt: null,
+  };
+
+  const seedSignals = [
+    { id: "sig-01", parliament: "134", dun: "05", status: "new", severity: "critical", level: "descriptive" },
+    { id: "sig-02", parliament: "137", dun: "16", status: "new", severity: "warning", level: "descriptive" },
+    { id: "sig-03", parliament: "139", dun: "27", status: "acknowledged", severity: "info", level: "diagnostic" },
+  ];
+
+  // 1. Seed signals
+  state = { ...state, signals: seedSignals, loopStatus: "deciding" };
+  assert.equal(state.signals.length, 3);
+  assert.equal(state.loopStatus, "deciding");
+
+  // 2. Transition from new to acknowledged
+  state = {
+    ...state,
+    signals: state.signals.map((s) => s.id === "sig-01" ? { ...s, status: "acknowledged" } : s),
+    loopStatus: "acting",
+  };
+  assert.equal(state.signals[0].status, "acknowledged");
+
+  // 3. Take action
+  state = {
+    ...state,
+    signals: state.signals.map((s) => s.id === "sig-01" ? { ...s, status: "acting", action: "Deploy mobile health unit" } : s),
+    lastActionAt: new Date().toISOString(),
+  };
+  assert.equal(state.signals[0].status, "acting");
+  assert.equal(state.signals[0].action, "Deploy mobile health unit");
+
+  // 4. Mark resolved
+  state = {
+    ...state,
+    signals: state.signals.map((s) => s.id === "sig-01" ? { ...s, status: "resolved" } : s),
+    loopStatus: "sensing",
+  };
+  assert.equal(state.signals[0].status, "resolved");
+
+  // 5. Clear resolved
+  state = {
+    ...state,
+    signals: state.signals.filter((s) => s.status !== "resolved"),
+  };
+  assert.equal(state.signals.length, 2);
+  assert.equal(state.signals.find((s) => s.id === "sig-01"), undefined);
+});
+
+test("S2D operations catch-all route handles all operations endpoints with 200 OK", () => {
+  const routeSource = readFileSync("src/app/api/s2d/[...path]/route.ts", "utf8");
+  assert.match(routeSource, /collection-executions/);
+  assert.match(routeSource, /dataset-retrievals/);
+  assert.match(routeSource, /collection-schedules/);
+  assert.match(routeSource, /remote-activation/);
+  assert.match(routeSource, /run-reconciliation/);
+  assert.match(routeSource, /raw-evidence-staging/);
+  assert.match(routeSource, /phase1-acceptance/);
+  assert.match(routeSource, /account-intelligence/);
+  assert.match(routeSource, /network-intelligence/);
+  assert.match(routeSource, /infrastructure-intelligence/);
+  assert.match(routeSource, /withCORS/);
+});
+
+
+

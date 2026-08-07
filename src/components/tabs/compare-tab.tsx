@@ -1,248 +1,205 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeftRight, Copy, Twitter, MessageCircle, FileSpreadsheet, Users, Building2, TrendingUp, Trophy, WifiOff } from "lucide-react";
+import { Segmented } from "@/components/ui/segmented";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeftRight, Building2, Copy, FileSpreadsheet, Landmark, MapPin, TrendingUp, Trophy, Users, WifiOff } from "lucide-react";
 import { PARLIAMENTS } from "@/lib/melaka-constants";
-import { PARTY_COLORS } from "@/lib/party-colors";
+import { DUN_SUMMARY, type DunSummary } from "@/lib/dun-summary";
 import { DUN_FALLBACK, DPT_FALLBACK } from "@/lib/fallback-data";
+import { PARTY_COLORS } from "@/lib/party-colors";
 import { useI18n } from "@/lib/i18n";
+
+type ComparisonLevel = "parliament" | "dun";
 
 interface DunRecord {
   geography: { parliament_code: string; dun_code: string; dun_name: string };
-  metrics: { total_voters: number; male_voters: number; female_voters: number; senior_voters_56_plus?: number; senior_dependency_percent: number; gender_balance_score: number; male_percent: number; female_percent: number; dominant_age_group: string; dominant_ethnicity_group: string };
+  metrics: {
+    total_voters: number; male_voters: number; female_voters: number;
+    senior_voters_56_plus?: number; senior_dependency_percent: number;
+    gender_balance_score: number; male_percent: number; female_percent: number;
+    dominant_age_group: string; dominant_ethnicity_group: string;
+  };
 }
 interface DptData { per_parliament: Array<{ parliament_code: string; parliament_name: string; additions: number; deletions: number; net: number }>; }
 
-interface ParlAgg {
-  code: string; name: string; voters: number; male: number; female: number; malePct: number; femalePct: number;
-  seniorDep: number; genderBal: number; duns: number; age: string; ethnicity: string;
-  dpt?: { additions: number; deletions: number; net: number };
-  ge15Winner: "PH" | "BN" | "PN";
+interface ComparisonRecord {
+  id: string;
+  label: string;
+  subtitle: string;
+  voters?: number;
+  malePct?: number;
+  femalePct?: number;
+  seniorDep?: number;
+  genderBal?: number;
+  dptNet?: number;
+  winner: string;
+  winnerParty: string;
+  candidate: string;
+  margin: number;
+  priorMargin: number;
+  swing: boolean;
+  dataAvailable: boolean;
 }
 
-function StatRow({ label, a, b, highlight }: { label: string; a: string; b: string; highlight?: "a" | "b" }) {
+const marginBand = (margin: number) => {
+  if (margin < 5) return { label: "Marginal", className: "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-300" };
+  if (margin < 10) return { label: "Competitive", className: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300" };
+  return { label: "Safe", className: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" };
+};
+
+function MetricRow({ label, values, formatter = (value) => value }: { label: string; values: Array<number | undefined>; formatter?: (value: number) => string }) {
   return (
-    <div className="grid grid-cols-3 gap-2 py-1.5 border-b border-border/30 text-xs">
+    <div className="grid grid-cols-4 gap-2 border-b border-border/30 py-2 text-xs last:border-0">
       <div className="text-muted-foreground">{label}</div>
-      <div className={`text-right font-mono ${highlight === "a" ? "text-mlk font-bold" : ""}`}>{a}</div>
-      <div className={`text-right font-mono ${highlight === "b" ? "text-mlk font-bold" : ""}`}>{b}</div>
+      {values.map((value, index) => <div key={index} className="text-right font-mono">{value === undefined ? <span className="text-muted-foreground">—</span> : formatter(value)}</div>)}
+    </div>
+  );
+}
+
+function SeatHeader({ record }: { record: ComparisonRecord }) {
+  const band = marginBand(record.margin);
+  const coalitionColor = PARTY_COLORS[record.winner as keyof typeof PARTY_COLORS] ?? "#64748b";
+  return (
+    <div className="min-w-0 text-right">
+      <div className="flex items-center justify-end gap-1.5">
+        <span className="truncate font-semibold text-mlk" title={record.label}>{record.label}</span>
+        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: coalitionColor }} />
+      </div>
+      <div className="truncate text-[10px] text-muted-foreground" title={record.subtitle}>{record.subtitle}</div>
+      <Badge variant="outline" className={`mt-1 text-[8px] ${band.className}`}>{band.label} · {record.margin.toFixed(1)}pp</Badge>
     </div>
   );
 }
 
 export function CompareTab() {
   const { t } = useI18n();
+  const [level, setLevel] = useState<ComparisonLevel>("parliament");
   const [duns, setDuns] = useState<DunRecord[]>([]);
   const [dpt, setDpt] = useState<DptData | null>(null);
   const [offline, setOffline] = useState(false);
-  const [codeA, setCodeA] = useState<string>("134");
-  const [codeB, setCodeB] = useState<string>("137");
-  const [codeC, setCodeC] = useState<string>("139");
+  const [selected, setSelected] = useState(["134", "137", "139"]);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
-      fetch("/data/p134/dun-intelligence.jsonl").then((r) => r.text()).then((t) => t.trim().split("\n").map((l) => JSON.parse(l) as DunRecord)),
-      fetch("/data/dpt/spr-dpt-pameran-summary.json").then((r) => r.json()),
+      fetch("/data/p134/dun-intelligence.jsonl").then((r) => r.ok ? r.text() : Promise.reject(new Error("DUN data unavailable")).then((text) => text.trim().split("\n").map((line) => JSON.parse(line) as DunRecord)),
+      fetch("/data/dpt/spr-dpt-pameran-summary.json").then((r) => r.ok ? r.json() : Promise.reject(new Error("DPT data unavailable"))),
     ]).then(([d, dp]) => { setDuns(d); setDpt(dp); }).catch(() => {
-      // Dev server OOM / fetch failure — render inline fallback so the tab
-      // ALWAYS shows content. Mirrors public/data/p134/dun-intelligence.jsonl
-      // and public/data/dpt/spr-dpt-pameran-summary.json.
       setDuns(DUN_FALLBACK as unknown as DunRecord[]);
       setDpt(DPT_FALLBACK as DptData);
       setOffline(true);
     });
   }, []);
 
-  // Aggregate by parliament from P134 DUN data. P135-P139 fallback to PARLIAMENTS constants (no raw voter rolls yet).
-  const aggByCode = useMemo(() => {
-    const map = new Map<string, ParlAgg>();
-    PARLIAMENTS.forEach((p) => {
-      const dunRows = duns.filter((d) => d.geography.parliament_code === p.code);
-      const voters = dunRows.length > 0 ? dunRows.reduce((s, d) => s + d.metrics.total_voters, 0) : p.totalVoters;
-      const male = dunRows.reduce((s, d) => s + d.metrics.male_voters, 0);
-      const female = dunRows.reduce((s, d) => s + d.metrics.female_voters, 0);
-      const sen = dunRows.length > 0 ? dunRows.reduce((s, d) => s + (d.metrics.senior_voters_56_plus ?? Math.round(d.metrics.total_voters * d.metrics.senior_dependency_percent / 100)), 0) / Math.max(voters, 1) * 100 : 26.8;
-      const malePct = voters > 0 ? male / voters * 100 : 48.77;
-      const femalePct = voters > 0 ? female / voters * 100 : 51.23;
-      map.set(p.code, {
-        code: p.code, name: p.name, voters, male, female, malePct, femalePct,
-        seniorDep: sen, genderBal: dunRows.length > 0 ? dunRows.reduce((s, d) => s + d.metrics.gender_balance_score, 0) / dunRows.length : 97.5,
-        duns: p.dunCount, age: dunRows[0]?.metrics.dominant_age_group ?? "n/a", ethnicity: dunRows[0]?.metrics.dominant_ethnicity_group ?? "n/a",
-        dpt: dpt?.per_parliament.find((x) => x.parliament_code === p.code),
-        ge15Winner: p.ge15Winner,
-      });
-    });
-    return map;
-  }, [duns, dpt]);
+  // Keep selections meaningful when switching geography level.
+  useEffect(() => {
+    setSelected(level === "parliament" ? ["134", "137", "139"] : ["01", "11", "21"]);
+  }, [level]);
 
-  const a = aggByCode.get(codeA);
-  const b = aggByCode.get(codeB);
-  const c = aggByCode.get(codeC);
-  if (!a || !b) return <Card className="border-mlk/20"><CardContent className="p-4 text-sm text-muted-foreground">Loading…</CardContent></Card>;
+  const parliamentRecords = useMemo(() => PARLIAMENTS.map((parliament): ComparisonRecord => {
+    const rows = duns.filter((d) => d.geography.parliament_code === parliament.code);
+    const voters = rows.length ? rows.reduce((sum, d) => sum + d.metrics.total_voters, 0) : undefined;
+    const male = rows.length ? rows.reduce((sum, d) => sum + d.metrics.male_voters, 0) : 0;
+    const female = rows.length ? rows.reduce((sum, d) => sum + d.metrics.female_voters, 0) : 0;
+    const latestSeats = DUN_SUMMARY.filter((d) => d.parliamentCode === parliament.code);
+    const margin = latestSeats.reduce((sum, d) => sum + d.prn15.marginPct, 0) / latestSeats.length;
+    const oldMargin = latestSeats.reduce((sum, d) => sum + d.ge14.marginPct, 0) / latestSeats.length;
+    const winningCoalition = parliament.ge15Winner;
+    return {
+      id: parliament.code, label: `P${parliament.code} · ${parliament.name}`, subtitle: `${parliament.dunCount} DUN · ${parliament.district}`,
+      voters, malePct: voters ? male / voters * 100 : undefined, femalePct: voters ? female / voters * 100 : undefined,
+      seniorDep: rows.length ? rows.reduce((sum, d) => sum + d.metrics.senior_dependency_percent, 0) / rows.length : undefined,
+      genderBal: rows.length ? rows.reduce((sum, d) => sum + d.metrics.gender_balance_score, 0) / rows.length : undefined,
+      dptNet: dpt?.per_parliament.find((item) => item.parliament_code === parliament.code)?.net,
+      winner: winningCoalition, winnerParty: winningCoalition, candidate: "GE15 parliamentary result", margin, priorMargin: oldMargin,
+      swing: latestSeats.some((d) => d.swing), dataAvailable: rows.length > 0,
+    };
+  }), [duns, dpt]);
 
-  const voterDiff = a.voters - b.voters;
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2000); };
+  const dunRecords = useMemo(() => DUN_SUMMARY.map((dun: DunSummary): ComparisonRecord => {
+    const intelligence = duns.find((row) => row.geography.dun_code === dun.dunCode);
+    const metrics = intelligence?.metrics;
+    return {
+      id: dun.dunCode, label: `${dun.dunCodeLabel} · ${dun.dunName}`, subtitle: `P${dun.parliamentCode} ${dun.parliamentName} · ${dun.district}`,
+      voters: metrics?.total_voters, malePct: metrics?.male_percent, femalePct: metrics?.female_percent,
+      seniorDep: metrics?.senior_dependency_percent, genderBal: metrics?.gender_balance_score,
+      winner: dun.prn15.coalition, winnerParty: dun.prn15.party, candidate: dun.incumbentCandidate,
+      margin: dun.prn15.marginPct, priorMargin: dun.ge14.marginPct, swing: dun.swing, dataAvailable: Boolean(metrics),
+    };
+  }), [duns]);
 
-  const onCopyUrl = () => {
-    const url = `${window.location.origin}/?compare=${codeA}-${codeB}`;
-    navigator.clipboard?.writeText(url);
-    showToast(t("compare.toastUrlCopied"));
+  const options = level === "parliament" ? parliamentRecords : dunRecords;
+  const records = selected.map((id) => options.find((item) => item.id === id)).filter(Boolean) as ComparisonRecord[];
+  const setSeat = (index: number, value: string) => setSelected((previous) => previous.map((item, itemIndex) => itemIndex === index ? value : item));
+  const showToast = (message: string) => { setToast(message); window.setTimeout(() => setToast(null), 2200); };
+
+  const copyLink = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("compareLevel", level);
+    url.searchParams.set("compare", selected.join("-"));
+    navigator.clipboard?.writeText(url.toString());
+    showToast("Comparison link copied");
   };
-  const onTweet = () => { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`PIP-MLK compare: ${a.name} vs ${b.name}`)}&url=${encodeURIComponent(window.location.href)}`, "_blank"); };
-  const onWhatsApp = () => { window.open(`https://wa.me/?text=${encodeURIComponent(`PIP-MLK compare ${a.name} vs ${b.name}: ${window.location.href}`)}`, "_blank"); };
-  const onCsv = () => {
-    const rows = [["metric", a.name, b.name], ["voters", a.voters, b.voters], ["male %", a.malePct.toFixed(1), b.malePct.toFixed(1)], ["female %", a.femalePct.toFixed(1), b.femalePct.toFixed(1)], ["senior dep", a.seniorDep.toFixed(1), b.seniorDep.toFixed(1)], ["gender bal", a.genderBal.toFixed(1), b.genderBal.toFixed(1)], ["DPT net", a.dpt?.net ?? 0, b.dpt?.net ?? 0]];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url; link.download = `compare-${a.code}-vs-${b.code}.csv`; link.click();
-    URL.revokeObjectURL(url);
-    showToast(t("compare.toastCsvDownloaded"));
+  const downloadCsv = () => {
+    const rows = [
+      ["metric", ...records.map((record) => record.label)],
+      ["latest winner", ...records.map((record) => `${record.winner} · ${record.winnerParty}`)],
+      ["PRN15 margin (pp)", ...records.map((record) => record.margin.toFixed(1))],
+      ["GE14 margin (pp)", ...records.map((record) => record.priorMargin.toFixed(1))],
+      ["swing", ...records.map((record) => record.swing ? "Yes" : "No")],
+      ["verified voters", ...records.map((record) => record.voters ?? "")],
+      ["senior dependency (%)", ...records.map((record) => record.seniorDep?.toFixed(1) ?? "")],
+    ];
+    const csv = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const link = document.createElement("a"); link.href = url; link.download = `${level}-comparison.csv`; link.click(); URL.revokeObjectURL(url);
+    showToast("Comparison CSV downloaded");
   };
 
   return (
     <div className="space-y-4 fade-in-up">
-      <Card className="border-mlk/20">
-        <CardContent className="p-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <ArrowLeftRight className="h-4 w-4 text-mlk flex-shrink-0" />
-          <span>{t("compare.intro")}</span>
-          {offline && (
-            <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-700 dark:text-amber-300">
-              <WifiOff className="h-2.5 w-2.5" /> {t("compare.offlineData")}
-            </span>
-          )}
-        </CardContent>
-      </Card>
+      <Card className="border-mlk/20"><CardContent className="flex items-center gap-2 p-3 text-xs text-muted-foreground">
+        <ArrowLeftRight className="h-4 w-4 shrink-0 text-mlk" />
+        <span>{level === "parliament" ? t("compare.intro") : "Compare three DUN seats using PRN15 and GE14 election results. Voter-demographic metrics appear only where verified DUN intelligence is available."}</span>
+        {offline && <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] text-amber-700 dark:text-amber-300"><WifiOff className="h-2.5 w-2.5" /> {t("compare.offlineData")}</span>}
+      </CardContent></Card>
 
-      {/* Selectors — §7.6: Third comparison slot */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-        <div>
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">{t("compare.parliamentA")}</label>
-          <Select value={codeA} onValueChange={setCodeA}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-            <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
+      <Segmented value={level} onChange={(value) => setLevel(value)} options={[
+        { value: "parliament", label: "Parliament" }, { value: "dun", label: "DUN" },
+      ]} />
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        {selected.map((value, index) => <div key={`${level}-${index}`}>
+          <label className="mb-1 block text-[10px] uppercase tracking-wide text-muted-foreground">{level === "dun" ? `DUN ${String.fromCharCode(65 + index)}` : `Parliament ${String.fromCharCode(65 + index)}`}</label>
+          <Select value={value} onValueChange={(next) => setSeat(index, next)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>{options.map((option) => <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>)}</SelectContent>
           </Select>
-        </div>
-        <div>
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">{t("compare.parliamentB")}</label>
-          <Select value={codeB} onValueChange={setCodeB}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-            <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 block">{t("compare.parliamentC")}</label>
-          <Select value={codeC} onValueChange={setCodeC}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-            <SelectContent>{PARLIAMENTS.map((p) => <SelectItem key={p.code} value={p.code}>P{p.code} · {p.name}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
+        </div>)}
       </div>
 
-      {/* Side-by-side — §7.6: Extended to 3 columns with auto-highlight */}
-      <Card className="border-mlk/30">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2"><Users className="h-4 w-4 text-mlk" /> {t("compare.sideBySide")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className={`grid gap-2 py-2 border-b border-mlk/20 text-[10px] uppercase tracking-wide text-muted-foreground ${c ? "grid-cols-4" : "grid-cols-3"}`}>
-            <div>{t("compare.metric")}</div>
-            <div className="text-right text-mlk font-semibold">P{a.code} {a.name}</div>
-            <div className="text-right text-mlk font-semibold">P{b.code} {b.name}</div>
-            {c && <div className="text-right text-mlk font-semibold">P{c.code} {c.name}</div>}
-          </div>
-          {/* §7.6: Auto-highlight best value in green */}
-          {(() => {
-            const threeCol = !!c;
-            const maxVoters = Math.max(a.voters, b.voters, c?.voters ?? 0);
-            const minSenior = Math.min(a.seniorDep, b.seniorDep, c?.seniorDep ?? 999);
-            const maxGender = Math.max(a.genderBal, b.genderBal, c?.genderBal ?? 0);
-            const maxNet = Math.max(a.dpt?.net ?? 0, b.dpt?.net ?? 0, c?.dpt?.net ?? 0);
-            return (
-              <>
-                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">{t("compare.totalVoters")}</div>
-                  <div className={`text-right font-mono ${a.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{a.voters.toLocaleString()}</div>
-                  <div className={`text-right font-mono ${b.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{b.voters.toLocaleString()}</div>
-                  {c && <div className={`text-right font-mono ${c.voters === maxVoters ? "text-emerald-600 font-bold" : ""}`}>{c.voters.toLocaleString()}</div>}
-                </div>
-                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">{t("compare.seniorDepPct")}</div>
-                  <div className={`text-right font-mono ${a.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{a.seniorDep.toFixed(1)}%</div>
-                  <div className={`text-right font-mono ${b.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{b.seniorDep.toFixed(1)}%</div>
-                  {c && <div className={`text-right font-mono ${c.seniorDep === minSenior ? "text-emerald-600 font-bold" : ""}`}>{c.seniorDep.toFixed(1)}%</div>}
-                </div>
-                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">{t("compare.genderBal")}</div>
-                  <div className={`text-right font-mono ${a.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{a.genderBal.toFixed(1)}</div>
-                  <div className={`text-right font-mono ${b.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{b.genderBal.toFixed(1)}</div>
-                  {c && <div className={`text-right font-mono ${c.genderBal === maxGender ? "text-emerald-600 font-bold" : ""}`}>{c.genderBal.toFixed(1)}</div>}
-                </div>
-                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 border-b border-border/30 text-xs`}>
-                  <div className="text-muted-foreground">{t("compare.dptNet")}</div>
-                  <div className={`text-right font-mono ${(a.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{a.dpt?.net ?? 0}</div>
-                  <div className={`text-right font-mono ${(b.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{b.dpt?.net ?? 0}</div>
-                  {c && <div className={`text-right font-mono ${(c.dpt?.net ?? 0) === maxNet ? "text-emerald-600 font-bold" : ""}`}>+{c.dpt?.net ?? 0}</div>}
-                </div>
-                <div className={`grid ${threeCol ? "grid-cols-4" : "grid-cols-3"} gap-2 py-1.5 text-xs`}>
-                  <div className="text-muted-foreground">{t("compare.ge15Winner")}</div>
-                  <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[a.ge15Winner] }}>{a.ge15Winner}</span></div>
-                  <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[b.ge15Winner] }}>{b.ge15Winner}</span></div>
-                  {c && <div className="text-right"><span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: PARTY_COLORS[c.ge15Winner] }}>{c.ge15Winner}</span></div>}
-                </div>
-              </>
-            );
-          })()}
-          <div className="text-[9px] text-muted-foreground mt-2 flex items-center gap-1">
-            <span className="text-emerald-600 font-bold">●</span> {t("compare.bestValue")}
-          </div>
-        </CardContent>
-      </Card>
+      <Card className="border-mlk/30"><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-sm"><Landmark className="h-4 w-4 text-mlk" /> Side-by-side {level === "dun" ? "DUN" : "Parliament"} comparison</CardTitle></CardHeader><CardContent>
+        <div className="grid grid-cols-4 gap-2 border-b border-mlk/20 pb-3 text-[10px] uppercase tracking-wide text-muted-foreground"><div>Metric</div>{records.map((record) => <SeatHeader key={record.id} record={record} />)}</div>
+        <div className="grid grid-cols-4 gap-2 border-b border-border/30 py-2 text-xs"><div className="text-muted-foreground">Latest winner</div>{records.map((record) => <div key={record.id} className="text-right"><div className="font-semibold">{record.winner} · {record.winnerParty}</div><div className="truncate text-[10px] text-muted-foreground" title={record.candidate}>{record.candidate}</div></div>)}</div>
+        <MetricRow label="Latest margin" values={records.map((record) => record.margin)} formatter={(value) => `${value.toFixed(1)}pp`} />
+        <MetricRow label="GE14 margin" values={records.map((record) => record.priorMargin)} formatter={(value) => `${value.toFixed(1)}pp`} />
+        <div className="grid grid-cols-4 gap-2 border-b border-border/30 py-2 text-xs"><div className="text-muted-foreground">Seat changed hands</div>{records.map((record) => <div key={record.id} className="text-right">{record.swing ? <span className="font-medium text-amber-600 dark:text-amber-300">Yes</span> : "No"}</div>)}</div>
+        <MetricRow label="Verified voters" values={records.map((record) => record.voters)} formatter={(value) => value.toLocaleString()} />
+        <div className="grid grid-cols-4 gap-2 border-b border-border/30 py-2 text-xs"><div className="text-muted-foreground">Male / female</div>{records.map((record) => <div key={record.id} className="text-right font-mono">{record.malePct === undefined || record.femalePct === undefined ? <span className="text-muted-foreground">—</span> : `${record.malePct.toFixed(1)}% / ${record.femalePct.toFixed(1)}%`}</div>)}</div>
+        <MetricRow label="Senior dependency" values={records.map((record) => record.seniorDep)} formatter={(value) => `${value.toFixed(1)}%`} />
+        <MetricRow label="Gender balance" values={records.map((record) => record.genderBal)} formatter={(value) => value.toFixed(1)} />
+        {level === "parliament" && <MetricRow label="DPT net change" values={records.map((record) => record.dptNet)} formatter={(value) => `${value > 0 ? "+" : ""}${value.toLocaleString()}`} />}
+      </CardContent></Card>
 
-      {/* Verdict */}
-      <Card className="border-mlk/30 bg-mlk-radial">
-        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4 text-mlk" /> {t("compare.verdict")}</CardTitle></CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div className="rounded-md border border-border/40 p-3">
-              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Building2 className="h-3 w-3" /> {t("compare.voterDiff")}</div>
-              <div className="text-lg font-bold text-mlk">{voterDiff > 0 ? "+" : ""}{voterDiff.toLocaleString()}</div>
-              <div className="text-[10px] text-muted-foreground">{voterDiff > 0 ? t("compare.voterLarger").replace("{name}", a.name) : voterDiff < 0 ? t("compare.voterLarger").replace("{name}", b.name) : t("compare.equal")}</div>
-            </div>
-            <div className="rounded-md border border-border/40 p-3">
-              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> {t("compare.dptNetDiff")}</div>
-              <div className="text-lg font-bold text-mlk">{((a.dpt?.net ?? 0) - (b.dpt?.net ?? 0)).toLocaleString()}</div>
-              <div className="text-[10px] text-muted-foreground">{(a.dpt?.net ?? 0) > (b.dpt?.net ?? 0) ? t("compare.fasterGrowth").replace("{name}", a.name) : t("compare.comparable")}</div>
-            </div>
-            <div className="rounded-md border border-border/40 p-3">
-              <div className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1"><Users className="h-3 w-3" /> {t("compare.seniorDepRisk")}</div>
-              <div className="text-lg font-bold" style={{ color: a.seniorDep >= 30 || b.seniorDep >= 30 ? "#dc2626" : "#16a34a" }}>
-                {a.seniorDep >= 30 || b.seniorDep >= 30 ? t("compare.critical") : t("compare.ok")}
-              </div>
-              <div className="text-[10px] text-muted-foreground">{a.seniorDep > b.seniorDep ? t("compare.older").replace("{name}", a.name) : t("compare.older").replace("{name}", b.name)}</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {level === "dun" && records.some((record) => !record.dataAvailable) && <Card className="border-amber-500/30 bg-amber-500/5"><CardContent className="flex gap-2 p-3 text-xs text-muted-foreground"><Users className="h-4 w-4 shrink-0 text-amber-600" /> Election comparisons are complete for all 28 DUNs. Demographic metrics marked “—” have not yet been verified outside the current P134 DUN intelligence coverage.</CardContent></Card>}
 
-      {/* Share buttons */}
-      <Card className="border-mlk/20">
-        <CardContent className="p-3">
-          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">{t("compare.share")}</div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onCopyUrl}><Copy className="h-3.5 w-3.5 me-1" /> {t("compare.copyUrl")}</Button>
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onTweet}><Twitter className="h-3.5 w-3.5 me-1" /> {t("compare.tweet")}</Button>
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onWhatsApp}><MessageCircle className="h-3.5 w-3.5 me-1" /> {t("compare.whatsapp")}</Button>
-            <Button size="sm" variant="outline" className="border-mlk/30 hover:bg-mlk/10 hover:text-mlk" onClick={onCsv}><FileSpreadsheet className="h-3.5 w-3.5 me-1" /> {t("compare.csv")}</Button>
-          </div>
-          {toast && <div className="text-[10px] text-emerald-600 mt-2">{toast}</div>}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">{records.map((record) => { const band = marginBand(record.margin); return <Card key={record.id} className="border-mlk/20"><CardContent className="p-4"><div className="mb-2 flex items-start justify-between gap-2"><div><div className="font-semibold text-sm">{record.label}</div><div className="text-[10px] text-muted-foreground">{record.subtitle}</div></div><Trophy className="h-4 w-4 shrink-0 text-mlk" /></div><div className="flex items-center justify-between"><Badge variant="outline" className={band.className}>{band.label}</Badge><span className="font-mono text-lg font-bold">{record.margin.toFixed(1)}pp</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full" style={{ width: `${Math.min(record.margin / 30 * 100, 100)}%`, backgroundColor: record.margin < 5 ? "#dc2626" : record.margin < 10 ? "#d97706" : "#16a34a" }} /></div><div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground"><TrendingUp className="h-3 w-3" /> GE14 → latest: {record.priorMargin.toFixed(1)}pp → {record.margin.toFixed(1)}pp</div></CardContent></Card>; })}</div>
+
+      <Card className="border-mlk/20"><CardContent className="flex flex-wrap gap-2 p-3"><Button size="sm" variant="outline" className="border-mlk/30" onClick={copyLink}><Copy className="me-1 h-3.5 w-3.5" /> Copy comparison link</Button><Button size="sm" variant="outline" className="border-mlk/30" onClick={downloadCsv}><FileSpreadsheet className="me-1 h-3.5 w-3.5" /> Export CSV</Button>{toast && <span className="self-center text-xs text-emerald-600">{toast}</span>}</CardContent></Card>
     </div>
   );
 }

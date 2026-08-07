@@ -31,6 +31,12 @@ import { detectChangePoints, type ChangePointInput } from "@/lib/s2d-engine/chan
 import { buildLocalSignalProfiles, type LocalSignalRecord } from "@/lib/s2d-engine/local-signal-profile";
 import { buildS2dDailyIntelligenceBrief, validateS2dDailyIntelligenceBrief, buildDailyBriefMarkdown, type BriefInput } from "@/lib/s2d-engine/daily-intelligence-brief";
 import { validatePipAggregateContext } from "@/lib/s2d-engine/pip-aggregate-context-adapter";
+import {
+  sanitizeForSharedAggregateExchange,
+  assertNoIndividualLinkage,
+  assertNoTargetingPayload,
+  assertNoElectionPredictionPayload,
+} from "@ritzanalytics/pip-s2d-contracts";
 
 // Sample signal data — 8 signals across 6 Melaka parliaments (P134-P139), all human-reviewed aggregate.
 // Would come from Apify scrapers (TikTok/FB/IG/Threads/X) in production via /api/scrape/run.
@@ -101,7 +107,7 @@ const SAMPLE_SIGNALS: SignalRecord[] = [
   },
   {
     snapshotId: "sig-004",
-    locality: { stateCode: "04", stateName: "Melaka", parliamentCode: "135", parliamentName: "Alor Gajah", dunCode: "08", dunName: "Gadek", localityName: "Gadek" },
+    locality: { stateCode: "04", stateName: "Melaka", parliamentCode: "135", parliamentName: "Alor Gajah", dunCode: "08", dunName: "Machap Jaya", localityName: "Machap Jaya" },
     politicalEntity: "BN",
     issue: "Youth employment",
     platform: "Instagram",
@@ -122,7 +128,7 @@ const SAMPLE_SIGNALS: SignalRecord[] = [
   },
   {
     snapshotId: "sig-005",
-    locality: { stateCode: "04", stateName: "Melaka", parliamentCode: "136", parliamentName: "Tang. Batu", dunCode: "12", dunName: "Lendu", localityName: "Lendu" },
+    locality: { stateCode: "04", stateName: "Melaka", parliamentCode: "136", parliamentName: "Tangga Batu", dunCode: "12", dunName: "Pantai Kundor", localityName: "Pantai Kundor" },
     politicalEntity: "PN",
     issue: "Cost of living",
     platform: "X",
@@ -294,7 +300,18 @@ export async function GET(req: NextRequest) {
         );
       });
     }
-    const signals = filtered.map((s) => ({
+    // Fail closed at the exchange boundary. The contracts package is a build-
+    // time dependency; silently returning unsanitised records if it cannot load
+    // would defeat the purpose of the boundary guard.
+    const sanitisation = sanitizeForSharedAggregateExchange({ signals: filtered });
+    assertNoIndividualLinkage(sanitisation.value);
+    assertNoTargetingPayload(sanitisation.value);
+    assertNoElectionPredictionPayload(sanitisation.value);
+    const sanitisedSignals = Array.isArray(sanitisation.value?.signals)
+      ? sanitisation.value.signals as SignalRecord[]
+      : [];
+
+    const signals = sanitisedSignals.map((s) => ({
       signalId: s.snapshotId,
       date: s.snapshotDate,
       locality: s.locality,
@@ -314,7 +331,12 @@ export async function GET(req: NextRequest) {
       signals,
       count: signals.length,
       localityCode: localityCode ?? "MELAKA",
-      governance: { aggregatePublicSignalsOnly: true, humanReviewRequired: true },
+      governance: {
+        aggregatePublicSignalsOnly: true,
+        humanReviewRequired: true,
+        sanitised: true,
+        prohibitedFieldCountRemoved: sanitisation.report.prohibitedFieldsRemoved.length,
+      },
     });
   } else if (path === "/narratives") {
     // Narrative clusters — aggregated themes across signals
@@ -413,4 +435,9 @@ export async function POST(req: NextRequest) {
   }
 
   return withCORS(() => NextResponse.json({ error: "Unknown POST route", path }, { status: 404 }))(req, {} as never);
+}
+
+export async function OPTIONS(req: NextRequest) {
+  const { handlePreflight } = await import("@/lib/cors");
+  return handlePreflight(req) ?? new NextResponse(null, { status: 403 });
 }

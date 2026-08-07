@@ -24,3 +24,8 @@ export const GET = withCORS(async () => {
     },
   });
 });
+
+export async function OPTIONS(req: NextRequest) {
+  const { handlePreflight } = await import("@/lib/cors");
+  return handlePreflight(req) ?? new NextResponse(null, { status: 403 });
+}

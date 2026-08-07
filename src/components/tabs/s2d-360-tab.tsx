@@ -4,12 +4,12 @@
  * S2D-360 Intelligence Engine tab — embeds the full S2D 360 engine via iframe.
  *
  * The S2D engine is a standalone React+Vite app built to static assets in
- * /public/s2d-360/. It provides 56 pages across 8 sections:
+ * /public/s2d-360/. It provides 63 pages across 8 sections:
  * - Intelligence: Overview, Analysis, Forecasting, Reporting
  * - Data Entry: Collection (scraper, intake, watchlist)
  * - Operations: Hub, Annotation Ops, Integration
  *
- * The iframe approach gives instant access to all 56 pages without porting
+ * The iframe approach gives instant access to all 63 pages without porting
  * 12,000+ files to Next.js/TypeScript. The engine runs in its own JS context
  * with its own IndexedDB storage — fully isolated from PIP-MLK.
  *
@@ -18,9 +18,9 @@
  * context (DUN-level demographics) can cross the boundary, and only when
  * explicitly enabled (currently DISABLED by default).
  *
- * Phase 2 will port the intelligence modules (src/intelligence/*) to
- * TypeScript and connect via /api/s2d/intelligence/* API routes.
- * Phase 3 will implement the /api/pip/aggregate-context endpoint.
+ * Native intelligence modules are exposed through /api/s2d/intelligence/*.
+ * /api/pip/aggregate-context is aggregate-only and currently has verified
+ * values for P134 / N01–N05; unsupported areas fail closed with 404.
  */
 
 import { useState, useEffect, useRef } from "react";

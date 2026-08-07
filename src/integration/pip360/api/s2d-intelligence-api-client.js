@@ -37,15 +37,16 @@ const DEFAULT_TIMEOUT_MS = 10000;
 
 // Base URLs
 function resolveBaseUrl() {
-  // Cloudflare Workers / Pages: use relative fetch (same-origin)
-  // Local Express engine: use http://localhost:4000
+  // Browser code must stay same-origin. A public localhost URL would point at
+  // the operator's browser, not the server/Worker, and would bypass the Next.js
+  // integration boundary. Callers can still pass opts.baseUrl explicitly in a
+  // controlled server-side integration test.
+  if (typeof window !== 'undefined') return '';
+
+  // Server-side local development may proxy to the Express engine on :4000.
   if (typeof process !== 'undefined' && process.env.S2D_ENGINE_URL) {
     return process.env.S2D_ENGINE_URL.replace(/\/$/, '');
   }
-  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_S2D_ENGINE_URL) {
-    return process.env.NEXT_PUBLIC_S2D_ENGINE_URL.replace(/\/$/, '');
-  }
-  // In browser, relative URL works for both local Next.js and Workers
   return '';
 }
 

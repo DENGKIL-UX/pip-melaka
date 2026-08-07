@@ -860,7 +860,7 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // ─── S2D 360 tab (§7.9 S2D-360 Intelligence Engine) ──────────────────
     "s2d360.engineVersion": "S2D-360 Intelligence Engine v1.0.0",
-    "s2d360.headerDescPre": "56 pages · 8 sections · Identity firewall active · PIP boundary: ",
+    "s2d360.headerDescPre": "63 pages · 8 sections · Identity firewall active · PIP boundary: ",
     "s2d360.headerDescPost": " (read-only)",
     "s2d360.disabled": "DISABLED",
     "s2d360.engineOnline": "Engine Online",
@@ -870,7 +870,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "s2d360.boundaryDescP1": "The S2D engine operates with a strict aggregate-only data contract. No individual voter data enters S2D — the identity firewall (28 rejected keys + 9 regex patterns) blocks any PII at the adapter layer. PIP context fusion is currently ",
     "s2d360.boundaryDescP2": " by default. Enabling it is a deliberate operator decision post-release.",
     "s2d360.nativeEngine": "Native Engine",
-    "s2d360.fullEngine": "Full Engine (56 pages)",
+    "s2d360.fullEngine": "Full Engine (63 pages)",
     "s2d360.pipContextApi": "PIP Context API",
     "s2d360.s2dApi": "S2D API",
     "s2d360.loadingNative": "Loading native engine data…",
@@ -907,7 +907,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "s2d360.fullscreen": "Fullscreen",
     "s2d360.openInNewTab": "Open in New Tab",
     "s2d360.loadingEngine": "Loading S2D-360 Intelligence Engine…",
-    "s2d360.loadingBundle": "56 pages · 3.3MB bundle",
+    "s2d360.loadingBundle": "63 pages · 3.17MB bundle",
     "s2d360.footerEngine": "Engine:",
     "s2d360.footerPages": "Pages:",
     "s2d360.footerSections": "Sections:",
@@ -1153,7 +1153,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "onboarding.marginal.title": "Senarai Pantau Kerusi Marginal",
     "onboarding.marginal.desc": "6 kerusi DUN dengan margin kemenangan <5pp — kerusi paling kompetitif yang berkemungkinan bertukar tangan dalam PRN16. Disusun mengikut margin paling nipis dengan skor risiko.",
     "onboarding.s2d.title": "Enjin Kecerdasan S2D",
-    "onboarding.s2d.desc": "Gelung 9-fasa Merasakan→Membuat Keputusan→Bertindak dengan enjin kecerdasan 56-halaman. Suapan isyarat masa nyata, simulasi senario, dan analitik ramalan.",
+    "onboarding.s2d.desc": "Gelung 9-fasa Merasakan→Membuat Keputusan→Bertindak dengan enjin kecerdasan 63-halaman. Suapan isyarat masa nyata, simulasi senario, dan analitik ramalan.",
     "onboarding.step": "Langkah",
     "onboarding.of": "daripada",
 
@@ -1911,7 +1911,7 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // ─── S2D 360 tab (§7.9 S2D-360 Intelligence Engine) ──────────────────
     "s2d360.engineVersion": "Enjin Kecerdasan S2D-360 v1.0.0",
-    "s2d360.headerDescPre": "56 halaman · 8 bahagian · Dinding identiti aktif · Sempadan PIP: ",
+    "s2d360.headerDescPre": "63 halaman · 8 bahagian · Dinding identiti aktif · Sempadan PIP: ",
     "s2d360.headerDescPost": " (baca-sahaja)",
     "s2d360.disabled": "DILUMPUHKAN",
     "s2d360.engineOnline": "Enjin Dalam Talian",
@@ -1921,7 +1921,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "s2d360.boundaryDescP1": "Enjin S2D beroperasi dengan kontrak data agregat-sahaja yang ketat. Tiada data pengundi individu memasuki S2D — dinding identiti (28 kunci ditolak + 9 corak regex) menghalang sebarang PII di lapisan penyesuai. Gabungan konteks PIP buat masa ini ",
     "s2d360.boundaryDescP2": " secara lalai. Membolehkannya adalah keputusan operator yang disengajakan selepas pelepasan.",
     "s2d360.nativeEngine": "Enjin Natif",
-    "s2d360.fullEngine": "Enjin Penuh (56 halaman)",
+    "s2d360.fullEngine": "Enjin Penuh (63 halaman)",
     "s2d360.pipContextApi": "API Konteks PIP",
     "s2d360.s2dApi": "API S2D",
     "s2d360.loadingNative": "Memuatkan data enjin natif…",
@@ -1958,7 +1958,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "s2d360.fullscreen": "Skrin Penuh",
     "s2d360.openInNewTab": "Buka di Tab Baharu",
     "s2d360.loadingEngine": "Memuatkan Enjin Kecerdasan S2D-360…",
-    "s2d360.loadingBundle": "56 halaman · 3.3MB bundle",
+    "s2d360.loadingBundle": "63 halaman · 3.17MB bundle",
     "s2d360.footerEngine": "Enjin:",
     "s2d360.footerPages": "Halaman:",
     "s2d360.footerSections": "Bahagian:",

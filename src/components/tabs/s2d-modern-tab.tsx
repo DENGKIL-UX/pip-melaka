@@ -5,7 +5,7 @@
  *
  * This tab mounts the modern components imported from S2D-workspace-code
  * (s2d-360-intelligence-engine):
- *   - <S2D360Engine />                (src/S2D360Engine.clean.jsx — root app, 4030 lines monolith, mounted as-is via wrapper)
+ *   - <S2D360Engine />                (current 5,185-line upstream Vite build, isolated via sandboxed iframe)
  *   - <S2DDailyIntelligenceBriefPage />
  *   - <S2DAlertCenterPage />
  *   - <S2DNarrativePropagationGraphPage />
@@ -13,9 +13,9 @@
  *   - <S2DCredentialSettingsModal />  (Gear Settings — dynamic Apify/WhatsApp token config)
  *   - <S2DWorkspaceToolbar />         (hosts the ⚙️ Gear Settings trigger)
  *
- * NOTE: S2D360Engine.clean.jsx is a large monolith (~208KB / 4030 lines).
- * Mounted as-is via S2D360Engine.wrapper.tsx (dynamic ssr:false + iframe fallback to /public/s2d-360/ dist/).
- * Future decomposition into src/features/* is a separate enhancement, not part of this replacement.
+ * NOTE: S2D360Engine.clean.jsx is a large monolith (~276KB / 5,185 lines).
+ * Its Vite production bundle is mounted by S2D360Engine.wrapper.tsx from /public/s2d-360/.
+ * Future decomposition into src/features/* is a separate enhancement.
  *
  * Phase 3 — Frontend Component Replacement
  */
@@ -54,8 +54,7 @@ export function S2DModernTab() {
             <Brain className="h-5 w-5 text-mlk" /> S2D 360 — Modern Engine (Replacement)
           </h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Replaces legacy S2D panels — mounts{" "}
-            <code className="bg-muted px-1 rounded">S2D360Engine.clean.jsx</code> as-is (4030 lines monolith) + modern pages.
+            Current upstream <code className="bg-muted px-1 rounded">S2D360Engine.clean.jsx</code> (5,185 lines / 63 workspaces), rebuilt with Vite and isolated in a same-origin sandbox, plus native modern pages.
             <br />
             API: <code className="bg-muted px-1 rounded">GET /api/s2d/intelligence/signals?localityCode=MELAKA</code> ·{" "}
             <code className="bg-muted px-1 rounded">GET /api/s2d/intelligence/narratives</code> ·{" "}
@@ -108,12 +107,10 @@ export function S2DModernTab() {
             <Card className="border-mlk/20">
               <CardContent className="p-4">
                 <div className="text-sm font-semibold text-mlk mb-2 flex items-center gap-2">
-                  <Brain className="h-4 w-4" /> S2D360Engine (src/S2D360Engine.clean.jsx — monolith mounted as-is)
+                  <Brain className="h-4 w-4" /> S2D360Engine — current upstream Vite bundle
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
-                  The full S2D 360 engine is mounted here. In Cloudflare deployment, the Vite build (<code className="bg-muted px-1 rounded">npm run build</code> in s2d-360-intelligence-engine) is served via{" "}
-                  <code className="bg-muted px-1 rounded">dist/</code> → Cloudflare Pages / Workers Static Assets (zero frontend changes needed). API
-                  routes run as Hono/Worker fetch handlers (<code className="bg-muted px-1 rounded">fetch/Headers/Request/Response/Web Crypto</code>). Nmap/Tshark not available in V8 — Edge Fixture / Audit Mode by default (<code className="bg-muted px-1 rounded">S2D_ACTIVE_SECURITY_SCAN_ENABLED=false</code>).
+                  The full S2D-360 Vite build is served from <code className="bg-muted px-1 rounded">/s2d-360/</code> by OpenNext static assets. PIP intelligence, credentials, and scraping use Worker APIs; advanced upstream operations that require the standalone Node service remain read-only/unavailable until an authorized proxy is connected. Nmap/TShark pages use truthful NOT_RUN fixtures and <code className="bg-muted px-1 rounded">S2D_ACTIVE_SECURITY_SCAN_ENABLED=false</code>.
                 </p>
                 <S2D360EngineWrapper />
               </CardContent>
@@ -122,7 +119,7 @@ export function S2DModernTab() {
             <Card className="border-mlk/20">
               <CardContent className="p-3 text-xs text-muted-foreground flex items-center justify-between">
                 <span>
-                  <strong className="text-foreground">Cloudflare Edge Deployment</strong> — Build: <code className="bg-muted px-1 rounded">npm run build</code> in s2d-360-intelligence-engine → serve <code className="bg-muted px-1 rounded">dist/</code> via Pages / Workers Static Assets. API via Hono fetch handlers. Storage: IndexedDB (client cache) → KV (server JSON) → D1 (audit logs) → R2 (PCAP/artifacts). Secrets via <code className="bg-muted px-1 rounded">npx wrangler secret put APIFY_TOKEN</code>.
+                  <strong className="text-foreground">Cloudflare Edge Deployment</strong> — OpenNext serves the Vite bundle and App Router APIs from one origin. Browser cache stays in IndexedDB; production credentials must use Wrangler secrets because dynamic vault entries are isolate-local. Active PCAP/security binaries require an external authorized service.
                 </span>
                 <a href="/s2d-360/" target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-mlk hover:underline flex-shrink-0">
                   Open dist/ <ExternalLink className="h-3 w-3" />
@@ -144,9 +141,7 @@ export function S2DModernTab() {
         <CardContent className="p-2 text-[11px] text-muted-foreground flex items-center gap-2">
           <Radio className="h-3 w-3 text-emerald-500" />
           S2D Intelligence API client:{" "}
-          <code className="bg-muted px-1 rounded">src/integration/pip360/api/s2d-intelligence-api-client.js</code> →{" "}
-          <code className="bg-muted px-1 rounded">http://localhost:4000/api/s2d/intelligence/*</code> (dev Express) · Workers Hono fetch handlers · CORS{" "}
-          <code className="bg-muted px-1 rounded">https://pip-melaka.ritz-analytics.workers.dev</code>
+          <code className="bg-muted px-1 rounded">src/integration/pip360/api/s2d-intelligence-api-client.js</code> → same-origin Worker APIs · optional server-side <code className="bg-muted px-1 rounded">S2D_ENGINE_URL</code> for local Express integration · restricted CORS
         </CardContent>
       </Card>
     </div>

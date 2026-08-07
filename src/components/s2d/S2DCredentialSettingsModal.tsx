@@ -31,13 +31,24 @@ interface CredentialConfig {
 const CREDENTIALS: CredentialConfig[] = [
   { key: "APIFY_TOKEN", label: "Apify Token", hint: "From console.apify.com — live-verified via GET https://api.apify.com/v2/users/me", icon: Cloud, placeholder: "apify_api_••••••••" },
   { key: "S2D_ALERT_WHATSAPP_TOKEN", label: "WhatsApp Alert Token", hint: "WhatsApp Cloud API token for S2D alert delivery", icon: MessageSquare, placeholder: "EAAxxxxx••••" },
-  { key: "S2D_ALERT_EMAIL_TOKEN", label: "Email Alert Token", hint: "Transactional email provider token", icon: Mail, placeholder: "sendgrid_••••" },
-  { key: "TIKTOK_API_KEY", label: "TikTok API Key", hint: "Approved TikTok metadata provider key", icon: KeyRound, placeholder: "tiktok_api_••••" },
+  { key: "S2D_ALERT_EMAIL_TOKEN", label: "Email Alert Token", hint: "SendGrid API key — live-verified against the provider profile endpoint", icon: Mail, placeholder: "SG.••••" },
+  { key: "TIKTOK_API_KEY", label: "TikTok API Key", hint: "Format-validated unless S2D_TIKTOK_CREDENTIAL_TEST_URL is configured server-side", icon: KeyRound, placeholder: "tiktok_api_••••" },
   { key: "S2D_BURP_DAST_API_KEY", label: "Burp DAST API Key", hint: "Burp Suite DAST API key (optional, only if active scans proxied)", icon: ShieldCheck, placeholder: "burp_••••" },
   { key: "S2D_BURP_DAST_GRAPHQL_URL", label: "Burp DAST GraphQL URL", hint: "GraphQL endpoint for Burp DAST", icon: ShieldCheck, placeholder: "https://burp.example.com/graphql" },
   { key: "S2D_NETWORK_EVIDENCE_PRIVACY_KEY", label: "Network Evidence Privacy Key", hint: "Privacy key for authorized network evidence", icon: ShieldCheck, placeholder: "priv_••••" },
   { key: "S2D_APIFY_WEBHOOK_SHARED_SECRET", label: "Apify Webhook Shared Secret", hint: "HMAC shared secret for Apify webhook receiver (32+ chars)", icon: Webhook, placeholder: "whsec_••••" },
 ];
+
+const EMPTY_CREDENTIAL_VALUES: Record<CredentialKey, string> = {
+  APIFY_TOKEN: "",
+  S2D_ALERT_WHATSAPP_TOKEN: "",
+  S2D_ALERT_EMAIL_TOKEN: "",
+  S2D_BURP_DAST_API_KEY: "",
+  S2D_BURP_DAST_GRAPHQL_URL: "",
+  S2D_NETWORK_EVIDENCE_PRIVACY_KEY: "",
+  S2D_APIFY_WEBHOOK_SHARED_SECRET: "",
+  TIKTOK_API_KEY: "",
+};
 
 interface VaultEntry {
   key: CredentialKey;
@@ -45,41 +56,48 @@ interface VaultEntry {
   verified: boolean;
   verifiedAt?: string;
   provider?: string;
-}
-
-function maskToken(token: string): string {
-  if (!token || token.length < 8) return "••••";
-  return `${token.slice(0, 4)}***${token.slice(-4)}`;
+  verificationMode?: "LIVE_PROVIDER" | "LOCAL_CRYPTO" | "FORMAT_ONLY";
+  source?: "environment" | "dynamic.vault";
 }
 
 export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  const [tokens, setTokens] = useState<Record<CredentialKey, string>>({
-    APIFY_TOKEN: "",
-    S2D_ALERT_WHATSAPP_TOKEN: "",
-    S2D_ALERT_EMAIL_TOKEN: "",
-    S2D_BURP_DAST_API_KEY: "",
-    S2D_BURP_DAST_GRAPHQL_URL: "",
-    S2D_NETWORK_EVIDENCE_PRIVACY_KEY: "",
-    S2D_APIFY_WEBHOOK_SHARED_SECRET: "",
-    TIKTOK_API_KEY: "",
-  });
+  const [tokens, setTokens] = useState<Record<CredentialKey, string>>({ ...EMPTY_CREDENTIAL_VALUES });
   const [show, setShow] = useState<Record<string, boolean>>({});
   const [verifying, setVerifying] = useState<CredentialKey | null>(null);
   const [vault, setVault] = useState<Record<string, VaultEntry>>({});
   const [result, setResult] = useState<{ key: CredentialKey; status: "PASS" | "FAIL"; message: string } | null>(null);
+  const [accessToken, setAccessToken] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const [loadingVault, setLoadingVault] = useState(false);
 
-  // Load masked vault on open
+  function authHeaders(): Record<string, string> {
+    return accessToken.trim() ? { Authorization: `Bearer ${accessToken.trim()}` } : {};
+  }
+
+  async function loadVault() {
+    setLoadingVault(true);
+    setAuthMessage("");
+    try {
+      const res = await fetch("/api/s2d/credentials", { headers: authHeaders() });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAuthMessage(data.error || "Enter the production S2D operator token to load the vault.");
+        return;
+      }
+      if (data.vault) setVault(data.vault);
+      setAuthMessage("Authenticated — masked credential status loaded.");
+    } catch {
+      setAuthMessage("Unable to connect to the credential vault.");
+    } finally {
+      setLoadingVault(false);
+    }
+  }
+
+  // Development mode can load without a token. Production fails closed and
+  // asks the operator for the server-configured S2D_AUTH_TOKEN. The access
+  // token is intentionally not persisted or auto-submitted per keypress.
   useEffect(() => {
-    if (!open) return;
-    (async () => {
-      try {
-        const res = await fetch("/api/s2d/credentials");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.vault) setVault(data.vault);
-        }
-      } catch {}
-    })();
+    if (open) void loadVault();
   }, [open]);
 
   async function handleVerify(key: CredentialKey) {
@@ -93,14 +111,22 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
     try {
       const res = await fetch("/api/s2d/credentials", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ key, token }),
       });
       const data = await res.json();
       if (data.verified) {
         setVault((prev) => ({
           ...prev,
-          [key]: { key, masked: data.masked, verified: true, verifiedAt: data.verifiedAt, provider: data.provider },
+          [key]: {
+            key,
+            masked: data.masked,
+            verified: true,
+            verifiedAt: data.verifiedAt,
+            provider: data.provider,
+            verificationMode: data.verificationMode,
+            source: "dynamic.vault",
+          },
         }));
         setResult({ key, status: "PASS", message: data.message || "VERIFIED PASS — token live-verified against provider" });
         // Clear the input for security (never keep raw token in UI longer than needed)
@@ -115,8 +141,19 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
     }
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen) {
+      setAccessToken("");
+      setTokens({ ...EMPTY_CREDENTIAL_VALUES });
+      setShow({});
+      setResult(null);
+      setAuthMessage("");
+    }
+    onOpenChange(nextOpen);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -125,7 +162,8 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
           <DialogDescription className="text-xs">
             Configure Apify, WhatsApp, TikTok and DAST credentials. Tokens are live-verified against their provider
             (e.g. Apify <code className="bg-muted px-1 rounded">GET https://api.apify.com/v2/users/me</code>) before
-            committing to the in-memory vault. Raw tokens are <strong>NEVER</strong> returned to the browser — only masked
+            before committing to the process-local dynamic vault. Local HMAC/format checks are explicitly labelled and are
+            not presented as live provider tests. Raw tokens are <strong>NEVER</strong> returned to the browser — only masked
             metadata like <code className="bg-muted px-1 rounded">apif***9x2a</code>.
           </DialogDescription>
         </DialogHeader>
@@ -135,7 +173,34 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
             <CardContent className="p-3 text-xs text-muted-foreground">
               <strong className="text-amber-700 dark:text-amber-400">Security note:</strong> Production keys are swapped via{" "}
               <code>npx wrangler secret put APIFY_TOKEN</code> (and the other keys). Do not bake real secrets into client bundles.
-              The data boundary guard (<code>s2d-pip-context-privacy-guard</code>) remains enabled — only aggregate public signals cross the boundary.
+              Dynamic entries are process-local and can disappear on a Worker cold start, so Wrangler secrets remain the durable production source. The data boundary guard remains enabled — only aggregate public signals cross the PIP exchange boundary.
+            </CardContent>
+          </Card>
+
+          <Card className="border-mlk/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-mlk" /> Operator authentication
+              </CardTitle>
+              <p className="text-[11px] text-muted-foreground">
+                Production only: enter the server-configured <code>S2D_AUTH_TOKEN</code>. It stays in this modal&apos;s memory and is never saved by the browser.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  type="password"
+                  value={accessToken}
+                  onChange={(event) => setAccessToken(event.target.value)}
+                  placeholder="S2D operator access token"
+                  autoComplete="off"
+                  className="font-mono"
+                />
+                <Button type="button" variant="outline" onClick={() => void loadVault()} disabled={loadingVault}>
+                  {loadingVault ? <Loader2 className="h-4 w-4 animate-spin" /> : "Authenticate"}
+                </Button>
+              </div>
+              {authMessage && <p className="text-[11px] text-muted-foreground">{authMessage}</p>}
             </CardContent>
           </Card>
 
@@ -150,7 +215,7 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
                     <Icon className="h-4 w-4 text-mlk" /> {cfg.label}
                     {entry?.verified ? (
                       <Badge variant="outline" className="ml-auto text-[10px] bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
-                        <CheckCircle2 className="h-3 w-3 mr-1" /> VERIFIED
+                        <CheckCircle2 className="h-3 w-3 mr-1" /> {entry.verificationMode === "LIVE_PROVIDER" ? "LIVE VERIFIED" : entry.verificationMode === "LOCAL_CRYPTO" ? "LOCAL CHECK" : "FORMAT CHECK"}
                       </Badge>
                     ) : entry ? (
                       <Badge variant="outline" className="ml-auto text-[10px] bg-amber-500/10 text-amber-700 border-amber-500/30">
@@ -164,6 +229,7 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
                       Vault: <span className="font-semibold">{entry.masked}</span>
                       {entry.verifiedAt && <span className="text-muted-foreground"> · verified {new Date(entry.verifiedAt).toLocaleString()}</span>}
                       {entry.provider && <span className="text-muted-foreground"> · via {entry.provider}</span>}
+                      {entry.source && <span className="text-muted-foreground"> · {entry.source}</span>}
                     </p>
                   )}
                 </CardHeader>
@@ -198,7 +264,7 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
                   {result?.key === cfg.key && (
                     <div className={`text-xs px-2 py-1.5 rounded flex items-center gap-1.5 ${result.status === "PASS" ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/30" : "bg-red-500/10 text-red-700 border border-red-500/30"}`}>
                       {result.status === "PASS" ? <CheckCircle2 className="h-3.5 w-3.5" /> : <AlertCircle className="h-3.5 w-3.5" />}
-                      <span className="font-medium">{result.status === "PASS" ? "VERIFIED PASS" : "VERIFICATION FAILED"}</span>
+                      <span className="font-medium">{result.status === "PASS" ? "VALIDATION PASS" : "VERIFICATION FAILED"}</span>
                       <span>· {result.message}</span>
                     </div>
                   )}
@@ -212,7 +278,7 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
           <span className="text-[11px] text-muted-foreground">
             Unified scraper: <code className="bg-muted px-1 rounded">POST /api/scrape/run</code> (TikTok, Facebook, Instagram, Threads, X)
           </span>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => handleOpenChange(false)}>
             Close
           </Button>
         </DialogFooter>

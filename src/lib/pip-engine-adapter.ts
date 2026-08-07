@@ -6,11 +6,13 @@
 // pipeline-provenance.json:verified == true. Defensive re-strip of PDPA fields.
 
 import { readFileSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const PUBLIC_DATA = join(__dirname, "..", "..", "public", "data");
+// Scope filesystem tracing to the two data directories. Deriving these paths
+// from this module's compiled __dirname caused Turbopack to trace the entire
+// repository (including upload archives) into the Cloudflare Worker.
+const PUBLIC_DATA = join(process.cwd(), "public", "data");
+const PIPELINE_PROVENANCE = join(process.cwd(), "src", "data", "pipeline-provenance.json");
 
 export type IntelligenceLevel =
   | "STATE"
@@ -123,8 +125,8 @@ const PDPA_RESTRIP_FIELDS = [
 
 function loadProvenance(): PipelineProvenance {
   try {
-    const path = join(__dirname, "..", "data", "pipeline-provenance.json");
-    if (!existsSync(path)) {
+    const path = PIPELINE_PROVENANCE;
+    if (!existsSync(/* turbopackIgnore: true */ path)) {
       return {
         source_archive_sha256: "",
         script_versions: { profiler: "1.1.0", cleanser: "1.1.0", transformer: "1.0.0" },
@@ -141,7 +143,7 @@ function loadProvenance(): PipelineProvenance {
         verified_at: null,
       };
     }
-    return JSON.parse(readFileSync(path, "utf8"));
+    return JSON.parse(readFileSync(/* turbopackIgnore: true */ path, "utf8"));
   } catch {
     return { verified: false } as PipelineProvenance;
   }
@@ -183,8 +185,8 @@ function applyTier(record: IntelligenceRecord, provenance: PipelineProvenance): 
 }
 
 function readJsonl(path: string): IntelligenceRecord[] {
-  if (!existsSync(path)) return [];
-  const text = readFileSync(path, "utf8");
+  if (!existsSync(/* turbopackIgnore: true */ path)) return [];
+  const text = readFileSync(/* turbopackIgnore: true */ path, "utf8");
   return text
     .split("\n")
     .filter((l) => l.trim())
@@ -211,11 +213,15 @@ export async function fetchIntelligence(
     LOCALITY: join(dir, "locality-intelligence.jsonl"),
   };
   const path = fileMap[level];
-  if (!existsSync(path)) return [];
+  if (!existsSync(/* turbopackIgnore: true */ path)) return [];
   const provenance = loadProvenance();
   const records = readJsonl(path)
     .map((r) => defensiveReStrip(r) as IntelligenceRecord)
-    .map((r) => ({ ...r, geography: normaliseStateCode(r.geography) }))
+    .map((r) => ({
+      ...r,
+      level: String(r.level).toUpperCase() as IntelligenceLevel,
+      geography: normaliseStateCode(r.geography),
+    }))
     .filter((r) => r.level === level)
     .map((r) => applyTier(r, provenance));
   return records;
@@ -224,8 +230,8 @@ export async function fetchIntelligence(
 export async function fetchOverview(parliament: string): Promise<ParliamentOverview | null> {
   const code = parliamentCode(parliament);
   const path = join(PUBLIC_DATA, `p${code}`, "dashboard-overview.json");
-  if (!existsSync(path)) return null;
-  const overview = JSON.parse(readFileSync(path, "utf8")) as ParliamentOverview;
+  if (!existsSync(/* turbopackIgnore: true */ path)) return null;
+  const overview = JSON.parse(readFileSync(/* turbopackIgnore: true */ path, "utf8")) as ParliamentOverview;
   const provenance = loadProvenance();
   // Normalise state_code and apply tier
   overview.state_code = overview.state_code === "12" ? "04" : overview.state_code;
@@ -246,8 +252,8 @@ export async function fetchAllOverviews(): Promise<ParliamentOverview[]> {
 export async function fetchManifest(parliament: string): Promise<Record<string, unknown> | null> {
   const code = parliamentCode(parliament);
   const path = join(PUBLIC_DATA, `p${code}`, "transformation-manifest.json");
-  if (!existsSync(path)) return null;
-  return JSON.parse(readFileSync(path, "utf8"));
+  if (!existsSync(/* turbopackIgnore: true */ path)) return null;
+  return JSON.parse(readFileSync(/* turbopackIgnore: true */ path, "utf8"));
 }
 
 export function fetchProvenanceSync(): PipelineProvenance {

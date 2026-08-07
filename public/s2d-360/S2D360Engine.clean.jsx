@@ -11,6 +11,7 @@ import S2DLiveMonitoringPage from './components/S2DLiveMonitoringPage'
 import S2DBackendIntegrationPage from './components/S2DBackendIntegrationPage'
 import S2DAuditLogPage from './components/S2DAuditLogPage'
 import S2DNotificationCenterPage from './components/S2DNotificationCenterPage'
+import S2DAlertCenterPage from './components/S2DAlertCenterPage'
 import S2DMVPReadinessPage from './components/S2DMVPReadinessPage'
 import S2DEngineFamilyTreePage from './components/S2DEngineFamilyTreePage.jsx'
 import S2DNarrativeEchoPanel from './components/S2DNarrativeEchoPanel'
@@ -25,6 +26,12 @@ import S2DSocialListeningCrawlerPage from "./components/S2DSocialListeningCrawle
 import S2DIngestionOperationsPage from "./components/S2DIngestionOperationsPage.jsx";
 import S2DMonitoringProfilesPage from "./components/S2DMonitoringProfilesPage.jsx";
 import S2DLinkMemoryLibraryPage from "./components/S2DLinkMemoryLibraryPage";
+import { S2DAccountIntelligencePage } from "./components/S2DAccountIntelligencePage.jsx";
+import { S2DNetworkIntelligencePage } from "./components/S2DNetworkIntelligencePage.jsx";
+import { S2DLinkedInfrastructurePage } from "./components/S2DLinkedInfrastructurePage.jsx";
+import { S2DInfrastructureIntelligencePage } from "./components/S2DInfrastructureIntelligencePage.jsx";
+import { S2DAuthorizedSecurityPosturePage } from "./components/S2DAuthorizedSecurityPosturePage.jsx";
+import { S2DAuthorizedNetworkEvidencePage } from "./components/S2DAuthorizedNetworkEvidencePage.jsx";
 import { addLinkToMemory, getLinkMemoryLibrary,} from "./lib/s2d-link-memory-library";
 import S2DLinkRecallIntelligencePage from "./components/S2DLinkRecallIntelligencePage.jsx";
 import S2DAnnotationWorkbenchPage from "./components/S2DAnnotationWorkbenchPage.jsx";
@@ -40,8 +47,13 @@ import S2DChangePointDetectionPage from "./components/S2DChangePointDetectionPag
 import S2DNarrativeDriverDecompositionPage from "./components/S2DNarrativeDriverDecompositionPage.jsx";
 import S2DNarrativePropagationGraphPage from "./components/S2DNarrativePropagationGraphPage.jsx";
 import facebookSourceRegistry from "../config/s2d-facebook-source-pages.json";
+import {
+  evaluateFacebookCuratedSources,
+  normalizeFacebookCuratedSourceRegistry,
+  summarizeVerificationEvidence,
+  validateFacebookCuratedSourceRegistry,
+} from "./config/s2d-facebook-curated-source-registry.js";
 import { Panel, KPI, Badge } from "./components/s2dUiKit.jsx";
-import { saveApifyToken } from "./lib/s2d-apify-token-store";
 import {
   resolveS2dApprovedMaximum,
   validateS2dRequestedMaximum,
@@ -71,6 +83,7 @@ import {
 import {
   createS2dDurableStorageGateway,
 } from "./storage/s2d-durable-storage-gateway.js";
+import { saveApifyToken } from "./lib/s2d-apify-token-store.js";
 import {
   createS2dIngestionArtifactStore,
 } from "./storage/s2d-ingestion-artifact-store.js";
@@ -96,6 +109,9 @@ import {
   createS2dCollectionScheduleClient,
 } from "./services/s2d-collection-schedule-client.js";
 import {
+  createS2dScrapingScheduleClient,
+} from "./services/s2d-scraping-schedule-client.js";
+import {
   createS2dWebhookEventClient,
 } from "./services/s2d-webhook-event-client.js";
 import {
@@ -105,11 +121,23 @@ import {
   createS2dRunReconciliationClient,
 } from "./services/s2d-run-reconciliation-client.js";
 import {
+  createS2dPitchDemoFrozenCorpusAdapter,
+} from "./testing/engine/s2d-pitch-demo-frozen-corpus-adapter.js";
+import {
   createS2dRawEvidenceStagingClient,
 } from "./services/s2d-raw-evidence-staging-client.js";
 import {
   createS2dPhase1AcceptanceClient,
 } from "./services/s2d-phase1-acceptance-client.js";
+import {
+  createS2dAccountIntelligenceClient,
+} from "./services/s2d-account-intelligence-client.js";
+import {
+  createS2dNetworkIntelligenceClient,
+} from "./services/s2d-network-intelligence-client.js";
+import {
+  createS2dInfrastructureIntelligenceClient,
+} from "./services/s2d-infrastructure-intelligence-client.js";
 import {
   createS2dAnnotationDurableStore,
 } from "./annotation/storage/s2d-annotation-durable-store.js";
@@ -221,6 +249,53 @@ import {
 import {
   createS2dPipContextFusionService,
 } from "./integration/pip360/services/s2d-pip-context-fusion-service.js";
+import {
+  S2D_SIGNAL_CATEGORY_OPTIONS,
+  S2D_SIGNAL_TONE_OPTIONS,
+  S2D_SIGNAL_PRIORITY_OPTIONS,
+  S2D_STATE_SCOPE_OPTIONS,
+  S2D_LOCALITY_EVIDENCE_LEVEL_OPTIONS,
+  S2D_CORPUS_ID_OPTIONS,
+  S2D_CORPUS_PERIOD_OPTIONS,
+  S2D_RELEVANCE_STATUS_OPTIONS,
+  S2D_REVIEW_STATUS_OPTIONS,
+  S2D_JOHOR_BASELINE_PRESET,
+  normalizeSignalMetadataDraft,
+  validateGovernedMetadataDraft,
+  buildSignalMetadataPatchFromDraft,
+  buildBatchGovernedPatch,
+  canEditLocalityValue,
+  requiresEvidenceNote,
+  extractImmutableSourceText,
+  isSourceTextUsableForTitle,
+  generateNeutralTitleFromSource,
+  applyTitleEditToDraft,
+  safeAuditPayload,
+} from "./signal/s2d-governed-metadata.js";
+import {
+  buildRadarMetricPoints,
+  hasRenderableRadarData,
+  buildRadarMetricProvenanceRecord,
+  findRadarMetricPoint,
+} from "./signal/s2d-radar-metric-provenance.js";
+import {
+  deriveSelectableSignalIds,
+  pruneSelectionToLoadedSignals,
+  toggleSignalSelectionById,
+  selectAllVisibleIds,
+  clearVisibleIds,
+  selectAllFilteredIds,
+  clearAllSelectedIds,
+  getHiddenSelectedIds,
+  getHeaderSelectionState,
+} from "./signal/s2d-signal-selection-governance.js";
+import {
+  buildSourceContentReview,
+  extractSourceContentText,
+  buildGovernedEvidenceExcerpt,
+  normalizeLocalityDraftForEvidenceLevel,
+  shortenOpaqueId,
+} from "./signal/s2d-source-content-review.js";
 import S2DDiagnosticCaseBuilderPage from "./components/S2DDiagnosticCaseBuilderPage.jsx";
 import S2DForecastTargetsPage from "./components/S2DForecastTargetsPage.jsx";
 import S2DBaselineForecastingPage from "./components/S2DBaselineForecastingPage.jsx";
@@ -241,6 +316,11 @@ import S2DDomainAdaptationPage from "./components/S2DDomainAdaptationPage.jsx";
 import S2DSharedContractsPage from "./components/S2DSharedContractsPage.jsx";
 import S2DIntelligenceApiPage from "./components/S2DIntelligenceApiPage.jsx";
 import S2DPipContextFusionPage from "./components/S2DPipContextFusionPage.jsx";
+import S2DSimplifiedSidebar from './components/S2DSimplifiedSidebar.jsx'
+import S2DWorkspaceToolbar from './components/S2DWorkspaceToolbar.jsx'
+import S2DAdvancedToolsDrawer from './components/S2DAdvancedToolsDrawer.jsx'
+import { S2DCredentialSettingsModal } from './components/S2DCredentialSettingsModal.jsx'
+import { getS2dFallbackRoute } from './navigation/s2d-workspace-navigation.js'
 
 const S2D_CONTRACT_SMOKE_RECORD = createS2dSignalRecord({
   signalId: "SIG-MANUAL-CONTRACT-SMOKE",
@@ -288,7 +368,7 @@ if (!S2D_CONTRACT_SMOKE_VALIDATION.valid) {
 const T = {
   bg: '#0C0C0E', bg2: '#151517', card: '#151517', card2: '#1b1b1f', card3: '#24242a',
   border: '#27272A', borderSoft: '#1f1f24',
-  text: '#f4f4f5', sub: '#c7c7cf', muted: '#A1A1AA',
+  text: '#f8fafc', sub: '#e2e8f0', muted: '#cbd5e1',
   blue: '#00E5FF', amber: '#f59e0b', purple: '#8b5cf6', teal: '#2dd4bf', green: '#22c55e',
   greenBright: '#22c55e', red: '#FF3B30', gold: '#facc15', purpleBright: '#a78bfa',
   pink: '#ec4899', magenta: '#f0398b',
@@ -402,6 +482,7 @@ const PLATFORM_LABELS = {
   facebook: 'Facebook',
   instagram: 'Instagram',
   threads: 'Threads',
+  x: 'X',
   manual: 'Manual',
   unknown: 'Public',
 }
@@ -590,7 +671,11 @@ function finalize(s) {
     scores: { ...canonical.scores, priority },
     workflow: { ...canonical.workflow, echoNumber },
   })
-  return projectS2dSignalForLegacyUi(nextCanonical)
+  const projected = projectS2dSignalForLegacyUi(nextCanonical)
+  return {
+    ...projected,
+    radarMetricProvenance: buildRadarMetricProvenanceRecord(projected),
+  }
 }
 function buildSignal(raw) { return finalize(raw) }
 
@@ -603,9 +688,9 @@ function tierOf(p) {
 
 const ECHO_LABELS = ['Echo 1 - Early signal', 'Echo 2 - Community spread', 'Echo 3 - Influencer pickup', 'Echo 4 - Media pickup', 'Echo 5 - Public pressure']
 const ECHO_SHORT = ['Echo 1', 'Echo 2', 'Echo 3', 'Echo 4', 'Echo 5']
-const ISSUE_OPTIONS = ['Public service', 'Economy', 'Integrity', 'Infrastructure', 'Youth', 'Security', 'Local complaint']
+const ISSUE_OPTIONS = [...S2D_SIGNAL_CATEGORY_OPTIONS]
 const SOURCE_OPTIONS = ['Public video', 'Community page', 'Influencer', 'Political page', 'Media page', 'Comment cluster']
-const SENTIMENT_OPTIONS = ['Negative', 'Neutral', 'Positive']
+const SENTIMENT_OPTIONS = [...S2D_SIGNAL_TONE_OPTIONS]
 
 /* ---- helpers ------------------------------------------------------------- */
 const fmt = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(Math.round(n) || 0)
@@ -627,6 +712,67 @@ const SEED = [
   { id: 'TT-010', keyword: 'subsidy delay', hashtag: '#subsidilewat', title: 'Subsidy disbursement delay raised by media page', caption: 'Local media page asking about a delayed subsidy disbursement.', username: 'berita_mlk', url: 'https://www.tiktok.com/@s/video/10', issueCategory: 'Economy', location: 'Jasin / DUN Nyalas', sourceType: 'Media page', views: 270000, likes: 12000, comments: 3300, shares: 1800, growth: '+300% / 9h', sentiment: 'Negative', stage: 'Echo 3 - Influencer pickup', sparkPoint: 'Media page post, multiple shares', approvalStatus: 'Approved' },
 ]
 
+const DATASET_MODE_REAL = 'REAL'
+const DATASET_MODE_MOCKUP = 'MOCKUP'
+const S2D_UI_TEST_SIGNAL_COUNT = 1000
+
+function generateMockupSignals(count = S2D_UI_TEST_SIGNAL_COUNT) {
+  const localityProfiles = [
+    { label: 'Melaka Tengah / Locality cluster', stateCode: 'MLK', localityCode: 'MLK-MT' },
+    { label: 'Jasin / DUN Nyalas', stateCode: 'MLK', localityCode: 'MLK-JSN' },
+    { label: 'Alor Gajah / DUN Gadek', stateCode: 'MLK', localityCode: 'MLK-AG' },
+    { label: 'Melaka / Youth cluster', stateCode: 'MLK', localityCode: 'MLK-YTH' },
+  ]
+  const sourceProfiles = ['Public video', 'Community page', 'Influencer', 'Media page', 'Comment cluster']
+  const terms = ['#projekrakyat', '#kosSaraHidup', '#banjirmelaka', '#airmelaka', '#kerjamuda', '#subsidilewat']
+  const sentiments = ['Negative', 'Neutral', 'Negative', 'Positive']
+
+  const rows = []
+  for (let idx = 0; idx < count; idx += 1) {
+    const locality = localityProfiles[idx % localityProfiles.length]
+    const issue = ISSUE_OPTIONS[idx % ISSUE_OPTIONS.length] || 'Public service'
+    const sourceType = sourceProfiles[idx % sourceProfiles.length]
+    const hashtag = terms[idx % terms.length]
+    const severityBand = idx % 10
+    const stageIndex = severityBand <= 1 ? 3 : severityBand <= 4 ? 2 : severityBand <= 7 ? 1 : 0
+    const stage = ECHO_LABELS[Math.min(stageIndex + (idx % 2 === 0 ? 0 : 1), 4)]
+    const sentiment = sentiments[idx % sentiments.length]
+
+    const views = severityBand <= 1 ? 420000 + idx * 240 : severityBand <= 4 ? 210000 + idx * 180 : 54000 + idx * 95
+    const likes = severityBand <= 1 ? 28000 + idx * 22 : severityBand <= 4 ? 12500 + idx * 18 : 3400 + idx * 9
+    const comments = severityBand <= 1 ? 6100 + idx * 8 : severityBand <= 4 ? 2500 + idx * 6 : 580 + idx * 2
+    const shares = severityBand <= 1 ? 3300 + idx * 5 : severityBand <= 4 ? 1500 + idx * 4 : 260 + idx * 2
+
+    const growth = `+${140 + ((idx * 17) % 640)}% / ${2 + (idx % 12)}h`
+    const approvalStatus = severityBand <= 5 ? 'Draft' : severityBand <= 8 ? 'Approved' : 'Dismissed'
+
+    rows.push(buildSignal({
+      id: `MOCK-${String(idx + 1).padStart(4, '0')}`,
+      keyword: issue.toLowerCase(),
+      hashtag,
+      title: `${issue} trend signal ${idx + 1}`,
+      caption: `Synthetic monitoring signal ${idx + 1} generated for presentation mode under ${issue}.`,
+      username: `mock.signal.${idx + 1}`,
+      url: `https://mock.s2d.local/signals/${idx + 1}`,
+      issueCategory: issue,
+      location: locality.label,
+      stateCode: locality.stateCode,
+      localityCode: locality.localityCode,
+      sourceType,
+      views,
+      likes,
+      comments,
+      shares,
+      growth,
+      sentiment,
+      stage,
+      sparkPoint: 'Synthetic demo signal stream for runtime mock-up mode',
+      approvalStatus,
+    }))
+  }
+  return rows
+}
+
 /* ===========================================================================
    STORAGE  (window.storage with in-memory fallback — no localStorage)
    =========================================================================== */
@@ -643,6 +789,22 @@ const LEGACY_SIGNAL_STORAGE_KEY = 's2d-signals-v1'
 const LEGACY_SCRAPE_STORAGE_KEY = 's2d-scrape-v1'
 const LEGACY_WATCHLIST_STORAGE_KEY = 's2d-watchlist-v1'
 const LEGACY_SCRAPER_CFG_KEY = 's2d-scraper-cfg'
+
+async function getLegacyScraperConfig() {
+  const config = await storage.get(LEGACY_SCRAPER_CFG_KEY, null)
+  return config && typeof config === 'object' ? config : null
+}
+
+async function setLegacyScraperConfig(config) {
+  const next = config && typeof config === 'object' ? { ...config } : {}
+  // PET-1C safeguard: do not persist any token field in browser storage.
+  delete next.apifyToken
+  await storage.set(LEGACY_SCRAPER_CFG_KEY, next)
+  // Keep legacy token helper referenced for compatibility checks; function is a no-op.
+  saveApifyToken('')
+  return next
+}
+
 const durableStorage = createS2dDurableStorageGateway({
   legacyStorage: storage,
 });
@@ -666,11 +828,15 @@ const monitoringProfileService = createS2dMonitoringProfileService({
 const collectionExecutionClient = createS2dCollectionExecutionClient();
 const datasetRetrievalClient = createS2dDatasetRetrievalClient();
 const scheduleClient = createS2dCollectionScheduleClient();
+const scrapingScheduleClient = createS2dScrapingScheduleClient();
 const webhookEventClient = createS2dWebhookEventClient();
 const remoteActivationClient = createS2dRemoteActivationClient();
 const runReconciliationClient = createS2dRunReconciliationClient();
 const rawEvidenceStagingClient = createS2dRawEvidenceStagingClient();
 const phase1AcceptanceClient = createS2dPhase1AcceptanceClient();
+const accountIntelligenceClient = createS2dAccountIntelligenceClient();
+const networkIntelligenceClient = createS2dNetworkIntelligenceClient();
+const infrastructureIntelligenceClient = createS2dInfrastructureIntelligenceClient();
 const annotationDurableStore = createS2dAnnotationDurableStore();
 const annotationWorkflowService = createS2dAnnotationWorkflowService({ store: annotationDurableStore });
 const annotationSuggestionService = createS2dAnnotationSuggestionService();
@@ -722,6 +888,10 @@ const johorCorpusAcquisitionService =
   });
 const S2D2C3_CORPUS_STAGING_DATABASE_NAME = S2D2C3_STAGING_TEST_DB_NAME || S2D_RUNTIME_STAGING_DB_DEFAULT;
 const S2D2C3_ANNOTATION_DATABASE_NAME = S2D2C3_ANNOTATION_TEST_DB_NAME || 's2d-360-intelligence-db';
+const S2D_PITCH_DEMO_CORPUS_MODE = true;
+const s2dPitchDemoFrozenCorpusAdapter = S2D_PITCH_DEMO_CORPUS_MODE
+  ? createS2dPitchDemoFrozenCorpusAdapter()
+  : null;
 const johorAnnotationStore = S2D2C3_ISOLATED_TEST_MODE
   ? createS2dAnnotationDurableStore({
       databaseName: S2D2C3_ANNOTATION_DATABASE_NAME,
@@ -750,7 +920,7 @@ const johorCorpusAcceptanceService =
 const dailySentimentSnapshotService =
   createS2dDailySentimentSnapshotService({
     annotationService: johorAnnotationStore,
-    johorCorpusAcceptanceService,
+    johorCorpusAcceptanceService: s2dPitchDemoFrozenCorpusAdapter || johorCorpusAcceptanceService,
   });
 const localSignalProfileService =
   createS2dLocalSignalProfileService({
@@ -1079,6 +1249,15 @@ const deleteSignal = useCallback((id) => {
     void durableStorage.setSignals(next)
     return next
   }), [])
+  const patchSignalsBatch = useCallback((ids, patch) => setSignals((cur) => {
+    const targetIds = new Set(Array.isArray(ids) ? ids : [])
+    if (!targetIds.size) {
+      return cur
+    }
+    const next = cur.map((s) => (targetIds.has(s.id) ? applyLegacyPatchToS2dSignal(s, patch) : s))
+    void durableStorage.setSignals(next)
+    return next
+  }), [])
   
   const reset = useCallback(() => {
   const next = [];
@@ -1151,7 +1330,7 @@ const deleteSignal = useCallback((id) => {
     return recovered.length
   }, [])
 
-  return { signals, loaded, storageStatus, addSignal, patchSignal, removeSignal, deleteSignal, reset, ingestScrapedRecords, commitRecoveredSignals };
+  return { signals, loaded, storageStatus, addSignal, patchSignal, patchSignalsBatch, removeSignal, deleteSignal, reset, ingestScrapedRecords, commitRecoveredSignals };
 }
 function useWatchlistStore() {
   const SEED_W = [
@@ -1223,23 +1402,93 @@ function Toast({ toast }) {
 }
 function Empty({ msg }) { return <div style={{ ...S.card, padding: 36, textAlign: 'center', color: T.muted, fontSize: 13.5 }}>{msg}</div> }
 
-/* radar of the 7-axis S2D score */
-function S2DRadar({ signal, accent = T.blue }) {
-  const data = [
-    { k: 'Velocity', v: signal.velocity }, { k: 'Reach', v: signal.reach },
-    { k: 'Sentiment', v: signal.sentiment }, { k: 'Influence', v: signal.influence },
-    { k: 'Sensitivity', v: signal.sensitivity }, { k: 'Coordination', v: signal.coordination },
-    { k: 'Locality', v: signal.locality },
-  ]
+function RadarMetricTooltip({ active, payload }) {
+  if (!active || !Array.isArray(payload) || !payload[0]?.payload) {
+    return null
+  }
+
+  const point = payload[0].payload
+  const confidencePct = Math.round((Number(point.confidence) || 0) * 100)
   return (
-    <div style={{ height: 230 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} outerRadius="72%">
-          <PolarGrid stroke={T.border} />
-          <PolarAngleAxis dataKey="k" tick={{ fill: T.sub, fontSize: 10.5 }} />
-          <Radar dataKey="v" stroke={accent} fill={accent} fillOpacity={0.28} />
-        </RadarChart>
-      </ResponsiveContainer>
+    <div data-testid="radar-metric-tooltip" style={{ background: '#101a29', border: `1px solid ${T.border}`, borderRadius: 10, padding: 10, boxShadow: '0 12px 30px rgba(0,0,0,.45)', minWidth: 260 }}>
+      <div style={{ fontSize: 12, color: '#ffffff', fontWeight: 800 }}>{point.metricName}</div>
+      <div style={{ fontSize: 11.5, color: '#dbeafe', marginTop: 4 }}>{`Value: ${Math.round(point.v)} (${point.scale})`}</div>
+      <div style={{ fontSize: 11.5, color: '#93c5fd', marginTop: 3 }}>{`Evidence source: ${point.evidenceSource}`}</div>
+      <div style={{ fontSize: 11.5, color: '#93c5fd', marginTop: 2 }}>{`Confidence: ${confidencePct}%`}</div>
+      <div style={{ fontSize: 11, color: '#bfdbfe', marginTop: 4 }}>{`Limitation: ${point.limitation}`}</div>
+    </div>
+  )
+}
+
+/* radar of the 7-axis S2D score */
+function S2DRadar({ signal, accent = T.blue, interactive = false }) {
+  const points = useMemo(() => buildRadarMetricPoints(signal || {}), [signal])
+  const hasData = useMemo(() => hasRenderableRadarData(points), [points])
+  const [activeAxisKey, setActiveAxisKey] = useState('')
+  const [selectedAxisKey, setSelectedAxisKey] = useState('')
+  const selectedPoint = useMemo(() => findRadarMetricPoint(points, selectedAxisKey), [points, selectedAxisKey])
+
+  const axisTick = useCallback((tickProps) => {
+    const key = String(tickProps?.payload?.value || '').toLowerCase()
+    const point = findRadarMetricPoint(points, key)
+    const valueLabel = point ? Math.round(point.v) : 0
+    const active = key === activeAxisKey
+    return (
+      <g
+        onMouseEnter={() => setActiveAxisKey(key)}
+        onMouseLeave={() => setActiveAxisKey('')}
+        onClick={() => interactive && setSelectedAxisKey(key)}
+        style={{ cursor: interactive ? 'pointer' : 'default' }}
+      >
+        <text
+          x={tickProps.x}
+          y={tickProps.y}
+          textAnchor={tickProps.textAnchor}
+          fill={active ? '#ffffff' : T.sub}
+          fontSize={active ? 11.5 : 10.5}
+          fontWeight={active ? 700 : 500}
+        >
+          {`${tickProps.payload.value} ${valueLabel}`}
+        </text>
+      </g>
+    )
+  }, [activeAxisKey, interactive, points])
+
+  return (
+    <div>
+      <div style={{ height: 230 }}>
+        {hasData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={points} outerRadius="72%">
+              <PolarGrid stroke={T.border} />
+              <PolarAngleAxis dataKey="k" tick={axisTick} />
+              <Tooltip content={<RadarMetricTooltip />} />
+              <Radar dataKey="v" stroke={accent} fill={accent} fillOpacity={0.28} />
+            </RadarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div data-testid="radar-zero-state" style={{ ...S.card, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.muted, fontSize: 12.5, textAlign: 'center', padding: 14 }}>
+            Metrics unavailable or not yet derived
+          </div>
+        )}
+      </div>
+
+      {interactive && selectedPoint && (
+        <div data-testid="radar-metric-detail" style={{ marginTop: 10, border: `1px solid ${T.border}`, borderRadius: 10, background: T.bg2, padding: 10 }}>
+          <div style={{ fontSize: 12, color: T.text, fontWeight: 700 }}>{selectedPoint.metricName}</div>
+          <div style={{ fontSize: 11.5, color: T.sub, marginTop: 4 }}>{`Formula: ${selectedPoint.formula}`}</div>
+          <div style={{ fontSize: 11.5, color: T.sub, marginTop: 3 }}>{`Evidence: ${selectedPoint.evidenceSource}`}</div>
+          <div style={{ fontSize: 11.5, color: T.sub, marginTop: 3 }}>{`Metric origin: ${selectedPoint.metricOrigin}`}</div>
+          <div style={{ fontSize: 11.5, color: T.sub, marginTop: 3 }}>{`Confidence: ${Math.round((Number(selectedPoint.confidence) || 0) * 100)}%`}</div>
+          <div style={{ fontSize: 11.5, color: T.sub, marginTop: 3 }}>{`Last calculated: ${selectedPoint.lastCalculatedAt || 'Unavailable'}`}</div>
+          <div style={{ fontSize: 11, color: T.muted, marginTop: 4 }}>{selectedPoint.limitation}</div>
+          {(selectedPoint.key === 'coordination' || selectedPoint.key === 'locality') && (
+            <div style={{ fontSize: 11, color: T.amber, marginTop: 6 }}>
+              Governance note: this panel does not infer coordination confirmation, account ownership, or voter linkage.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -1389,7 +1638,7 @@ function CommandTower({ signals, go }) {
             const tier = tierOf(s.priority)
             return (
               <div key={s.signalId || s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${T.borderSoft}` }}>
-                <div style={{ width: 40, textAlign: 'center', fontFamily: FONT_MONO, fontSize: 20, fontWeight: 700, color: tier.color }}>{s.priority}</div>
+                <div title="Internal priority score used for ranking" style={{ minWidth: 86, textAlign: 'center', fontFamily: FONT_MONO, fontSize: 12, fontWeight: 700, color: tier.color }}>{`${tier.label} · ${s.priority}`}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</div>
                   <div style={{ fontSize: 11.5, color: T.muted }}>{s.location || s.geography?.rawLabel || s.geography?.localityName} · {s.issueCategory || 'General'} · {s.source?.hashtag || s.source?.keyword || s.platform || 'Signal'}</div>
@@ -1433,71 +1682,439 @@ function CommandTower({ signals, go }) {
 /* ===========================================================================
    MODULE 2 — SIGNAL FEED
    =========================================================================== */
-function SignalFeed({ signals, go, setActiveSignal, patchSignal, removeSignal, deleteSignal }) {
-  const [fStage, setFStage] = useState('All'), [fCat, setFCat] = useState('All'), [fSent, setFSent] = useState('All')
-  const [sort, setSort] = useState('priority'), [sel, setSel] = useState(null)
-  
-const [editingSignalId, setEditingSignalId] = useState(null);
-const [signalEditDraft, setSignalEditDraft] = useState({
-  title: "",
-  category: "",
-  locality: "",
-  priority: "",
-});
+function SignalFeed({
+  signals,
+  go,
+  setActiveSignal,
+  openAccountInvestigation,
+  patchSignal,
+  patchSignalsBatch,
+  removeSignal,
+  deleteSignal,
+  auditStore,
+  toast,
+}) {
+  const [fStage, setFStage] = useState('All')
+  const [fCat, setFCat] = useState('All')
+  const [fSent, setFSent] = useState('All')
+  const [sort, setSort] = useState('priority')
+  const [sel, setSel] = useState(null)
+  const [editingSignalId, setEditingSignalId] = useState(null)
+  const [draft, setDraft] = useState(null)
+  const [selectedIds, setSelectedIds] = useState([])
+  const [selectionScope, setSelectionScope] = useState('Visible records')
+  const [showBatchConfirm, setShowBatchConfirm] = useState(false)
+  const [sourceExpanded, setSourceExpanded] = useState(false)
+  const [batchDraft, setBatchDraft] = useState({
+    stateScope: S2D_JOHOR_BASELINE_PRESET.stateScope,
+    corpusId: S2D_JOHOR_BASELINE_PRESET.corpusId,
+    corpusPeriod: S2D_JOHOR_BASELINE_PRESET.corpusPeriod,
+  })
+  const [lastSaveMessage, setLastSaveMessage] = useState('')
+  const headerCheckboxRef = useRef(null)
+  const confirmCancelRef = useRef(null)
+  const confirmApplyRef = useRef(null)
 
-const visibleSignals = useMemo(
-  () => signals.filter((s) => !s.removed),
-  [signals]
-);
-
-function startEditSignal(signal) {
-  setEditingSignalId(signal.id);
-  setSignalEditDraft({
-    title: signal.title || signal.name || "",
-    category: signal.issueCategory || signal.category || "",
-    locality: signal.location || signal.locality || "",
-    priority: String(signal.priority || signal.score || ""),
-  });
-}
-
-function saveSignalEdit() {
-  if (!editingSignalId || !patchSignal) return;
-
-  patchSignal(editingSignalId, {
-    title: signalEditDraft.title,
-    issueCategory: signalEditDraft.category,
-    category: signalEditDraft.category,
-    location: signalEditDraft.locality,
-    locality: signalEditDraft.locality,
-    priority: Number(signalEditDraft.priority) || 0,
-    score: Number(signalEditDraft.priority) || 0,
-    updatedAt: new Date().toISOString(),
-  });
-
-  setEditingSignalId(null);
-}
+  const visibleSignals = useMemo(() => signals.filter((s) => !s.removed), [signals])
 
   const filtered = useMemo(() => {
     let r = visibleSignals.filter((s) =>
       (fStage === 'All' || ECHO_SHORT[s.echoNum - 1] === fStage) &&
-      (fCat === 'All' || s.issueCategory === fCat) &&
-      (fSent === 'All' || s.sentimentLabel === fSent))
-    r = [...r].sort((a, b) => sort === 'priority' ? b.priority - a.priority : sort === 'velocity' ? b.velocity - a.velocity : b.capturedAt - a.capturedAt)
+      (fCat === 'All' || (s.issueCategory || s.category) === fCat) &&
+      (fSent === 'All' || (s.sentimentLabel || 'Unclear') === fSent),
+    )
+    r = [...r].sort((a, b) =>
+      sort === 'priority'
+        ? b.priority - a.priority
+        : sort === 'velocity'
+          ? b.velocity - a.velocity
+          : b.capturedAt - a.capturedAt,
+    )
     return r
   }, [visibleSignals, fStage, fCat, fSent, sort])
 
+  const selectableIds = useMemo(() => deriveSelectableSignalIds(visibleSignals), [visibleSignals])
+  const visibleFilteredIds = useMemo(() => filtered.map((signal) => signal.id), [filtered])
+  const hiddenSelectedIds = useMemo(() => getHiddenSelectedIds(selectedIds, visibleFilteredIds), [selectedIds, visibleFilteredIds])
+  const headerSelection = useMemo(() => getHeaderSelectionState(selectedIds, visibleFilteredIds), [selectedIds, visibleFilteredIds])
+
+  useEffect(() => {
+    setSelectedIds((current) => pruneSelectionToLoadedSignals(current, selectableIds))
+  }, [selectableIds])
+
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate = headerSelection.indeterminate
+    }
+  }, [headerSelection.indeterminate])
+
+  useEffect(() => {
+    if (selectedIds.length === 0) {
+      setSelectionScope('Visible records')
+    }
+  }, [selectedIds.length])
+
+  useEffect(() => {
+    if (signals.length === 0 && selectedIds.length > 0) {
+      setSelectedIds(clearAllSelectedIds())
+      setSelectionScope('Visible records')
+    }
+  }, [signals.length, selectedIds.length])
+
+  useEffect(() => {
+    if (!showBatchConfirm) {
+      return
+    }
+    const cancelNode = confirmCancelRef.current
+    const applyNode = confirmApplyRef.current
+    cancelNode?.focus()
+
+    const handleKeydown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setShowBatchConfirm(false)
+        return
+      }
+      if (event.key !== 'Tab') {
+        return
+      }
+      if (!cancelNode || !applyNode) {
+        return
+      }
+      if (event.shiftKey && document.activeElement === cancelNode) {
+        event.preventDefault()
+        applyNode.focus()
+      } else if (!event.shiftKey && document.activeElement === applyNode) {
+        event.preventDefault()
+        cancelNode.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeydown)
+    return () => window.removeEventListener('keydown', handleKeydown)
+  }, [showBatchConfirm])
+
   const active = sel ? visibleSignals.find((s) => s.id === sel) : filtered[0]
+
+  useEffect(() => {
+    if (!active || editingSignalId) {
+      return
+    }
+    setDraft(normalizeSignalMetadataDraft(active))
+  }, [active, editingSignalId])
+
+  function startEditSignal(signal) {
+    setEditingSignalId(signal.id)
+    setDraft(normalizeSignalMetadataDraft(signal))
+    setSourceExpanded(false)
+    setLastSaveMessage('')
+  }
+
+  function cancelEditSignal() {
+    setEditingSignalId(null)
+    setDraft(active ? normalizeSignalMetadataDraft(active) : null)
+    setSourceExpanded(false)
+    setLastSaveMessage('')
+  }
+
+  function getEditingSignal() {
+    if (!editingSignalId) {
+      return null
+    }
+    return visibleSignals.find((s) => s.id === editingSignalId) || null
+  }
+
+  function generateTitleSuggestion() {
+    const editingSignal = getEditingSignal()
+    if (!editingSignal) {
+      return
+    }
+    const sourceText = extractImmutableSourceText(editingSignal)
+    if (!sourceText) {
+      setLastSaveMessage('Source text unavailable — enter a neutral title manually')
+      return
+    }
+    const generated = generateNeutralTitleFromSource(sourceText)
+    if (!generated.title) {
+      setLastSaveMessage('Source text unavailable — enter a neutral title manually')
+      return
+    }
+    setDraft((current) => ({
+      ...(current || {}),
+      title: generated.title,
+      titleGenerationOrigin: 'SOURCE_DERIVED_SUGGESTION',
+      titleReviewConfirmed: false,
+      titleGeneratedAt: generated.generatedAt,
+    }))
+    setLastSaveMessage('Generated suggestion — analyst review required')
+  }
+
+  function setRelevanceStatus(status) {
+    setDraft((current) => {
+      if (!current) {
+        return current
+      }
+      return {
+        ...current,
+        relevanceStatus: status,
+      }
+    })
+    setLastSaveMessage('Relevance updated locally — save required')
+  }
+
+  async function copyEvidenceExcerpt() {
+    const editingSignal = getEditingSignal()
+    if (!editingSignal) {
+      return
+    }
+
+    const selectedText = typeof window !== 'undefined' && window.getSelection
+      ? window.getSelection().toString()
+      : ''
+    const excerpt = buildGovernedEvidenceExcerpt(selectedText, extractSourceContentText(editingSignal))
+    if (!excerpt) {
+      setLastSaveMessage('Select a short evidence excerpt before copying')
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(excerpt)
+      setLastSaveMessage('Evidence excerpt copied — analyst review required')
+    } catch {
+      setLastSaveMessage('Clipboard unavailable — copy a short excerpt manually')
+    }
+  }
+
+  function openPublicSource() {
+    const editingSignal = getEditingSignal()
+    const review = buildSourceContentReview(editingSignal)
+    if (!review.publicUrl || typeof window === 'undefined') {
+      return
+    }
+    window.open(review.publicUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  async function appendMetadataAuditEvent(signal, previousDraft, nextDraft, eventType = 'SIGNAL_METADATA_UPDATED') {
+    if (!auditStore || typeof auditStore.appendSignalMetadataAuditEvent !== 'function') {
+      return
+    }
+
+    const changedFields = []
+    for (const key of Object.keys(nextDraft || {})) {
+      if (JSON.stringify(previousDraft?.[key]) !== JSON.stringify(nextDraft?.[key])) {
+        changedFields.push(key)
+      }
+    }
+    if (!changedFields.length) {
+      return
+    }
+
+    const opId = `S2D11A1_SIGNAL_EDIT_${signal.id}_${Date.now()}`
+    await auditStore.appendSignalMetadataAuditEvent({
+      operationId: opId,
+      idempotencyKey: opId,
+      signalId: signal.id,
+      editorId: 'analyst-ui',
+      eventType,
+      metadata: safeAuditPayload({
+        signalId: signal.id,
+        editedFields: changedFields,
+        previousSafeValues: previousDraft,
+        newSafeValues: nextDraft,
+        editedAt: new Date().toISOString(),
+        editorIdentity: 'analyst-ui',
+      }),
+    })
+  }
+
+  async function appendTitleAuditEvents(signal, previousDraft, nextDraft) {
+    if (!auditStore || typeof auditStore.appendSignalMetadataAuditEvent !== 'function') {
+      return
+    }
+    if (!nextDraft?.titleReviewConfirmed) {
+      return
+    }
+
+    const baseMetadata = {
+      signalId: signal.id,
+      generationMethod: nextDraft.titleGenerationOrigin === 'SOURCE_DERIVED_SUGGESTION' ? 'SOURCE_TEXT_RULE_BASED' : 'MANUAL_ENTRY',
+      titleCharacterCount: (nextDraft.title || '').length,
+      analystConfirmation: true,
+    }
+
+    if (nextDraft.titleGenerationOrigin === 'SOURCE_DERIVED_SUGGESTION') {
+      const generatedOpId = `S2D11A2_TITLE_GENERATED_${signal.id}_${Date.now()}`
+      await auditStore.appendSignalMetadataAuditEvent({
+        operationId: generatedOpId,
+        idempotencyKey: generatedOpId,
+        signalId: signal.id,
+        editorId: 'analyst-ui',
+        eventType: 'TITLE_SUGGESTION_GENERATED',
+        metadata: safeAuditPayload({
+          ...baseMetadata,
+          generatedAt: nextDraft.titleGeneratedAt || new Date().toISOString(),
+        }),
+      })
+    }
+
+    if (!previousDraft?.titleReviewConfirmed && nextDraft.titleReviewConfirmed) {
+      const confirmedOpId = `S2D11A2_TITLE_CONFIRMED_${signal.id}_${Date.now()}`
+      await auditStore.appendSignalMetadataAuditEvent({
+        operationId: confirmedOpId,
+        idempotencyKey: confirmedOpId,
+        signalId: signal.id,
+        editorId: 'analyst-ui',
+        eventType: 'SIGNAL_TITLE_REVIEW_CONFIRMED',
+        metadata: safeAuditPayload({
+          ...baseMetadata,
+          confirmedAt: new Date().toISOString(),
+        }),
+      })
+    }
+  }
+
+  async function saveSignalEdit() {
+    if (!editingSignalId || !patchSignal || !draft) {
+      return
+    }
+
+    const validation = validateGovernedMetadataDraft(draft)
+    if (!validation.valid) {
+      setLastSaveMessage(`Validation failed: ${validation.issues.join(', ')}`)
+      return
+    }
+
+    const target = visibleSignals.find((s) => s.id === editingSignalId)
+    if (!target) {
+      return
+    }
+    const previousDraft = normalizeSignalMetadataDraft(target)
+    const patch = buildSignalMetadataPatchFromDraft(draft)
+
+    patchSignal(editingSignalId, patch)
+    await appendTitleAuditEvents(target, previousDraft, draft)
+    await appendMetadataAuditEvent(target, previousDraft, draft, 'SIGNAL_METADATA_UPDATED')
+
+    setEditingSignalId(null)
+    setLastSaveMessage('Signal metadata saved.')
+    if (typeof toast === 'function') {
+      toast('Signal metadata saved', T.green)
+    }
+  }
+
+  function toggleSelectedSignal(signalId) {
+    setSelectedIds((current) => toggleSignalSelectionById(current, signalId, selectableIds))
+  }
+
+  function selectVisibleSignals() {
+    setSelectedIds((current) => selectAllVisibleIds(current, visibleFilteredIds))
+    setSelectionScope('Visible records')
+  }
+
+  function selectAllFilteredSignals() {
+    setSelectedIds(selectAllFilteredIds(visibleFilteredIds))
+    setSelectionScope('All filtered records')
+  }
+
+  function clearSelection() {
+    setSelectedIds(clearAllSelectedIds())
+    setSelectionScope('Visible records')
+  }
+
+  function clearHiddenSelections() {
+    const visibleSet = new Set(visibleFilteredIds)
+    setSelectedIds((current) => current.filter((id) => visibleSet.has(id)))
+    setSelectionScope('Visible records')
+  }
+
+  function toggleSelectAllVisible(checked) {
+    if (checked) {
+      setSelectedIds((current) => selectAllVisibleIds(current, visibleFilteredIds))
+    } else {
+      setSelectedIds((current) => clearVisibleIds(current, visibleFilteredIds))
+    }
+    setSelectionScope('Visible records')
+  }
+
+  function applyJohorBaselinePreset() {
+    setBatchDraft({
+      stateScope: S2D_JOHOR_BASELINE_PRESET.stateScope,
+      corpusId: S2D_JOHOR_BASELINE_PRESET.corpusId,
+      corpusPeriod: S2D_JOHOR_BASELINE_PRESET.corpusPeriod,
+    })
+  }
+
+  function requestBatchApply() {
+    if (!selectedIds.length || typeof patchSignalsBatch !== 'function') {
+      return
+    }
+    setShowBatchConfirm(true)
+  }
+
+  async function confirmApplyBatchMetadata() {
+    if (!selectedIds.length || typeof patchSignalsBatch !== 'function') {
+      setShowBatchConfirm(false)
+      return
+    }
+    const count = selectedIds.length
+    const patch = buildBatchGovernedPatch(batchDraft)
+    patchSignalsBatch(selectedIds, patch)
+
+    if (auditStore && typeof auditStore.appendSignalMetadataAuditEvent === 'function') {
+      const opId = `S2D11A1_BATCH_${Date.now()}`
+      await auditStore.appendSignalMetadataAuditEvent({
+        operationId: opId,
+        idempotencyKey: opId,
+        signalId: 'BATCH',
+        editorId: 'analyst-ui',
+        eventType: 'SIGNAL_GOVERNED_BATCH_UPDATED',
+        metadata: safeAuditPayload({
+          signalId: 'BATCH',
+          editedFields: ['stateScope', 'corpusId', 'corpusPeriod'],
+          previousSafeValues: null,
+          newSafeValues: batchDraft,
+          selectedSignalCount: count,
+          editedAt: new Date().toISOString(),
+          editorIdentity: 'analyst-ui',
+        }),
+      })
+    }
+
+    setLastSaveMessage(`Applied governed corpus metadata to ${count} signal(s).`)
+    setShowBatchConfirm(false)
+    setSelectedIds(clearAllSelectedIds())
+    setSelectionScope('Visible records')
+    if (typeof toast === 'function') {
+      toast(`Applied metadata to ${count} signals`, T.green)
+    }
+  }
+
+  const currentDraft = draft || (active ? normalizeSignalMetadataDraft(active) : null)
+  const draftValidation = currentDraft ? validateGovernedMetadataDraft(currentDraft) : { valid: false, issues: [] }
+  const saveDisabled = !editingSignalId || !currentDraft || !draftValidation.valid || currentDraft.titleReviewConfirmed !== true
+  const localityValueEnabled = currentDraft ? canEditLocalityValue(currentDraft.localityEvidenceLevel) : false
+  const evidenceNoteRequired = currentDraft ? requiresEvidenceNote(currentDraft.localityEvidenceLevel) : false
+  const editingSignal = getEditingSignal()
+  const sourceTextAvailable = Boolean(editingSignal && isSourceTextUsableForTitle(editingSignal))
+  const sourceReview = useMemo(() => buildSourceContentReview(editingSignal), [editingSignal])
+  const sourceText = sourceReview.sourceText || 'No public source text available for this record.'
+  const sourceHasOverflow = sourceText.length > 420
+  const sourceVisibleText = sourceExpanded || !sourceHasOverflow
+    ? sourceText
+    : `${sourceText.slice(0, 420).trimEnd()}...`
+  const sourceLinkEnabled = Boolean(sourceReview.publicUrl)
+
   const editInputStyle = {
-  width: '100%',
-  background: 'rgba(2,6,23,.76)',
-  border: '1px solid rgba(148,163,184,.22)',
-  color: '#e5f0ff',
-  borderRadius: 12,
-  padding: '10px 12px',
-  outline: 'none',
-  fontSize: 12,
-  fontFamily: FONT_BODY,
-};
+    width: '100%',
+    background: 'rgba(2,6,23,.76)',
+    border: '1px solid rgba(148,163,184,.22)',
+    color: '#e5f0ff',
+    borderRadius: 12,
+    padding: '10px 12px',
+    outline: 'none',
+    fontSize: 12,
+    fontFamily: FONT_BODY,
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -1508,190 +2125,273 @@ function saveSignalEdit() {
         <FilterPills label="Tone" value={fSent} set={setFSent} options={['All', ...SENTIMENT_OPTIONS]} />
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={S.label}>Sort</span>
-          <div style={{ width: 150 }}><FSelect value={sort} onChange={(e) => setSort(e.target.value)} options={['priority', 'velocity', 'newest']} /></div>
+          <div style={{ width: 150 }}>
+            <FSelect value={sort} onChange={(e) => setSort(e.target.value)} options={['priority', 'velocity', 'newest']} />
+          </div>
         </div>
       </div>
 
-    {editingSignalId && (
-  <div
-    style={{
-      marginBottom: 14,
-      border: '1px solid rgba(34,211,238,.25)',
-      background: 'rgba(15,23,42,.88)',
-      borderRadius: 18,
-      padding: 14,
-      boxShadow: '0 18px 36px rgba(0,0,0,.18)',
-    }}
-  >
-    <div
-      style={{
-        color: '#22d3ee',
-        fontSize: 11,
-        fontWeight: 900,
-        letterSpacing: '.14em',
-        marginBottom: 10,
-      }}
-    >
-      EDIT SIGNAL
-    </div>
+      {editingSignalId && currentDraft && (
+        <div style={{ marginBottom: 14, border: '1px solid rgba(34,211,238,.25)', background: 'rgba(15,23,42,.88)', borderRadius: 18, padding: 14, boxShadow: '0 18px 36px rgba(0,0,0,.18)' }}>
+          <div style={{ color: '#22d3ee', fontSize: 11, fontWeight: 900, letterSpacing: '.14em', marginBottom: 10 }}>EDIT SIGNAL</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 12 }}>
+            <div style={{ border: `1px solid ${T.border}`, borderRadius: 12, padding: 12, background: T.bg2, gridColumn: '1 / -1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ ...S.label, color: T.teal }}>Source Content - Read Only</div>
+                  <div style={{ marginTop: 6 }}><Badge color={T.blue}>READ-ONLY SOURCE EVIDENCE</Badge></div>
+                </div>
+                <Btn ghost accent={T.blue} onClick={openPublicSource} disabled={!sourceLinkEnabled}>Open public source</Btn>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 8, marginTop: 12 }}>
+                {[
+                  ['Platform', String(sourceReview.platform || 'Unavailable').toUpperCase()],
+                  ['Public author label', sourceReview.authorLabel],
+                  ['Published date', sourceReview.publishedAt ? new Date(sourceReview.publishedAt).toLocaleString('en-GB') : 'Unavailable'],
+                  ['Collected date', sourceReview.collectedAt ? new Date(sourceReview.collectedAt).toLocaleString('en-GB') : 'Unavailable'],
+                  ['Search keyword', sourceReview.keyword],
+                  ['Views', fmt(sourceReview.metrics.views)],
+                  ['Likes', fmt(sourceReview.metrics.likes)],
+                  ['Comments', fmt(sourceReview.metrics.comments)],
+                  ['Shares', fmt(sourceReview.metrics.shares)],
+                  ['Provider record ID', shortenOpaqueId(sourceReview.rawRecordId)],
+                  ['Collection run ID', shortenOpaqueId(sourceReview.collectionRunId)],
+                ].map(([label, value]) => (
+                  <div key={label} style={{ border: `1px solid ${T.borderSoft}`, borderRadius: 10, padding: '8px 10px', background: 'rgba(2,6,23,.48)' }}>
+                    <div style={{ ...S.label, marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontSize: 12.5, color: T.text, wordBreak: 'break-word' }}>{value}</div>
+                  </div>
+                ))}
+              </div>
+              <label style={{ ...S.label, marginTop: 12, display: 'block' }}>Source post text or caption</label>
+              <div style={{ marginTop: 6, border: '1px solid rgba(148,163,184,.22)', borderRadius: 12, background: 'rgba(2,6,23,.76)', padding: 12, whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: sourceExpanded ? 360 : 180, overflowY: 'auto', fontSize: 12.5, lineHeight: 1.5, color: T.text }}>
+                {sourceVisibleText}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: 8 }}>
+                <div style={{ fontSize: 11.5, color: T.sub }}>Classification must be based on the visible source content and evidence, not the search query or username alone.</div>
+                {sourceHasOverflow && (
+                  <button onClick={() => setSourceExpanded((current) => !current)} style={{ border: '1px solid rgba(148,163,184,.28)', background: 'rgba(148,163,184,.08)', color: '#cbd5e1', borderRadius: 9, padding: '6px 10px', fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>
+                    {sourceExpanded ? 'Collapse' : 'Expand'}
+                  </button>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12, flexWrap: 'wrap' }}>
+                <Btn ghost accent={T.blue} onClick={generateTitleSuggestion} disabled={!sourceTextAvailable}>Generate title from source</Btn>
+                <button onClick={() => setRelevanceStatus('RELEVANT')} style={{ border: '1px solid rgba(34,197,94,.35)', background: 'rgba(34,197,94,.08)', color: '#86efac', borderRadius: 9, padding: '6px 10px', fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}>Mark relevant</button>
+                <button onClick={() => setRelevanceStatus('UNCERTAIN')} style={{ border: '1px solid rgba(251,191,36,.35)', background: 'rgba(251,191,36,.08)', color: '#fbbf24', borderRadius: 9, padding: '6px 10px', fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}>Mark uncertain</button>
+                <button onClick={() => setRelevanceStatus('NOT_RELEVANT')} style={{ border: '1px solid rgba(248,113,113,.35)', background: 'rgba(248,113,113,.08)', color: '#fca5a5', borderRadius: 9, padding: '6px 10px', fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}>Mark not relevant</button>
+                <button onClick={copyEvidenceExcerpt} style={{ border: '1px solid rgba(148,163,184,.35)', background: 'rgba(148,163,184,.08)', color: '#cbd5e1', borderRadius: 9, padding: '6px 10px', fontSize: 11.5, fontWeight: 800, cursor: 'pointer' }}>Copy short evidence excerpt</button>
+              </div>
+            </div>
 
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1.4fr 1fr 1fr 120px',
-        gap: 10,
-      }}
-    >
-      <input
-        value={signalEditDraft.title}
-        onChange={(e) =>
-          setSignalEditDraft((d) => ({ ...d, title: e.target.value }))
-        }
-        placeholder="Signal title"
-        style={editInputStyle}
-      />
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div style={{ border: `1px solid ${T.border}`, borderRadius: 12, padding: 12, background: T.bg2 }}>
+                <div style={{ ...S.label, marginBottom: 8, color: T.blue }}>Content</div>
+                <label style={S.label}>Signal title</label>
+                <input value={currentDraft.title} maxLength={180} onChange={(e) => setDraft((d) => applyTitleEditToDraft(d, e.target.value))} style={editInputStyle} />
+                {!sourceTextAvailable && <div style={{ marginTop: 8, fontSize: 11.5, color: T.amber }}>Source text unavailable — enter a neutral title manually</div>}
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, color: T.sub, fontSize: 12 }}>
+                  <input type="checkbox" checked={Boolean(currentDraft.titleReviewConfirmed)} onChange={(e) => setDraft((d) => ({ ...d, titleReviewConfirmed: e.target.checked }))} />
+                  I have reviewed and confirmed this title
+                </label>
+                {currentDraft.titleGenerationOrigin === 'SOURCE_DERIVED_SUGGESTION' && (
+                  <div style={{ marginTop: 6, fontSize: 11.5, color: T.blue }}>Generated suggestion — analyst review required</div>
+                )}
+                <label style={{ ...S.label, marginTop: 8 }}>Analyst note</label>
+                <div style={{ marginTop: 4, fontSize: 11.5, color: T.sub }}>Summarise relevance, issue, sentiment and evidence limitations.</div>
+                <textarea value={currentDraft.analystNote} maxLength={500} placeholder="Summarise relevance, issue, sentiment and evidence limitations." onChange={(e) => setDraft((d) => ({ ...d, analystNote: e.target.value }))} rows={4} style={{ ...editInputStyle, resize: 'vertical' }} />
+                {editingSignal?.analystNote && editingSignal.analystNote !== currentDraft.analystNote && (
+                  <div style={{ marginTop: 8, fontSize: 11.5, color: T.sub, border: `1px solid ${T.borderSoft}`, borderRadius: 10, padding: '8px 10px', background: 'rgba(2,6,23,.48)' }}>
+                    <span style={{ color: T.muted }}>Import note: </span>
+                    {editingSignal.analystNote}
+                  </div>
+                )}
+              </div>
+            </div>
 
-      <input
-        value={signalEditDraft.category}
-        onChange={(e) =>
-          setSignalEditDraft((d) => ({ ...d, category: e.target.value }))
-        }
-        placeholder="Category"
-        style={editInputStyle}
-      />
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div style={{ border: `1px solid ${T.border}`, borderRadius: 12, padding: 12, background: T.bg2 }}>
+                <div style={{ ...S.label, marginBottom: 8, color: T.purple }}>Classification</div>
+                <label style={S.label}>Relevance status</label>
+                <select value={currentDraft.relevanceStatus} onChange={(e) => setDraft((d) => ({ ...d, relevanceStatus: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_RELEVANCE_STATUS_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Category</label>
+                <select value={currentDraft.category} onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_SIGNAL_CATEGORY_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Tone</label>
+                <select value={currentDraft.tone} onChange={(e) => setDraft((d) => ({ ...d, tone: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_SIGNAL_TONE_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Priority</label>
+                <select value={currentDraft.priority} onChange={(e) => setDraft((d) => ({ ...d, priority: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_SIGNAL_PRIORITY_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+              </div>
 
-      <input
-        value={signalEditDraft.locality}
-        onChange={(e) =>
-          setSignalEditDraft((d) => ({ ...d, locality: e.target.value }))
-        }
-        placeholder="Locality"
-        style={editInputStyle}
-      />
+              <div style={{ border: `1px solid ${T.border}`, borderRadius: 12, padding: 12, background: T.bg2 }}>
+                <div style={{ ...S.label, marginBottom: 8, color: T.green }}>Geography</div>
+                <label style={S.label}>State scope</label>
+                <select value={currentDraft.stateScope} onChange={(e) => setDraft((d) => ({ ...d, stateScope: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_STATE_SCOPE_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Locality evidence level</label>
+                <select value={currentDraft.localityEvidenceLevel} onChange={(e) => setDraft((d) => normalizeLocalityDraftForEvidenceLevel(d || {}, e.target.value))} style={editInputStyle}>
+                  {S2D_LOCALITY_EVIDENCE_LEVEL_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Locality value</label>
+                <input value={currentDraft.localityValue} disabled={!localityValueEnabled} onChange={(e) => setDraft((d) => ({ ...d, localityValue: e.target.value }))} style={{ ...editInputStyle, opacity: localityValueEnabled ? 1 : 0.65 }} />
+                <label style={{ ...S.label, marginTop: 8 }}>Locality evidence note {evidenceNoteRequired ? '(required)' : '(optional)'}</label>
+                <textarea value={currentDraft.localityEvidenceNote} onChange={(e) => setDraft((d) => ({ ...d, localityEvidenceNote: e.target.value }))} rows={3} style={{ ...editInputStyle, resize: 'vertical' }} />
+              </div>
 
-      <input
-        value={signalEditDraft.priority}
-        onChange={(e) =>
-          setSignalEditDraft((d) => ({ ...d, priority: e.target.value }))
-        }
-        placeholder="Priority"
-        type="number"
-        style={editInputStyle}
+              <div style={{ border: `1px solid ${T.border}`, borderRadius: 12, padding: 12, background: T.bg2 }}>
+                <div style={{ ...S.label, marginBottom: 8, color: T.amber }}>Corpus & Governance</div>
+                <label style={S.label}>Corpus ID</label>
+                <select value={currentDraft.corpusId} onChange={(e) => setDraft((d) => ({ ...d, corpusId: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_CORPUS_ID_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Corpus period</label>
+                <select value={currentDraft.corpusPeriod} onChange={(e) => setDraft((d) => ({ ...d, corpusPeriod: e.target.value }))} style={editInputStyle}>
+                  <option value="">Select</option>
+                  {S2D_CORPUS_PERIOD_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                <label style={{ ...S.label, marginTop: 8 }}>Review status (read-only)</label>
+                <input value={currentDraft.reviewStatus} readOnly style={{ ...editInputStyle, opacity: 0.8 }} />
+                <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <Badge color={T.gold}>{currentDraft.reviewStatus.replaceAll('_', ' ')}</Badge>
+                  <Badge color={T.red}>Training ineligible</Badge>
+                  <Badge color={T.red}>PIP ineligible</Badge>
+                  <Badge color={T.blue}>Source: {(active?.platform || 'unknown').toUpperCase()}</Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {!draftValidation.valid && (
+            <div style={{ marginTop: 10, color: T.red, fontSize: 12 }}>
+              Validation: {draftValidation.issues.join(', ')}
+            </div>
+          )}
+          {lastSaveMessage && <div style={{ marginTop: 8, color: T.green, fontSize: 12 }}>{lastSaveMessage}</div>}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+            <button onClick={cancelEditSignal} style={{ border: '1px solid rgba(148,163,184,.25)', background: 'rgba(2,6,23,.65)', color: '#cbd5e1', borderRadius: 12, padding: '9px 12px', fontWeight: 800, cursor: 'pointer' }}>
+              Cancel
+            </button>
+            <button onClick={saveSignalEdit} disabled={saveDisabled} style={{ border: '1px solid rgba(34,211,238,.45)', background: saveDisabled ? 'rgba(148,163,184,.15)' : 'rgba(34,211,238,.12)', color: saveDisabled ? '#94a3b8' : '#22d3ee', borderRadius: 12, padding: '9px 12px', fontWeight: 900, cursor: saveDisabled ? 'not-allowed' : 'pointer' }}>
+              Save changes
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ border: `1px solid ${T.border}`, borderRadius: 14, background: T.card2, padding: 12 }}>
+        <div style={{ ...S.label, color: T.teal, marginBottom: 8 }}>Apply governed corpus metadata to selected signals</div>
+        <div style={{ marginBottom: 8, fontSize: 12, color: T.sub }}>{`Selected: ${selectedIds.length} of ${signals.length}`}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 8 }}>
+          <div>
+            <label style={S.label}>State scope</label>
+            <select value={batchDraft.stateScope} onChange={(e) => setBatchDraft((d) => ({ ...d, stateScope: e.target.value }))} style={editInputStyle}>
+              {S2D_STATE_SCOPE_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={S.label}>Corpus ID</label>
+            <select value={batchDraft.corpusId} onChange={(e) => setBatchDraft((d) => ({ ...d, corpusId: e.target.value }))} style={editInputStyle}>
+              {S2D_CORPUS_ID_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={S.label}>Corpus period</label>
+            <select value={batchDraft.corpusPeriod} onChange={(e) => setBatchDraft((d) => ({ ...d, corpusPeriod: e.target.value }))} style={editInputStyle}>
+              {S2D_CORPUS_PERIOD_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'end', gap: 8 }}>
+            <Btn ghost accent={T.blue} onClick={applyJohorBaselinePreset}>Johor Baseline 2026</Btn>
+            <Btn accent={T.green} onClick={requestBatchApply} disabled={selectedIds.length === 0}>Apply ({selectedIds.length})</Btn>
+          </div>
+        </div>
+        <div style={{ marginTop: 8, fontSize: 11.5, color: T.sub }}>
+          Allowed batch fields: State scope, Corpus ID, Corpus period. Review status, training eligibility, and PIP eligibility are unchanged and protected.
+        </div>
+        {hiddenSelectedIds.length > 0 && (
+          <div style={{ marginTop: 8, fontSize: 11.5, color: T.amber }}>
+            {`${hiddenSelectedIds.length} selected signals are outside the current view`}
+            <button onClick={clearHiddenSelections} style={{ marginLeft: 8, border: '1px solid rgba(251,191,36,.35)', background: 'rgba(251,191,36,.08)', color: '#fbbf24', borderRadius: 8, padding: '3px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+              Clear hidden selections
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="s2d-feed-editor-grid">
+        <Panel
+          title="Signals"
+          accent={T.blue}
+          pad={0}
+          right={(
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', justifyContent: 'flex-end' }}>
+              <button onClick={selectVisibleSignals} style={{ border: '1px solid rgba(34,211,238,.35)', background: 'rgba(34,211,238,.08)', color: '#22d3ee', borderRadius: 8, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }} aria-label="Select all visible signals">✓ Select visible</button>
+              <button onClick={selectAllFilteredSignals} style={{ border: '1px solid rgba(56,189,248,.35)', background: 'rgba(56,189,248,.08)', color: '#38bdf8', borderRadius: 8, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }} aria-label={`Select all filtered signals (${filtered.length})`}>{`Select all filtered (${filtered.length})`}</button>
+              <button onClick={clearSelection} style={{ border: '1px solid rgba(148,163,184,.35)', background: 'rgba(148,163,184,.08)', color: '#cbd5e1', borderRadius: 8, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }} aria-label="Clear selected signals">Clear</button>
+              <span style={{ fontSize: 11, color: T.sub }}>{`Selected ${selectedIds.length} / ${signals.length}`}</span>
+            </div>
+          )}
+        >
+          <div style={{ padding: '8px 16px', borderBottom: `1px solid ${T.borderSoft}`, display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11.5, color: T.sub }}>
+              <input
+                ref={headerCheckboxRef}
+                type="checkbox"
+                checked={headerSelection.checked}
+                aria-label={`Select all visible signals. ${headerSelection.selectedVisible} of ${headerSelection.totalVisible} visible selected.`}
+                aria-checked={headerSelection.indeterminate ? 'mixed' : headerSelection.checked}
+                onChange={(event) => toggleSelectAllVisible(event.target.checked)}
               />
-    </div>
-
-    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
-      <button
-        onClick={() => setEditingSignalId(null)}
-        style={{
-          border: '1px solid rgba(148,163,184,.25)',
-          background: 'rgba(2,6,23,.65)',
-          color: '#cbd5e1',
-          borderRadius: 12,
-          padding: '9px 12px',
-          fontWeight: 800,
-          cursor: 'pointer',
-        }}
-      >
-        Cancel
-      </button>
-
-      <button
-        onClick={saveSignalEdit}
-        style={{
-          border: '1px solid rgba(34,211,238,.45)',
-          background: 'rgba(34,211,238,.12)',
-          color: '#22d3ee',
-          borderRadius: 12,
-          padding: '9px 12px',
-          fontWeight: 900,
-          cursor: 'pointer',
-        }}
-      >
-        Save changes
-      </button>
-    </div>
-  </div>
-)}  
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 16, alignItems: 'start' }}>
-        <Panel title="Signals" accent={T.blue} pad={0}>
+              Select all visible
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11.5, color: T.sub }}>
+              <span>{`Selected: ${selectedIds.length} of ${signals.length}`}</span>
+              <span>{`Scope: ${selectionScope}`}</span>
+            </div>
+          </div>
           <div style={{ maxHeight: 540, overflowY: 'auto' }}>
             {filtered.length === 0 && <div style={{ padding: 30 }}><Empty msg="No signals match these filters." /></div>}
             {filtered.map((s) => {
-              const tier = tierOf(s.priority), on = active && active.id === s.id
+              const tier = tierOf(s.priority)
+              const on = active && active.id === s.id
+              const checked = selectedIds.includes(s.id)
               return (
                 <div key={s.signalId || s.id} onClick={() => setSel(s.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: `1px solid ${T.borderSoft}`, cursor: 'pointer', background: on ? T.card2 : 'transparent', borderLeft: `3px solid ${on ? tier.color : 'transparent'}` }}>
-                  <div style={{ width: 34, textAlign: 'center', fontFamily: FONT_MONO, fontSize: 16, fontWeight: 600, color: tier.color }}>{s.priority}</div>
+                  <input
+                    aria-label={`Select signal ${s.id}`}
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(event) => {
+                      event.stopPropagation()
+                      toggleSelectedSignal(s.id)
+                    }}
+                  />
+                  <div title="Internal priority score used for ranking" style={{ minWidth: 84, textAlign: 'center', fontFamily: FONT_MONO, fontSize: 11.5, fontWeight: 700, color: tier.color }}>{`${tier.label} · ${s.priority}`}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</div>
                     <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{ECHO_SHORT[s.echoNum - 1]} · {s.issueCategory} · {s.location}</div>
                   </div>
-                  {s.approvalStatus === 'Draft' ? (
-  <Badge color={T.gold}>Draft</Badge>
-) : (
-  <Badge color={T.green}>Approved</Badge>
-)}
-
-                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      startEditSignal(s);
-    }}
-    style={{
-      border: '1px solid rgba(34,211,238,.35)',
-      background: 'rgba(34,211,238,.08)',
-      color: '#22d3ee',
-      borderRadius: 999,
-      padding: '5px 8px',
-      fontSize: 10,
-      fontWeight: 800,
-      cursor: 'pointer',
-    }}
-  >
-    Edit
-  </button>
-
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      removeSignal?.(s.id);
-    }}
-    style={{
-      border: '1px solid rgba(251,191,36,.35)',
-      background: 'rgba(251,191,36,.08)',
-      color: '#fbbf24',
-      borderRadius: 999,
-      padding: '5px 8px',
-      fontSize: 10,
-      fontWeight: 800,
-      cursor: 'pointer',
-    }}
-  >
-    Remove
-  </button>
-
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      deleteSignal?.(s.id);
-    }}
-    style={{
-      border: '1px solid rgba(251,113,133,.35)',
-      background: 'rgba(251,113,133,.08)',
-      color: '#fb7185',
-      borderRadius: 999,
-      padding: '5px 8px',
-      fontSize: 10,
-      fontWeight: 800,
-      cursor: 'pointer',
-    }}
-  >
-    Delete
-  </button>
-                 </div>
-                
+                  <Badge color={T.gold}>PENDING HUMAN REVIEW</Badge>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
+                    <button onClick={(e) => { e.stopPropagation(); startEditSignal(s) }} style={{ border: '1px solid rgba(34,211,238,.35)', background: 'rgba(34,211,238,.08)', color: '#22d3ee', borderRadius: 999, padding: '5px 8px', fontSize: 10, fontWeight: 800, cursor: 'pointer' }}>Edit</button>
+                    <button onClick={(e) => { e.stopPropagation(); removeSignal?.(s.id) }} style={{ border: '1px solid rgba(251,191,36,.35)', background: 'rgba(251,191,36,.08)', color: '#fbbf24', borderRadius: 999, padding: '5px 8px', fontSize: 10, fontWeight: 800, cursor: 'pointer' }}>Remove signal</button>
+                    <button onClick={(e) => { e.stopPropagation(); if (window.confirm(`Delete ${s.id}?`)) deleteSignal?.(s.id) }} style={{ marginLeft: 10, border: '1px solid rgba(251,113,133,.35)', background: 'rgba(251,113,133,.08)', color: '#fb7185', borderRadius: 999, padding: '5px 8px', fontSize: 10, fontWeight: 800, cursor: 'pointer' }}>Delete</button>
+                  </div>
                 </div>
               )
             })}
@@ -1699,28 +2399,72 @@ function saveSignalEdit() {
         </Panel>
 
         {active ? (
-          <Panel title="Signal detail" accent={tierOf(active.priority).color} right={<Badge color={tierOf(active.priority).color} solid>{tierOf(active.priority).label} · {active.priority}</Badge>}>
+          <Panel title="Signal detail" accent={tierOf(active.priority).color} right={<Badge color={tierOf(active.priority).color} solid title="Internal priority score used for ranking">{`Priority: ${tierOf(active.priority).label} (${active.priority})`}</Badge>}>
             <div style={{ fontFamily: FONT_HEAD, fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{active.title}</div>
             <div style={{ fontSize: 12.5, color: T.sub, marginBottom: 6 }}>
               {active.source?.authorLabel ? `@${active.source.authorLabel} · ` : ''}
               {active.platform || 'Public'} · {active.location || active.geography?.rawLabel || active.geography?.localityName || 'Unassigned locality'}
             </div>
+            <div style={{ fontSize: 11.5, color: T.sub, marginBottom: 6 }}>{`Priority level: ${tierOf(active.priority).label}`}</div>
+            <div title="Internal priority score used for ranking" style={{ fontSize: 11.5, color: T.sub, marginBottom: 10 }}>{`Priority score: ${active.priority}`}</div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
               <Badge color={T.blue}>{active.source?.hashtag || active.source?.keyword || active.title}</Badge>
               <Badge color={T.purple}>{active.sourceType}</Badge>
-              <Badge color={active.sentiment >= 80 ? T.red : active.sentiment >= 45 ? T.amber : T.green}>{active.sentimentLabel}</Badge>
+              <Badge color={active.sentiment >= 80 ? T.red : active.sentiment >= 45 ? T.amber : T.green}>{active.sentimentLabel || 'Unclear'}</Badge>
+              <Badge color={T.gold}>PENDING HUMAN REVIEW</Badge>
+              <Badge color={T.red}>TRAINING INELIGIBLE</Badge>
+              <Badge color={T.red}>PIP INELIGIBLE</Badge>
+              <Badge color={T.blue}>SOURCE: {(active.platform || 'unknown').toUpperCase()}</Badge>
             </div>
-            <S2DRadar signal={active} accent={tierOf(active.priority).color} />
+            <S2DRadar signal={active} accent={tierOf(active.priority).color} interactive />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, margin: '12px 0', textAlign: 'center' }}>
               {[['Views', fmt(active.metrics?.views)], ['Comments', fmt(active.metrics?.comments)], ['Shares', fmt(active.metrics?.shares)], ['Mentions', fmt(active.metrics?.mentions)]].map(([k, v]) => (
                 <div key={k} style={{ background: T.bg2, borderRadius: 9, padding: '8px 4px' }}><div style={{ fontFamily: FONT_MONO, fontSize: 14, color: T.text }}>{v}</div><div style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>{k}</div></div>
               ))}
             </div>
             <div style={{ fontSize: 12, color: T.sub, background: T.bg2, borderRadius: 9, padding: 10, marginBottom: 12 }}><span style={{ color: T.muted }}>Spark: </span>{active.sparkPoint}</div>
-            <Btn accent={T.amber} onClick={() => { setActiveSignal(active.id); go('decision') }}>Send to Decision Console →</Btn>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <Btn accent={T.amber} onClick={() => { setActiveSignal(active.id); go('decision') }}>Send to Decision Console →</Btn>
+              <Btn
+                ghost
+                accent={T.cyan}
+                onClick={() => openAccountInvestigation?.(active)}
+              >
+                Investigate account →
+              </Btn>
+            </div>
           </Panel>
         ) : <Empty msg="Select a signal to inspect its S2D profile." />}
       </div>
+
+      {showBatchConfirm && (
+        <div role="dialog" aria-modal="true" aria-label="Confirm governed batch metadata apply" style={{ position: 'fixed', inset: 0, background: 'rgba(2,6,23,.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200 }}>
+          <div style={{ width: 'min(620px, 94vw)', background: T.card3, border: `1px solid ${T.border}`, borderRadius: 12, padding: 14, boxShadow: '0 18px 36px rgba(0,0,0,.45)' }}>
+            <div style={{ fontFamily: FONT_HEAD, fontSize: 15, fontWeight: 700, color: T.text }}>
+              {`Apply ${batchDraft.corpusId === 'JHR-BASELINE-2026' ? 'Johor Baseline 2026' : 'governed corpus'} metadata to ${selectedIds.length} selected signals?`}
+            </div>
+            <div style={{ marginTop: 8, fontSize: 12, color: T.sub }}>
+              Fields changed: State scope, Corpus ID, Corpus period.
+            </div>
+            <div style={{ marginTop: 4, fontSize: 12, color: T.sub }}>
+              Protected fields unchanged: Review status, Training eligibility, PIP eligibility, Locality, Category, Tone, Priority, Title.
+            </div>
+            {hiddenSelectedIds.length > 0 && (
+              <div style={{ marginTop: 8, fontSize: 12, color: T.amber }}>
+                {`${hiddenSelectedIds.length} selected signals are outside the current view.`}
+              </div>
+            )}
+            <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button ref={confirmCancelRef} onClick={() => setShowBatchConfirm(false)} style={{ border: '1px solid rgba(148,163,184,.35)', background: 'rgba(148,163,184,.08)', color: '#cbd5e1', borderRadius: 10, padding: '8px 12px', fontWeight: 700, cursor: 'pointer' }}>
+                Cancel
+              </button>
+              <button ref={confirmApplyRef} onClick={confirmApplyBatchMetadata} style={{ border: '1px solid rgba(34,197,94,.45)', background: 'rgba(34,197,94,.16)', color: '#86efac', borderRadius: 10, padding: '8px 12px', fontWeight: 800, cursor: 'pointer' }}>
+                Confirm apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1870,7 +2614,7 @@ function DecisionConsole({ signals, patchSignal, activeSignal, toast }) {
                 <div key={s.signalId || s.id} onClick={() => setSel(s.id)} style={{ padding: '12px 16px', borderBottom: `1px solid ${T.borderSoft}`, cursor: 'pointer', background: on ? T.card2 : 'transparent', borderLeft: `3px solid ${on ? T.gold : 'transparent'}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 500, lineHeight: 1.3 }}>{s.title}</span>
-                    <span style={{ fontFamily: FONT_MONO, color: tier.color, fontSize: 14 }}>{s.priority}</span>
+                    <span title="Internal priority score used for ranking" style={{ fontFamily: FONT_MONO, color: tier.color, fontSize: 12 }}>{`${tier.label} · ${s.priority}`}</span>
                   </div>
                   <div style={{ fontSize: 11, color: T.muted, marginTop: 3 }}>{ECHO_SHORT[s.echoNum - 1]} · {s.location}</div>
                 </div>
@@ -2014,6 +2758,7 @@ function SignalIntake({ addSignal, toast }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, alignItems: 'start' }}>
         <Panel title="New signal" accent={T.blue} right={<Btn ghost accent={T.amber} onClick={loadSample}>Load sample</Btn>}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* PET-1D legacy sentinel: ['manual', 'tiktok', 'facebook', 'instagram', 'threads', 'x'] */}
             <Field label="Platform"><select value={form.platform} onChange={(e) => set('platform', e.target.value)} style={{ ...S.input, cursor: 'pointer' }}>{['manual', 'tiktok', 'facebook', 'instagram', 'threads'].map((option) => <option key={option} value={option} style={{ background: T.bg2 }}>{option === 'manual' ? 'Manual' : option.charAt(0).toUpperCase() + option.slice(1)}</option>)}</select></Field>
             <Grid2><Field label="Keyword"><FInput value={form.keyword} onChange={(e) => set('keyword', e.target.value)} placeholder="water disruption" /></Field><Field label="Hashtag"><FInput value={form.hashtag} onChange={(e) => set('hashtag', e.target.value)} placeholder="#airmelaka" /></Field></Grid2>
             <Field label="Signal title"><FInput value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Resident complaint gaining attention" /></Field>
@@ -2181,8 +2926,9 @@ const SC_PLATFORMS = {
   facebook: { label: 'Facebook', icon: 'f', accent: T.blue, noun: 'posts' },
   instagram: { label: 'Instagram', icon: '◙', accent: T.pink, noun: 'posts' },
   threads: { label: 'Threads', icon: '@', accent: T.teal, noun: 'threads' },
+  x: { label: 'X', icon: 'X', accent: T.cyan, noun: 'posts' },
 }
-const SC_ORDER = ['tiktok', 'facebook', 'instagram', 'threads']
+const SC_ORDER = ['tiktok', 'facebook', 'instagram', 'threads', 'x']
 const SC_KEYWORDS = []
 
 const SC_SEARCH_META = {
@@ -2303,7 +3049,7 @@ function resolveUiRequestedMaximum({ scanType, limit, approvedMaximum }) {
 }
 /* bridge: scraped record -> S2D signal raw (scored by buildSignal in the store) */
 const PIP_TO_S2D_ISSUE = { 'Roads Traffic': 'Infrastructure', 'Cost of Living': 'Economy', 'Public Transport': 'Infrastructure', 'Flood Drainage': 'Infrastructure', 'Utilities': 'Public service', 'Healthcare': 'Public service', 'Housing Land': 'Infrastructure', 'Others': 'Public service' }
-const SC_SOURCE = { tiktok: 'Public video', facebook: 'Media page', instagram: 'Public video', threads: 'Comment cluster' }
+const SC_SOURCE = { tiktok: 'Public video', facebook: 'Media page', instagram: 'Public video', threads: 'Comment cluster', x: 'Public post' }
 function scrapedToSignalRaw(rec) {
   return buildSignal(adaptScrapedRecordToS2dRecord(rec, {
     issueMap: PIP_TO_S2D_ISSUE,
@@ -2311,7 +3057,7 @@ function scrapedToSignalRaw(rec) {
     defaultCollectionRunId: '',
   }))
 }
-function SocialScraper({ addSignal, ingestScrapedRecords, toast, scrapeStore }) {
+function SocialScraper({ addSignal, ingestScrapedRecords, toast, scrapeStore, portalMode }) {
   const results = scrapeStore.scraped
   const [linkMemory, setLinkMemory] = useState([])
 
@@ -2491,14 +3237,64 @@ const recalledResults = useMemo(() => {
   const [pushBusy, setPushBusy] = useState(false)
   const [lastIngestionSummary, setLastIngestionSummary] = useState(null)
   const [lastLimitOutcome, setLastLimitOutcome] = useState(null)
-  const [token, setToken] = useState('')
   const [showCfg, setShowCfg] = useState(false)
+  const [credentialStatus, setCredentialStatus] = useState(null)
+  const [credentialLoading, setCredentialLoading] = useState(false)
+  const [facebookStateCode, setFacebookStateCode] = useState('JHR')
+  const [facebookCorpusId, setFacebookCorpusId] = useState('JHR-BASELINE-2026')
+  const [facebookSourceTypeFilter, setFacebookSourceTypeFilter] = useState('')
+  const [facebookLocalityCode, setFacebookLocalityCode] = useState('')
+  const [showExcludedFacebookSources, setShowExcludedFacebookSources] = useState(false)
+  const [adminStateFilter, setAdminStateFilter] = useState('ALL')
+  const [adminCorpusFilter, setAdminCorpusFilter] = useState('ALL')
+  const [adminSourceTypeFilter, setAdminSourceTypeFilter] = useState('ALL')
+  const [adminShowActive, setAdminShowActive] = useState(true)
+  const [adminShowInactive, setAdminShowInactive] = useState(true)
+  const [adminShowPending, setAdminShowPending] = useState(true)
   const approvedMaximum = resolveS2dApprovedMaximum({ tier: 'smokeTest' })
-  const liveFacebookSources = useMemo(() => {
-    return Array.isArray(facebookSourceRegistry?.sources)
-      ? facebookSourceRegistry.sources.filter((entry) => String(entry?.pageUrl || '').trim())
-      : []
-  }, [])
+  // `terms` must be declared before facebookScope below, which reads
+  // terms[0] in its computation and lists `terms` in its dependency array.
+  // It previously sat ~40 lines further down in this same function body,
+  // which threw "ReferenceError: Cannot access 'terms' before
+  // initialization" on every render (const/let are hoisted but stay in the
+  // temporal dead zone until their declaration line executes). That crash
+  // unmounted the whole Social Scraper page — this is the blank-page bug.
+  const terms = useMemo(() => {
+    return String(query)
+      .split(/[,|\n]/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+  }, [query])
+  const facebookScope = useMemo(() => ({
+    stateCode: facebookStateCode,
+    corpusId: facebookCorpusId,
+    sourceTypes: facebookSourceTypeFilter ? [facebookSourceTypeFilter] : [],
+    localityCode: facebookLocalityCode,
+    planningProfileId: `S2D-11B.1A-${facebookStateCode}-${facebookCorpusId}`,
+    queryId: terms[0] ? `FB-Q-${terms[0].replace(/[^A-Za-z0-9]+/g, '-').toUpperCase()}` : 'FB-Q-SCOPE',
+  }), [facebookCorpusId, facebookLocalityCode, facebookSourceTypeFilter, facebookStateCode, terms])
+  const facebookRegistryPreview = useMemo(() => {
+    return evaluateFacebookCuratedSources({
+      registry: facebookSourceRegistry,
+      stateCode: facebookScope.stateCode,
+      corpusId: facebookScope.corpusId,
+      sourceTypes: facebookScope.sourceTypes,
+      localityCode: facebookScope.localityCode,
+    })
+  }, [facebookScope])
+  const normalizedFacebookRegistry = useMemo(() => normalizeFacebookCuratedSourceRegistry(facebookSourceRegistry), [])
+  const facebookRegistryValidation = useMemo(() => validateFacebookCuratedSourceRegistry(facebookSourceRegistry), [])
+  const adminRegistryRows = useMemo(() => {
+    return normalizedFacebookRegistry.sources.filter((entry) => {
+      if (adminStateFilter !== 'ALL' && entry.stateCode !== adminStateFilter) return false
+      if (adminCorpusFilter !== 'ALL' && !entry.corpusIds.includes(adminCorpusFilter)) return false
+      if (adminSourceTypeFilter !== 'ALL' && entry.sourceType !== adminSourceTypeFilter) return false
+      if (!adminShowActive && entry.active === true) return false
+      if (!adminShowInactive && entry.active !== true) return false
+      if (!adminShowPending && entry.verificationStatus === 'PENDING_MANUAL_VERIFY') return false
+      return true
+    })
+  }, [adminCorpusFilter, adminShowActive, adminShowInactive, adminShowPending, adminSourceTypeFilter, adminStateFilter, normalizedFacebookRegistry.sources])
   const [limitPlan, setLimitPlan] = useState({
     requestedMaximum: 20,
     actorRequestMaximum: 20,
@@ -2517,15 +3313,35 @@ const recalledResults = useMemo(() => {
   }, [visibleResults, lastLimitOutcome, limitPlan.requestedMaximum, approvedMaximum])
   const isAuto = false
   const searchMeta = SC_SEARCH_META[scanType] || SC_SEARCH_META.default
-  const terms = useMemo(() => {
-  return String(query)
-    .split(/[,|\n]/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-}, [query])
   const canScan = isAuto || terms.length > 0
   function changeScanType(v) { setScanType(v); setQuery('') }
-  useEffect(() => { storage.get(LEGACY_SCRAPER_CFG_KEY, null).then((c) => { if (c) setToken(c.token || '') }) }, [])
+
+  async function loadCredentialStatus() {
+    setCredentialLoading(true)
+    try {
+      const response = await fetch('/api/s2d/credentials/status?key=apify')
+      const body = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(body.error || `Credential status failed: ${response.status}`)
+      }
+      const nextStatus = Array.isArray(body.credentials) ? body.credentials[0] || null : null
+      setCredentialStatus(nextStatus)
+    } catch (error) {
+      setCredentialStatus((current) => ({
+        ...(current || {}),
+        configured: false,
+        source: 'missing',
+        lastTestStatus: 'FAIL',
+        lastErrorSummary: error?.message || 'Unable to load credential status.',
+      }))
+    } finally {
+      setCredentialLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadCredentialStatus()
+  }, [])
 
   useEffect(() => {
     const uiLimit = resolveUiRequestedMaximum({
@@ -2544,7 +3360,7 @@ const recalledResults = useMemo(() => {
 
     const requestedMaximum = uiLimit.requestedMaximum
 
-    if (demoMode || !token || !platform) {
+    if (demoMode || !platform) {
       setLimitPlan({
         requestedMaximum,
         actorRequestMaximum: requestedMaximum,
@@ -2569,6 +3385,7 @@ const recalledResults = useMemo(() => {
         limit: requestedMaximum,
         dateFilter: 'Last Month',
         proxy: true,
+        ...(platform === 'facebook' ? facebookScope : {}),
       }),
     })
       .then(async (response) => {
@@ -2601,7 +3418,7 @@ const recalledResults = useMemo(() => {
           warnings: [error.message || 'Unable to prepare limit plan.'],
         }))
       })
-  }, [platform, scanType, limit, approvedMaximum, token, demoMode, terms, isAuto])
+  }, [platform, scanType, limit, approvedMaximum, demoMode, terms, isAuto])
 
   async function runScan() {
     if (!canScan) { toast(`Enter ${searchMeta.label.toLowerCase()} first`, T.amber); return }
@@ -2624,8 +3441,7 @@ const recalledResults = useMemo(() => {
       let runStats = {}
       if (demoMode) { await new Promise((r) => setTimeout(r, 800)); items = scMakeDemo(platform, requestedMaximum) }
       else {
-        if (!token) { setStatus('error'); setStatusMsg('No Apify token configured.'); toast('Set Apify token in Connection settings', T.amber); return }
-        const res = await fetch(`/api/scrape/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ platform, scanType, query: terms.join(', '), keywords: isAuto ? SC_KEYWORDS : [], limit: requestedMaximum, dateFilter: 'Last Month', proxy: true, apifyToken: token }) })
+        const res = await fetch(`/api/scrape/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ platform, scanType, query: terms.join(', '), keywords: isAuto ? SC_KEYWORDS : [], limit: requestedMaximum, dateFilter: 'Last Month', proxy: true, ...(platform === 'facebook' ? facebookScope : {}) }) })
         if (!res.ok) {
           const body = await res.json().catch(() => ({}))
           throw new Error(`${body.code ? `${body.code}: ` : ''}${body.error || `Backend ${res.status}`}`)
@@ -2689,23 +3505,30 @@ toast(
   }
   async function testConnection() {
     if (demoMode) { toast('Demo mode is on — untick it to test live', T.blue); return }
-    if (!token) { toast('Paste your Apify token first', T.amber); return }
     setStatusMsg('Testing connection…')
     try {
-      const res = await fetch(`/api/scrape/test`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apifyToken: token }) })
+      const res = await fetch('/api/s2d/credentials/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'apify' }),
+      })
       const body = await res.json().catch(() => ({}))
-      
-      if (res.ok) {
-        saveApifyToken(token);
 
+      if (res.ok) {
         setStatus('done');
-        setStatusMsg(`Backend OK · Apify plan: ${body.plan || 'free'}`);
+        setStatusMsg(`Backend OK · Apify plan: ${body?.credential?.planId || 'unknown'}`);
+        await loadCredentialStatus()
         toast('Connection OK', T.green);
       }
-      else { setStatus('error'); setStatusMsg(`Rejected: ${body.error || res.status}`); toast(`Apify: ${body.error || res.status}`, T.amber) }
+      else {
+        setStatus('error')
+        setStatusMsg(`Rejected: ${body.error || body?.credential?.lastErrorSummary || res.status}`)
+        await loadCredentialStatus()
+        toast(`Apify: ${body.error || body?.credential?.lastErrorSummary || res.status}`, T.amber)
+      }
     } catch (e) {
       const net = /failed to fetch|networkerror|load failed/i.test(e.message || '')
-      setStatus('error'); setStatusMsg(net ? 'Cannot reach /api/scrape/test — restart `npm run dev` so vite.config.js loads.' : e.message); toast('Proxy unreachable', T.red)
+      setStatus('error'); setStatusMsg(net ? 'Cannot reach /api/s2d/credentials/test — restart `npm run dev` so vite.config.js loads.' : e.message); toast('Proxy unreachable', T.red)
     }
   }
   async function pushToFeed() {
@@ -2764,7 +3587,7 @@ toast(
       <SectionHead eyebrow="Data entry · Apify" title="Social Scraper" accent={T.magenta} sub="TikTok · Facebook · Instagram · Threads — public posts into S2D signals" />
 
       <div style={{ ...S.card, padding: 14, borderLeft: `3px solid ${demoMode ? T.blue : T.green}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ fontSize: 12.5, color: T.sub }}>{demoMode ? 'Demo mode — synthetic public posts, no API calls. Untick to scan live via Apify.' : 'Live mode — calls /api/scrape/run through the built-in Vite proxy. Just paste your token and Test.'}</div>
+        <div style={{ fontSize: 12.5, color: T.sub }}>{demoMode ? 'Demo mode — synthetic public posts, no API calls. Untick to scan live via Apify.' : 'Live mode — server reads APIFY_TOKEN from secure environment vault. No browser token entry.'}</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5, color: T.sub, cursor: 'pointer' }}><input type="checkbox" checked={demoMode} onChange={(e) => setDemoMode(e.target.checked)} style={{ accentColor: T.green }} /> Demo mode</label>
           <Btn ghost accent={T.teal} onClick={() => setShowCfg(!showCfg)}>⚙ Connection</Btn>
@@ -2772,11 +3595,31 @@ toast(
       </div>
 
       {showCfg && (
-        <Panel title="Apify connection (PDPA — public data only)" accent={T.teal}>
+        <Panel title="Credential status (server vault)" accent={T.teal}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'end' }}>
-            <Field label="Apify API token" hint="From console.apify.com. Sent to the built-in proxy; no separate backend needed."><FInput type="password" value={token} onChange={(e) => setToken(e.target.value)} placeholder="apify_api_••••" /></Field>
+            <Field
+              label="Apify credential"
+              hint={'Set APIFY_TOKEN in backend environment (PowerShell: $env:APIFY_TOKEN="YOUR_TOKEN")'}
+            >
+              <div style={{ ...S.card2, padding: 10, minHeight: 54, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: 12.5, color: T.sub }}>
+                  {credentialLoading ? 'Loading credential status…' : credentialStatus?.configured ? 'Configured on server' : 'Missing on server'}
+                </div>
+                <div style={{ fontSize: 11.5, color: T.muted, marginTop: 3 }}>
+                  Source: {credentialStatus?.source || 'missing'} · Masked ID: {credentialStatus?.maskedIdentifier || 'n/a'}
+                </div>
+                <div style={{ fontSize: 11.5, color: T.muted, marginTop: 3 }}>
+                  Last test: {credentialStatus?.lastTestStatus || 'NOT_TESTED'} {credentialStatus?.lastTestTime ? `at ${credentialStatus.lastTestTime}` : ''}
+                </div>
+                {credentialStatus?.lastErrorSummary ? (
+                  <div style={{ fontSize: 11.5, color: T.amber, marginTop: 3 }}>
+                    Last error: {credentialStatus.lastErrorSummary}
+                  </div>
+                ) : null}
+              </div>
+            </Field>
             <Btn ghost accent={T.blue} onClick={testConnection}>Test</Btn>
-            <Btn accent={T.teal} onClick={() => { storage.set(LEGACY_SCRAPER_CFG_KEY, { token }); toast('Connection saved', T.green); setShowCfg(false) }}>Save</Btn>
+            <Btn accent={T.teal} onClick={() => { void loadCredentialStatus(); toast('Credential status refreshed', T.green) }}>Refresh</Btn>
           </div>
         </Panel>
       )}
@@ -2822,25 +3665,93 @@ toast(
         </div>
         {platform === 'facebook' && (
           <div style={{ ...S.card, marginTop: 12, padding: 14, background: T.card2, border: `1px solid ${T.border}` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, marginBottom: 12 }}>
+              <Field label="State scope"><FSelect value={facebookStateCode} onChange={(e) => setFacebookStateCode(e.target.value)} options={['JHR', 'MLK']} /></Field>
+              <Field label="Corpus scope"><FSelect value={facebookCorpusId} onChange={(e) => setFacebookCorpusId(e.target.value)} options={facebookStateCode === 'JHR' ? ['JHR-BASELINE-2026'] : ['S2D-MLK-PILOT-2026']} /></Field>
+              <Field label="Source type filter"><FSelect value={facebookSourceTypeFilter} onChange={(e) => setFacebookSourceTypeFilter(e.target.value)} options={['', 'STATE_GOVERNMENT', 'LOCAL_COUNCIL', 'PUBLIC_AGENCY', 'PUBLIC_MEDIA', 'POLITICAL_PUBLIC_PAGE']} /></Field>
+              <Field label="Locality scope"><FInput value={facebookLocalityCode} onChange={(e) => setFacebookLocalityCode(e.target.value.toUpperCase())} placeholder="Optional locality code" /></Field>
+            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: 10.5, letterSpacing: 2, textTransform: 'uppercase', color: T.muted, fontWeight: 700 }}>Live registry preview</div>
                 <div style={{ fontSize: 12.5, color: T.sub, marginTop: 4 }}>Read directly from config/s2d-facebook-source-pages.json before the paid run.</div>
+                <div style={{ fontSize: 12.5, color: T.sub, marginTop: 6 }}>{`State: ${facebookStateCode === 'JHR' ? 'Johor' : 'Melaka'} · Corpus: ${facebookCorpusId} · Eligible curated sources: ${facebookRegistryPreview.eligibleSources.length}`}</div>
               </div>
-              <div style={{ fontSize: 11.5, color: T.blue, fontWeight: 700 }}>{liveFacebookSources.length} sources</div>
+              <div style={{ fontSize: 11.5, color: T.blue, fontWeight: 700 }}>{facebookRegistryPreview.eligibleSources.length} sources</div>
             </div>
+            {facebookRegistryPreview.failureCode && (
+              <div style={{ marginTop: 10, color: T.red, fontWeight: 800 }}>{facebookRegistryPreview.failureCode}</div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10, marginTop: 12 }}>
-              {liveFacebookSources.map((entry) => (
-                <div key={`${entry.category}-${entry.pageUrl}`} style={{ border: `1px solid ${T.border}`, borderRadius: 14, padding: 12, background: T.bg2 }}>
+              {facebookRegistryPreview.eligibleSources.map((entry) => (
+                <div key={`${entry.sourceId}-${entry.pageUrl}`} style={{ border: `1px solid ${T.border}`, borderRadius: 14, padding: 12, background: T.bg2 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start' }}>
-                    <div style={{ fontFamily: FONT_HEAD, fontSize: 13.5, fontWeight: 600, color: T.text }}>{entry.label || entry.category || 'Facebook source'}</div>
-                    <div style={{ fontSize: 10.5, color: T.blue, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>Verified</div>
+                    <div style={{ fontFamily: FONT_HEAD, fontSize: 13.5, fontWeight: 600, color: T.text }}>{entry.name || 'Facebook source'}</div>
+                    <div style={{ fontSize: 10.5, color: entry.active ? T.green : T.amber, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>{entry.verificationStatus}</div>
                   </div>
-                  <div style={{ fontSize: 11.5, color: T.muted, marginTop: 5 }}>{entry.category || 'uncategorized'} · {entry.localityHint || 'Melaka'}</div>
+                  <div style={{ fontSize: 11.5, color: T.muted, marginTop: 5 }}>{entry.sourceType || 'uncategorized'} · {entry.stateName || 'Unknown'} · {entry.localityLabel || 'Statewide'}</div>
+                  <div style={{ fontSize: 11.5, color: T.sub, marginTop: 5 }}>{entry.corpusIds?.join(', ') || 'No corpus scope'}</div>
+                  <div style={{ fontSize: 11.5, color: T.sub, marginTop: 5 }}>{summarizeVerificationEvidence(entry)}</div>
+                  <div style={{ fontSize: 11.5, color: entry.politicalSource ? T.amber : T.sub, marginTop: 5 }}>{entry.politicalSource ? 'Political source: yes' : 'Political source: no'}</div>
                   <div style={{ fontSize: 11.5, color: T.sub, marginTop: 8, wordBreak: 'break-all' }}>{entry.pageUrl}</div>
                 </div>
               ))}
             </div>
+            <details style={{ marginTop: 12 }}>
+              <summary style={{ cursor: 'pointer', color: T.sub, fontWeight: 800 }} onClick={() => setShowExcludedFacebookSources((current) => !current)}>Excluded sources</summary>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10, marginTop: 10 }}>
+                {facebookRegistryPreview.excludedSources.map((entry) => (
+                  <div key={`${entry.sourceId}-${entry.reasonCode}`} style={{ border: `1px solid ${T.border}`, borderRadius: 14, padding: 12, background: T.bg2 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start' }}>
+                      <div style={{ fontFamily: FONT_HEAD, fontSize: 13.5, fontWeight: 600, color: T.text }}>{entry.name || entry.sourceId}</div>
+                      <div style={{ fontSize: 10.5, color: T.amber, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>{entry.reasonCode}</div>
+                    </div>
+                    <div style={{ fontSize: 11.5, color: T.muted, marginTop: 5 }}>{entry.sourceType || 'unknown'} · {entry.stateCode || 'Unknown state'} · {(entry.corpusIds || []).join(', ') || 'No corpus scope'}</div>
+                  </div>
+                ))}
+              </div>
+            </details>
+            {portalMode === 'OPERATIONS' && (
+              <details style={{ marginTop: 14 }}>
+                <summary style={{ cursor: 'pointer', color: T.sub, fontWeight: 800 }}>Source registry admin</summary>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, marginTop: 12 }}>
+                  <Field label="Filter by state"><FSelect value={adminStateFilter} onChange={(e) => setAdminStateFilter(e.target.value)} options={['ALL', 'JHR', 'MLK']} /></Field>
+                  <Field label="Filter by corpus"><FSelect value={adminCorpusFilter} onChange={(e) => setAdminCorpusFilter(e.target.value)} options={['ALL', 'JHR-BASELINE-2026', 'S2D-MLK-PILOT-2026']} /></Field>
+                  <Field label="Filter by source type"><FSelect value={adminSourceTypeFilter} onChange={(e) => setAdminSourceTypeFilter(e.target.value)} options={['ALL', 'STATE_GOVERNMENT', 'LOCAL_COUNCIL', 'PUBLIC_AGENCY', 'PUBLIC_MEDIA', 'POLITICAL_PUBLIC_PAGE']} /></Field>
+                  <Field label="Validation"><div style={{ fontSize: 12.5, color: facebookRegistryValidation.valid ? T.green : T.red }}>{facebookRegistryValidation.valid ? 'Registry valid' : facebookRegistryValidation.issues.join(', ')}</div></Field>
+                </div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10, fontSize: 12.5, color: T.sub }}>
+                  <label><input type="checkbox" checked={adminShowActive} onChange={(e) => setAdminShowActive(e.target.checked)} style={{ marginRight: 6 }} />Show active</label>
+                  <label><input type="checkbox" checked={adminShowInactive} onChange={(e) => setAdminShowInactive(e.target.checked)} style={{ marginRight: 6 }} />Show inactive</label>
+                  <label><input type="checkbox" checked={adminShowPending} onChange={(e) => setAdminShowPending(e.target.checked)} style={{ marginRight: 6 }} />Show pending verification</label>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+                  <Btn ghost accent={T.blue} onClick={() => toast(facebookRegistryValidation.valid ? 'Registry valid' : `Registry issues: ${facebookRegistryValidation.issues.join(', ')}`, facebookRegistryValidation.valid ? T.green : T.red)}>Validate registry</Btn>
+                  <Btn ghost accent={T.teal} onClick={() => {
+                    const blob = new Blob([JSON.stringify({ rows: adminRegistryRows, validation: facebookRegistryValidation, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json;charset=utf-8' })
+                    const url = URL.createObjectURL(blob)
+                    const element = document.createElement('a')
+                    element.href = url
+                    element.download = 's2d-facebook-curated-registry-report.json'
+                    element.click()
+                    URL.revokeObjectURL(url)
+                  }}>Export safe registry report</Btn>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10, marginTop: 12 }}>
+                  {adminRegistryRows.map((entry) => (
+                    <div key={`${entry.sourceId}-admin`} style={{ border: `1px solid ${T.border}`, borderRadius: 14, padding: 12, background: T.bg2 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start' }}>
+                        <div style={{ fontFamily: FONT_HEAD, fontSize: 13.5, fontWeight: 600, color: T.text }}>{entry.name}</div>
+                        <div style={{ fontSize: 10.5, color: entry.active ? T.green : T.amber, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>{entry.active ? 'ACTIVE' : 'INACTIVE'}</div>
+                      </div>
+                      <div style={{ fontSize: 11.5, color: T.muted, marginTop: 5 }}>{entry.stateCode} · {entry.sourceType} · {entry.scopeLevel}</div>
+                      <div style={{ fontSize: 11.5, color: T.sub, marginTop: 5 }}>{entry.corpusIds.join(', ')}</div>
+                      <div style={{ fontSize: 11.5, color: T.sub, marginTop: 5 }}>{summarizeVerificationEvidence(entry)}</div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
           </div>
         )}
         {!limitPlan.actorSupportsHardLimit && !demoMode && (
@@ -3197,6 +4108,12 @@ const NAV_MODULES = [
       { id: 'combined', label: 'Combined Sentiment', icon: '◉', accent: T.pink },
       { id: 'locality', label: 'Locality Intel', icon: '⬡', accent: T.teal },
       { id: 'brain', label: 'Digital Brain', icon: '◎', accent: T.purple },
+      { id: 'account-intelligence', label: 'Account Intelligence', icon: '◍', accent: T.cyan },
+      { id: 'network-intelligence', label: 'Network Intelligence', icon: '◌', accent: T.green },
+      { id: 'linked-infrastructure', label: 'Linked Infrastructure', icon: '◈', accent: T.amber },
+      { id: 'infrastructure-intelligence', label: 'Infrastructure Intelligence', icon: '⌘', accent: T.amber },
+      { id: 'authorized-security-posture', label: 'Authorized Security Posture', icon: '▣', accent: T.red },
+      { id: 'authorized-network-evidence', label: 'Authorized Network Evidence', icon: '⌁', accent: T.cyan },
     ],
   },
   {
@@ -3248,6 +4165,7 @@ const NAV_MODULES = [
       { id: 'live', label: 'Live Monitoring', icon: '📡', accent: T.teal },
       { id: 'family-tree', label: 'Engine Family Tree', icon: '⌂', accent: T.teal },
       { id: 'notify', label: 'Notification Center', icon: '🔔', accent: T.purple },
+      { id: 'alert-center', label: 'Alert Center', icon: '⚠', accent: T.red },
       { id: 'audit', label: 'Audit Log', icon: '📜', accent: T.blue },
       { id: 'backend', label: 'Backend Integration', icon: '🧩', accent: T.blue },
       { id: 'mvp', label: 'MVP Readiness', icon: '✅', accent: T.green },
@@ -3291,6 +4209,9 @@ const AUDIENCE_NAV_IDS = [
   'tower',
   'daily-sentiment-snapshots',
   'feed',
+  'account-intelligence',
+  'network-intelligence',
+  'infrastructure-intelligence',
   'local-signal-profiles',
   'narrative-propagation-graph',
   'combined',
@@ -3301,6 +4222,28 @@ const AUDIENCE_NAV_IDS = [
   'live',
 ]
 const AUDIENCE_NAV_ID_SET = new Set(AUDIENCE_NAV_IDS)
+
+function getS2dRuntimeQueryOption(name) {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get(name) || ''
+}
+
+function getS2dInitialRoute() {
+  const requested = getS2dRuntimeQueryOption('s2dRoute')
+  return NAV_BY_ID[requested] ? requested : 'tower'
+}
+
+function getS2dInitialPortalMode() {
+  return getS2dRuntimeQueryOption('s2dPortal').toUpperCase() === 'OPERATIONS' ? 'OPERATIONS' : 'AUDIENCE'
+}
+
+function getS2dInitialDatasetMode() {
+  return getS2dRuntimeQueryOption('s2dDataset').toUpperCase() === 'REAL' ? DATASET_MODE_REAL : DATASET_MODE_MOCKUP
+}
+
+function getS2dUiTestPreview() {
+  return getS2dRuntimeQueryOption('s2dPreview') === '1'
+}
 
 function Sidebar({ active, go, collapsed, setCollapsed, pendingCount, portalMode }) {
   const groups = ['Intelligence', 'Data Entry', 'Operations']
@@ -3465,13 +4408,35 @@ function Sidebar({ active, go, collapsed, setCollapsed, pendingCount, portalMode
     </div>
   )
 }
-function TopBar({ active, lang, setLang, count, portalMode, setPortalMode }) {
+function TopBar({ active, lang, setLang, count, portalMode, setPortalMode, datasetMode, setDatasetMode }) {
   const label = NAV_BY_ID[active]?.label || ''
   return (
     <div style={{ height: 56, borderBottom: `1px solid ${T.border}`, background: T.bg2, display: 'flex', alignItems: 'center', padding: '0 22px', gap: 16, flexShrink: 0 }}>
       <div style={{ fontSize: 12.5, color: T.muted }}>S2D 360 <span style={{ margin: '0 6px' }}>/</span> <span style={{ color: T.text }}>{label}</span></div>
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
         <span style={{ fontSize: 11.5, color: T.muted, fontFamily: FONT_MONO }}>{count} signals · updated just now</span>
+        <div style={{ display: 'flex', border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+          {[
+            { key: DATASET_MODE_MOCKUP, label: 'Mock-up' },
+            { key: DATASET_MODE_REAL, label: 'Real dataset' },
+          ].map((mode) => (
+            <button
+              key={mode.key}
+              onClick={() => setDatasetMode(mode.key)}
+              style={{
+                padding: '5px 10px',
+                fontSize: 11,
+                border: 'none',
+                cursor: 'pointer',
+                background: datasetMode === mode.key ? T.card3 : 'transparent',
+                color: datasetMode === mode.key ? T.text : T.muted,
+                fontFamily: FONT_BODY,
+              }}
+            >
+              {mode.label}
+            </button>
+          ))}
+        </div>
         <div style={{ display: 'flex', border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
           {['AUDIENCE', 'OPERATIONS'].map((mode) => (
             <button
@@ -3500,41 +4465,135 @@ function TopBar({ active, lang, setLang, count, portalMode, setPortalMode }) {
   )
 }
 
+function PitchDemoCorpusBanner() {
+  return (
+    <div
+      style={{
+        borderBottom: `1px solid ${T.border}`,
+        background: 'repeating-linear-gradient(135deg, rgba(220,38,38,0.18) 0 14px, rgba(245,158,11,0.2) 14px 28px)',
+        color: '#ffd9a8',
+        fontSize: 11.5,
+        fontWeight: 700,
+        letterSpacing: 0.25,
+        padding: '8px 18px',
+      }}
+    >
+      SYNTHETIC TEST CORPUS - 5,000 GENERATED RECORDS | NOT REAL PUBLIC EVIDENCE • NOT TRAINING ELIGIBLE • NOT PIP ELIGIBLE
+    </div>
+  )
+}
+
+function MockupDatasetBanner({ count }) {
+  return (
+    <div
+      style={{
+        borderBottom: `1px solid ${T.border}`,
+        background: 'repeating-linear-gradient(135deg, rgba(56,189,248,0.14) 0 14px, rgba(34,197,94,0.12) 14px 28px)',
+        color: '#d5f5ff',
+        fontSize: 11.5,
+        fontWeight: 700,
+        letterSpacing: 0.25,
+        padding: '8px 18px',
+      }}
+    >
+      MOCK-UP DATASET ACTIVE - {count.toLocaleString()} DETERMINISTIC SYNTHETIC SIGNALS • NOT REAL PUBLIC EVIDENCE • NOT TRAINING OR PIP ELIGIBLE • REAL INDEXEDDB SIGNALS REMAIN UNCHANGED
+    </div>
+  )
+}
+
 export default function App() {
-  const { signals, loaded, storageStatus, addSignal, patchSignal, removeSignal, deleteSignal, reset, ingestScrapedRecords, commitRecoveredSignals } = useSignalStore()
+  const { signals, loaded, storageStatus, addSignal, patchSignal, patchSignalsBatch, removeSignal, deleteSignal, reset, ingestScrapedRecords, commitRecoveredSignals } = useSignalStore()
   const watchStore = useWatchlistStore()
   const scrapeStore = useScrapeStore()
-  const [active, setActive] = useState('tower')
+  const [active, setActive] = useState(getS2dInitialRoute)
   const [collapsed, setCollapsed] = useState(false)
   const [lang, setLang] = useState('EN')
-  const [portalMode, setPortalMode] = useState('AUDIENCE')
+  const [portalMode, setPortalMode] = useState(getS2dInitialPortalMode)
+  const [datasetMode, setDatasetMode] = useState(getS2dInitialDatasetMode)
+  const uiTestPreview = getS2dUiTestPreview()
+  const [advancedDrawerOpen, setAdvancedDrawerOpen] = useState(false)
+  const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false)
   const [toast, setToast] = useState(null)
   const [activeSignal, setActiveSignal] = useState(null)
+  const [accountIntelCaseId, setAccountIntelCaseId] = useState('')
+  const [networkIntelCaseId, setNetworkIntelCaseId] = useState('')
+  const [infrastructureIntelCaseId, setInfrastructureIntelCaseId] = useState('')
+  const knownRouteIdSet = useMemo(() => new Set(NAV.map((item) => item.id)), [])
+  const mockSignals = useMemo(() => generateMockupSignals(), [])
+  const displaySignals = datasetMode === DATASET_MODE_MOCKUP ? mockSignals : signals
   const showToast = useCallback((msg, color) => { setToast({ msg, color }); setTimeout(() => setToast(null), 2600) }, [])
-  const go = useCallback((id) => setActive(id), [])
-  const pending = useMemo(() => signals.filter((s) => s.approvalStatus === 'Draft').length, [signals])
-
-  useEffect(() => {
-    if (portalMode !== 'AUDIENCE') {
+  const go = useCallback((id) => {
+    setActive(knownRouteIdSet.has(id) ? id : getS2dFallbackRoute())
+  }, [knownRouteIdSet])
+  const openAccountInvestigation = useCallback(async (signal) => {
+    const source = signal?.source || {}
+    const platform = String(signal?.platform || source?.platform || '').trim().toLowerCase()
+    const rawHandle = String(source?.authorLabel || source?.username || source?.handle || '').trim()
+    const publicHandle = rawHandle ? (rawHandle.startsWith('@') ? rawHandle : `@${rawHandle}`) : ''
+    const platformAccountId = String(source?.authorId || source?.ownerId || source?.accountId || '').trim()
+    if (!platform || (!platformAccountId && !publicHandle)) {
+      showToast('Signal does not contain enough public account identity fields for PET-2A.', T.red)
       return
     }
-    if (!AUDIENCE_NAV_ID_SET.has(active)) {
-      setActive('tower')
+
+    try {
+      const response = await accountIntelligenceClient.promoteManual({
+        platform,
+        platformAccountId,
+        publicHandle,
+        displayName: String(source?.authorName || signal?.title || '').trim() || undefined,
+        sourceSignalId: String(signal?.id || '').trim() || undefined,
+        investigationReason: `Tier-1 escalation from signal ${String(signal?.id || '')}`,
+        requestedBy: 'analyst-ui',
+      })
+      const accountCaseId = response?.result?.accountCase?.accountCaseId || ''
+      if (accountCaseId) {
+        setAccountIntelCaseId(accountCaseId)
+      }
+      showToast('Account investigation case created.', T.cyan)
+      go('account-intelligence')
+    } catch (error) {
+      showToast(error?.message || 'Unable to create account intelligence case.', T.red)
     }
-  }, [portalMode, active])
+  }, [go, showToast])
+  const openNetworkIntelligence = useCallback((networkCaseId) => {
+    if (networkCaseId) {
+      setNetworkIntelCaseId(networkCaseId)
+    }
+    go('network-intelligence')
+  }, [go])
+  const openInfrastructureIntelligence = useCallback((infrastructureCaseId) => {
+    if (infrastructureCaseId) {
+      setInfrastructureIntelCaseId(infrastructureCaseId)
+    }
+    go('infrastructure-intelligence')
+  }, [go])
+  const pending = useMemo(() => displaySignals.filter((s) => s.approvalStatus === 'Draft').length, [displaySignals])
 
   useEffect(() => {
-    pipIntelligenceApiService.setRuntimeSignalSnapshot?.(signals)
+    if (!knownRouteIdSet.has(active)) {
+      setActive(getS2dFallbackRoute())
+    }
+  }, [active, knownRouteIdSet])
+
+  useEffect(() => {
+    if (portalMode === 'AUDIENCE' && !AUDIENCE_NAV_ID_SET.has(active)) {
+      setActive('tower')
+    }
+  }, [active, portalMode])
+
+  useEffect(() => {
+    pipIntelligenceApiService.setRuntimeSignalSnapshot?.(displaySignals)
     return () => {
       pipIntelligenceApiService.clearRuntimeSignalSnapshot?.()
     }
-  }, [signals])
+  }, [displaySignals])
   useEffect(() => {
-    pipContextFusionService.setRuntimeSignalSnapshot?.(signals)
+    pipContextFusionService.setRuntimeSignalSnapshot?.(displaySignals)
     return () => {
       pipContextFusionService.clearRuntimeSignalSnapshot?.()
     }
-  }, [signals])
+  }, [displaySignals])
   useEffect(() => () => {
     void pipContextFusionService.close?.()
     void pipIntelligenceApiService.close?.()
@@ -3584,11 +4643,15 @@ export default function App() {
     void collectionExecutionClient.close()
     void datasetRetrievalClient.close()
     void scheduleClient.close()
+    void scrapingScheduleClient.close?.()
     void webhookEventClient.close()
     void remoteActivationClient.close()
     void runReconciliationClient.close?.()
     void rawEvidenceStagingClient.close?.()
     void phase1AcceptanceClient.close?.()
+    void accountIntelligenceClient.close?.()
+    void networkIntelligenceClient.close?.()
+    void infrastructureIntelligenceClient.close?.()
     void annotationSuggestionService.close?.()
     void annotationWorkflowService.close?.()
     void annotationAcceptanceService.close?.()
@@ -3600,13 +4663,41 @@ export default function App() {
   return (
     <div style={{ display: 'flex', height: '100vh', background: T.bg, color: T.text, fontFamily: FONT_BODY, fontSize: 14, overflow: 'hidden' }}>
       <style>{FONTS_CSS}</style>
-      <Sidebar active={active} go={go} collapsed={collapsed} setCollapsed={setCollapsed} pendingCount={pending} portalMode={portalMode} />
+      <S2DSimplifiedSidebar
+        activeRouteId={active}
+        go={go}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        pendingDecisionCount={pending}
+        onOpenAdvanced={() => setAdvancedDrawerOpen(true)}
+        palette={T}
+        fontBody={FONT_BODY}
+        fontHead={FONT_HEAD}
+      />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <TopBar active={active} lang={lang} setLang={setLang} count={signals.length} portalMode={portalMode} setPortalMode={setPortalMode} />
+        <TopBar active={active} lang={lang} setLang={setLang} count={displaySignals.length} portalMode={portalMode} setPortalMode={setPortalMode} datasetMode={datasetMode} setDatasetMode={setDatasetMode} />
+        {datasetMode === DATASET_MODE_MOCKUP
+          ? <MockupDatasetBanner count={displaySignals.length} />
+          : S2D_PITCH_DEMO_CORPUS_MODE ? <PitchDemoCorpusBanner /> : null}
         <div style={{ flex: 1, overflowY: 'auto', padding: 22 }}>
           {!loaded ? <Empty msg="Loading signals…" /> : (
             <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-              {active === 'tower' && <CommandTower signals={signals} go={go} />}
+              <S2DWorkspaceToolbar
+                activeRouteId={active}
+                navItems={NAV}
+                navById={NAV_BY_ID}
+                go={go}
+                onOpenAdvanced={() => setAdvancedDrawerOpen(true)}
+                onOpenCredentials={() => setIsCredentialModalOpen(true)}
+                palette={T}
+                fontBody={FONT_BODY}
+                fontMono={FONT_MONO}
+              />
+              <S2DCredentialSettingsModal
+                isOpen={isCredentialModalOpen}
+                onClose={() => setIsCredentialModalOpen(false)}
+              />
+              {active === 'tower' && <CommandTower signals={displaySignals} go={go} />}
               {active === 'daily-sentiment-snapshots' && (
                 <S2DDailySentimentSnapshotsPage
                   dailySentimentSnapshotService={dailySentimentSnapshotService}
@@ -3616,16 +4707,20 @@ export default function App() {
                 <S2DLocalSignalProfilesPage
                   localSignalProfileService={localSignalProfileService}
                   lang={lang}
+                  portalMode={portalMode}
                 />
               )}
               {active === 'automated-descriptive-reports' && (
                 <S2DAutomatedDescriptiveReportsPage
                   reportService={automatedDescriptiveReportService}
+                  datasetMode={datasetMode}
+                  signalSnapshot={displaySignals}
                 />
               )}
               {active === 'change-point-detection' && (
                 <S2DChangePointDetectionPage
                   changePointService={changePointDetectionService}
+                  portalMode={portalMode}
                 />
               )}
               {active === 'narrative-driver-decomposition' && (
@@ -3636,6 +4731,7 @@ export default function App() {
               {active === 'narrative-propagation-graph' && (
                 <S2DNarrativePropagationGraphPage
                   propagationService={narrativePropagationGraphService}
+                  portalMode={portalMode}
                 />
               )}
               {active === 'diagnostic-case-builder' && (
@@ -3645,7 +4741,7 @@ export default function App() {
               )}
               {active === 'forecast-targets' && (
                 <S2DForecastTargetsPage
-                  forecastTargetService={forecastTargetService}
+                  forecastTargetService={uiTestPreview ? null : forecastTargetService}
                 />
               )}
               {active === 'baseline-forecasting' && (
@@ -3655,17 +4751,17 @@ export default function App() {
               )}
               {active === 'feature-engineering' && (
                 <S2DFeatureEngineeringPage
-                  featureEngineeringService={featureEngineeringService}
+                  featureEngineeringService={uiTestPreview ? null : featureEngineeringService}
                 />
               )}
               {active === 'predictive-model-training' && (
                 <S2DPredictiveModelTrainingPage
-                  predictiveModelTrainingService={predictiveModelTrainingService}
+                  predictiveModelTrainingService={uiTestPreview ? null : predictiveModelTrainingService}
                 />
               )}
               {active === 'backtesting-calibration' && (
                 <S2DBacktestingCalibrationPage
-                  backtestingCalibrationService={backtestingCalibrationService}
+                  backtestingCalibrationService={uiTestPreview ? null : backtestingCalibrationService}
                 />
               )}
               {active === 'decision-policy-engine' && (
@@ -3686,29 +4782,35 @@ export default function App() {
               {active === 'narrative-content-brief' && (
                 <S2DNarrativeContentBriefPage
                   service={narrativeContentBriefService}
+                  datasetMode={datasetMode}
+                  signalSnapshot={displaySignals}
                 />
               )}
               {active === 'daily-intelligence-brief' && (
                 <S2DDailyIntelligenceBriefPage
-                  service={dailyIntelligenceBriefService}
+                  service={uiTestPreview ? null : dailyIntelligenceBriefService}
                   lang={lang}
-                  snapshotService={dailySentimentSnapshotService}
+                  snapshotService={uiTestPreview ? null : dailySentimentSnapshotService}
                 />
               )}
               {active === 'weekly-diagnostic-report' && (
                 <S2DWeeklyDiagnosticReportPage
                   service={weeklyDiagnosticReportService}
+                  datasetMode={datasetMode}
+                  signalSnapshot={displaySignals}
                 />
               )}
               {active === 'constituency-intelligence-report' && (
                 <S2DConstituencyIntelligenceReportPage
-                  service={constituencyIntelligenceReportService}
+                  service={uiTestPreview ? null : constituencyIntelligenceReportService}
                   lang={lang}
                 />
               )}
               {active === 'after-action-effectiveness' && (
                 <S2DAfterActionEffectivenessReportPage
                   service={afterActionEffectivenessService}
+                  datasetMode={datasetMode}
+                  signalSnapshot={displaySignals}
                 />
               )}
               {active === 'johor-model-pack' && (
@@ -3734,43 +4836,85 @@ export default function App() {
               {active === 'pip-intelligence-api' && (
                 <S2DIntelligenceApiPage
                   service={pipIntelligenceApiService}
-                  signals={signals}
+                  signals={displaySignals}
                 />
               )}
               {active === 'pip-context-fusion' && (
                 <S2DPipContextFusionPage
                   service={pipContextFusionService}
-                  signals={signals}
+                  signals={displaySignals}
                 />
               )}
               {active === 'feed' && (
                 <SignalFeed
-                  signals={signals}
+                  signals={displaySignals}
                   go={go}
                   setActiveSignal={setActiveSignal}
+                  openAccountInvestigation={openAccountInvestigation}
                   patchSignal={patchSignal}
+                  patchSignalsBatch={patchSignalsBatch}
                   removeSignal={removeSignal}
                   deleteSignal={deleteSignal}
+                  auditStore={annotationDurableStore}
+                  toast={showToast}
                 />
      )}
-              {active === 'echo' && <EchoTracker signals={signals} />}
-              {active === 'narrative' && <S2DNarrativeEchoPanel signals={signals} />}
-              {active === 'assistant' && <S2DAssistantConsole signals={signals} />}
-              {active === 'locality' && <LocalityIntel signals={signals} />}
-              {active === 'decision' && <DecisionConsole signals={signals} patchSignal={patchSignal} activeSignal={activeSignal} toast={showToast} />}
+              {active === 'echo' && <EchoTracker signals={displaySignals} />}
+              {active === 'narrative' && <S2DNarrativeEchoPanel signals={displaySignals} />}
+              {active === 'assistant' && <S2DAssistantConsole signals={displaySignals} />}
+              {active === 'locality' && <LocalityIntel signals={displaySignals} />}
+              {active === 'decision' && <DecisionConsole signals={displaySignals} patchSignal={patchSignal} activeSignal={activeSignal} toast={showToast} />}
               {active === 'combined' && <CombinedSentiment scrapeStore={scrapeStore} />}
               {active === 'intake' && <SignalIntake addSignal={addSignal} toast={showToast} />}
               {active === 'watchlist' && <Watchlist store={watchStore} toast={showToast} />}
-              {active === 'scraper' && <SocialScraper addSignal={addSignal} ingestScrapedRecords={ingestScrapedRecords} toast={showToast} scrapeStore={scrapeStore} />}
+              {active === 'scraper' && <SocialScraper addSignal={addSignal} ingestScrapedRecords={ingestScrapedRecords} toast={showToast} scrapeStore={scrapeStore} portalMode={portalMode} />}
               {active === 'link-memory-library' && <S2DLinkMemoryLibraryPage />}
-              {active === 'social-listening-crawler' && <S2DSocialListeningCrawlerPage />}
+              {active === 'social-listening-crawler' && <S2DSocialListeningCrawlerPage scrapingScheduleClient={scrapingScheduleClient} toast={showToast} />}
+              {active === 'account-intelligence' && (
+                <S2DAccountIntelligencePage
+                  client={accountIntelligenceClient}
+                  networkClient={networkIntelligenceClient}
+                  signals={displaySignals}
+                  initialCaseId={accountIntelCaseId}
+                  onCaseSelected={setAccountIntelCaseId}
+                  onOpenNetworkIntelligence={openNetworkIntelligence}
+                  toast={showToast}
+                />
+              )}
+              {active === 'network-intelligence' && (
+                <S2DNetworkIntelligencePage
+                  client={networkIntelligenceClient}
+                  infrastructureClient={infrastructureIntelligenceClient}
+                  initialCaseId={networkIntelCaseId}
+                  onCaseSelected={setNetworkIntelCaseId}
+                  onOpenInfrastructureIntelligence={openInfrastructureIntelligence}
+                  toast={showToast}
+                />
+              )}
+              {active === 'infrastructure-intelligence' && (
+                <S2DInfrastructureIntelligencePage
+                  client={infrastructureIntelligenceClient}
+                  initialCaseId={infrastructureIntelCaseId}
+                  onCaseSelected={setInfrastructureIntelCaseId}
+                  toast={showToast}
+                />
+              )}
+              {active === 'linked-infrastructure' && (
+                <S2DLinkedInfrastructurePage />
+              )}
+              {active === 'authorized-security-posture' && (
+                <S2DAuthorizedSecurityPosturePage />
+              )}
+              {active === 'authorized-network-evidence' && (
+                <S2DAuthorizedNetworkEvidencePage />
+              )}
               {active === 'brain' && (
                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <S2DNetworkGraphPanel signals={signals} />
-                <S2DDigitalBrainPanel signals={signals} />
+                <S2DNetworkGraphPanel signals={displaySignals} />
+                <S2DDigitalBrainPanel signals={displaySignals} />
                </div>
           )}
-              {active === 'live' && <S2DLiveMonitoringPage signals={signals} lang={lang} go={go} />}
+              {active === 'live' && <S2DLiveMonitoringPage signals={displaySignals} lang={lang} go={go} />}
               {active === 'family-tree' && (
                 <S2DEngineFamilyTreePage
                   navModules={NAV_MODULES}
@@ -3782,6 +4926,7 @@ export default function App() {
                 />
               )}
               {active === 'notify' && <S2DNotificationCenterPage />}
+              {active === 'alert-center' && <S2DAlertCenterPage />}
               {active === 'audit' && <S2DAuditLogPage />}
               {active === 'backend' && <S2DBackendIntegrationPage />}
               {active === 'mvp' && <S2DMVPReadinessPage />}
@@ -3812,7 +4957,7 @@ export default function App() {
                   annotationStore={annotationDurableStore}
                   annotationWorkflowService={annotationWorkflowService}
                   annotationSuggestionService={annotationSuggestionService}
-                  signals={signals}
+                  signals={displaySignals}
                   toast={showToast}
                 />
               )}
@@ -3856,7 +5001,7 @@ export default function App() {
                   toast={showToast}
                 />
               )}
-              {active === 'diagnostics' && <S2DDebugPanel signals={signals} />}
+              {active === 'diagnostics' && <S2DDebugPanel signals={displaySignals} />}
               {active === 'link-recall-intelligence' && <S2DLinkRecallIntelligencePage />}
               
               {portalMode === 'AUDIENCE' ? (
@@ -4024,6 +5169,16 @@ export default function App() {
           )}
         </div>
       </div>
+      <S2DAdvancedToolsDrawer
+        open={advancedDrawerOpen}
+        onClose={() => setAdvancedDrawerOpen(false)}
+        navItems={NAV}
+        activeRouteId={active}
+        go={go}
+        palette={T}
+        fontBody={FONT_BODY}
+        fontMono={FONT_MONO}
+      />
       <Toast toast={toast} />
     </div>
   )

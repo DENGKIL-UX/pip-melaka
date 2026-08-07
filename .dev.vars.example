@@ -44,9 +44,20 @@ S2D_NETWORK_EVIDENCE_PRIVACY_KEY=your_privacy_key_here
 S2D_APIFY_WEBHOOK_SHARED_SECRET=your_32plus_char_shared_secret_here
 TIKTOK_API_KEY=your_tiktok_api_key_here
 
-# S2D Engine URL (local dev: Express server on :4000; production: relative /api/s2d/intelligence via Workers)
+# S2D Engine URL (server-side local dev only). Browser requests always remain
+# same-origin and use /api/s2d/intelligence on Workers.
 S2D_ENGINE_URL=http://localhost:4000
-NEXT_PUBLIC_S2D_ENGINE_URL=http://localhost:4000
+
+# Privileged API auth. Generate with: openssl rand -hex 32
+# Production callers send Authorization: Bearer <S2D_AUTH_TOKEN>.
+S2D_AUTH_TOKEN=your_32plus_char_s2d_operator_token_here
+
+# Optional approved Apify actor/source configuration. Threads has no default
+# actor; Facebook collection is disabled until curated Melaka page URLs exist.
+S2D_APIFY_ACTOR_THREADS=
+S2D_APIFY_ACTOR_X=apidojo~tweet-scraper
+S2D_FACEBOOK_SOURCE_URLS=
+S2D_APIFY_RESIDENTIAL_PROXY_ENABLED=false
 
 # S2D Security toggles (Cloudflare Workers: active scans not supported in V8 isolates)
 S2D_ACTIVE_SECURITY_SCAN_ENABLED=false

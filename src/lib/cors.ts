@@ -10,20 +10,26 @@ import { NextRequest, NextResponse } from "next/server";
 // ---------------------------------------------------------------------------
 
 const PROD_ORIGIN = process.env.NEXT_PUBLIC_APP_ORIGIN ?? "https://pip-mlk.example.gov.my";
+const ENV_S2D_ORIGINS = (process.env.S2D_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter((origin) => origin && origin !== "*");
 
-export const ALLOWED_ORIGINS: string[] = [
+export const ALLOWED_ORIGINS: string[] = [...new Set([
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "https://pip-melaka.ritz-analytics.workers.dev",
   PROD_ORIGIN,
-];
+  ...ENV_S2D_ORIGINS,
+])];
 
 // S2D specific allowlist (never '*') — per S2D security checklist
-export const S2D_ALLOWED_ORIGINS: string[] = [
+export const S2D_ALLOWED_ORIGINS: string[] = [...new Set([
   "https://pip-melaka.ritz-analytics.workers.dev",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
-];
+  ...ENV_S2D_ORIGINS,
+])];
 
 // Methods/Headers we permit on cross-origin API calls.
 const ALLOWED_METHODS = "GET, POST, PUT, PATCH, DELETE, OPTIONS";
@@ -111,9 +117,9 @@ type RouteHandler<TCtx> = (
  *
  * Behavior:
  *   - OPTIONS preflight → 204 with CORS headers if origin allowed, else 403.
- *   - Actual request    → invoke handler, then stamp CORS headers on response.
- *   - Disallowed origin → handler still runs, but no ACAO header is sent
- *                         (browser will block the cross-origin read).
+ *   - Same-origin request (no Origin header) → invoke handler normally.
+ *   - Allowed cross-origin request → invoke handler and stamp CORS headers.
+ *   - Disallowed cross-origin request → reject before any route side effect.
  */
 export function withCORS<TCtx = RouteContext>(
   handler: RouteHandler<TCtx>,
@@ -123,11 +129,19 @@ export function withCORS<TCtx = RouteContext>(
     const preflight = handlePreflight(req);
     if (preflight) return preflight;
 
-    // 2. Run the actual handler.
-    const res = await handler(req, ctx);
-
-    // 3. Stamp CORS headers on the response.
+    // 2. Fail closed for an explicit, untrusted cross-origin request. Omitting
+    // Origin is normal for server-to-server and same-origin navigation.
+    const requestOrigin = req.headers.get("origin");
     const allowed = resolveAllowedOrigin(req);
+    if (requestOrigin && !allowed) {
+      return applyCORSHeaders(
+        NextResponse.json({ error: "Origin not allowed", code: "CORS_ORIGIN_REJECTED" }, { status: 403 }),
+        null,
+      );
+    }
+
+    // 3. Run the handler only after the origin check, then stamp CORS headers.
+    const res = await handler(req, ctx);
     return applyCORSHeaders(res, allowed);
   };
 }

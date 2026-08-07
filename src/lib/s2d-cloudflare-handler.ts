@@ -68,6 +68,15 @@ export function s2dCorsMiddleware(allowedOrigins: readonly string[] = S2D_ALLOWE
       });
     }
 
+    // Reject an explicit untrusted origin before the route can mutate state.
+    // Requests without Origin are same-origin/server-to-server and may proceed.
+    if (origin && !isAllowed) {
+      return new Response(JSON.stringify({ error: 'Origin not allowed', code: 'CORS_ORIGIN_REJECTED' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json', 'Vary': 'Origin' },
+      });
+    }
+
     await next();
 
     // Stamp CORS headers on actual response

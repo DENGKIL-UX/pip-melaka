@@ -121,7 +121,7 @@ export function S2DModernTab() {
                 <span>
                   <strong className="text-foreground">Cloudflare Edge Deployment</strong> — OpenNext serves the Vite bundle and App Router APIs from one origin. Browser cache stays in IndexedDB; production credentials must use Wrangler secrets because dynamic vault entries are isolate-local. Active PCAP/security binaries require an external authorized service.
                 </span>
-                <a href="/s2d-360/" target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-mlk hover:underline flex-shrink-0">
+                <a href="/s2d-360/engine" target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-mlk hover:underline flex-shrink-0">
                   Open dist/ <ExternalLink className="h-3 w-3" />
                 </a>
               </CardContent>

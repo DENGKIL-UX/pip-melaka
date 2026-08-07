@@ -40,7 +40,10 @@ const config: NextConfig = {
         ],
       },
       {
-        source: "/(.*)",
+        // Do not apply the global DENY policy to the embedded S2D-360
+        // document: the dedicated /s2d-360 rule above must win so the
+        // engine can be framed same-origin.
+        source: "/((?!s2d-360).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },

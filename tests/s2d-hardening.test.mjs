@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import vm from "node:vm";
 import test from "node:test";
 import ts from "typescript";
 
@@ -121,6 +122,114 @@ test("embedded engine source, bundle paths and security fixtures are internally 
   assert.equal(posture.openServices.length, 0);
   assert.equal(network.analysis.status, "NOT_RUN");
   assert.equal(network.governance.liveCapturePerformed, false);
+});
+
+test("S2D-360 engine route, manifest and toolbar runtime fix are in lockstep", async () => {
+  const manifest = await loadTypeScriptModule("src/lib/s2d-runtime-manifest.ts");
+  const bundlePath = manifest.S2D_RUNTIME_BUNDLE;
+  assert.match(bundlePath, /^\/s2d-360\/assets\/index-.*\.js$/);
+  assert.equal(existsSync(`public${bundlePath}`), true);
+
+  const bundle = readFileSync(`public${bundlePath}`, "utf8");
+  // Upstream S2DWorkspaceToolbar referenced onOpenCredentials without
+  // declaring it — an undeclared identifier that threw ReferenceError on
+  // first render and made React clear the entire engine root. The committed
+  // bundle must bind the prop in the toolbar destructuring instead.
+  assert.equal(
+    bundle.includes(
+      "function JJe({activeRouteId:e,navItems:t,navById:n,go:r,onOpenAdvanced:i,palette:a,fontBody:o,fontMono:s})"
+    ),
+    false
+  );
+  assert.match(bundle, /function JJe\(\{[^}]*onOpenCredentials[^}]*\}\)/);
+  assert.equal(bundle.includes("onOpenCredentials:()=>O(!0)"), true);
+
+  // The App Router route that serves the engine document must reference the
+  // manifest so the document and the committed bundle cannot drift, and it
+  // must allow same-origin framing.
+  const route = readFileSync("src/app/s2d-360/engine/route.ts", "utf8");
+  assert.match(route, /S2D_RUNTIME_BUNDLE/);
+  assert.match(route, /X-Frame-Options/);
+  assert.match(route, /frame-ancestors 'self'/);
+
+  // The static index document must reference the same bundle.
+  const index = readFileSync("public/s2d-360/index.html", "utf8");
+  assert.equal(index.includes(`src=${JSON.stringify(bundlePath)}`), true);
+});
+
+test("committed S2D-360 toolbar bundle renders without the onOpenCredentials ReferenceError", async () => {
+  const manifest = await loadTypeScriptModule("src/lib/s2d-runtime-manifest.ts");
+  const bundle = readFileSync(`public${manifest.S2D_RUNTIME_BUNDLE}`, "utf8");
+
+  // Extract the minified S2DWorkspaceToolbar function (JJe) from the bundle
+  // and execute it against React stubs. The upstream component referenced
+  // onOpenCredentials without declaring it, so this render used to throw
+  // `ReferenceError: onOpenCredentials is not defined` on first paint, which
+  // made React clear the entire engine root (blank iframe).
+  const startMarker = "function JJe({activeRouteId:e,navItems:t,navById:n,go:r,onOpenAdvanced:i,";
+  const start = bundle.indexOf(startMarker);
+  assert.notEqual(start, -1, "toolbar signature not found in bundle");
+  const closeParen = bundle.indexOf("})", start);
+  const bodyStart = closeParen + 2;
+  assert.equal(bundle[bodyStart], "{");
+  let depth = 0;
+  let end = bodyStart;
+  for (; end < bundle.length; end++) {
+    if (bundle[end] === "{") depth += 1;
+    else if (bundle[end] === "}") {
+      depth -= 1;
+      if (depth === 0) break;
+    }
+  }
+  const toolbarSource = bundle.slice(start, end + 1);
+
+  const sandbox = {
+    HJe: () => null,
+    RJe: [],
+    WJe: () => null,
+    qJe: () => "Tool label",
+    v: { useMemo: (fn) => fn() },
+    R: {
+      jsx: (type, props) => ({ type, props }),
+      jsxs: (type, props) => ({ type, props }),
+    },
+    __result: undefined,
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(`${toolbarSource};\n__result = JJe;`, sandbox);
+
+  const credentialsOpened = { count: 0 };
+  const tree = sandbox.__result({
+    activeRouteId: "overview",
+    navItems: [],
+    navById: {},
+    go: () => {},
+    onOpenAdvanced: () => {},
+    onOpenCredentials: () => {
+      credentialsOpened.count += 1;
+    },
+    palette: { border: "#000", bg2: "#111", muted: "#aaa", text: "#fff", sub: "#999", card: "#222" },
+    fontBody: "sans-serif",
+    fontMono: "monospace",
+  });
+
+  // Walk the rendered tree: the Gear Settings button must be present with a
+  // working onClick (the free-variable reference was the crash, and with the
+  // prop bound it must call the parent handler).
+  const buttons = [];
+  const walk = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (node.type === "button") buttons.push(node);
+    const children = node.props && node.props.children;
+    if (Array.isArray(children)) children.forEach(walk);
+    else walk(children);
+  };
+  walk(tree);
+  const gear = buttons.find((b) => String(b.props.children).includes("Gear Settings"));
+  assert.ok(gear, "Gear Settings button missing from toolbar render");
+  assert.equal(typeof gear.props.onClick, "function");
+  gear.props.onClick();
+  assert.equal(credentialsOpened.count, 1, "onOpenCredentials prop was not bound to the rendered button");
 });
 
 test("Melaka sample signals use the canonical parliament/DUN mapping", () => {

@@ -76,7 +76,7 @@
         "z-ai-web-dev-sdk": "^0.0.18",
         "zod": "^4.0.2",
         "zustand": "^5.0.6",
-        "@ritzanalytics/pip-s2d-contracts": "file:../S2D-workspace-code/s2d-360-intelligence-engine/packages/pip-s2d-contracts",
+        "@ritzanalytics/pip-s2d-contracts": "file:./packages/pip-s2d-contracts",
       },
       "devDependencies": {
         "@opennextjs/cloudflare": "^1.20.1",
@@ -2685,7 +2685,7 @@
 
     "glob/minimatch/brace-expansion/balanced-match": ["balanced-match@4.0.4", "", {}, "sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA=="],
 
-    "@ritzanalytics/pip-s2d-contracts": ["@ritzanalytics/pip-s2d-contracts@file:../S2D-workspace-code/s2d-360-intelligence-engine/packages/pip-s2d-contracts", {}],
+    "@ritzanalytics/pip-s2d-contracts": ["@ritzanalytics/pip-s2d-contracts@file:./packages/pip-s2d-contracts", {}],
 
     "refractor/parse-entities/is-alphanumerical/is-alphabetical": ["is-alphabetical@1.0.4", "https://registry.npmjs.com/is-alphabetical/-/is-alphabetical-1.0.4.tgz", {}, "sha512-DwzsA04LQ10FHTZuL0/grVDk4rFoVH1pjAToYwBrHSxcrBIGQuXrQMtD5U1b0U2XVgKZCTLLP8u2Qxqhy3l2Vg=="],
   }

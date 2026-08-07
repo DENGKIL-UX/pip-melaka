@@ -562,6 +562,10 @@ export function Map2DTab() {
               </div>`,
               { sticky: true, className: "mlk-map-tooltip" },
             );
+            // FIX: GE15 overlay now supports click (was missing — now sets parliament like par layer)
+            lyr.on("click", () => {
+              setSelectedParliament(parlCode);
+            });
           },
         });
         layerRefs.current.ge15 = ge15Layer;

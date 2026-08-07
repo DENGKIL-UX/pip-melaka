@@ -1,4 +1,21 @@
-<!doctype html>
+import { S2D_RUNTIME_BUNDLE } from "@/lib/s2d-runtime-manifest";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * S2D-360 engine document.
+ *
+ * The upstream Vite application is committed as static assets under
+ * /public/s2d-360/ and served by the Workers assets binding. Serving the
+ * HTML document from a real App Router route (instead of relying on
+ * Cloudflare's handling of /s2d-360/index.html) makes the iframe source
+ * deterministic and lets us control the framing headers on the document
+ * itself, plus surface startup failures instead of a silent blank panel.
+ */
+function engineDocument(): string {
+  const bundle = JSON.stringify(S2D_RUNTIME_BUNDLE);
+  return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -44,11 +61,12 @@
     </style>
     <script>
       (() => {
-        const bundle = "/s2d-360/assets/index-BSJ6YCDt.js";
+        const bundle = ${bundle};
         let failed = false;
         const fail = (reason) => {
           failed = true;
           let state = document.getElementById('s2d-boot-state');
+          // Reconstruct the error UI if React already cleared the root.
           if (!state) {
             const root = document.getElementById('root');
             if (!root) return;
@@ -69,7 +87,7 @@
             'S2D-360 failed to start';
           document.getElementById('s2d-boot-detail').textContent =
             String(reason || 'Unknown startup error') +
-            '\nBundle: ' +
+            '\\nBundle: ' +
             bundle;
         };
         window.addEventListener(
@@ -88,7 +106,10 @@
             )
         );
         window.setTimeout(() => {
-          if (!failed && document.getElementById('s2d-boot-state')) {
+          if (
+            !failed &&
+            document.getElementById('s2d-boot-state')
+          ) {
             fail(
               'Startup timed out. Reload once; if this persists, ' +
               'verify the bundle request in browser developer tools.'
@@ -97,7 +118,7 @@
         }, 15000);
       })();
     </script>
-    <script type="module" crossorigin src="/s2d-360/assets/index-BSJ6YCDt.js"></script>
+    <script type="module" crossorigin src=${bundle}></script>
   </head>
   <body>
     <div id="root">
@@ -111,4 +132,28 @@
       </div>
     </div>
   </body>
-</html>
+</html>`;
+}
+
+export async function GET(): Promise<Response> {
+  return new Response(engineDocument(), {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      // Same-origin framing for the embedded engine document. Kept on the
+      // response itself so the iframe policy does not depend on edge header
+      // handling for route handlers.
+      "X-Frame-Options": "SAMEORIGIN",
+      "Content-Security-Policy":
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data: https:; " +
+        "font-src 'self' data:; " +
+        "connect-src 'self' https:; " +
+        "frame-ancestors 'self';",
+    },
+  });
+}

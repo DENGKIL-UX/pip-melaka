@@ -13,8 +13,8 @@ interface Props {
 }
 
 function engineUrl(deepLink?: string): string {
-  if (!deepLink) return "/s2d-360/";
-  return `/s2d-360/#${encodeURIComponent(deepLink)}`;
+  if (!deepLink) return "/s2d-360/engine";
+  return `/s2d-360/engine#${encodeURIComponent(deepLink)}`;
 }
 
 export function S2D360Engine({ deepLink }: Props) {

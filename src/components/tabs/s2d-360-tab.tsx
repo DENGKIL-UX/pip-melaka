@@ -386,7 +386,7 @@ export function S2D360Tab() {
               <Maximize2 className="h-3 w-3" />
               {fullscreen ? t("s2d360.exitFullscreen") : t("s2d360.fullscreen")}
             </Button>
-            <a href="/s2d-360/" target="_blank" rel="noopener noreferrer">
+            <a href="/s2d-360/engine" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1 border-mlk/30">
                 <ExternalLink className="h-3 w-3" />
                 {t("s2d360.openInNewTab")}
@@ -409,7 +409,7 @@ export function S2D360Tab() {
           )}
           <iframe
             ref={iframeRef}
-            src={`/s2d-360/index.html${deepLink ? `#${deepLink}` : ""}`}
+            src={`/s2d-360/engine${deepLink ? `#${deepLink}` : ""}`}
             className="w-full h-full border-0"
             title="S2D-360 Intelligence Engine"
             onLoad={() => setLoading(false)}
@@ -425,7 +425,7 @@ export function S2D360Tab() {
         <CardContent className="p-2 text-[9px] text-muted-foreground flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-3">
             <span>{t("s2d360.footerEngine")} <strong className="text-foreground">v1.0.0</strong></span>
-            <span>{t("s2d360.footerPages")} <strong className="text-foreground">56</strong></span>
+            <span>{t("s2d360.footerPages")} <strong className="text-foreground">63</strong></span>
             <span>{t("s2d360.footerSections")} <strong className="text-foreground">8</strong></span>
             <span>{t("s2d360.footerGovBooleans")} <strong className="text-foreground">22</strong></span>
             <span>{t("s2d360.footerValidators")} <strong className="text-foreground">100+</strong></span>

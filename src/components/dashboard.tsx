@@ -64,6 +64,7 @@ const Map2DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-2d-
 const Map3DTab = dynamic(() => withRetry(() => import("@/components/tabs/map-3d-tab").then((m) => ({ default: m.Map3DTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.map3d" fallback="Loading 3D map…" /> });
 const S2DConsoleTab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-console-tab").then((m) => ({ default: m.S2DConsoleTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.s2dConsole" fallback="Loading S2D console…" /> });
 const S2D360Tab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-360-tab").then((m) => ({ default: m.S2D360Tab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.s2d360" fallback="Loading S2D 360…" /> });
+const S2DModernTab = dynamic(() => withRetry(() => import("@/components/tabs/s2d-modern-tab").then((m) => ({ default: m.S2DModernTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.s2d360" fallback="Loading S2D 360 Modern…" /> });
 const PublicCommunicationTab = dynamic(() => withRetry(() => import("@/components/tabs/public-communication-tab").then((m) => ({ default: m.PublicCommunicationTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.publicComm" fallback="Loading Public Comm…" /> });
 const IncidentCasebookTab = dynamic(() => withRetry(() => import("@/components/tabs/incident-casebook-tab").then((m) => ({ default: m.IncidentCasebookTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.incidents" fallback="Loading Incidents…" /> });
 const ScenarioTab = dynamic(() => withRetry(() => import("@/components/tabs/scenario-tab").then((m) => ({ default: m.ScenarioTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.scenarios" fallback="Loading Scenarios…" /> });
@@ -82,8 +83,9 @@ const TABS: Array<{ id: DashboardTab; label: string; i18nKey: string; icon: Reac
   { id: "analysis", label: "DPT Analysis", i18nKey: "tab.analysis", icon: TrendingUp },
   { id: "risk", label: "Risk + Socio", i18nKey: "tab.risk", icon: ShieldAlert },
   { id: "compare", label: "Compare", i18nKey: "tab.compare", icon: ArrowLeftRight },
-  { id: "s2d", label: "S2D Console", i18nKey: "tab.s2d", icon: Activity },
-  { id: "s2d-360", label: "S2D 360", i18nKey: "tab.s2d360", icon: Brain },
+  { id: "s2d", label: "S2D Console (Legacy)", i18nKey: "tab.s2d", icon: Activity },
+  { id: "s2d-360", label: "S2D 360 (Legacy)", i18nKey: "tab.s2d360", icon: Brain },
+  { id: "s2d-modern", label: "S2D 360 Modern", i18nKey: "tab.s2dModern", icon: Brain },
   { id: "scraper", label: "Scraper", i18nKey: "tab.scraper", icon: Radar },
   { id: "public-comm", label: "Public Comm", i18nKey: "tab.publicComm", icon: MessageSquare },
   { id: "incidents", label: "Incidents", i18nKey: "tab.incidents", icon: AlertTriangle },
@@ -100,7 +102,7 @@ const TAB_GROUPS: Array<{ label: string; ids: DashboardTab[] }> = [
   { label: "Overview", ids: ["overview"] },
   { label: "Maps", ids: ["map-2d", "map-3d"] },
   { label: "Elections", ids: ["elections", "demographics", "analysis", "compare"] },
-  { label: "Intelligence", ids: ["s2d", "s2d-360", "scraper", "insights", "predictive"] },
+  { label: "Intelligence", ids: ["s2d-modern", "s2d", "s2d-360", "scraper", "insights", "predictive"] },
   { label: "Operations", ids: ["public-comm", "incidents", "scenarios", "alerts", "dual-layer"] },
   { label: "Governance", ids: ["risk", "governance"] },
 ];
@@ -345,6 +347,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "map-3d" && <Map3DTab />}
         {activeTab === "s2d" && <S2DConsoleTab />}
         {activeTab === "s2d-360" && <S2D360Tab />}
+        {activeTab === "s2d-modern" && <S2DModernTab />}
         {activeTab === "scraper" && <ScraperTab />}
         {activeTab === "public-comm" && <PublicCommunicationTab />}
         {activeTab === "incidents" && <IncidentCasebookTab />}

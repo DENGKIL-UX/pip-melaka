@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import { I18nProvider } from "@/lib/i18n";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Geist font via next/font/google requires network fetch to fonts.googleapis.com.
+// In offline CI / Cloudflare Workers build, the fetch can fail. Use a local fallback
+// that provides the same CSS variables without network. The original Geist import is
+// preserved in comments for reference:
+// import { Geist, Geist_Mono } from "next/font/google";
+// const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+// const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistSans = { variable: "font-geist-sans" } as const;
+const geistMono = { variable: "font-geist-mono" } as const;
 
 export const metadata: Metadata = {
   title: "PIP-MLK · Political Intelligence Platform · Melaka",

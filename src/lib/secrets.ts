@@ -46,6 +46,48 @@ export const SECRET_REGISTRY: SecretRequirement[] = [
     required: false,
     hint: "Production origin, e.g. https://pip-mlk.example.gov.my",
   },
+  {
+    name: "APIFY_TOKEN",
+    required: false,
+    hint: "Apify token — live-verified via GET https://api.apify.com/v2/users/me (Gear Settings or wrangler secret put)",
+    minLength: 10,
+  },
+  {
+    name: "S2D_ALERT_WHATSAPP_TOKEN",
+    required: false,
+    hint: "WhatsApp Cloud API token for S2D alerts",
+  },
+  {
+    name: "S2D_ALERT_EMAIL_TOKEN",
+    required: false,
+    hint: "Email provider token for S2D alerts",
+  },
+  {
+    name: "S2D_BURP_DAST_API_KEY",
+    required: false,
+    hint: "Burp DAST API key (optional — proxied active scans only)",
+  },
+  {
+    name: "S2D_BURP_DAST_GRAPHQL_URL",
+    required: false,
+    hint: "Burp DAST GraphQL URL",
+  },
+  {
+    name: "S2D_NETWORK_EVIDENCE_PRIVACY_KEY",
+    required: false,
+    hint: "Privacy key for authorized network evidence",
+  },
+  {
+    name: "S2D_APIFY_WEBHOOK_SHARED_SECRET",
+    required: false,
+    hint: "HMAC shared secret for Apify webhook (32+ chars)",
+    minLength: 32,
+  },
+  {
+    name: "TIKTOK_API_KEY",
+    required: false,
+    hint: "Approved TikTok metadata provider key",
+  },
 ];
 
 // ---------------------------------------------------------------------------

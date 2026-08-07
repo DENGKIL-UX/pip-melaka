@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"SignalRecord","type":"object","properties":{"schema":{"const":"pip-s2d.signal-record.v1"}},"required":["schema"],"additionalProperties":true}

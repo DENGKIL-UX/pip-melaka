@@ -1,16 +1,28 @@
-// PIP-MLK S2D Intelligence API — Phase 2 ported engine routes.
+// PIP-MLK S2D Intelligence API — Phase 2/3 ported engine routes.
 //
 // Exposes the ported S2D intelligence modules via Next.js API routes.
 // These endpoints provide the same data contracts as the S2D-360 engine's
-// src/integration/pip360/api/ but run natively in PIP-MLK's Next.js runtime.
+// Express server (s2d-360-intelligence-engine/server/index.js) on http://localhost:4000
+// with OpenAPI v1 routes under /api/s2d/intelligence/*.
 //
-// Endpoints:
-//   GET  /api/s2d/intelligence/                   → API info
-//   GET  /api/s2d/intelligence/sentiment-snapshots → Daily sentiment snapshots
-//   GET  /api/s2d/intelligence/change-points      → Change-point detection results
-//   GET  /api/s2d/intelligence/local-profiles     → Local signal profiles
-//   GET  /api/s2d/intelligence/daily-brief         → Daily Intelligence Brief
-//   POST /api/s2d/intelligence/validate-context   → PIP aggregate context validation
+// For Cloudflare deployment, Express JSON handlers are re-mounted as Hono / Web Fetch
+// handlers (Cloudflare Workers support fetch/Headers/Request/Response/Web Crypto).
+// CORS is restricted to https://pip-melaka.ritz-analytics.workers.dev (see src/lib/cors.ts -> S2D_ALLOWED_ORIGINS, not '*').
+//
+// Endpoints (per S2D-PIP-MELAKA-REPLACEMENT-GUIDE.md):
+//   GET  /api/s2d/intelligence/                              → API info
+//   GET  /api/s2d/intelligence/signals?localityCode=MELAKA  → Public signals (sanitised, aggregate-only)
+//   GET  /api/s2d/intelligence/narratives                   → Narrative clusters
+//   GET  /api/s2d/intelligence/recommendations              → Recommendation cases (White/Grey/Black)
+//   GET  /api/s2d/intelligence/briefs/daily                 → Daily Intelligence Brief (alias: /daily-brief)
+//   GET  /api/s2d/intelligence/sentiment-snapshots          → Daily sentiment snapshots
+//   GET  /api/s2d/intelligence/change-points                → Change-point detection results
+//   GET  /api/s2d/intelligence/local-profiles               → Local signal profiles
+//   GET  /api/s2d/intelligence/forecasts                    → 24-72h forecasts
+//   POST /api/s2d/intelligence/validate-context             → PIP aggregate context validation
+//
+// Storage mapping (Cloudflare): client cache -> IndexedDB; server JSON -> KV; audit logs -> D1; PCAP/artifacts -> R2
+// Nmap/Tshark spawn does NOT exist in Cloudflare V8 isolates — Edge Fixture / Audit Mode by default (S2D_ACTIVE_SECURITY_SCAN_ENABLED=false)
 
 import { NextRequest, NextResponse } from "next/server";
 import { withCORS } from "@/lib/cors";
@@ -99,14 +111,14 @@ export async function GET(req: NextRequest) {
       endpoint: "/api/s2d/intelligence",
       description: "S2D Intelligence API — ported engine (Phase 3)",
       routes: [
+        "GET /signals?localityCode=MELAKA — Public signals (sanitised, filtered by locality)",
+        "GET /narratives — Narrative clusters",
+        "GET /recommendations — Recommendation cases (White/Grey/Black)",
+        "GET /briefs/daily — Daily Intelligence Brief (alias: /daily-brief)",
         "GET /sentiment-snapshots — Daily sentiment snapshots",
         "GET /change-points — Change-point detection results",
         "GET /local-profiles — Local signal profiles",
-        "GET /daily-brief — Daily Intelligence Brief",
-        "GET /signals — Signal records (sanitised public signals)",
-        "GET /narratives — Narrative clusters",
-        "GET /forecasts — Forecast records (24-72h outlook)",
-        "GET /recommendations — Recommendation cases",
+        "GET /forecasts — 24-72h forecasts",
         "POST /validate-context — PIP aggregate context validation",
       ],
       engineVersion: "v1.0.0 (ported)",
@@ -144,7 +156,7 @@ export async function GET(req: NextRequest) {
   } else if (path === "/local-profiles") {
     const profiles = buildLocalSignalProfiles(SAMPLE_SIGNALS as unknown as LocalSignalRecord[]);
     response = NextResponse.json({ profiles, count: profiles.length });
-  } else if (path === "/daily-brief") {
+  } else if (path === "/daily-brief" || path === "/briefs/daily") {
     const briefInput: BriefInput = {
       reportDate: new Date().toISOString().slice(0, 10),
       generatedAt: new Date().toISOString(),
@@ -161,7 +173,21 @@ export async function GET(req: NextRequest) {
     response = NextResponse.json({ brief, validation, markdown });
   } else if (path === "/signals") {
     // Sanitised public signal records — no @handles, no URLs with account names
-    const signals = SAMPLE_SIGNALS.map((s) => ({
+    // Supports ?localityCode=MELAKA (state-level filter) per replacement guide; DUN codes also accepted
+    const { searchParams } = new URL(req.url);
+    const localityCode = searchParams.get("localityCode");
+    let filtered = SAMPLE_SIGNALS;
+    if (localityCode && localityCode !== "MELAKA") {
+      // Simple filter: match dunCode, parliamentCode, or stateCode; otherwise return empty for unknown codes
+      const code = localityCode.toUpperCase();
+      filtered = SAMPLE_SIGNALS.filter((s) => {
+        const loc: any = (s as any).locality;
+        return [loc.dunCode, loc.parliamentCode, loc.stateCode, loc.dunName, loc.parliamentName, loc.localityName].some(
+          (v: any) => v && String(v).toUpperCase() === code
+        );
+      });
+    }
+    const signals = filtered.map((s) => ({
       signalId: s.snapshotId,
       date: s.snapshotDate,
       locality: s.locality,
@@ -177,7 +203,12 @@ export async function GET(req: NextRequest) {
       acceptedEvidence: s.acceptedEvidence,
       humanReviewed: s.humanReviewed,
     }));
-    response = NextResponse.json({ signals, count: signals.length });
+    response = NextResponse.json({
+      signals,
+      count: signals.length,
+      localityCode: localityCode ?? "MELAKA",
+      governance: { aggregatePublicSignalsOnly: true, humanReviewRequired: true },
+    });
   } else if (path === "/narratives") {
     // Narrative clusters — aggregated themes across signals
     const narratives = [

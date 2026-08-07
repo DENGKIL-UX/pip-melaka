@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"RecommendationCase","type":"object","properties":{"schema":{"const":"pip-s2d.recommendation-case.v1"}},"required":["schema"],"additionalProperties":true}

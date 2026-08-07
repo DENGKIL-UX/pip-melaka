@@ -24,17 +24,20 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Segmented } from "@/components/ui/segmented";
-import { Brain, FileText, Bell, Share2, MapPin, Settings2, ExternalLink, ShieldCheck, Radio } from "lucide-react";
+import { Brain, FileText, Bell, Share2, MapPin, BarChart3, Target, MapPinned, ExternalLink, ShieldCheck, Radio } from "lucide-react";
 import { S2DWorkspaceToolbar } from "@/components/s2d/S2DWorkspaceToolbar";
 import { S2DDailyIntelligenceBriefPage } from "@/components/s2d/S2DDailyIntelligenceBriefPage";
 import { S2DAlertCenterPage } from "@/components/s2d/S2DAlertCenterPage";
 import { S2DNarrativePropagationGraphPage } from "@/components/s2d/S2DNarrativePropagationGraphPage";
 import { S2DConstituencyIntelligenceReportPage } from "@/components/s2d/S2DConstituencyIntelligenceReportPage";
+import { S2DSentimentSnapshotsPage } from "@/components/s2d/S2DSentimentSnapshotsPage";
+import { S2DLocalSignalProfilesPage } from "@/components/s2d/S2DLocalSignalProfilesPage";
+import { S2DForecastingPage } from "@/components/s2d/S2DForecastingPage";
 import { S2D360Engine as S2D360EngineWrapper } from "@/components/s2d/S2D360Engine.wrapper";
 import { useS2DStore } from "@/stores/s2d-store";
 import { useI18n } from "@/lib/i18n";
 
-type ModernView = "engine" | "brief" | "alerts" | "narrative" | "constituency";
+type ModernView = "engine" | "brief" | "alerts" | "narrative" | "constituency" | "sentiment" | "profiles" | "forecast";
 
 export function S2DModernTab() {
   const { t } = useI18n();
@@ -82,16 +85,19 @@ export function S2DModernTab() {
         </CardContent>
       </Card>
 
-      {/* View switcher */}
+      {/* View switcher — Intelligence (S2D-360) — inspired by S2D-workspace-code navigation workspaces */}
       <Segmented
         value={view}
         onChange={(v) => setView(v as ModernView)}
         options={[
           { value: "engine" as const, label: "Engine", icon: Brain },
           { value: "brief" as const, label: "Daily Brief", icon: FileText },
+          { value: "sentiment" as const, label: "Sentiment", icon: BarChart3 },
+          { value: "profiles" as const, label: "Local Profiles", icon: MapPinned },
           { value: "alerts" as const, label: "Alerts", icon: Bell },
           { value: "narrative" as const, label: "Narrative Graph", icon: Share2 },
           { value: "constituency" as const, label: "Constituency", icon: MapPin },
+          { value: "forecast" as const, label: "Forecast", icon: Target },
         ]}
       />
 
@@ -126,9 +132,12 @@ export function S2DModernTab() {
           </div>
         )}
         {view === "brief" && <S2DDailyIntelligenceBriefPage />}
+        {view === "sentiment" && <S2DSentimentSnapshotsPage />}
+        {view === "profiles" && <S2DLocalSignalProfilesPage />}
         {view === "alerts" && <S2DAlertCenterPage />}
         {view === "narrative" && <S2DNarrativePropagationGraphPage />}
         {view === "constituency" && <S2DConstituencyIntelligenceReportPage />}
+        {view === "forecast" && <S2DForecastingPage />}
       </div>
 
       <Card className="border-mlk/20">

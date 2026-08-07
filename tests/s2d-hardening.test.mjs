@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { copyFileSync, existsSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import vm from "node:vm";
 import test from "node:test";
@@ -343,6 +346,35 @@ test("S2D operations catch-all route handles all operations endpoints with 200 O
   assert.match(routeSource, /network-intelligence/);
   assert.match(routeSource, /infrastructure-intelligence/);
   assert.match(routeSource, /withCORS/);
+});
+
+test("committed S2D-360 engine bundle parses cleanly as an ES module", () => {
+  const index = readFileSync("public/s2d-360/index.html", "utf8");
+  const bundlePath = index.match(/src="([^"]+index-[^"]+\.js)"/)?.[1];
+  assert.ok(bundlePath, "engine document does not reference a bundle");
+  const absolute = `public${bundlePath}`;
+  assert.equal(existsSync(absolute), true);
+
+  // The browser loads this file with <script type="module">, so parse it with
+  // the ES module goal and fail on any SyntaxError. A hand edit once left
+  // template literals in object-literal key position (`monitoring-profiles`:
+  // ...) which threw "Uncaught SyntaxError: Unexpected template string" and
+  // prevented S2D-360 from starting; none of the extractor-based tests above
+  // parse the whole bundle, so this regression shipped. node --check parses
+  // .mjs with the module goal, matching the browser.
+  const tmp = join(tmpdir(), `s2d-bundle-parse-${process.pid}.mjs`);
+  copyFileSync(absolute, tmp);
+  try {
+    const result = spawnSync(process.execPath, ["--check", tmp], { encoding: "utf8" });
+    assert.equal(result.status, 0, `S2D-360 bundle failed to parse as an ES module:\n${result.stderr}`);
+  } finally {
+    rmSync(tmp, { force: true });
+  }
+
+  // Hyphenated route-alias keys must be valid quoted property names.
+  const bundle = readFileSync(absolute, "utf8");
+  assert.equal(bundle.includes("`monitoring-profiles`:"), false);
+  assert.match(bundle, /"monitoring-profiles":/);
 });
 
 

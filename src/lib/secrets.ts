@@ -47,6 +47,12 @@ export const SECRET_REGISTRY: SecretRequirement[] = [
     hint: "Production origin, e.g. https://pip-mlk.example.gov.my",
   },
   {
+    name: "S2D_AUTH_TOKEN",
+    required: false,
+    hint: "32+ random chars for privileged S2D credential/scrape API access",
+    minLength: 32,
+  },
+  {
     name: "APIFY_TOKEN",
     required: false,
     hint: "Apify token — live-verified via GET https://api.apify.com/v2/users/me (Gear Settings or wrangler secret put)",

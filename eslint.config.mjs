@@ -89,6 +89,14 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "react/no-danger": "warn",
   },
 }, {
+  // The imported S2D page family intentionally mirrors upstream state/effect
+  // orchestration. Review it through the upstream test suite rather than
+  // applying React Compiler's advisory set-state-in-effect rule retroactively.
+  files: ["src/components/s2d/**/*.{js,jsx,ts,tsx}"],
+  rules: {
+    "react-hooks/set-state-in-effect": "off",
+  },
+}, {
   ignores: [
     "node_modules/**",
     ".next/**",
@@ -107,6 +115,7 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "pip-melaka-blueprint/**",
     "bp-tmp/**",
     "public/**",            // Static assets — includes S2D-360 minified bundle
+    "vendor/**",            // Verbatim third-party/upstream audit copies
     "mini-services/**",     // Independent Bun services (own lint configs)
     "scripts/**",           // Shell/utility scripts
     ".zscripts/**",         // Build automation scripts

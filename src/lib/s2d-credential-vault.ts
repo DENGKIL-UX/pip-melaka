@@ -1,7 +1,9 @@
-// src/lib/s2d-credential-vault.ts
-// In-memory vault for S2D credentials — raw tokens NEVER returned to browser
-// Per Phase 4 spec: PUT /api/s2d/credentials live-verifies token against provider
-// (e.g. Apify GET https://api.apify.com/v2/users/me) before committing.
+// Server-only, process-local S2D credential vault.
+// Raw values are never serialized by this module. Environment secrets remain
+// the durable production source; dynamic entries are intentionally ephemeral
+// and may disappear when a Worker isolate is recycled.
+
+export type VerificationMode = "LIVE_PROVIDER" | "LOCAL_CRYPTO" | "FORMAT_ONLY";
 
 export interface VaultEntry {
   key: string;
@@ -9,49 +11,95 @@ export interface VaultEntry {
   verified: boolean;
   verifiedAt?: string;
   provider?: string;
-  // Raw token is stored only server-side in memory (never serialized to client)
+  verificationMode?: VerificationMode;
+  source: "environment" | "dynamic.vault";
   _raw?: string;
 }
 
-const vault = new Map<string, VaultEntry>();
+export const S2D_CREDENTIAL_KEYS = [
+  "APIFY_TOKEN",
+  "S2D_ALERT_WHATSAPP_TOKEN",
+  "S2D_ALERT_EMAIL_TOKEN",
+  "S2D_BURP_DAST_API_KEY",
+  "S2D_BURP_DAST_GRAPHQL_URL",
+  "S2D_NETWORK_EVIDENCE_PRIVACY_KEY",
+  "S2D_APIFY_WEBHOOK_SHARED_SECRET",
+  "TIKTOK_API_KEY",
+] as const;
+
+export type S2dCredentialKey = typeof S2D_CREDENTIAL_KEYS[number];
+
+const PROVIDERS: Record<S2dCredentialKey, string> = {
+  APIFY_TOKEN: "Apify",
+  S2D_ALERT_WHATSAPP_TOKEN: "WhatsApp Cloud API",
+  S2D_ALERT_EMAIL_TOKEN: "Email provider",
+  S2D_BURP_DAST_API_KEY: "Burp DAST",
+  S2D_BURP_DAST_GRAPHQL_URL: "Burp DAST",
+  S2D_NETWORK_EVIDENCE_PRIVACY_KEY: "Network evidence HMAC",
+  S2D_APIFY_WEBHOOK_SHARED_SECRET: "Apify webhook HMAC",
+  TIKTOK_API_KEY: "TikTok",
+};
+
+const vault = new Map<S2dCredentialKey, VaultEntry>();
 
 export function maskToken(token: string): string {
   if (!token) return "••••";
   if (token.length <= 8) return `${token.slice(0, 2)}***${token.slice(-2)}`;
-  // Show first 4 and last 4 like apif***9x2a
   return `${token.slice(0, 4)}***${token.slice(-4)}`;
 }
 
-export function setVaultEntry(key: string, token: string, opts: { verified?: boolean; provider?: string } = {}): VaultEntry {
+export function setVaultEntry(
+  key: S2dCredentialKey,
+  token: string,
+  opts: { verified: boolean; provider?: string; verificationMode: VerificationMode },
+): VaultEntry {
   const entry: VaultEntry = {
     key,
     masked: maskToken(token),
-    verified: opts.verified ?? false,
+    verified: opts.verified,
     verifiedAt: opts.verified ? new Date().toISOString() : undefined,
-    provider: opts.provider,
+    provider: opts.provider ?? PROVIDERS[key],
+    verificationMode: opts.verificationMode,
+    source: "dynamic.vault",
     _raw: token,
   };
   vault.set(key, entry);
   return entry;
 }
 
-export function getVaultEntry(key: string): VaultEntry | undefined {
+export function getVaultEntry(key: S2dCredentialKey): VaultEntry | undefined {
   return vault.get(key);
 }
 
-export function getMaskedVault(): Record<string, Omit<VaultEntry, "_raw">> {
-  const out: Record<string, Omit<VaultEntry, "_raw">> = {};
-  for (const [k, v] of vault.entries()) {
-    const { _raw, ...masked } = v;
-    out[k] = masked;
+export function getMaskedVault(): Partial<Record<S2dCredentialKey, Omit<VaultEntry, "_raw">>> {
+  const out: Partial<Record<S2dCredentialKey, Omit<VaultEntry, "_raw">>> = {};
+
+  for (const key of S2D_CREDENTIAL_KEYS) {
+    const dynamicEntry = vault.get(key);
+    if (dynamicEntry) {
+      const { _raw: _discarded, ...masked } = dynamicEntry;
+      out[key] = masked;
+      continue;
+    }
+
+    const environmentValue = process.env[key]?.trim();
+    if (environmentValue) {
+      out[key] = {
+        key,
+        masked: maskToken(environmentValue),
+        verified: false,
+        provider: PROVIDERS[key],
+        source: "environment",
+      };
+    }
   }
   return out;
 }
 
-export function getRawToken(key: string): string | undefined {
-  return vault.get(key)?._raw;
+export function getRawToken(key: S2dCredentialKey): string | undefined {
+  return vault.get(key)?._raw ?? (process.env[key]?.trim() || undefined);
 }
 
-export function listVaultKeys(): string[] {
-  return Array.from(vault.keys());
+export function listVaultKeys(): S2dCredentialKey[] {
+  return S2D_CREDENTIAL_KEYS.filter((key) => Boolean(getRawToken(key)));
 }

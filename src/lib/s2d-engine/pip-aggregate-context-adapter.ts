@@ -1,42 +1,39 @@
 /**
- * S2D PIP Aggregate Context Adapter — ported from the S2D-360 Intelligence Engine.
+ * PIP → S2D aggregate-context identity firewall.
  *
- * This is the identity firewall that guards the PIP↔S2D boundary.
- * It validates that population context payloads contain ONLY aggregate
- * data — never individual voter records.
- *
- * Source: s2d-engine/src/intelligence/integration/s2d-pip-aggregate-context-adapter.js
- * Ported to TypeScript for PIP-MLK's Next.js runtime.
- *
- * Key rules:
- * - 28 rejected keys (voters, names, ic, nric, phone, address, etc.)
- * - 9 regex patterns to catch obfuscated variants
- * - If ANY individual-level key is found, the ENTIRE payload is REJECTED
- * - Status: REJECTED_INDIVIDUAL_DATA (not filtered — rejected)
+ * The boundary rejects the entire payload when individual, targeting, or
+ * election-prediction fields are detected. It never attempts to "clean" an
+ * unsafe PIP context because partial filtering can hide a modelling error.
  */
 
-// 28 hard-coded rejected keys — any of these in the payload = instant rejection
-const REJECTED_KEYS = Object.freeze([
-  "voters", "voterRecords", "persons", "people", "individuals", "citizens",
-  "fullName", "firstName", "lastName", "ic", "icNumber", "nric",
-  "phone", "phoneNumber", "mobile", "address", "addresses",
-  "voterId", "voterIds", "username", "usernames", "personName",
-  "preferenceScore", "supportScore", "politicalClassification",
-  "individualPoliticalClassification",
+const REJECTED_CANONICAL_KEYS = new Set([
+  "voters", "voterrecords", "persons", "people", "individuals", "citizens", "records", "names",
+  "fullname", "firstname", "lastname", "personname", "identitynumber", "ic", "icnumber", "nric",
+  "phone", "phonenumber", "mobile", "email", "address", "addresses", "residentialaddress",
+  "voterid", "voterids", "username", "usernames", "handle", "accountid", "profileid", "socialaccount",
+  "preferencescore", "supportscore", "politicalclassification", "individualpoliticalclassification",
+  "targetsegment", "targetaudienceid", "demographictarget", "individualtargeting", "personalisedpersuasion",
+  "partywinner", "candidatewinner", "constituencywinner", "voteshareprediction", "turnoutprediction",
+  "electionresultprediction", "voterpreference", "votingpreference", "predictedvote", "persuasionscore",
+  "turnoutprobability", "personaldata", "householddata", "individualprofile",
 ]);
 
-// 9 regex patterns to catch obfuscated variants
-const REJECTED_PATTERNS = Object.freeze([
-  { pattern: /voter.?id/i, reason: "voter_id variant" },
-  { pattern: /political.?classification/i, reason: "political classification variant" },
-  { pattern: /\bic\b|\bnric\b/i, reason: "IC/NRIC variant" },
-  { pattern: /preference.?score/i, reason: "preference score variant" },
-  { pattern: /support.?score/i, reason: "support score variant" },
-  { pattern: /individual.?profile/i, reason: "individual profile variant" },
-  { pattern: /personal.?data/i, reason: "personal data variant" },
-  { pattern: /household.?data/i, reason: "household data variant" },
-  { pattern: /social.?account/i, reason: "social account variant" },
+const ALLOWED_NAME_PATHS = new Set([
+  "constituency.name",
+  "constituency.stateName",
 ]);
+const ALLOWED_OBJECT_ARRAY_PATHS = new Set([
+  "populationContext.ageBandShares",
+  "populationContext.broadPopulationSegments",
+]);
+
+function canonicalKey(key: string): string {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
 
 export interface PipAggregateContextInput {
   schema?: string;
@@ -72,110 +69,157 @@ export interface NormalisedContext {
   canonical: string;
 }
 
-/**
- * Recursively scan an object for any rejected keys or patterns.
- * Returns an array of findings (key paths where individual data was detected).
- */
-export function scanForIndividualData(
-  obj: unknown,
-  path = "",
-): Array<{ path: string; key: string; reason: string }> {
-  const findings: Array<{ path: string; key: string; reason: string }> = [];
+export interface IndividualDataFinding {
+  path: string;
+  key: string;
+  reason: string;
+}
 
-  if (obj === null || obj === undefined || typeof obj !== "object") {
-    return findings;
-  }
+/** Scan recursively using separator/case-insensitive key canonicalisation. */
+export function scanForIndividualData(obj: unknown, path = ""): IndividualDataFinding[] {
+  const findings: IndividualDataFinding[] = [];
+  const seen = new WeakSet<object>();
+  let visited = 0;
 
-  if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) {
-      findings.push(...scanForIndividualData(obj[i], `${path}[${i}]`));
+  function scan(value: unknown, currentPath: string, depth: number): void {
+    if (!value || typeof value !== "object") return;
+    if (depth > 64 || ++visited > 10_000) {
+      findings.push({ path: currentPath || "root", key: "", reason: "Payload nesting/size limit exceeded" });
+      return;
     }
-    return findings;
-  }
+    if (seen.has(value)) return;
+    seen.add(value);
 
-  const record = obj as Record<string, unknown>;
-  for (const key of Object.keys(record)) {
-    const currentPath = path ? `${path}.${key}` : key;
-    const lowerKey = key.toLowerCase();
-
-    // Check exact key matches
-    if (REJECTED_KEYS.includes(lowerKey)) {
-      findings.push({ path: currentPath, key, reason: `Rejected key: ${key}` });
-    }
-
-    // Check regex patterns
-    for (const { pattern, reason } of REJECTED_PATTERNS) {
-      if (pattern.test(key)) {
-        findings.push({ path: currentPath, key, reason });
-        break;
+    if (Array.isArray(value)) {
+      if (!ALLOWED_OBJECT_ARRAY_PATHS.has(currentPath) && value.some(isRecord)) {
+        findings.push({ path: currentPath, key: "", reason: "Record-level object array rejected" });
       }
+      value.forEach((entry, index) => scan(entry, `${currentPath}[${index}]`, depth + 1));
+      return;
     }
 
-    // Recurse into nested objects
-    if (typeof record[key] === "object" && record[key] !== null) {
-      findings.push(...scanForIndividualData(record[key], currentPath));
+    for (const key of Object.keys(value)) {
+      const nextPath = currentPath ? `${currentPath}.${key}` : key;
+      const canonical = canonicalKey(key);
+      const isAllowedAggregateName = ALLOWED_NAME_PATHS.has(nextPath);
+      if (!isAllowedAggregateName && REJECTED_CANONICAL_KEYS.has(canonical)) {
+        findings.push({ path: nextPath, key, reason: `Rejected individual/targeting key: ${key}` });
+      }
+      if (["__proto__", "prototype", "constructor"].includes(key.toLowerCase())) {
+        findings.push({ path: nextPath, key, reason: "Prototype manipulation key rejected" });
+      }
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (descriptor && "value" in descriptor) scan(descriptor.value, nextPath, depth + 1);
     }
   }
 
+  scan(obj, path, 0);
   return findings;
 }
 
-/**
- * Validate a PIP aggregate context payload.
- * Returns ACCEPTED if the payload contains only aggregate data,
- * or REJECTED_INDIVIDUAL_DATA if any individual-level data is detected.
- */
-export function validatePipAggregateContext(input: unknown): ValidationResult {
-  const failures: string[] = [];
-  const rejectedFields: string[] = [];
-
-  if (!input || typeof input !== "object") {
-    return {
-      valid: false,
-      status: "REJECTED_SCHEMA_MISMATCH",
-      failures: ["Input is not an object"],
-      rejectedFields: [],
-    };
+function validateNumber(value: unknown, field: string, failures: string[], integer = false): void {
+  if (value === null || value === undefined || value === "") return;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || (integer && !Number.isInteger(value))) {
+    failures.push(`${field} must be a non-negative${integer ? " integer" : " number"} when present`);
   }
+}
 
-  const ctx = input as PipAggregateContextInput;
-
-  // Check schema
-  if (ctx.schema && ctx.schema !== "pip.constituency-aggregate-context.v1") {
-    failures.push(`Unexpected schema: ${ctx.schema}`);
+function validateShareRows(value: unknown, field: string, failures: string[]): void {
+  if (!Array.isArray(value)) {
+    failures.push(`${field} must be an array`);
+    return;
   }
-
-  // Run identity firewall scan
-  const findings = scanForIndividualData(ctx);
-
-  if (findings.length > 0) {
-    for (const finding of findings) {
-      rejectedFields.push(finding.path);
+  let total = 0;
+  value.forEach((row, index) => {
+    if (!isRecord(row) || typeof row.label !== "string" || !row.label.trim()) {
+      failures.push(`${field}[${index}].label is required`);
+      return;
     }
+    if (typeof row.share !== "number" || !Number.isFinite(row.share) || row.share < 0 || row.share > 1) {
+      failures.push(`${field}[${index}].share must be between 0 and 1`);
+      return;
+    }
+    total += row.share;
+  });
+  if (value.length && Math.abs(total - 1) > 0.02) failures.push(`${field} shares must total approximately 1`);
+}
+
+export function validatePipAggregateContext(input: unknown): ValidationResult {
+  if (!isRecord(input)) {
+    return { valid: false, status: "REJECTED_SCHEMA_MISMATCH", failures: ["Input must be an object"], rejectedFields: [] };
+  }
+
+  const findings = scanForIndividualData(input);
+  if (findings.length) {
     return {
       valid: false,
       status: "REJECTED_INDIVIDUAL_DATA",
       failures: [
-        `Found ${findings.length} individual-level data field(s):`,
-        ...findings.slice(0, 10).map((f) => `  ${f.path} — ${f.reason}`),
-        ...(findings.length > 10 ? [`  ... and ${findings.length - 10} more`] : []),
-        "The entire payload is REJECTED. No individual voter data may enter S2D.",
+        `Found ${findings.length} prohibited field(s) or record structure(s).`,
+        ...findings.slice(0, 10).map((finding) => `${finding.path} — ${finding.reason}`),
+        "The entire payload is rejected; no individual data may enter S2D.",
       ],
-      rejectedFields,
+      rejectedFields: [...new Set(findings.map((finding) => finding.path))],
     };
   }
 
+  const failures: string[] = [];
+  const ctx = input as PipAggregateContextInput;
+  if (ctx.schema !== "pip.constituency-aggregate-context.v1") failures.push("schema must be pip.constituency-aggregate-context.v1");
+
+  const constituency = ctx.constituency;
+  if (!isRecord(constituency)) {
+    failures.push("constituency is required");
+  } else {
+    if (constituency.level !== "DUN" && constituency.level !== "PARLIAMENT") failures.push("constituency.level must be DUN or PARLIAMENT");
+    if (typeof constituency.code !== "string" || !constituency.code.trim()) failures.push("constituency.code is required");
+    if (typeof constituency.name !== "string" || !constituency.name.trim()) failures.push("constituency.name is required");
+  }
+
+  const provenance = ctx.provenance;
+  if (!isRecord(provenance)) {
+    failures.push("provenance is required");
+  } else {
+    if (provenance.sourceSystem !== "PIP") failures.push("provenance.sourceSystem must be PIP");
+    if (provenance.aggregateOnly !== true) failures.push("provenance.aggregateOnly must be true");
+  }
+
+  const population = ctx.populationContext;
+  if (!isRecord(population)) {
+    failures.push("populationContext is required");
+  } else {
+    validateNumber(population.totalPopulation, "populationContext.totalPopulation", failures, true);
+    validateNumber(population.totalRegisteredElectors, "populationContext.totalRegisteredElectors", failures, true);
+    validateNumber(population.localityCount, "populationContext.localityCount", failures, true);
+    validateNumber(population.dmCount, "populationContext.dmCount", failures, true);
+
+    const mix = population.geographyMix;
+    if (!isRecord(mix)) {
+      failures.push("populationContext.geographyMix is required");
+    } else {
+      const values = [mix.urbanShare, mix.semiUrbanShare, mix.ruralShare];
+      values.forEach((value, index) => {
+        if (value !== null && value !== undefined && (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1)) {
+          failures.push(`populationContext.geographyMix share ${index + 1} must be between 0 and 1`);
+        }
+      });
+      if (values.every((value) => typeof value === "number")) {
+        const total = (values as number[]).reduce((sum, value) => sum + value, 0);
+        if (total > 0 && Math.abs(total - 1) > 0.02) failures.push("populationContext.geographyMix shares must total approximately 1");
+      }
+    }
+    validateShareRows(population.ageBandShares, "populationContext.ageBandShares", failures);
+    validateShareRows(population.broadPopulationSegments, "populationContext.broadPopulationSegments", failures);
+  }
+
   return {
-    valid: true,
-    status: "ACCEPTED",
-    failures: [],
+    valid: failures.length === 0,
+    status: failures.length === 0 ? "ACCEPTED" : "REJECTED_SCHEMA_MISMATCH",
+    failures,
     rejectedFields: [],
   };
 }
 
-/**
- * Create an empty (zero-value) PIP aggregate context — used as a template.
- */
 export function createEmptyPipAggregateContext(params: {
   level: string;
   code: string;
@@ -212,19 +256,17 @@ export function createEmptyPipAggregateContext(params: {
   };
 }
 
-/**
- * Normalise a PIP aggregate context input — validate + canonicalise.
- */
 export function normalisePipAggregateContext(input: unknown): NormalisedContext {
   const validation = validatePipAggregateContext(input);
+  const now = new Date().toISOString();
   const trace = [
-    { stage: "PIP_INPUT_BOUNDARY", status: validation.status, timestamp: new Date().toISOString() },
-    { stage: "AGGREGATE_ONLY_VALIDATION", status: validation.valid ? "PASSED" : "FAILED", timestamp: new Date().toISOString() },
-    { stage: "GOVERNANCE_BOUNDARY", status: validation.valid ? "ACCEPTED" : "REJECTED", timestamp: new Date().toISOString() },
+    { stage: "PIP_INPUT_BOUNDARY", status: validation.status, timestamp: now },
+    { stage: "AGGREGATE_ONLY_VALIDATION", status: validation.valid ? "PASSED" : "FAILED", timestamp: now },
+    { stage: "GOVERNANCE_BOUNDARY", status: validation.valid ? "ACCEPTED" : "REJECTED", timestamp: now },
   ];
 
   return {
-    context: validation.valid ? (input as PipAggregateContextInput) : null,
+    context: validation.valid ? input as PipAggregateContextInput : null,
     validation,
     trace,
     canonical: validation.valid ? JSON.stringify(input) : "",

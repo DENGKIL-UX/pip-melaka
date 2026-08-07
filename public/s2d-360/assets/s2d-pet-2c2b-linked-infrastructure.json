@@ -1,0 +1,19 @@
+{
+  "schema": "s2d.pet-2c2b.linked-infrastructure-browser.v1",
+  "batch": "S2D-PET-2C.2B",
+  "generatedAt": null,
+  "method": "EDGE_FIXTURE_NOT_RUN",
+  "counts": {
+    "stagingRecords": 0,
+    "enrichable": 0,
+    "observed": 0
+  },
+  "rows": [],
+  "governance": {
+    "fixtureMode": true,
+    "networkJobsExecuted": false,
+    "activeScanningProhibited": true,
+    "posterIpAttributionProhibited": true,
+    "voterLinkageProhibited": true
+  }
+}

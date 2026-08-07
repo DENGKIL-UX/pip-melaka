@@ -1,0 +1,27 @@
+{
+  "schema": "s2d.pet-3a.authorized-security-posture.v1",
+  "batch": "S2D-PET-3A",
+  "status": "INTEGRATED",
+  "phaseStatus": "PET-3A AUTHORIZED SECURITY POSTURE INTEGRATED. ACTIVE SCANNING REMAINS DISABLED. PET-3B REPOSITORY INTEGRATION NOT STARTED.",
+  "asset": {},
+  "execution": {
+    "mode": "ACTIVE SCANNING DISABLED",
+    "status": "NOT_RUN",
+    "nmapInstalled": false,
+    "burpConnection": "NOT_TESTED",
+    "credentialConfigured": false,
+    "credentialHealth": "NOT_TESTED"
+  },
+  "severitySummary": {},
+  "lifecycle": {},
+  "remediation": {},
+  "boundaries": {
+    "fixtureMode": true,
+    "activeScanningPerformed": false,
+    "socialUserIpAttribution": false
+  },
+  "openServices": [],
+  "findings": [],
+  "evidenceReferences": [],
+  "auditHistory": []
+}

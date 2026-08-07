@@ -1,0 +1,40 @@
+{
+  "schema": "s2d.pet-3b.authorized-network-evidence.v1",
+  "phaseStatus": "EDGE FIXTURE MODE — NO CAPTURE IMPORTED OR ANALYSED",
+  "evidenceCaseId": null,
+  "assetId": null,
+  "authorizationRef": null,
+  "capture": {
+    "captureId": null,
+    "captureType": null,
+    "checksumSha256": null,
+    "rawCapturePathExposed": false
+  },
+  "analysis": {
+    "status": "NOT_RUN",
+    "packetCount": 0,
+    "byteCount": 0,
+    "firstSeenAt": null,
+    "lastSeenAt": null,
+    "protocolCounts": [],
+    "publicEndpointCounts": [],
+    "dnsObservations": [],
+    "tlsServerNames": [],
+    "topConversations": [],
+    "observations": [],
+    "transportIndicators": {
+      "retransmissionCount": 0
+    }
+  },
+  "correlation": {
+    "securityMatches": [],
+    "infrastructureMatches": []
+  },
+  "governance": {
+    "fixtureMode": true,
+    "liveCapturePerformed": false,
+    "packetPayloadRetained": false,
+    "socialUserAttributionClaimed": false,
+    "rawInternalIpExposed": false
+  }
+}

@@ -4391,3 +4391,39 @@ PR: #3
 - 92 files changed, +16521, docs/S2D-REPLACEMENT-IMPLEMENTATION.md
 - PR #3 opened, checks: lint·tsc·build now fixed via CI frozen-lockfile removal, Workers Builds pending
 
+
+---
+
+Task ID: S2D-360-SENIOR-REAUDIT
+Agent: arena/019fdb00
+Task: Re-research and harden the PIP Melaka S2D-360 replacement against current upstream
+Date: 2026-08-07
+Branch: arena/019fdb00-pip-melaka
+Upstream: DENGKIL-UX/S2D-workspace-code@5d9f83b
+
+## Audit corrections and completed work
+
+- Rebuilt and mounted the actual current 5,185-line / 63-workspace upstream Vite runtime. Synced both audit sources to upstream SHA-256 `e5be44d...`, replaced the stale 4,030-line bundle, rebased nested asset paths, removed the optional vulnerable `xlsx@0.18.5` export path from the runtime bundle (CSV/PDF retained), and added truthful NOT_RUN Edge fixtures for newly exposed security/network pages.
+- Removed the Modern tab's placeholder-first wrapper; it now loads the current same-origin sandboxed runtime directly.
+- Fixed production auth bypasses: arbitrary bearer strings and unverified cookie presence are no longer sessions. Production requires exact constant-time `S2D_AUTH_TOKEN`; role headers are trusted only after authentication.
+- Added scrape role enforcement (`SECURITY_APPROVER` / `S2D_ANALYST_WRITE`), body caps, strict Zod schemas, recursive prototype-pollution rejection, and error/token redaction.
+- Replaced fake `QUEUED` scrape responses with controlled synchronous Apify runs, server-only credentials, server-approved actors/sources, and a 20-record cap. Threads and Facebook now fail closed until approved configuration exists.
+- Hardened credential checks: Apify/WhatsApp/SendGrid/Burp live checks; local HMAC and format checks explicitly labelled; Apify token moved from URL query to Authorization header. Environment secret status is masked in the vault; dynamic Worker entries are documented as ephemeral.
+- Made intelligence signal sanitization fail closed through `@ritzanalytics/pip-s2d-contracts`; no silent unsanitized fallback.
+- Fixed the PIP identity firewall's camelCase/lowercase comparison defect and added strict schema, provenance, share, targeting, and prediction validation.
+- Fixed Melaka geography: P135/N08 Machap Jaya and P136/N12 Pantai Kundor. Added exact DUN/parliament join validation and real weighted P134 aggregation (84,000 population / 71,415 electors).
+- CORS now rejects explicit disallowed origins before route side effects and has complete OPTIONS coverage.
+- Browser API client can no longer call a baked `NEXT_PUBLIC_*` localhost URL; browser traffic stays same-origin.
+- Added 7 focused S2D regression tests and a package test command. Updated implementation documentation with explicit production limitations.
+
+## Verification
+
+- `npm run test:s2d`: 7/7 pass.
+- `npm run lint`: 0 errors (existing warnings only).
+- `npm run typecheck`: 0 errors (local Prisma type stub used because binaries.prisma.sh was unavailable; CI generates the real client).
+- `npm run build`: pass; all S2D/API routes compiled.
+- `npm run build:cf`: pass after making OpenNext's build command independent of a globally installed Bun binary and scoping filesystem tracing to `public/data`; artifact reduced 304 MB → 41 MB with upload archives removed from the server function. Also normalized lowercase JSONL levels so `/api/demographics?...&level=DUN` returns the expected 5 P134 records.
+- `verify-no-pdpa-files.sh`: pass.
+- Live development route checks: signals 8/sanitised, P134 aggregation accepted, geography mismatch 400, untrusted CORS 403, pollution payload 400, missing scraper token 503, nested static engine assets 200.
+- Production-mode auth checks: no token 401, arbitrary long bearer 401, exact token 200, disallowed OPERATIONS scrape role 403.
+- Upstream re-research: Vite build passes; root Node suite is 45 pass / 2 fail due missing generated corpus files; upstream npm audit reports 4 high findings. Recorded as upstream follow-up, not hidden as green.

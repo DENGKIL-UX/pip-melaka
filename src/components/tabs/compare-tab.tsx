@@ -86,8 +86,17 @@ export function CompareTab() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/data/p134/dun-intelligence.jsonl").then((r) => r.ok ? r.text() : Promise.reject(new Error("DUN data unavailable")).then((text) => text.trim().split("\n").map((line) => JSON.parse(line) as DunRecord)),
-      fetch("/data/dpt/spr-dpt-pameran-summary.json").then((r) => r.ok ? r.json() : Promise.reject(new Error("DPT data unavailable"))),
+      fetch("/data/p134/dun-intelligence.jsonl")
+        .then((response) => {
+          if (!response.ok) throw new Error("DUN data unavailable");
+          return response.text();
+        })
+        .then((text) => text.trim().split("\n").map((line) => JSON.parse(line) as DunRecord)),
+      fetch("/data/dpt/spr-dpt-pameran-summary.json")
+        .then((response) => {
+          if (!response.ok) throw new Error("DPT data unavailable");
+          return response.json() as Promise<DptData>;
+        }),
     ]).then(([d, dp]) => { setDuns(d); setDpt(dp); }).catch(() => {
       setDuns(DUN_FALLBACK as unknown as DunRecord[]);
       setDpt(DPT_FALLBACK as DptData);

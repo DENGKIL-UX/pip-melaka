@@ -92,18 +92,34 @@ function engineDocument(): string {
         };
         window.addEventListener(
           'error',
-          (event) =>
-            fail(event.message || ('Unable to load ' + event.filename)),
+          (event) => {
+            // Ignore element-targeted resource-load errors (blocked stylesheet,
+            // missing image, etc.). Those carry no message/filename and are not
+            // fatal — the engine bundle is a module script that runs regardless.
+            // Only a genuine window-level script exception (script.onerror) is
+            // treated as a startup failure here.
+            const msg = event.message;
+            const file = event.filename;
+            if (!msg && !file) return;
+            fail(msg || ("Unable to load " + file));
+          },
           true
         );
         window.addEventListener(
           'unhandledrejection',
-          (event) =>
-            fail(
-              event.reason?.message ||
-              event.reason ||
-              'Unhandled startup rejection'
-            )
+          (event) => {
+            // Only fatal during the boot window: if the boot-state card is still
+            // visible the engine has not rendered yet, so any unhandled rejection
+            // is a startup failure. Once React has mounted and replaced the card,
+            // post-render rejections (optional network calls, etc.) are ignored.
+            if (document.getElementById('s2d-boot-state')) {
+              fail(
+                event.reason?.message ||
+                  event.reason ||
+                  'Unhandled startup rejection'
+              );
+            }
+          }
         );
         window.setTimeout(() => {
           if (
@@ -149,9 +165,9 @@ export async function GET(): Promise<Response> {
       "Content-Security-Policy":
         "default-src 'self'; " +
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-        "style-src 'self' 'unsafe-inline'; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' data: https://fonts.gstatic.com; " +
         "img-src 'self' data: https:; " +
-        "font-src 'self' data:; " +
         "connect-src 'self' https:; " +
         "frame-ancestors 'self';",
     },

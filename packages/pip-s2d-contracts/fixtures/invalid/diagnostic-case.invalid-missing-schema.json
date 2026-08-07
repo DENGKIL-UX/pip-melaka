@@ -1,0 +1,81 @@
+﻿{
+    "confidence":  {
+                       "basis":  [
+
+                                 ],
+                       "score":  null,
+                       "level":  "NOT_AVAILABLE",
+                       "sampleSize":  null
+                   },
+    "recordVersion":  1,
+    "geography":  {
+                      "localityName":  null,
+                      "stateCode":  "JHR",
+                      "localityCode":  null,
+                      "countryCode":  "MY",
+                      "unresolved":  false,
+                      "parliamentCode":  null,
+                      "geographyLevel":  "STATE",
+                      "dmCode":  null,
+                      "dunCode":  null,
+                      "basis":  [
+
+                                ],
+                      "confidence":  null
+                  },
+    "provenance":  {
+                       "adapterVersion":  "1.0.0",
+                       "lineageHash":  null,
+                       "sourceRunIds":  [
+
+                                        ],
+                       "sourceDatasetIds":  [
+
+                                            ],
+                       "sourceRecordIds":  [
+
+                                           ]
+                   },
+    "lifecycle":  {
+                      "updatedAt":  "2026-07-17T15:41:40.3427565Z",
+                      "status":  "DRAFT",
+                      "acceptedAt":  null,
+                      "supersededBy":  null,
+                      "createdAt":  "2026-07-17T15:41:40.3427565Z"
+                  },
+    "evidenceRefs":  [
+
+                     ],
+    "VALIDATOR_FIXTURE_ONLY":  true,
+    "governance":  {
+                       "automaticPublication":  false,
+                       "aggregateOnly":  true,
+                       "individualTargeting":  false,
+                       "publicSignalOnly":  true,
+                       "microtargeting":  false,
+                       "politicalSupportInference":  false,
+                       "individualVoterLinkage":  false,
+                       "automaticExecution":  false,
+                       "personalisedPersuasion":  false,
+                       "voterPreferenceInference":  false,
+                       "humanReviewRequired":  true,
+                       "demographicTargeting":  false,
+                       "electionResultPrediction":  false
+                   },
+    "limitations":  [
+                        "Fixture only"
+                    ],
+    "producer":  {
+                     "component":  "fixture-generator",
+                     "systemVersion":  "1.0.0",
+                     "system":  "VALIDATOR_FIXTURE"
+                 },
+    "contractVersion":  "1.0",
+    "exchange":  {
+                     "scope":  "VALIDATOR_FIXTURE_ONLY",
+                     "generatedAt":  "2026-07-17T15:41:40.3427565Z",
+                     "expiresAt":  null,
+                     "correlationId":  "COR-FIXTURE-001"
+                 },
+    "recordId":  "DGC-FIXTURE-001"
+}

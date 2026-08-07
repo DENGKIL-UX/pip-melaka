@@ -30,3 +30,4 @@ tsconfig.tsbuildinfo
 
 # npm lockfile artifact (project uses bun.lock; generated when bun unavailable)
 package-lock.json
+upload/zid3VoGc

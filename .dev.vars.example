@@ -30,3 +30,24 @@ CF_AI_TOKEN=your_cf_api_token_here
 # ElectionData.MY REST API (optional — for live candidate history queries)
 # Token expires: 30 days from issue
 ELECTIONDATA_API_TOKEN=your_edmy_api_token_here
+
+# --- S2D Engine Credentials (Phase 4 — Gear Settings or Wrangler secrets) ---
+# Operators configure via Gear Settings Modal (PUT /api/s2d/credentials) or via env/Wrangler secrets.
+# Raw tokens are NEVER returned to browser (only masked metadata like apif***9x2a).
+# For production: npx wrangler secret put APIFY_TOKEN (and the rest below)
+APIFY_TOKEN=apify_api_xxx
+S2D_ALERT_WHATSAPP_TOKEN=your_whatsapp_token_here
+S2D_ALERT_EMAIL_TOKEN=your_email_token_here
+S2D_BURP_DAST_API_KEY=your_burp_api_key_here
+S2D_BURP_DAST_GRAPHQL_URL=https://burp.example.com/graphql
+S2D_NETWORK_EVIDENCE_PRIVACY_KEY=your_privacy_key_here
+S2D_APIFY_WEBHOOK_SHARED_SECRET=your_32plus_char_shared_secret_here
+TIKTOK_API_KEY=your_tiktok_api_key_here
+
+# S2D Engine URL (local dev: Express server on :4000; production: relative /api/s2d/intelligence via Workers)
+S2D_ENGINE_URL=http://localhost:4000
+NEXT_PUBLIC_S2D_ENGINE_URL=http://localhost:4000
+
+# S2D Security toggles (Cloudflare Workers: active scans not supported in V8 isolates)
+S2D_ACTIVE_SECURITY_SCAN_ENABLED=false
+S2D_ALLOWED_ORIGINS=https://pip-melaka.ritz-analytics.workers.dev

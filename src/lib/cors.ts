@@ -14,7 +14,15 @@ const PROD_ORIGIN = process.env.NEXT_PUBLIC_APP_ORIGIN ?? "https://pip-mlk.examp
 export const ALLOWED_ORIGINS: string[] = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
+  "https://pip-melaka.ritz-analytics.workers.dev",
   PROD_ORIGIN,
+];
+
+// S2D specific allowlist (never '*') — per S2D security checklist
+export const S2D_ALLOWED_ORIGINS: string[] = [
+  "https://pip-melaka.ritz-analytics.workers.dev",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
 ];
 
 // Methods/Headers we permit on cross-origin API calls.

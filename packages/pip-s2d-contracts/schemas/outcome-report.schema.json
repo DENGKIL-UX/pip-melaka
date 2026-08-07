@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"OutcomeReport","type":"object","properties":{"schema":{"const":"pip-s2d.outcome-report.v1"}},"required":["schema"],"additionalProperties":true}

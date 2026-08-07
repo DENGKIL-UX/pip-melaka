@@ -32,6 +32,8 @@ import { ExternalLink, Maximize2, ShieldCheck, AlertCircle, Loader2, Database, A
 import { Segmented } from "@/components/ui/segmented";
 import { PartyTag, StatusTag } from "@/components/ui/party-tag";
 import { useI18n } from "@/lib/i18n";
+import { S2DWorkspaceToolbar } from "@/components/s2d/S2DWorkspaceToolbar";
+import { useS2DStore } from "@/stores/s2d-store";
 
 // Types for the native engine API responses
 interface NativeBrief {
@@ -84,6 +86,8 @@ interface NativeRecommendation {
 
 export function S2D360Tab() {
   const { t } = useI18n();
+  const loopStatus = useS2DStore((s) => s.loopStatus);
+  const signalsCount = useS2DStore((s) => s.signals.filter((sig) => sig.status !== "resolved").length);
   const [loading, setLoading] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [view, setView] = useState<"native" | "full">("native");
@@ -150,6 +154,9 @@ export function S2D360Tab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Workspace toolbar — Gear Settings visible in ALL S2D tabs (legacy + modern) */}
+      <S2DWorkspaceToolbar loopStatus={loopStatus} signalsCount={signalsCount} />
 
       {/* PIP boundary notice */}
       <Card className="border-amber-500/30 bg-amber-500/5">

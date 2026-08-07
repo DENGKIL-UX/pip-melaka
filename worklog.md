@@ -4427,3 +4427,39 @@ Upstream: DENGKIL-UX/S2D-workspace-code@5d9f83b
 - Live development route checks: signals 8/sanitised, P134 aggregation accepted, geography mismatch 400, untrusted CORS 403, pollution payload 400, missing scraper token 503, nested static engine assets 200.
 - Production-mode auth checks: no token 401, arbitrary long bearer 401, exact token 200, disallowed OPERATIONS scrape role 403.
 - Upstream re-research: Vite build passes; root Node suite is 45 pass / 2 fail due missing generated corpus files; upstream npm audit reports 4 high findings. Recorded as upstream follow-up, not hidden as green.
+
+
+---
+
+Task ID: S2D-360-IFRAME-RENDER-FIX
+Agent: arena/019fdb51
+Task: Restore the blank S2D-360 engine iframe in production (Cloudflare)
+Date: 2026-08-07
+Branch: arena/019fdb51-pip-melaka
+
+## Root cause (three runtime failures, not the build warnings)
+
+The Cloudflare build succeeded and uploaded the S2D assets; the blank panel came from frontend/runtime failures:
+
+1. **Conflicting iframe security headers** — the global rule in `next.config.ts` matched `/s2d-360/*` and applied `X-Frame-Options: DENY` + `CSP frame-ancestors 'none'`, overriding the dedicated S2D `SAMEORIGIN` policy.
+2. **Fatal upstream React error** — `S2DWorkspaceToolbar` referenced `onOpenCredentials` (the ⚙️ Gear Settings button) without declaring the prop: `ReferenceError: onOpenCredentials is not defined` crashed React after first render and emptied the engine root. Reproduced exactly from the committed bundle (`ReferenceError: onOpenCredentials is not defined`).
+3. **Unreliable static HTML routing** — direct `/s2d-360/index.html` serving behind Cloudflare's HTML asset handling was not dependable as the iframe source.
+
+## Fix completed
+
+- `next.config.ts`: global DENY rule now uses `/((?!s2d-360).*)` so the S2D `SAMEORIGIN` rule wins. Verified engine responses send `X-Frame-Options: SAMEORIGIN` and `CSP ... frame-ancestors 'self'`; the rest of the app keeps `DENY`.
+- New App Router route `src/app/s2d-360/engine/route.ts`: deterministic engine document with dark boot screen + visible startup error reporting (no silent blank panel). All S2D iframes and "open in new tab" links now use `/s2d-360/engine`.
+- Patched the committed Vite bundle in place: bound `onOpenCredentials` in the minified toolbar destructuring (the exact source-level fix, applied to the 3.17 MB bundle).
+- New `src/lib/s2d-runtime-manifest.ts` keeps the route document, static `index.html` and bundle in lockstep; `scripts/build-s2d-embedded-runtime.mjs` now applies the toolbar fix on future rebuilds and regenerates the manifest + index document.
+- `tests/s2d-hardening.test.mjs` extended to 9 tests: manifest/route lockstep + VM execution of the extracted toolbar (old bundle reproduces `ReferenceError`; fixed bundle renders the Gear Settings button with a working onClick).
+
+## Verification
+
+- `npm run test:s2d`: 9/9 pass.
+- `npm run typecheck`: pass.
+- `npm run lint`: 0 errors (existing warnings only).
+- `next build`: pass; new route `ƒ /s2d-360/engine`.
+- `npx @opennextjs/cloudflare build`: pass.
+- `wrangler dev` (workerd): `/s2d-360/engine` HTTP 200 with `SAMEORIGIN` + `frame-ancestors 'self'`; patched bundle HTTP 200 (3,167,175 bytes); `/` still `DENY`.
+- jsdom execution smoke: patched bundle imports and renders the engine (~27k chars of UI), boot screen replaced, no errors captured.
+- PR #6: CI lint·tsc·build pass; Workers Builds (Cloudflare) pass.

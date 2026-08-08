@@ -7,7 +7,7 @@
 
 ## Approach
 - Kept the contract framework-agnostic and Worker-compatible: no Next.js imports, no Prisma imports, no Node-only runtime dependencies.
-- Added `RuntimeTelemetry` fields requested by the refinement: requestId, route, tool, authenticated, cacheStatus, queryCount, rowsRead, rowsWritten, cpuMs, durationMs, responseBytes, status, and dataVersion.
+- Added `RuntimeTelemetry` fields requested by the refinement: requestId, route, tool, authenticated, cacheStatus, queryCount, rowsRead, resultRows, rowsWritten, cpuMs, durationMs, responseBytes, status, and dataVersion. `resultRows` is tracked separately from `rowsRead`: Cloudflare D1 metadata records rows scanned/read during execution while `results` contains the returned records (set from `result.results?.length ?? 0`), so a query that scans 2,500 rows to return 20 is visible as `rowsRead = 2500` / `resultRows = 20`.
 - Implemented `runD1(statement, telemetry)` around D1 `.all()` calls. It reads Cloudflare D1 metadata keys `rows_read` and `rows_written` when present and falls back to zero when metadata is missing so successful local/mock requests are not broken by telemetry. `rowsRead` is documented as D1 rows scanned/read during SQL execution, including index reads, not the number of rows returned.
 - Kept `cpuMs` and `durationMs` separate. `cpuMs` is supplied when the runtime can provide Worker CPU; `durationMs` is finalized from wall-clock elapsed time and includes D1/R2/network waits.
 - Added warning-threshold helper for v0 budgets rather than hard-failing every overage during early fixture/schema work.
@@ -15,8 +15,8 @@
 - Updated roadmap/free-tier docs and agent prompts to require runtime telemetry, D1 metadata fallback tests, `EXPLAIN QUERY PLAN` checks, and WebMCP preview flag checks.
 
 ## Files created
-1. `src/lib/analytics/runtime-telemetry.ts` — shared runtime telemetry contract, D1 `.all()` wrapper, controlled D1 error type, response-byte estimator, finalizer, and v0 warning-threshold helper.
-2. `tests/runtime-telemetry.test.mjs` — Node built-in tests for envelope defaults, D1 `rows_read`/`rows_written` collection, missing metadata fallback, multi-statement accumulation, controlled D1 failure handling/no SQL leakage, CPU-vs-duration distinction, and budget warning generation.
+1. `src/lib/analytics/runtime-telemetry.ts` — shared runtime telemetry contract, D1 `.all()` wrapper (increments `queryCount`, `rowsRead`, `resultRows`, `rowsWritten`), controlled D1 error type, response-byte estimator, finalizer, and v0 warning-threshold helper.
+2. `tests/runtime-telemetry.test.mjs` — Node built-in tests for envelope defaults, D1 `rows_read`/`rows_written`/`resultRows` collection, missing metadata fallback, multi-statement accumulation, scanned-vs-returned distinction (`rowsRead = 2500`, `resultRows = 20`), controlled D1 failure handling/no SQL leakage, CPU-vs-duration distinction, and budget warning generation.
 3. `agent-ctx/ETHNIC-ANALYTICS-P0-TELEMETRY-main.md` — this hand-off record.
 
 ## Files modified
@@ -27,8 +27,8 @@
 4. `agent-ctx/ETHNIC-ANALYTICS-KICKER.md` — updated phase-agent ground rules and verification gates for RuntimeTelemetry, D1 metadata fallback, and query-plan tests.
 
 ## Verification
-- `node --test tests/runtime-telemetry.test.mjs` → 7 tests passed ✅
-- `npm run test:runtime-telemetry` → 7 tests passed ✅
+- `node --test tests/runtime-telemetry.test.mjs` → 8 tests passed ✅
+- `npm run test:runtime-telemetry` → 8 tests passed ✅
 - Runtime refinement assertions via `grep` → passed ✅
 - `git diff --check` → passed ✅
 - `bash scripts/verify-no-pdpa-files.sh` → passed ✅
@@ -38,7 +38,9 @@
 ## Notes for next agent
 - Start actual data work with Phase 0/1A after this telemetry contract.
 - When D1 schema lands, all analytics service queries should use `runD1` and tests should assert D1 metadata (`rows_read`, `rows_written`) plus `EXPLAIN QUERY PLAN` index usage.
-- `RUNTIME_TELEMETRY_WARNING_THRESHOLDS` are warnings for early development: queryCount ≤2, rowsRead ≤100 scanned/read rows, responseBytes ≤8 KB, CPU <8 ms, duration <500 ms. Convert canonical acceptance checks to hard assertions once fixtures and indexes stabilize.
-- Add `resultRows` later if response cardinality needs to be tracked separately from D1 scan/read cost.
+- `RUNTIME_TELEMETRY_WARNING_THRESHOLDS` are warnings for early development: queryCount ≤2, rowsRead ≤100 scanned/read rows, resultRows ≤20, responseBytes ≤8 KB, CPU <8 ms, duration <500 ms. Convert canonical acceptance checks to hard assertions once fixtures and indexes stabilize.
+- `resultRows` is now tracked separately from `rowsRead` so response cardinality cannot be confused with D1 scan/read cost.
+- Prefer `.all()` with an explicit `LIMIT` for v0 lookups because it returns both result rows and query metadata. Do not route `.first()` through `runD1` — Cloudflare documents that `.first()` does not return metadata the same way `.all()`/`.run()` do; confirm its return shape before accounting telemetry if it is ever used.
+- When `batch()` operations are added, decide one-logical-batch vs one-entry-per-SQL-statement. For quota/query-plan testing, per-statement accounting is preferable: aggregate `rows_read`, `rows_written`, and `resultRows` across every returned result.
 - Future REST/MCP route handlers should finalize `durationMs` at the route boundary and supply `cpuMs` only when Cloudflare exposes or approximates Worker CPU separately.
 - WebMCP remains disabled by default with `WEBMCP_ENABLED=false`; bridge injection must not be treated as proof that `/mcp` auth/tools are safe.

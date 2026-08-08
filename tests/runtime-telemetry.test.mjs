@@ -36,6 +36,7 @@ test("runtime telemetry envelope initializes with safe defaults", () => {
     cacheStatus: "miss",
     queryCount: 0,
     rowsRead: 0,
+    resultRows: 0,
     rowsWritten: 0,
     durationMs: 0,
     responseBytes: 0,
@@ -58,6 +59,7 @@ test("runD1 records D1 rows_read and rows_written metadata", async () => {
   assert.deepEqual(rows, [{ area_code: "N.01" }, { area_code: "N.02" }]);
   assert.equal(meta.queryCount, 1);
   assert.equal(meta.rowsRead, 28);
+  assert.equal(meta.resultRows, 2);
   assert.equal(meta.rowsWritten, 0);
 });
 
@@ -82,7 +84,28 @@ test("runD1 accumulates query and D1 metadata counters across statements", async
 
   assert.equal(meta.queryCount, 2);
   assert.equal(meta.rowsRead, 20);
+  assert.equal(meta.resultRows, 2);
   assert.equal(meta.rowsWritten, 3);
+});
+
+test("runD1 distinguishes rows scanned/read from rows returned", async () => {
+  const telemetry = loadRuntimeTelemetryModule();
+  const meta = telemetry.createRuntimeTelemetry({ requestId: "req-3d", route: "/api/margins", authenticated: true });
+
+  const results = Array.from({ length: 20 }, (_, i) => ({ area_code: `N.${String(i + 1).padStart(2, "0")}` }));
+
+  const rows = await telemetry.runD1({
+    all: async () => ({
+      results,
+      meta: { rows_read: 2500, rows_written: 0 },
+    }),
+  }, meta);
+
+  assert.equal(rows.length, 20);
+  assert.equal(meta.queryCount, 1);
+  assert.equal(meta.rowsRead, 2500);
+  assert.equal(meta.resultRows, 20);
+  assert.equal(meta.rowsWritten, 0);
 });
 
 test("runD1 wraps failed statements without leaking SQL or parameters", async () => {

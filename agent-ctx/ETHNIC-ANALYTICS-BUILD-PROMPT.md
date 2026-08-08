@@ -69,7 +69,7 @@ Build only the Free-tier prototype scope unless the roadmap explicitly says othe
 
 The roadmap’s phase numbers remain authoritative for hand-off files, but implement the riskiest contracts early to reduce rework:
 
-1. **Runtime telemetry contract:** implement/use the shared `RuntimeTelemetry` envelope in `src/lib/analytics/runtime-telemetry.ts` first so every analytics/REST/MCP/map-data request records requestId, route/tool, auth state, cache status, query count, D1 rows scanned/read and rows written, Worker CPU, total duration, response bytes, status, and data version.
+1. **Runtime telemetry contract:** implement/use the shared `RuntimeTelemetry` envelope in `src/lib/analytics/runtime-telemetry.ts` first so every analytics/REST/MCP/map-data request records requestId, route/tool, auth state, cache status, query count, D1 rows scanned/read (`rowsRead`), rows returned (`resultRows = result.results?.length ?? 0`), rows written, Worker CPU, total duration, response bytes, status, and data version. `rowsRead` (rows scanned during execution) and `resultRows` (records returned) must stay separate so a query that scans 2,500 rows to return 20 is visible. Prefer `.all()` with an explicit `LIMIT` because it returns both rows and metadata; do not route `.first()` through `runD1` (its return shape lacks metadata), and when `batch()` lands aggregate per-statement `rows_read`/`rows_written`/`resultRows` for quota accounting.
 2. **Phase 0:** data dictionary, source provenance, demographic methodology, privacy rules.
 3. **Phase 1A:** local aggregate builder with deterministic fixtures and Free-budget proof.
 4. **Phase 3:** analytics service functions before building MCP/dashboard controllers.
@@ -149,7 +149,7 @@ Code/scripts:
 Tests/verification:
 - Unit tests with mock D1/service adapters.
 - Contract tests for result shapes and privacy flags.
-- Runtime-budget tests that record query count, rows scanned/read and rows written from D1 metadata, CPU duration, total duration, response bytes, and cache status. Include tests for missing D1 metadata so telemetry cannot break a successful request.
+- Runtime-budget tests that record query count, rows scanned/read and rows written from D1 metadata, rows returned (`resultRows`), CPU duration, total duration, response bytes, and cache status. Include tests for missing D1 metadata so telemetry cannot break a successful request, and a scanned-vs-returned test (e.g. `rowsRead = 2500`, `resultRows = 20`) proving scan cost and response cardinality are distinguished.
 - `EXPLAIN QUERY PLAN` tests proving indexed access for v0 lookups; fail table scans.
 - Query-budget tests and response-size tests.
 
@@ -174,7 +174,7 @@ Code/scripts:
 Tests/verification:
 - Contract tests for all endpoints.
 - Negative tests for invalid geography/election/segment and over-limit requests.
-- Verify max row count, response size under 8 KB for canonical answers, query count within target, rows-scanned/read budget respected, rows-written recorded, CPU duration distinct from total duration, and cache status recorded.
+- Verify max row count, response size under 8 KB for canonical answers, query count within target, rows-scanned/read budget respected (separately from `resultRows` returned), rows-written recorded, CPU duration distinct from total duration, and cache status recorded.
 
 ### Phase 6 — authenticated MCP endpoint
 
@@ -275,7 +275,7 @@ Verify all of the following:
 - Results are under 8 KB.
 - Maximum row count is enforced.
 - Query count is within the two-statement target.
-- Rows-read budget, CPU duration, response bytes, and cache status are recorded and within budget.
+- Rows-read budget (kept distinct from rows returned), CPU duration, response bytes, and cache status are recorded and within budget.
 - The map updates deterministically.
 - An unauthenticated MCP request is rejected.
 - Audit logs record the tool, user, parameters, duration, and outcome.

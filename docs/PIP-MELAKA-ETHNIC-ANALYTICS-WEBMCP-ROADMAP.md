@@ -269,6 +269,7 @@ type RuntimeTelemetry = {
   cacheStatus: "hit" | "miss" | "stale" | "bypass";
   queryCount: number;
   rowsRead: number; // D1 rows scanned/read during SQL execution, not result-row count
+  resultRows: number; // rows actually returned in `results` by D1 `.all()`
   rowsWritten: number;
   cpuMs?: number; // Worker CPU actually consumed, when available
   durationMs: number; // total elapsed request time, including D1/R2/network waits
@@ -279,9 +280,11 @@ type RuntimeTelemetry = {
 ```
 
 Implementation notes:
-- [ ] Use the shared `runD1(statement, telemetry)` helper for D1 `.all()` calls. It increments `queryCount`, `rowsRead`, and `rowsWritten` from D1 result metadata (`rows_read`, `rows_written`) and tolerates missing metadata in local mocks. Treat `rowsRead` as D1 rows scanned/read during SQL execution, including index reads, **not** result-row count.
+- [ ] Use the shared `runD1(statement, telemetry)` helper for D1 `.all()` calls. It increments `queryCount`, `rowsRead`, `resultRows`, and `rowsWritten` from D1 result metadata (`rows_read`, `rows_written`) and `results.length`, and tolerates missing metadata in local mocks. Treat `rowsRead` as D1 rows scanned/read during SQL execution, including index reads, **not** result-row count; `resultRows` is the count of records actually returned in `results`. Prefer `.all()` with an explicit `LIMIT` for v0 lookups because it returns both the result rows and query metadata — e.g. `rowsRead = 2500` with `resultRows = 20` is the signature of a query that returns a small payload but scans too much data.
+- [ ] Do not route D1 `.first()` through `runD1` or any helper that expects query metadata: Cloudflare documents that `.first()` does not return metadata the same way `.all()`/`.run()` do. If a future analytics function needs `.first()`, confirm its return shape first and account telemetry separately.
 - [ ] Keep `cpuMs` and `durationMs` distinct: Cloudflare Worker CPU excludes database/network wait time; total duration includes it.
-- [ ] Warning thresholds for v0: `queryCount <= 2`, `rowsRead <= 100` scanned/read rows, `responseBytes <= 8 KB`, CPU P95 `< 8 ms`, duration P95 `< 500 ms`, error rate `< 1%`. Treat these as warnings while fixtures and indexes stabilize; fail canonical acceptance tests once budgets are agreed. Add a separate `resultRows` field later if response cardinality needs to be tracked independently from query cost.
+- [ ] Warning thresholds for v0: `queryCount <= 2`, `rowsRead <= 100` scanned/read rows, `resultRows <= 20`, `responseBytes <= 8 KB`, CPU P95 `< 8 ms`, duration P95 `< 500 ms`, error rate `< 1%`. Treat these as warnings while fixtures and indexes stabilize; fail canonical acceptance tests once budgets are agreed. `resultRows` is tracked independently from `rowsRead` so response cardinality and query scan cost are never confused.
+- [ ] When batch operations are added later, decide explicitly whether telemetry records one logical batch or one entry per SQL statement. For quota and query-plan testing, per-statement accounting is preferable: D1 returns typed results for each query in a batch, so aggregate `rows_read`, `rows_written`, and `resultRows` across every returned result.
 - [ ] Test runtime telemetry with empty filters, invalid area codes, unknown elections, maximum allowed comparisons, suppressed demographic cells, cache hit/miss, unauthenticated MCP, expired Access session, repeated identical requests, and concurrent requests.
 - [ ] Do not treat WebMCP bridge injection as a security signal. `/mcp` authentication, authorization, audit logging, and safe tool responses must pass independently.
 
@@ -335,7 +338,7 @@ type AnalyticsEnvelope<T> = {
 ### Testing (Phase 3)
 - [ ] 100% unit coverage threshold on `src/lib/analytics/*` (enforced in `eslint`/CI with a coverage script — add `c8` or `vitest`).
 - [ ] Table-driven tests for each service function using fixture data in `tests/fixtures/`.
-- [ ] Runtime-budget tests wrap the D1 adapter and response serializer to assert: query count, rows scanned/read (from D1 result metadata where available), rows written, CPU duration, total duration, response bytes, and cache status. Fail tests when any canonical v0 lookup exceeds the documented budget. Add specific tests that two statements accumulate query count and D1 metadata counters, and that one failed statement records failure status, preserves `requestId`, returns a controlled error, and does not leak SQL or sensitive parameters.
+- [ ] Runtime-budget tests wrap the D1 adapter and response serializer to assert: query count, rows scanned/read (from D1 result metadata where available), result rows returned, rows written, CPU duration, total duration, response bytes, and cache status. Fail tests when any canonical v0 lookup exceeds the documented budget. Add specific tests that two statements accumulate query count, `resultRows`, and D1 metadata counters; that a query can scan far more rows than it returns (e.g. `rowsRead = 2500`, `resultRows = 20`); and that one failed statement records failure status, preserves `requestId`, returns a controlled error, and does not leak SQL or sensitive parameters.
 - [ ] `EXPLAIN QUERY PLAN` tests for all v0 SQL lookups; assert indexed access on geography/election/segment columns and reject table scans. Keep documented SQL fixtures such as `SELECT ... FROM area_profile WHERE election_id = ? AND area_code = ? LIMIT 20` and expected composite indexes such as `idx_area_profile_election_area ON area_profile(election_id, area_code)`.
 - [ ] Tests for edge cases:
   - Missing election → `AnalyticsValidationError`.

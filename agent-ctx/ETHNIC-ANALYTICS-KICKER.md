@@ -20,7 +20,7 @@ You are a senior software engineer working on the PIP Melaka Ethnic Electoral An
 
 ## Ground rules
 
-- Free-tier law: Worker hot paths do only small validated parameter parsing, one or two indexed D1 queries or small cached artifact reads, and compact JSON serialization. Runtime tests must record query count, D1 rows scanned/read and rows written, Worker CPU, total duration, response bytes, and cache status via the shared `RuntimeTelemetry` envelope.
+- Free-tier law: Worker hot paths do only small validated parameter parsing, one or two indexed D1 queries or small cached artifact reads, and compact JSON serialization. Runtime tests must record query count, D1 rows scanned/read (`rowsRead`, kept separate from rows returned), result rows returned (`resultRows`), rows written, Worker CPU, total duration, response bytes, and cache status via the shared `RuntimeTelemetry` envelope. Prefer `.all()` with an explicit `LIMIT` (it returns both rows and metadata); do not route `.first()` through `runD1` since its return shape lacks metadata, and when `batch()` is added aggregate per-statement `rows_read`/`rows_written`/`resultRows` for quota accounting.
 - ETL, H3, MVT generation, large joins, JSONL parsing, and modelling run offline only.
 - No raw voters, names, NRIC, exact voter coordinates, or small-cell leakage.
 - `MIN_CELL_N=50` is only a starting point; also handle differencing attacks when filters combine.
@@ -78,4 +78,4 @@ Ask whether the phase moves the system closer to this end-to-end v0 acceptance t
 
 > “Show Melaka DUN constituencies with the highest GE15 turnout, compare area-level ethnic-composition estimates and winning margins, and update the map to the selected metric.”
 
-The final v0 must cite dataset version, return no individual records, keep results under 8 KB, enforce max rows plus query-count/rows-scanned/read/CPU/cache budgets, update the map deterministically, reject unauthenticated MCP, audit tool usage, and reproduce the same answer through local analytics, REST, MCP, MapLibre, and WebMCP when enabled.
+The final v0 must cite dataset version, return no individual records, keep results under 8 KB, enforce max rows plus query-count/rows-scanned/read (distinct from `resultRows` returned)/CPU/cache budgets, update the map deterministically, reject unauthenticated MCP, audit tool usage, and reproduce the same answer through local analytics, REST, MCP, MapLibre, and WebMCP when enabled.

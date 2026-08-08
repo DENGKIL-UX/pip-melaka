@@ -7,9 +7,12 @@ import { QuickActions } from "@/components/dashboard/quick-actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Sparkles, Map as MapIcon, Box, LayoutDashboard, Users, Vote, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, ShieldCheck, Brain, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, Radar, Search, Download } from "lucide-react";
-import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
+import { ArrowLeft, Sparkles, LayoutDashboard, Users, Activity, Search, Download, Menu } from "lucide-react";
+import { useDashboardStore } from "@/stores/dashboard-store";
 import { useS2DStore } from "@/stores/s2d-store";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { findTab } from "@/lib/dashboard-nav";
+import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import { TOTAL_VOTERS_P134, TOTAL_DUN } from "@/lib/melaka-constants";
 import { buildBrief, type BriefSnapshot } from "@/lib/export-brief";
 import { OverviewTab } from "@/components/tabs/overview-tab";
@@ -74,39 +77,6 @@ const AlertsTab = dynamic(() => withRetry(() => import("@/components/tabs/alerts
 const DualLayerTab = dynamic(() => withRetry(() => import("@/components/tabs/dual-layer-tab").then((m) => ({ default: m.DualLayerTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.dualLayer" fallback="Loading Dual-Layer…" /> });
 const ScraperTab = dynamic(() => withRetry(() => import("@/components/tabs/scraper-tab").then((m) => ({ default: m.ScraperTab }))), { ssr: false, loading: () => <TabLoading messageKey="loading.scraper" fallback="Loading Scraper…" /> });
 
-const TABS: Array<{ id: DashboardTab; label: string; i18nKey: string; icon: React.ComponentType<{ className?: string }> }> = [
-  { id: "overview", label: "Overview", i18nKey: "tab.overview", icon: LayoutDashboard },
-  { id: "map-2d", label: "2D Map", i18nKey: "tab.map2d", icon: MapIcon },
-  { id: "map-3d", label: "3D Map", i18nKey: "tab.map3d", icon: Box },
-  { id: "elections", label: "Elections", i18nKey: "tab.elections", icon: Vote },
-  { id: "demographics", label: "Demographics", i18nKey: "tab.demographics", icon: Users },
-  { id: "analysis", label: "DPT Analysis", i18nKey: "tab.analysis", icon: TrendingUp },
-  { id: "risk", label: "Risk + Socio", i18nKey: "tab.risk", icon: ShieldAlert },
-  { id: "compare", label: "Compare", i18nKey: "tab.compare", icon: ArrowLeftRight },
-  { id: "s2d", label: "S2D Console (Legacy)", i18nKey: "tab.s2d", icon: Activity },
-  { id: "s2d-360", label: "S2D 360 (Legacy)", i18nKey: "tab.s2d360", icon: Brain },
-  { id: "s2d-modern", label: "S2D 360 Modern", i18nKey: "tab.s2dModern", icon: Brain },
-  { id: "scraper", label: "Scraper", i18nKey: "tab.scraper", icon: Radar },
-  { id: "public-comm", label: "Public Comm", i18nKey: "tab.publicComm", icon: MessageSquare },
-  { id: "incidents", label: "Incidents", i18nKey: "tab.incidents", icon: AlertTriangle },
-  { id: "scenarios", label: "Scenarios", i18nKey: "tab.scenarios", icon: Layers3 },
-  { id: "predictive", label: "Predictive", i18nKey: "tab.predictive", icon: Sparkle },
-  { id: "insights", label: "Insights", i18nKey: "tab.insights", icon: FileText },
-  { id: "alerts", label: "Alerts", i18nKey: "tab.alerts", icon: Bell },
-  { id: "dual-layer", label: "Dual-Layer", i18nKey: "tab.dualLayer", icon: Layers3 },
-  { id: "governance", label: "Governance", i18nKey: "tab.governance", icon: ShieldCheck },
-];
-
-// Tab groups for the grouped nav — U3 from UX audit
-const TAB_GROUPS: Array<{ label: string; ids: DashboardTab[] }> = [
-  { label: "Overview", ids: ["overview"] },
-  { label: "Maps", ids: ["map-2d", "map-3d"] },
-  { label: "Elections", ids: ["elections", "demographics", "analysis", "compare"] },
-  { label: "Intelligence", ids: ["s2d-modern", "s2d", "s2d-360", "scraper", "insights", "predictive"] },
-  { label: "Operations", ids: ["public-comm", "incidents", "scenarios", "alerts", "dual-layer"] },
-  { label: "Governance", ids: ["risk", "governance"] },
-];
-
 /**
  * FreshnessIndicator — shows "Updated Xh ago" relative to the build time
  * embedded by next.config.ts (NEXT_PUBLIC_BUILD_TIME). Client-only render
@@ -140,6 +110,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
   const seedIfEmpty = useS2DStore((s) => s.seedIfEmpty);
   const [briefOpen, setBriefOpen] = useState(false);
   const [brief, setBrief] = useState<BriefSnapshot | null>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const openBrief = () => {
     setBrief(buildBrief({
@@ -157,7 +128,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
   }, [seedIfEmpty]);
 
   return (
-    <div className="app-shell bg-background">
+    <div className="app-shell bg-app">
       <a href="#dashboard-main" className="skip-link">Skip to main content</a>
 
       {/* Header */}
@@ -167,6 +138,16 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
             <div className="flex items-center gap-2 min-w-0">
               <Button variant="ghost" size="sm" onClick={onExit} className="text-muted-foreground hover:text-mlk p-2 h-8" aria-label={t("header.backToLanding")}>
                 <ArrowLeft className="h-4 w-4" />
+              </Button>
+              {/* Mobile nav trigger — opens the grouped sidebar as a drawer (UI-UX §4-P0) */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="lg:hidden text-muted-foreground hover:text-mlk p-2 h-8"
+                onClick={() => setMobileNavOpen(true)}
+                aria-label="Open navigation"
+              >
+                <Menu className="h-4 w-4" />
               </Button>
               <Sparkles className="h-5 w-5 text-mlk flex-shrink-0" aria-hidden="true" />
               <div className="min-w-0">
@@ -218,92 +199,30 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
 
       {/* Main content */}
       <main id="dashboard-main" className="app-main container mx-auto px-4 py-6" role="main">
+        <div className="flex gap-6">
+          {/* Desktop sidebar rail — grouped, collapsible nav (UI-UX §4-P0) */}
+          <aside className="hidden lg:block w-64 shrink-0" aria-label="Sidebar">
+            <div className="sticky top-20 max-h-[calc(100vh-6.5rem)] overflow-y-auto scrollbar-mlk pr-2 -mr-2">
+              <div className="sidebar-rail p-3">
+                <SidebarNav />
+              </div>
+            </div>
+          </aside>
+
+          {/* Content column */}
+          <div className="flex-1 min-w-0">
         <div className="mb-4">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             {(() => {
-              const tab = TABS.find((t) => t.id === activeTab);
+              const tab = findTab(activeTab);
               const Icon = tab?.icon ?? LayoutDashboard;
               return <Icon className="h-6 w-6 text-mlk" aria-hidden="true" />;
             })()}
-            {TABS.find((t) => t.id === activeTab) ? t(TABS.find((t) => t.id === activeTab)!.i18nKey, TABS.find((t) => t.id === activeTab)?.label) : t("tab.overview", "Overview")}
+            {findTab(activeTab) ? t(findTab(activeTab)!.i18nKey, findTab(activeTab)!.label) : t("tab.overview", "Overview")}
           </h1>
         </div>
 
         <Separator className="mb-4 bg-mlk/20" />
-
-        {/* Tab navigation — grouped with labels (U3) + mobile dropdown (U4) */}
-        {/* Mobile: select dropdown for small screens */}
-        <div className="md:hidden mb-4">
-          <select
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value as DashboardTab)}
-            className="w-full h-10 rounded-md border border-mlk/30 bg-card px-3 text-sm font-medium focus:border-mlk focus:outline-none focus:ring-1 focus:ring-mlk/20"
-            aria-label="Select dashboard section"
-          >
-            {TAB_GROUPS.map((group) => (
-              <optgroup key={group.label} label={group.label}>
-                {group.ids.map((tabId) => {
-                  const tab = TABS.find((t) => t.id === tabId);
-                  if (!tab) return null;
-                  return (
-                    <option key={tabId} value={tabId}>
-                      {t(tab.i18nKey, tab.label)}
-                    </option>
-                  );
-                })}
-              </optgroup>
-            ))}
-          </select>
-        </div>
-
-        {/* Desktop: grouped tablist with arrow-key navigation (U3 + U5) */}
-        <nav
-          className="hidden md:flex flex-wrap gap-1 mb-6"
-          role="tablist"
-          aria-label="Dashboard sections"
-          onKeyDown={(e) => {
-            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-            e.preventDefault();
-            const currentIdx = TABS.findIndex((tab) => tab.id === activeTab);
-            if (currentIdx === -1) return;
-            const dir = e.key === "ArrowRight" ? 1 : -1;
-            const nextIdx = (currentIdx + dir + TABS.length) % TABS.length;
-            setActiveTab(TABS[nextIdx].id);
-            const tablist = e.currentTarget;
-            const buttons = tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]');
-            buttons[nextIdx]?.focus();
-          }}
-        >
-          {TAB_GROUPS.map((group, gi) => (
-            <div key={group.label} className="flex items-center gap-1">
-              {gi > 0 && <div className="w-px h-5 bg-border/40 mx-0.5" />}
-              <span className="text-[9px] uppercase tracking-wide text-muted-foreground/60 px-1 select-none">
-                {group.label}
-              </span>
-              {group.ids.map((tabId) => {
-                const tab = TABS.find((t) => t.id === tabId);
-                if (!tab) return null;
-                const Icon = tab.icon;
-                const isActive = activeTab === tabId;
-                return (
-                  <button
-                    key={tabId}
-                    role="tab"
-                    aria-selected={isActive}
-                    tabIndex={isActive ? 0 : -1}
-                    onClick={() => setActiveTab(tabId)}
-                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
-                      isActive ? "bg-mlk text-white shadow-md" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>{t(tab.i18nKey, tab.label)}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </nav>
 
         {/* Quick action toolbar */}
         <QuickActions tab={activeTab} />
@@ -340,7 +259,25 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
         {activeTab === "governance" && <GovernanceTab />}
         </motion.div>
         </AnimatePresence>
+          </div>
+        </div>
       </main>
+
+      {/* Mobile navigation drawer — grouped sidebar on small screens (UI-UX §4-P0) */}
+      <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+        <SheetContent side="left" className="w-[300px] sm:w-[320px] overflow-y-auto scrollbar-mlk p-0">
+          <SheetHeader className="border-b border-mlk/15 px-4 py-3">
+            <SheetTitle className="flex items-center gap-2 text-sm">
+              <Sparkles className="h-4 w-4 text-mlk" aria-hidden="true" />
+              PIP-MLK <span className="text-muted-foreground font-normal">· Melaka</span>
+            </SheetTitle>
+            <SheetDescription className="text-xs">Political Intelligence Platform</SheetDescription>
+          </SheetHeader>
+          <div className="p-3">
+            <SidebarNav onNavigate={() => setMobileNavOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Footer */}
       <footer className="app-footer border-t border-mlk/20 bg-background/95 py-3" role="contentinfo">

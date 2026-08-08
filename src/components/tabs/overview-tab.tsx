@@ -88,7 +88,10 @@ function Sparkline({ data, color = "#C77B2C", width = 60, height = 16 }: { data:
   );
 }
 
-function KpiCard({ icon: Icon, label, value, sub, accent, trend }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub?: string; accent?: boolean; trend?: number[] }) {
+function KpiCard({ icon: Icon, label, value, sub, accent, trend, delta, deltaGoodWhenUp = true }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub?: string; accent?: boolean; trend?: number[]; delta?: number; deltaGoodWhenUp?: boolean }) {
+  const positive = delta !== undefined && delta > 0;
+  const neutral = delta !== undefined && delta === 0;
+  const good = delta !== undefined && (deltaGoodWhenUp ? delta >= 0 : delta <= 0);
   return (
     <Card className={`stat-card-pro ${accent ? "border-mlk/40" : ""}`}>
       <CardContent className="p-4">
@@ -100,7 +103,23 @@ function KpiCard({ icon: Icon, label, value, sub, accent, trend }: { icon: React
           <div className={`text-xl font-bold tabular ${accent ? "text-mlk" : ""}`}>{value}</div>
           {trend && <Sparkline data={trend} color={accent ? "#C77B2C" : "#64748b"} />}
         </div>
-        {sub && <div className="text-[10px] text-muted-foreground mt-0.5">{sub}</div>}
+        <div className="flex items-center justify-between mt-0.5 gap-1">
+          {sub && <div className="text-[10px] text-muted-foreground truncate">{sub}</div>}
+          {delta !== undefined && (
+            <span
+              className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold tabular ${
+                neutral
+                  ? "bg-muted text-muted-foreground"
+                  : good
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"
+                    : "bg-red-500/10 text-red-600 dark:text-red-300"
+              }`}
+            >
+              {positive ? "▲" : neutral ? "▬" : "▼"}
+              {Math.abs(delta)}%
+            </span>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -185,11 +204,11 @@ export function OverviewTab() {
 
       {/* KPI row — with sparkline trends showing election history */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <KpiCard icon={Users} label={t("overview.kpiVoters")} value={m.total_voters.toLocaleString()} sub={t("overview.kpiVotersSub")} accent trend={[68000, 69200, 70100, 70800, 71415]} />
-        <KpiCard icon={Vote} label={t("overview.kpiParliaments")} value={String(gc.parliaments)} sub="P134–P139" trend={[6, 6, 6, 6, 6]} />
-        <KpiCard icon={Building2} label={t("overview.kpiDun")} value={`${gc.duns} / ${TOTAL_DUN}`} sub={t("overview.kpiDunSub")} trend={[28, 28, 28, 28, 28]} />
+        <KpiCard icon={Users} label={t("overview.kpiVoters")} value={m.total_voters.toLocaleString()} sub={t("overview.kpiVotersSub")} accent trend={[68000, 69200, 70100, 70800, 71415]} delta={3.4} />
+        <KpiCard icon={Vote} label={t("overview.kpiParliaments")} value={String(gc.parliaments)} sub="P134–P139" trend={[6, 6, 6, 6, 6]} delta={0} />
+        <KpiCard icon={Building2} label={t("overview.kpiDun")} value={`${gc.duns} / ${TOTAL_DUN}`} sub={t("overview.kpiDunSub")} trend={[28, 28, 28, 28, 28]} delta={0} />
         <KpiCard icon={Layers} label={t("overview.kpiDm")} value={String(gc.dms)} sub={t("overview.kpiDmSub")} />
-        <KpiCard icon={MapPin} label={t("overview.kpiLocalities")} value={String(gc.localities)} sub={t("overview.kpiLocalitiesSub")} trend={[340, 348, 355, 362, 368]} />
+        <KpiCard icon={MapPin} label={t("overview.kpiLocalities")} value={String(gc.localities)} sub={t("overview.kpiLocalitiesSub")} trend={[340, 348, 355, 362, 368]} delta={8.2} />
       </div>
 
       {/* Data Quality & Coverage — three animated rings showing integrity of the dataset */}

@@ -5,6 +5,20 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 /**
+ * @deprecated LOCAL-DEV ONLY.
+ *
+ * Do NOT import this module from `src/app/api/**` or any `src/lib/**` module
+ * that is bundled into the Cloudflare Worker. Prisma's query engine cannot
+ * run on the Workers runtime (used by the PIP Melaka production deploy on
+ * `pip-melaka.ritz-analytics.workers.dev`), and the production hot path is
+ * backed by Cloudflare D1 (aggregate tables) + R2 (tiles/snapshots) rather
+ * than Prisma.
+ *
+ * This module is retained only for local ingestion/scripting until D1 is the
+ * sole database for analytics. It will be removed in a post-v0 cleanup PR.
+ * See docs/PIP-MELAKA-ETHNIC-ANALYTICS-WEBMCP-ROADMAP.md §1.1 and
+ * docs/CLOUDFLARE-FREE-TIER-ARCHITECTURE.md §7.
+ *
  * Lazily-instantiated Prisma client.
  *
  * Prisma is only consumed by the health / readiness probes — the main app

@@ -13,7 +13,7 @@ const APP_VERSION = (() => {
 
 const config: NextConfig = {
   images: { unoptimized: true },
-  typescript: { ignoreBuildErrors: true },
+  typescript: { ignoreBuildErrors: false },
   // pip-engine-adapter uses bounded dynamic paths under public/data. Declare
   // exactly those files instead of letting Turbopack trace the entire repo
   // (which previously pulled large upload archives into the Worker bundle).

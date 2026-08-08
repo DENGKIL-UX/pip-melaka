@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Search, ArrowRight, LayoutDashboard, Map as MapIcon, Box, Vote, Users, TrendingUp, ShieldAlert, ArrowLeftRight, Activity, Brain, Radar, MessageSquare, AlertTriangle, Layers3, Sparkle, FileText, Bell, ShieldCheck, Building2, ChevronRight } from "lucide-react";
 import { useDashboardStore, type DashboardTab } from "@/stores/dashboard-store";
 import { PARLIAMENTS } from "@/lib/melaka-constants";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, fmtNum } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type CommandKind = "tab" | "parliament";
@@ -25,31 +25,31 @@ export function CommandPalette() {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const { setActiveTab, setSelectedParliament, landed, setLanded } = useDashboardStore();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const commands = useMemo<CommandItem[]>(() => {
-    const tabCommands: Array<{ id: DashboardTab; labelKey: string; hint: string; icon: React.ComponentType<{ className?: string }>; keywords: string }> = [
-      { id: "overview", labelKey: "tab.overview", hint: "Alt+1", icon: LayoutDashboard, keywords: "home dashboard summary kpi" },
-      { id: "map-2d", labelKey: "tab.map2d", hint: "Alt+2", icon: MapIcon, keywords: "map leaflet choropleth dun grid" },
-      { id: "map-3d", labelKey: "tab.map3d", hint: "Alt+3", icon: Box, keywords: "3d three.js extrusion timeline morph" },
-      { id: "elections", labelKey: "tab.elections", hint: "Alt+4", icon: Vote, keywords: "ge14 prn15 ge15 election result bn ph pn swing" },
-      { id: "demographics", labelKey: "tab.demographics", hint: "Alt+5", icon: Users, keywords: "voter age gender ethnicity engine pyramid" },
-      { id: "analysis", labelKey: "tab.analysis", hint: "Alt+6", icon: TrendingUp, keywords: "dpt churn additions deletions trend" },
-      { id: "risk", labelKey: "tab.risk", hint: "Alt+7", icon: ShieldAlert, keywords: "risk senior dependency gini poverty dosm" },
-      { id: "compare", labelKey: "tab.compare", hint: "Alt+8", icon: ArrowLeftRight, keywords: "compare vs parliament side by side" },
-      { id: "s2d", labelKey: "tab.s2d", hint: "Alt+9", icon: Activity, keywords: "s2d sensing deciding acting signal" },
-      { id: "s2d-360", labelKey: "tab.s2d360", hint: "Alt+0", icon: Brain, keywords: "360 command centre signal monitoring sentiment narrative" },
-      { id: "scraper", labelKey: "tab.scraper", hint: "", icon: Radar, keywords: "apify scraper tiktok facebook instagram threads collection" },
-      { id: "public-comm", labelKey: "tab.publicComm", hint: "", icon: MessageSquare, keywords: "public communication response case evidence recommendation" },
-      { id: "incidents", labelKey: "tab.incidents", hint: "", icon: AlertTriangle, keywords: "incident casebook checklist severity" },
-      { id: "scenarios", labelKey: "tab.scenarios", hint: "", icon: Layers3, keywords: "scenario sync sharing persist localStorage" },
-      { id: "predictive", labelKey: "tab.predictive", hint: "", icon: Sparkle, keywords: "predictive forecast 72h escalation risk scoring" },
-      { id: "insights", labelKey: "tab.insights", hint: "", icon: FileText, keywords: "daily intelligence brief executive judgement outlook" },
-      { id: "alerts", labelKey: "tab.alerts", hint: "", icon: Bell, keywords: "operational alert critical warning system health" },
-      { id: "dual-layer", labelKey: "tab.dualLayer", hint: "", icon: Layers3, keywords: "dual layer population signal fusion locality" },
-      { id: "governance", labelKey: "tab.governance", hint: "Alt+-", icon: ShieldCheck, keywords: "provenance gate pdpa gap audit pipeline" },
+    const tabCommands: Array<{ id: DashboardTab; labelKey: string; hint: string; icon: React.ComponentType<{ className?: string }>; keywords: string; keywordsMs: string }> = [
+      { id: "overview", labelKey: "tab.overview", hint: "Alt+1", icon: LayoutDashboard, keywords: "home dashboard summary kpi", keywordsMs: "gambaran keseluruhan rumah papan pemuka ringkasan kpi" },
+      { id: "map-2d", labelKey: "tab.map2d", hint: "Alt+2", icon: MapIcon, keywords: "map leaflet choropleth dun grid", keywordsMs: "peta duadimensi peta 2d choropleth sempadan" },
+      { id: "map-3d", labelKey: "tab.map3d", hint: "Alt+3", icon: Box, keywords: "3d three.js extrusion timeline morph", keywordsMs: "peta tiga dimensi peta 3d ekstrusi" },
+      { id: "elections", labelKey: "tab.elections", hint: "Alt+4", icon: Vote, keywords: "ge14 prn15 ge15 election result bn ph pn swing", keywordsMs: "pilihan raya undian keputusan pusingan" },
+      { id: "demographics", labelKey: "tab.demographics", hint: "Alt+5", icon: Users, keywords: "voter age gender ethnicity engine pyramid", keywordsMs: "demografi jantina umur etnik piramid" },
+      { id: "analysis", labelKey: "tab.analysis", hint: "Alt+6", icon: TrendingUp, keywords: "dpt churn additions deletions trend", keywordsMs: "analisis dpt pusing ganti tambah buang trend" },
+      { id: "risk", labelKey: "tab.risk", hint: "Alt+7", icon: ShieldAlert, keywords: "risk senior dependency gini poverty dosm", keywordsMs: "risiko sosio kebergantungan warga emas gini kemiskinan" },
+      { id: "compare", labelKey: "tab.compare", hint: "Alt+8", icon: ArrowLeftRight, keywords: "compare vs parliament side by side", keywordsMs: "banding parlimen sisi" },
+      { id: "s2d", labelKey: "tab.s2d", hint: "Alt+9", icon: Activity, keywords: "s2d sensing deciding acting signal", keywordsMs: "konsol merasakan membuat keputusan bertindak isyarat" },
+      { id: "s2d-360", labelKey: "tab.s2d360", hint: "Alt+0", icon: Brain, keywords: "360 command centre signal monitoring sentiment narrative", keywordsMs: "pusat arahan isyarat pemantauan sentimen naratif" },
+      { id: "scraper", labelKey: "tab.scraper", hint: "", icon: Radar, keywords: "apify scraper tiktok facebook instagram threads collection", keywordsMs: "pengikis kikis media sosial koleksi" },
+      { id: "public-comm", labelKey: "tab.publicComm", hint: "", icon: MessageSquare, keywords: "public communication response case evidence recommendation", keywordsMs: "komunikasi awam respons kes bukti cadangan" },
+      { id: "incidents", labelKey: "tab.incidents", hint: "", icon: AlertTriangle, keywords: "incident casebook checklist severity", keywordsMs: "insiden kes senarai semak keterukan" },
+      { id: "scenarios", labelKey: "tab.scenarios", hint: "", icon: Layers3, keywords: "scenario sync sharing persist localStorage", keywordsMs: "senario sinkronisasi perkongsian simpan" },
+      { id: "predictive", labelKey: "tab.predictive", hint: "", icon: Sparkle, keywords: "predictive forecast 72h escalation risk scoring", keywordsMs: "ramalan 72 jam risiko eskalasi" },
+      { id: "insights", labelKey: "tab.insights", hint: "", icon: FileText, keywords: "daily intelligence brief executive judgement outlook", keywordsMs: "wawasan ringkasan kecerdasan harian pertimbangan eksekutif tinjauan" },
+      { id: "alerts", labelKey: "tab.alerts", hint: "", icon: Bell, keywords: "operational alert critical warning system health", keywordsMs: "amaran kritikal kesihatan sistem" },
+      { id: "dual-layer", labelKey: "tab.dualLayer", hint: "", icon: Layers3, keywords: "dual layer population signal fusion locality", keywordsMs: "lapisan dua populasi isyarat fusi gabungan lokaliti" },
+      { id: "governance", labelKey: "tab.governance", hint: "Alt+-", icon: ShieldCheck, keywords: "provenance gate pdpa gap audit pipeline", keywordsMs: "tadbir urus provenans pintu jurang audit saluran" },
     ];
 
     const tabItems: CommandItem[] = tabCommands.map((c) => ({
@@ -58,7 +58,7 @@ export function CommandPalette() {
       label: t(c.labelKey),
       hint: c.hint,
       icon: c.icon,
-      keywords: c.keywords,
+      keywords: `${c.keywords} ${c.keywordsMs}`,
       action: () => {
         if (!landed) setLanded(true);
         setActiveTab(c.id);
@@ -72,7 +72,7 @@ export function CommandPalette() {
       id: `parl-${p.code}`,
       kind: "parliament" as const,
       label: `P${p.code} — ${p.name}`,
-      subtitle: `${p.district} · ${p.dunCount} DUN · ${p.totalVoters > 0 ? p.totalVoters.toLocaleString() + " " + t("cmd.votersUnit") : t("cmd.pendingData")}`,
+      subtitle: `${p.district} · ${p.dunCount} DUN · ${p.totalVoters > 0 ? fmtNum(p.totalVoters, locale) + " " + t("cmd.votersUnit") : t("cmd.pendingData")}`,
       icon: Building2,
       keywords: `p${p.code} ${p.name} ${p.district} parliament`,
       action: () => {

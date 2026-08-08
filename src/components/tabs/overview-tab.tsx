@@ -8,7 +8,7 @@ import { Users, Vote, Building2, MapPin, Layers, ShieldCheck, TrendingUp, Map as
 import { PARLIAMENTS, TOTAL_VOTERS_P134, TOTAL_DUN, DUN_NAMES, getDunName } from "@/lib/melaka-constants";
 import { PARTY_COLORS } from "@/lib/party-colors";
 import { useDashboardStore } from "@/stores/dashboard-store";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, fmtNum } from "@/lib/i18n";
 import { OVERVIEW_FALLBACK, ELECTIONS_SUMMARY_FALLBACK } from "@/lib/fallback-data";
 import { PartyTag, StatusTag } from "@/components/ui/party-tag";
 import { PartyLogo } from "@/components/shared/party-logo";
@@ -127,7 +127,7 @@ function KpiCard({ icon: Icon, label, value, sub, accent, trend, delta, deltaGoo
 
 export function OverviewTab() {
   const setActiveTab = useDashboardStore((s) => s.setActiveTab);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [elections, setElections] = useState<ElectionSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -204,7 +204,7 @@ export function OverviewTab() {
 
       {/* KPI row — with sparkline trends showing election history */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <KpiCard icon={Users} label={t("overview.kpiVoters")} value={m.total_voters.toLocaleString()} sub={t("overview.kpiVotersSub")} accent trend={[68000, 69200, 70100, 70800, 71415]} delta={3.4} />
+        <KpiCard icon={Users} label={t("overview.kpiVoters")} value={fmtNum(m.total_voters, locale)} sub={t("overview.kpiVotersSub")} accent trend={[68000, 69200, 70100, 70800, 71415]} delta={3.4} />
         <KpiCard icon={Vote} label={t("overview.kpiParliaments")} value={String(gc.parliaments)} sub="P134–P139" trend={[6, 6, 6, 6, 6]} delta={0} />
         <KpiCard icon={Building2} label={t("overview.kpiDun")} value={`${gc.duns} / ${TOTAL_DUN}`} sub={t("overview.kpiDunSub")} trend={[28, 28, 28, 28, 28]} delta={0} />
         <KpiCard icon={Layers} label={t("overview.kpiDm")} value={String(gc.dms)} sub={t("overview.kpiDmSub")} />
@@ -256,7 +256,7 @@ export function OverviewTab() {
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                   <div className="min-w-0">
                     <div className="text-[10px] text-muted-foreground">{t("overview.metricVoters", "Verified voters")}</div>
-                    <div className="text-sm font-bold tabular">{m.total_voters.toLocaleString()}</div>
+                    <div className="text-sm font-bold tabular">{fmtNum(m.total_voters, locale)}</div>
                   </div>
                 </div>
                 <div className="rounded-lg border border-mlk/20 bg-mlk/5 p-2.5 flex items-center gap-2">
@@ -364,7 +364,7 @@ export function OverviewTab() {
                   <PartyBadge party={p.ge15Winner} />
                   <span className="text-[10px] text-muted-foreground">GE15</span>
                 </div>
-                {p.totalVoters > 0 && <div className="text-[10px] text-muted-foreground mt-1">{p.totalVoters.toLocaleString()} {t("overview.votersUnit")}</div>}
+                {p.totalVoters > 0 && <div className="text-[10px] text-muted-foreground mt-1">{fmtNum(p.totalVoters, locale)} {t("overview.votersUnit")}</div>}
               </CardContent>
             </Card>
           ))}
@@ -416,7 +416,7 @@ export function OverviewTab() {
                     <div className="text-[9px] text-muted-foreground truncate">{d.district} · P{d.parliament_code}</div>
                     <div className="mt-1.5 flex items-center justify-between">
                       <PartyBadge party={winner} />
-                      <span className="text-[8px] text-muted-foreground font-mono">{votesPct ? `${votesPct.toFixed(0)}%` : (d.verified ? `${Math.round(d.voters).toLocaleString()}` : "—")}</span>
+                      <span className="text-[8px] text-muted-foreground font-mono">{votesPct ? `${votesPct.toFixed(0)}%` : (d.verified ? `${fmtNum(Math.round(d.voters), locale)}` : "—")}</span>
                     </div>
                     {winnerParty && (
                       <div className="text-[8px] text-muted-foreground mt-0.5 truncate" title={winnerCandidate}>{winnerParty}</div>

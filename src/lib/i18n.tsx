@@ -167,9 +167,10 @@ const translations: Record<Locale, Record<string, string>> = {
     // Map legend
     "map.legendTitle": "Coalition",
     "map.legendNoData": "No Data",
-    "map.voterDensity": "Voter Density",
-    "map.densityLow": "Low",
-    "map.densityHigh": "High",
+    "map.voterDensity": "Registered voters",
+    "map.densityLow": "Fewer",
+    "map.densityHigh": "More",
+    "map.voterDensityNote": "Coloured by registered-voter count (turnout % pending Gate 9).",
     "map.statsParliaments": "Parliaments",
     "map.statsDun": "DUN",
     "map.statsVoters": "voters",
@@ -1224,9 +1225,10 @@ const translations: Record<Locale, Record<string, string>> = {
     // Map legend
     "map.legendTitle": "Gabungan",
     "map.legendNoData": "Tiada Data",
-    "map.voterDensity": "Kepadatan Pengundi",
-    "map.densityLow": "Rendah",
-    "map.densityHigh": "Tinggi",
+    "map.voterDensity": "Pengundi Berdaftar",
+    "map.densityLow": "Kurang",
+    "map.densityHigh": "Lebih",
+    "map.voterDensityNote": "Diwarnakan mengikut bilangan pengundi berdaftar (peratusan keluar mengundi menanti Pintu 9).",
     "map.statsParliaments": "Parlimen",
     "map.statsDun": "DUN",
     "map.statsVoters": "pengundi",
@@ -2188,6 +2190,16 @@ export function useI18n(): I18nContextValue {
     };
   }
   return ctx;
+}
+
+/**
+ * Locale-aware number formatting (P4.2). Returns comma-grouped output for the
+ * active locale ("ms" → ms-MY, otherwise en-US). Both locales use comma
+ * grouping, so this is cosmetic correctness — kept as a single helper so call
+ * sites stay consistent if a locale ever introduces a different separator.
+ */
+export function fmtNum(n: number, locale: Locale): string {
+  return n.toLocaleString(locale === "ms" ? "ms-MY" : "en-US");
 }
 
 // ─── Language Toggle Component ─────────────────────────────────────────────

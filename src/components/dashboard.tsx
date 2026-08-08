@@ -25,7 +25,8 @@ import { GovernanceTab } from "@/components/tabs/governance-tab";
 import { AssistantPanel } from "@/components/shared/assistant-panel";
 import { SelectedDunDrawer } from "@/components/shared/selected-dun-drawer";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { LanguageToggle, useI18n } from "@/lib/i18n";
+import { LanguageToggle, useI18n, fmtNum } from "@/lib/i18n";
+import { useS2DAlerts } from "@/hooks/use-s2d-alerts";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { ShortcutCheatSheet } from "@/components/shared/shortcut-cheat-sheet";
 import { BriefPreviewDialog } from "@/components/shared/brief-preview-dialog";
@@ -104,13 +105,17 @@ function FreshnessIndicator() {
 
 export function Dashboard({ onExit }: { onExit: () => void }) {
   const { activeTab, setActiveTab } = useDashboardStore();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const signalsCount = useS2DStore((s) => s.signals.filter(sig => sig.status !== "resolved").length);
   const loopStatus = useS2DStore((s) => s.loopStatus);
   const seedIfEmpty = useS2DStore((s) => s.seedIfEmpty);
   const [briefOpen, setBriefOpen] = useState(false);
   const [brief, setBrief] = useState<BriefSnapshot | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // P3.3 — real-time critical-signal alerts (toast when a new critical S2D
+  // signal appears). Gracefully no-ops when WebSocket is unavailable.
+  useS2DAlerts();
 
   const openBrief = () => {
     setBrief(buildBrief({
@@ -164,7 +169,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
               <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-700 dark:text-amber-300">Provenance: 8/9</Badge>
               <Badge variant="outline" className="text-[10px] hidden lg:inline-flex">
                 <Users className="h-3 w-3 me-1" />
-                {TOTAL_VOTERS_P134.toLocaleString()}
+                {fmtNum(TOTAL_VOTERS_P134, locale)}
               </Badge>
               <Button
                 variant="ghost"

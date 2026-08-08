@@ -89,7 +89,7 @@ Every request path is designed to:
 1. Return in **≤ 10 ms CPU** (validation → one or two indexed D1 prepares → JSON serialise).
 2. Use **≤ 5 subrequests** (≤ 2 D1, ≤ 1 R2 GET, ≤ 1 cache KV GET, ≤ 1 outbound fetch only during SWR refresh of ElectionData.MY).
 3. Never hold more than ~2 MB in memory (no large JSON loads).
-4. Emit a shared `RuntimeTelemetry` envelope for public analytics calls: request ID, route/tool, authenticated state, cache status, query count, D1 rows scanned/read and rows written from query metadata (`rows_read`, `rows_written`), Worker CPU when available, total duration, response bytes, status, and data version. `rowsRead` means rows scanned/read during SQL execution, including index reads, not rows returned. The ≤2 prepared-statement target is not enough by itself; tests must verify rows-scanned/read and `EXPLAIN QUERY PLAN` so one bad query cannot scan large tables.
+4. Emit a shared `RuntimeTelemetry` envelope for public analytics calls: request ID, route/tool, authenticated state, cache status, query count, D1 rows scanned/read, rows returned, and rows written (from query metadata `rows_read`, `rows_written` plus `results.length`), Worker CPU when available, total duration, response bytes, status, and data version. `rowsRead` means rows scanned/read during SQL execution, including index reads, not rows returned; `resultRows` is the count of records actually returned. The ≤2 prepared-statement target is not enough by itself; tests must verify rows-scanned/read (separate from rows returned) and `EXPLAIN QUERY PLAN` so one bad query cannot scan large tables.
 
 ---
 
@@ -117,7 +117,7 @@ Exact sequence to never hit quota:
 
 0. **Runtime contract first:**
    1. Use `src/lib/analytics/runtime-telemetry.ts` for one request envelope per analytics/REST/MCP/map-data call.
-   2. Route all D1 `.all()` calls through `runD1(statement, telemetry)` so query count and D1 rows scanned/read and rows written come from actual D1 metadata, not estimates. Track response cardinality separately later as `resultRows` if needed.
+   2. Route all D1 `.all()` calls through `runD1(statement, telemetry)` so query count, D1 rows scanned/read, rows returned (`resultRows = result.results?.length ?? 0`), and rows written come from actual D1 metadata, not estimates. Prefer `.all()` with an explicit `LIMIT` because it returns both result rows and metadata; do not route `.first()` through `runD1` — Cloudflare documents that `.first()` does not return metadata the same way `.all()`/`.run()` do, so confirm its return shape before accounting telemetry. When `batch()` is added, aggregate `rows_read`, `rows_written`, and `resultRows` per statement (one telemetry entry per SQL statement) for quota and query-plan testing.
    3. Keep CPU (`cpuMs`) and wall-clock duration (`durationMs`) separate for diagnostics: CPU indicates JavaScript work; duration includes D1/R2/network waits.
    4. Add tests for missing D1 metadata, cache hit/miss, invalid inputs, repeated/concurrent requests, unauthenticated MCP, and expired Access sessions.
 

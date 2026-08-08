@@ -19,6 +19,8 @@ export type RuntimeTelemetry = {
   queryCount: number;
   /** D1 rows scanned/read during SQL execution, not result-row count. */
   rowsRead: number;
+  /** Rows actually returned in `results` by D1 `.all()`, distinct from rows scanned/read. */
+  resultRows: number;
   rowsWritten: number;
   cpuMs?: number;
   durationMs: number;
@@ -82,6 +84,7 @@ export function createRuntimeTelemetry(init) {
     cacheStatus: init.cacheStatus ?? "bypass",
     queryCount: 0,
     rowsRead: 0,
+    resultRows: 0,
     rowsWritten: 0,
     durationMs: 0,
     responseBytes: 0,
@@ -127,6 +130,7 @@ export async function runD1(statement, telemetry) {
     const meta = result?.meta ?? {};
 
     telemetry.rowsRead += typeof meta.rows_read === "number" ? meta.rows_read : 0;
+    telemetry.resultRows += result?.results?.length ?? 0;
     telemetry.rowsWritten += typeof meta.rows_written === "number" ? meta.rows_written : 0;
 
     return Array.isArray(result?.results) ? result.results : [];

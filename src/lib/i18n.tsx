@@ -2151,11 +2151,23 @@ const translations: Record<Locale, Record<string, string>> = {
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
-  // Load saved locale from localStorage
+  // Load saved locale from localStorage + URL hash (#locale=ms)
   useEffect(() => {
+    // 1. Check URL hash first (shareable links)
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      const localeMatch = hash.match(/#locale=(en|ms)/);
+      if (localeMatch) {
+        const urlLocale = localeMatch[1] as Locale;
+        setLocaleState(urlLocale);
+        localStorage.setItem("pip-mlk-locale", urlLocale);
+        return;
+      }
+    }
+
+    // 2. Fallback to localStorage
     const saved = localStorage.getItem("pip-mlk-locale") as Locale | null;
     if (saved === "en" || saved === "ms") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocaleState(saved);
     }
   }, []);
@@ -2163,6 +2175,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const setLocale = (l: Locale) => {
     setLocaleState(l);
     localStorage.setItem("pip-mlk-locale", l);
+
+    // Persist to URL hash for shareable links (P3 item)
+    if (typeof window !== "undefined") {
+      const newHash = `#locale=${l}`;
+      if (window.location.hash !== newHash) {
+        // Use replaceState so we don't trigger a full navigation
+        history.replaceState(null, "", newHash);
+      }
+    }
   };
 
   const t = (key: string, fallback?: string): string => {

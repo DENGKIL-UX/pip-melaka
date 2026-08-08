@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, Eye, EyeOff, CheckCircle2, AlertCircle, Loader2, Settings2, KeyRound, Mail, MessageSquare, Cloud, Webhook } from "lucide-react";
+import { useCSRF } from "@/lib/use-csrf";
 
 // Credential types per Phase 4 spec
 type CredentialKey =
@@ -69,6 +70,7 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
   const [accessToken, setAccessToken] = useState("");
   const [authMessage, setAuthMessage] = useState("");
   const [loadingVault, setLoadingVault] = useState(false);
+  const { getCSRFHeader, ensureToken } = useCSRF();
 
   function authHeaders(): Record<string, string> {
     return accessToken.trim() ? { Authorization: `Bearer ${accessToken.trim()}` } : {};
@@ -78,7 +80,10 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
     setLoadingVault(true);
     setAuthMessage("");
     try {
-      const res = await fetch("/api/s2d/credentials", { headers: authHeaders() });
+      await ensureToken();
+      const res = await fetch("/api/s2d/credentials", {
+        headers: { ...authHeaders(), ...getCSRFHeader() },
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setAuthMessage(data.error || "Enter the production S2D operator token to load the vault.");
@@ -109,9 +114,14 @@ export function S2DCredentialSettingsModal({ open, onOpenChange }: { open: boole
     setVerifying(key);
     setResult(null);
     try {
+      await ensureToken();
       const res = await fetch("/api/s2d/credentials", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(),
+          ...getCSRFHeader(),
+        },
         body: JSON.stringify({ key, token }),
       });
       const data = await res.json();

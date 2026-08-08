@@ -26,6 +26,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { rateLimit, resolvePolicy } from "@/lib/rate-limiter";
 import { applySecurityHeaders } from "@/lib/security-headers";
+import { validateCSRFRequest } from "@/lib/csrf";
 
 export const config = {
   matcher: ["/api/:path*"],
@@ -77,7 +78,18 @@ export function middleware(req: NextRequest) {
     return applySecurityHeaders(res);
   }
 
-  // 3. Forward with rate-limit context so route handlers / responses can echo it.
+  // 3. CSRF validation for state-changing methods (double-submit cookie pattern)
+  if (!["GET", "HEAD", "OPTIONS"].includes(req.method.toUpperCase())) {
+    if (!validateCSRFRequest(req)) {
+      const res = NextResponse.json(
+        { error: "CSRF token missing or invalid" },
+        { status: 403 },
+      );
+      return applySecurityHeaders(res);
+    }
+  }
+
+  // 4. Forward with rate-limit context so route handlers / responses can echo it.
   const res = NextResponse.next({
     request: {
       headers: new Headers(req.headers),

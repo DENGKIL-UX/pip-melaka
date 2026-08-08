@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import { I18nProvider } from "@/lib/i18n";
+import { HtmlLangSetter } from "./html-lang-setter";
 
 // Geist font via next/font/google requires network fetch to fonts.googleapis.com.
 // In offline CI / Cloudflare Workers build, the fetch can fail. Use a local fallback
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           disableTransitionOnChange
         >
           <I18nProvider>
+            <HtmlLangSetter />
             {children}
             <Toaster />
           </I18nProvider>

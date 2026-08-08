@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test:runtime-telemetry": "node --experimental-strip-types --test tests/runtime-telemetry.test.mjs",
     "test:s2d": "node --test tests/s2d-hardening.test.mjs",
+    "test:middleware": "node --test tests/middleware-contract.test.mjs",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

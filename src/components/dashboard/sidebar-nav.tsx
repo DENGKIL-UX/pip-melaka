@@ -20,24 +20,22 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { activeTab, setActiveTab } = useDashboardStore();
   const { t } = useI18n();
 
-  // Groups the user has explicitly opened / closed. A group is otherwise open
-  // by default if it contains the active tab (derived, no effect needed).
+  // All navigation groups start collapsed by default so the sidebar remains compact.
+  // The user can click a section header to toggle its open/collapsed state.
   const [opened, setOpened] = useState<Set<string>>(() => new Set());
-  const [closed, setClosed] = useState<Set<string>>(() => new Set());
 
-  const activeGroup = TAB_GROUPS.find((g) => g.ids.includes(activeTab))?.label ?? null;
-
-  const isOpen = (label: string) =>
-    closed.has(label) ? false : opened.has(label) || label === activeGroup;
+  const isOpen = (label: string) => opened.has(label);
 
   const toggle = (label: string) => {
-    if (isOpen(label)) {
-      setOpened((prev) => { const n = new Set(prev); n.delete(label); return n; });
-      setClosed((prev) => new Set(prev).add(label));
-    } else {
-      setClosed((prev) => { const n = new Set(prev); n.delete(label); return n; });
-      setOpened((prev) => new Set(prev).add(label));
-    }
+    setOpened((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
   };
 
   return (
@@ -50,7 +48,11 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               type="button"
               onClick={() => toggle(group.label)}
               aria-expanded={groupOpen}
-              className="group flex w-full items-center gap-1.5 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70 hover:text-mlk transition-colors"
+              className={`group flex w-full items-center gap-1.5 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors ${
+                group.ids.includes(activeTab)
+                  ? "text-mlk"
+                  : "text-muted-foreground/70 hover:text-mlk"
+              }`}
             >
               <ChevronDown
                 className={`h-3 w-3 transition-transform duration-200 ${groupOpen ? "" : "-rotate-90"}`}

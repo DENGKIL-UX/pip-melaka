@@ -4563,3 +4563,17 @@ in older worklog entries were stale relative to HEAD.
   has `middleware['/']` (edge) and `functions-config-manifest.json` has NO
   `/_middleware`; `npm run build:cf` now reaches "OpenNext build complete".
   A file comment now warns not to rename it back to `proxy.ts`.
+
+### Follow-up CI fixes (2 commits)
+1. **`src/proxy.ts` → `src/middleware.ts`**: Next 16 treats ANY `proxy.ts` as Node.js
+   middleware (`isProxyFile` is always true), and OpenNext/Cloudflare can't run Node
+   middleware → CF build failed. Using the classic `middleware.ts` compiles as edge
+   middleware; verified `.next` manifests (edge middleware present, no `/_middleware`)
+   and `npm run build:cf` completes. File comment warns not to rename back.
+2. **command-palette `useMemo` deps**: `fmtNum(..., locale)` is used inside the
+   `commands` useMemo, but `locale` was missing from the deps array → CI lint
+   (`eslint-plugin-react-hooks@7.0.1`, the bun.lock-pinned version) flagged
+   `react-hooks/preserve-manual-memoization`. Added `locale` to the deps.
+   (Reproduced locally by pinning the CI-matching plugin versions; npm had
+   resolved newer ones that masked it. The explicit devDep pins were NOT committed —
+   they're transitive deps of eslint-config-next.)

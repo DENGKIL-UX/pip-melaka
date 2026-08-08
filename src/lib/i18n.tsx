@@ -71,6 +71,12 @@ const translations: Record<Locale, Record<string, string>> = {
     "tab.alerts": "Alerts",
     "tab.dualLayer": "Dual-Layer",
     "tab.governance": "Governance",
+    "group.overview": "Overview",
+    "group.maps": "Maps",
+    "group.elections": "Elections",
+    "group.intelligence": "Intelligence",
+    "group.operations": "Operations",
+    "group.governance": "Governance",
 
     // Map
     "map.hoverResults": "Hover any boundary for results · Click to select",
@@ -1122,6 +1128,12 @@ const translations: Record<Locale, Record<string, string>> = {
     "tab.alerts": "Amaran",
     "tab.dualLayer": "Lapisan Dual",
     "tab.governance": "Tadbir Urus",
+    "group.overview": "Gambaran Keseluruhan",
+    "group.maps": "Peta",
+    "group.elections": "Pilihan Raya",
+    "group.intelligence": "Perisikan",
+    "group.operations": "Operasi",
+    "group.governance": "Tadbir Urus",
 
     // Map
     "map.hoverResults": "Tahan pada sempadan untuk keputusan · Klik untuk pilih",

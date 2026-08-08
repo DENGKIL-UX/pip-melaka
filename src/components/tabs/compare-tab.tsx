@@ -53,7 +53,7 @@ const marginBand = (margin: number) => {
   return { label: "Safe", className: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" };
 };
 
-function MetricRow({ label, values, formatter = (value) => value }: { label: string; values: Array<number | undefined>; formatter?: (value: number) => string }) {
+function MetricRow({ label, values, formatter = (value) => String(value) }: { label: string; values: Array<number | undefined>; formatter?: (value: number) => string }) {
   return (
     <div className="grid grid-cols-4 gap-2 border-b border-border/30 py-2 text-xs last:border-0">
       <div className="text-muted-foreground">{label}</div>

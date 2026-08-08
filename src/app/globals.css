@@ -859,3 +859,39 @@
     .card-mlk-pro, .stat-card-pro { box-shadow: none !important; }
   }
 }
+
+  /* ═══ UI-UX pass: calm surface system ══════════════════════════════════ */
+  /* Reserved ambient background — a faint brand halo at the top keeps the
+     canvas calm while still feeling on-brand (accent used sparingly). */
+  .bg-app {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(ellipse 90% 40% at 50% -8%, rgba(199, 123, 44, 0.07), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  /* Unified soft card elevation — one quiet shadow for resting surfaces. */
+  .surface-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Reserved primary glow — only for the single primary CTA / hero accent.
+     Deliberately *not* applied to every card (UI-UX: hierarchy over decoration). */
+  .glow-primary {
+    box-shadow: 0 8px 24px -8px rgba(199, 123, 44, 0.35);
+  }
+
+  /* Sidebar rail — refined card container for the grouped nav. */
+  .sidebar-rail {
+    background: color-mix(in oklab, var(--card) 72%, transparent);
+    border: 1px solid color-mix(in oklab, #C77B2C 18%, var(--border));
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .dark .sidebar-rail {
+    border-color: color-mix(in oklab, #E89B45 24%, var(--border));
+  }

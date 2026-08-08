@@ -4552,3 +4552,14 @@ in older worklog entries were stale relative to HEAD.
   (P0-TELEMETRY) is now tsc-clean + tested.
 - Browser (agent-browser) E2E cannot run in this network-restricted sandbox; verified
   via build + HTTP + tsc/lint + node integration tests.
+
+### Follow-up fix (CF build)
+- `src/proxy.ts` → `src/middleware.ts`: Next 16 treats ANY `proxy.ts` file as Node.js
+  middleware (`isProxyFile("/proxy")` is always true in the Next build), and OpenNext /
+  Cloudflare Workers cannot run Node middleware → the CF build failed with
+  "Node.js middleware is not currently supported". Renamed to the classic
+  `middleware.ts` convention (compiled as EDGE middleware) and exported a named
+  `middleware` + default handler. Verified: `.next/server/middleware-manifest.json`
+  has `middleware['/']` (edge) and `functions-config-manifest.json` has NO
+  `/_middleware`; `npm run build:cf` now reaches "OpenNext build complete".
+  A file comment now warns not to rename it back to `proxy.ts`.

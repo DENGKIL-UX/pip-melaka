@@ -1,14 +1,20 @@
-// src/proxy.ts
-// PIP-MLK Security + resilience proxy (Next.js 16 middleware).
+// src/middleware.ts
+// PIP-MLK Security + resilience middleware.
 //
-// Next.js 16 renamed the classic `middleware.ts` to `proxy.ts`; this file is
-// the single chokepoint that runs BEFORE every `/api/*` request handler. It
+// This is the single chokepoint that runs BEFORE every `/api/*` request. It
 // was previously unimplemented even though `src/lib/rate-limiter.ts` and
 // `src/lib/security-headers.ts` shipped fully built — this wires them in.
 //
+// NOTE on the Next.js 16 convention: Next renamed `middleware.ts` to
+// `proxy.ts`, and a `proxy.ts` file is ALWAYS treated as Node.js middleware.
+// OpenNext / Cloudflare Workers cannot run Node middleware, so we keep the
+// classic `middleware.ts` file, which Next compiles as EDGE middleware
+// (supported on Workers). Do NOT rename this back to `proxy.ts` or the
+// Cloudflare build will fail with "Node.js middleware is not currently
+// supported".
+//
 // What it does per /api request:
-//   1. OPTIONS preflight  → short-circuits with a 204 (CORS is handled by the
-//      next.config.ts /api header rule; we just pass it through).
+//   1. OPTIONS preflight  → passes through (CORS handled by next.config.ts).
 //   2. Rate-limit         → fixed-window per-IP limit via resolvePolicy().
 //      Rejects with 429 + Retry-After when exceeded.
 //   3. Security headers   → applySecurityHeaders() on every API response
@@ -18,7 +24,7 @@
 // compiles into the edge bundle.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { rateLimit, getClientIdentifier, resolvePolicy } from "@/lib/rate-limiter";
+import { rateLimit, resolvePolicy } from "@/lib/rate-limiter";
 import { applySecurityHeaders } from "@/lib/security-headers";
 
 export const config = {
@@ -42,7 +48,7 @@ function getClientIp(req: NextRequest): string {
   );
 }
 
-export function proxy(req: NextRequest) {
+export function middleware(req: NextRequest) {
   // 1. Preflight — let the OPTIONS pass through (CORS headers are applied by
   //    the next.config.ts /api header rule). Do not consume rate-limit quota.
   if (req.method === "OPTIONS") {
@@ -83,3 +89,5 @@ export function proxy(req: NextRequest) {
 
   return applySecurityHeaders(res);
 }
+
+export default middleware;

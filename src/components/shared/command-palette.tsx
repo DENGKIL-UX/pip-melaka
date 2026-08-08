@@ -86,7 +86,7 @@ export function CommandPalette() {
     }));
 
     return [...tabItems, ...parliamentItems];
-  }, [landed, setActiveTab, setSelectedParliament, setLanded, t]);
+  }, [landed, setActiveTab, setSelectedParliament, setLanded, t, locale]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return commands;

@@ -82,7 +82,7 @@ const LAYERS: LayerDef[] = [
 // doesn't try to add/remove them from the map.
 const STYLE_TOGGLES = [
   { id: "choropleth", label: "Winner choropleth", defaultOn: true, color: "#0B3D91" },
-  { id: "heatmap", label: "Voter density heatmap", defaultOn: false, color: "#ef4444" },
+  { id: "heatmap", label: "Registered voters heatmap", defaultOn: false, color: "#ef4444" },
 ] as const;
 
 const SCENARIOS = ["PRN15", "GE14", "GE15"] as const;
@@ -617,11 +617,12 @@ export function Map2DTab() {
         scenario === "GE14" ? dunSum?.ge14.coalition :
         null;
 
-      // Heatmap mode: color by voter density (total voters)
-      // Uses a blue→amber→red gradient based on voter count
+      // Heatmap mode: colors DUNs by REGISTERED-VOTER COUNT (PRN15). This is a
+      // proxy for density — actual turnout % is pending Gate 9 (raw SPR rolls).
+      // Uses a blue→amber→red gradient based on voter count.
       if (layers.heatmap && dunSum) {
         const voters = dunSum.prn15.votes || 0;
-        // Density thresholds: <8000=low(blue), 8000-12000=medium(amber), >12000=high(red)
+        // Count thresholds: <8000=low(blue), 8000-12000=medium(amber), >12000=high(red)
         let heatColor: string;
         if (voters < 8000) heatColor = "#1e3a5f"; // low — dark blue
         else if (voters < 12000) heatColor = "#C77B2C"; // medium — amber
@@ -935,6 +936,7 @@ export function Map2DTab() {
                   <div className="flex-1 h-2 rounded-full" style={{ background: "linear-gradient(90deg, #1e3a5f, #C77B2C, #ef4444)" }} />
                   <span className="text-[8px] text-muted-foreground">{t("map.densityHigh")}</span>
                 </div>
+                <div className="mt-1 text-[8px] text-muted-foreground/70">{t("map.voterDensityNote")}</div>
               </div>
             </div>
           </div>

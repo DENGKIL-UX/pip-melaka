@@ -63,11 +63,32 @@ export const RUNTIME_TELEMETRY_WARNING_THRESHOLDS = Object.freeze({
   errorRate: 0.01,
 });
 
+export type RuntimeTelemetryWarningThresholds = {
+  queryCount: number;
+  rowsRead: number;
+  responseBytes: number;
+  cpuMsP95: number;
+  durationMsP95: number;
+  errorRate: number;
+};
+
+export type TelemetryErrorOptions = {
+  requestId?: string;
+  route?: string;
+  tool?: string;
+  cause?: unknown;
+};
+
 export class RuntimeTelemetryD1Error extends Error {
-  constructor(message, options = {}) {
+  readonly code = "D1_QUERY_FAILED";
+  requestId?: string;
+  route?: string;
+  tool?: string;
+  cause?: unknown;
+
+  constructor(message: string, options: TelemetryErrorOptions = {}) {
     super(message);
     this.name = "RuntimeTelemetryD1Error";
-    this.code = "D1_QUERY_FAILED";
     this.requestId = options.requestId;
     this.route = options.route;
     this.tool = options.tool;
@@ -75,7 +96,7 @@ export class RuntimeTelemetryD1Error extends Error {
   }
 }
 
-export function createRuntimeTelemetry(init) {
+export function createRuntimeTelemetry(init: RuntimeTelemetryInit): RuntimeTelemetry {
   return {
     requestId: init.requestId,
     route: init.route,
@@ -93,7 +114,7 @@ export function createRuntimeTelemetry(init) {
   };
 }
 
-export function estimateResponseBytes(payload) {
+export function estimateResponseBytes(payload: unknown): number {
   if (payload == null) return 0;
   if (typeof payload === "string") return new TextEncoder().encode(payload).byteLength;
   if (payload instanceof Uint8Array) return payload.byteLength;
@@ -101,18 +122,30 @@ export function estimateResponseBytes(payload) {
   return new TextEncoder().encode(JSON.stringify(payload)).byteLength;
 }
 
-export function finalizeRuntimeTelemetry(telemetry, startedAtMs, options = {}) {
-  const finalizeOptions = options as any;
+export type FinalizeOptions = {
+  status?: number;
+  cpuMs?: number;
+  cacheStatus?: RuntimeCacheStatus;
+  responseBytes?: number;
+  payload?: unknown;
+  dataVersion?: string;
+};
+
+export function finalizeRuntimeTelemetry(
+  telemetry: RuntimeTelemetry,
+  startedAtMs: number,
+  options: FinalizeOptions = {}
+): RuntimeTelemetry {
   telemetry.durationMs = Math.max(0, performance.now() - startedAtMs);
-  if (typeof finalizeOptions.status === "number") telemetry.status = finalizeOptions.status;
-  if (typeof finalizeOptions.cpuMs === "number") telemetry.cpuMs = Math.max(0, finalizeOptions.cpuMs);
-  if (finalizeOptions.cacheStatus) telemetry.cacheStatus = finalizeOptions.cacheStatus;
-  if (typeof finalizeOptions.responseBytes === "number") {
-    telemetry.responseBytes = Math.max(0, finalizeOptions.responseBytes);
-  } else if ("payload" in finalizeOptions) {
-    telemetry.responseBytes = estimateResponseBytes(finalizeOptions.payload);
+  if (typeof options.status === "number") telemetry.status = options.status;
+  if (typeof options.cpuMs === "number") telemetry.cpuMs = Math.max(0, options.cpuMs);
+  if (options.cacheStatus) telemetry.cacheStatus = options.cacheStatus;
+  if (typeof options.responseBytes === "number") {
+    telemetry.responseBytes = Math.max(0, options.responseBytes);
+  } else if ("payload" in options) {
+    telemetry.responseBytes = estimateResponseBytes(options.payload);
   }
-  if (typeof finalizeOptions.dataVersion === "string") telemetry.dataVersion = finalizeOptions.dataVersion;
+  if (typeof options.dataVersion === "string") telemetry.dataVersion = options.dataVersion;
   return telemetry;
 }
 
@@ -122,11 +155,14 @@ export function finalizeRuntimeTelemetry(telemetry, startedAtMs, options = {}) {
  * tests intentionally cover absent metadata because local mocks and future
  * runtime changes should not break successful requests.
  */
-export async function runD1(statement, telemetry) {
+export async function runD1<T = unknown>(
+  statement: D1PreparedStatementLike<T>,
+  telemetry: RuntimeTelemetry
+): Promise<T[]> {
   telemetry.queryCount += 1;
 
   try {
-    const result = await statement.all();
+    const result = await statement.all<T>();
     const meta = result?.meta ?? {};
 
     telemetry.rowsRead += typeof meta.rows_read === "number" ? meta.rows_read : 0;
@@ -145,8 +181,11 @@ export async function runD1(statement, telemetry) {
   }
 }
 
-export function getRuntimeTelemetryWarnings(telemetry, thresholds = RUNTIME_TELEMETRY_WARNING_THRESHOLDS) {
-  const warnings = [];
+export function getRuntimeTelemetryWarnings(
+  telemetry: RuntimeTelemetry,
+  thresholds: RuntimeTelemetryWarningThresholds = RUNTIME_TELEMETRY_WARNING_THRESHOLDS
+): string[] {
+  const warnings: string[] = [];
   if (telemetry.queryCount > thresholds.queryCount) warnings.push("queryCount");
   if (telemetry.rowsRead > thresholds.rowsRead) warnings.push("rowsRead");
   if (telemetry.responseBytes > thresholds.responseBytes) warnings.push("responseBytes");

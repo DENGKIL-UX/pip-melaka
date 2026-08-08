@@ -1,21 +1,13 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
 
-function loadRuntimeTelemetryModule() {
-  let source = readFileSync("src/lib/analytics/runtime-telemetry.ts", "utf8");
-  source = source
-    .replace(/export type [\s\S]*?;\n\n/g, "")
-    .replace(/ as any/g, "")
-    .replace(/export const /g, "const ")
-    .replace(/export class /g, "class ")
-    .replace(/export async function /g, "async function ")
-    .replace(/export function /g, "function ");
+// Load the real TypeScript module via Node's native type-stripping
+// (requires `node --experimental-strip-types`). The previous loader used a
+// fragile regex/Function() trick that could not parse typed class fields.
+const telemetryModule = await import("../src/lib/analytics/runtime-telemetry.ts");
 
-  const exports = {};
-  const moduleSource = `${source}\nObject.assign(exports, { RUNTIME_TELEMETRY_WARNING_THRESHOLDS, RuntimeTelemetryD1Error, createRuntimeTelemetry, estimateResponseBytes, finalizeRuntimeTelemetry, runD1, getRuntimeTelemetryWarnings });`;
-  Function("exports", "TextEncoder", "performance", moduleSource)(exports, TextEncoder, performance);
-  return exports;
+function loadRuntimeTelemetryModule() {
+  return telemetryModule;
 }
 
 test("runtime telemetry envelope initializes with safe defaults", () => {

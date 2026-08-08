@@ -12,7 +12,7 @@
     "preview:cf": "npm run build:cf && npx wrangler dev",
     "lint": "NODE_OPTIONS='--max-old-space-size=4096' eslint .",
     "typecheck": "tsc --noEmit",
-    "test:runtime-telemetry": "node --test tests/runtime-telemetry.test.mjs",
+    "test:runtime-telemetry": "node --experimental-strip-types --test tests/runtime-telemetry.test.mjs",
     "test:s2d": "node --test tests/s2d-hardening.test.mjs",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",

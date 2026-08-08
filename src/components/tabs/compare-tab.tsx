@@ -111,10 +111,7 @@ export function CompareTab() {
     });
   }, []);
 
-  // Keep selections meaningful when switching geography level.
-  useEffect(() => {
-    setSelected(level === "parliament" ? ["134", "137", "139"] : ["01", "11", "21"]);
-  }, [level]);
+
 
   const parliamentRecords = useMemo(() => PARLIAMENTS.map((parliament): ComparisonRecord => {
     const rows = duns.filter((d) => d.geography.parliament_code === parliament.code);
@@ -184,7 +181,7 @@ export function CompareTab() {
         {offline && <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[9px] text-amber-700 dark:text-amber-300"><WifiOff className="h-2.5 w-2.5" /> {t("compare.offlineData")}</span>}
       </CardContent></Card>
 
-      <Segmented value={level} onChange={(value) => setLevel(value)} options={[
+      <Segmented value={level} onChange={(value) => { setLevel(value); setSelected(value === "parliament" ? ["134", "137", "139"] : ["01", "11", "21"]); }} options={[
         { value: "parliament", label: "Parliament" }, { value: "dun", label: "DUN" },
       ]} />
 

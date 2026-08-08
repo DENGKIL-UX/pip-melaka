@@ -4463,3 +4463,117 @@ The Cloudflare build succeeded and uploaded the S2D assets; the blank panel came
 - `wrangler dev` (workerd): `/s2d-360/engine` HTTP 200 with `SAMEORIGIN` + `frame-ancestors 'self'`; patched bundle HTTP 200 (3,167,175 bytes); `/` still `DENY`.
 - jsdom execution smoke: patched bundle imports and renders the engine (~27k chars of UI), boot screen replaced, no errors captured.
 - PR #6: CI lint·tsc·build pass; Workers Builds (Cloudflare) pass.
+
+---
+
+Task ID: REFINEMENTS-ENHANCEMENTS-IMPLEMENT
+Agent: main (Arena Agent Mode)
+Task: Implement + test the refinements & enhancements catalogued in docs/REFINEMENTS-ENHANCEMENTS-RESEARCH.md
+Date: 2026-08-08
+Branch: arena/019fe0f3-pip-melaka
+
+## Summary
+Executed the net-new backlog from the research report. Baseline before work:
+tsc was actually failing (14 errors) and lint had 1 error — the "0 errors" claims
+in older worklog entries were stale relative to HEAD.
+
+## Implemented + tested
+
+### P0 — Correctness / production health
+1. **TS build checking re-enabled** — next.config.ts `typescript.ignoreBuildErrors`
+   false. Production build now runs TypeScript and passes (0 errors).
+2. **Prisma orphan** — `src/lib/db.ts` already carried a deprecation banner; deleted
+   the only dead importer `src/lib/db-optimization.ts`. Prisma stays in package.json
+   per roadmap §1.1 (local ingestion) but nothing on the Worker path uses it.
+3. **Security proxy wired (Next 16 `src/proxy.ts`)** — rate-limits every `/api/*`
+   request per-IP (route-policy aware: assistant 10/min, default 60/min), applies
+   `applySecurityHeaders()` (CSP/HSTS/XFO/etc.) on all API responses, returns 429 +
+   `Retry-After` on over-limit. Verified live: 200s → 429 at limit; headers present.
+
+### P2 — Hygiene
+4. **globals.css deduped** — consolidated the R10 duplicate block: `.glass`,
+   `.card-glow` (merged both hover behaviors), `.pulse-dot` (kept green — used for
+   "systems operational"; amber lives in `.live-dot-mlk`), `@keyframes
+   {pulse-ring,shimmer-sweep,tab-slide,fade-in-anim}`, `.tab-slide-in`,
+   `.animate-fade-in`, `.scrollbar-mlk` (bumped to 8px). Brace-balanced; file -~60 lines.
+5. **Dead code pruned** — deleted 10 verified-unreachable files:
+   `lib/{dun-code-utils,component-theme,motion-variants,api-version}.ts`,
+   `hooks/{use-data,use-fullscreen,use-hover-3d,use-responsive}.ts`,
+   `stores/{bookmarks-store,brain-store}.ts`.
+
+### P3 — Features / audit gaps
+6. **GE15 click (2D map)** — verified already implemented (map-2d-tab.tsx sets
+   `setSelectedParliament` on GE15 overlay click).
+7. **Voter-density heatmap honestly relabelled** — now "Registered voters heatmap"
+   (colours by registered-voter count, a proxy; not turnout). Legend labels
+   reworded + a Gate-9 note added (`map.voterDensity/densityLow/densityHigh/voterDensityNote`,
+   EN+BM).
+8. **S2D real-time signal alerts** — new `src/hooks/use-s2d-alerts.tsx` (toasts a
+   NEW critical S2D signal added to the store, deduped by id, works with zero
+   networking via Zustand store-subscription), mounted in dashboard. Deliberately
+   **dependency-free**: the repo's `bun.lock` is managed by `bun` (which cannot fetch
+   in this sandbox — cert errors), and CI runs `bun install --frozen-lockfile`, so
+   adding `socket.io` would require regenerating the lockfile and risk breaking CI.
+   Cross-client WebSocket fan-out remains available via the existing
+   `src/lib/websocket-server.ts` (socket.io, port 3003) once an operator installs
+   socket.io — the hook degrades gracefully to store-subscription in every case.
+
+### P4 — i18n polish
+9. **BM command-palette keywords** — each tab gets `keywordsMs`; match now searches
+   EN+BM.
+10. **Locale-aware number formatting** — added `fmtNum(n, locale)` to i18n.tsx;
+    wired into command-palette, dashboard header, overview KPI/table values.
+
+### Also fixed
+11. **runtime-telemetry.ts 14 tsc errors** — properly typed the error class, init,
+    finalize, runD1, warnings. Updated the fragile regex test loader to Node native
+    type-stripping (`--experimental-strip-types`); runtime-telemetry tests now pass 8/8.
+12. **compare-tab lint error** (react-hooks/set-state-in-effect) — moved selection
+    reset into the level-change handler.
+
+## Verification
+- `npx tsc --noEmit`: 0 errors.
+- `eslint .`: 0 errors, 2 pre-existing warnings (layout.tsx + chart.tsx react/no-danger).
+- Tests: runtime-telemetry 8/8 · s2d-hardening 13/13.
+- `npm run build`: pass (TypeScript gate on, proxy edge bundle built,
+  `ƒ Proxy (Middleware)` present, no `/api/s2d/broadcast`).
+- Dev-server runtime: `/api/health` 200 (data pass, no fs/Prisma),
+  `/api/dashboard` security+rate-limit headers, hammer → 429 + Retry-After,
+  `/s2d-360/engine` SAMEORIGIN (unaffected by the /api proxy), home page 200,
+  no runtime errors.
+
+## Unresolved / not feasible in this sandbox
+- P0.4 production secrets (S2D_AUTH_TOKEN, ELECTIONDATA_API_TOKEN, provider tokens)
+  must be set via `wrangler secret put` by an operator.
+- P3.4 UI/UX audit full roadmap (chart library standardisation, per-KPI deltas,
+  onboarding, Lighthouse budget) — open-ended design work, partially addressed.
+- Ethnic Analytics + WebMCP roadmap (phases 0–8) — multi-week greenfield; documented
+  in docs/PIP-MELAKA-ETHNIC-ANALYTICS-WEBMCP-ROADMAP.md. runtime-telemetry contract
+  (P0-TELEMETRY) is now tsc-clean + tested.
+- Browser (agent-browser) E2E cannot run in this network-restricted sandbox; verified
+  via build + HTTP + tsc/lint + node integration tests.
+
+### Follow-up fix (CF build)
+- `src/proxy.ts` → `src/middleware.ts`: Next 16 treats ANY `proxy.ts` file as Node.js
+  middleware (`isProxyFile("/proxy")` is always true in the Next build), and OpenNext /
+  Cloudflare Workers cannot run Node middleware → the CF build failed with
+  "Node.js middleware is not currently supported". Renamed to the classic
+  `middleware.ts` convention (compiled as EDGE middleware) and exported a named
+  `middleware` + default handler. Verified: `.next/server/middleware-manifest.json`
+  has `middleware['/']` (edge) and `functions-config-manifest.json` has NO
+  `/_middleware`; `npm run build:cf` now reaches "OpenNext build complete".
+  A file comment now warns not to rename it back to `proxy.ts`.
+
+### Follow-up CI fixes (2 commits)
+1. **`src/proxy.ts` → `src/middleware.ts`**: Next 16 treats ANY `proxy.ts` as Node.js
+   middleware (`isProxyFile` is always true), and OpenNext/Cloudflare can't run Node
+   middleware → CF build failed. Using the classic `middleware.ts` compiles as edge
+   middleware; verified `.next` manifests (edge middleware present, no `/_middleware`)
+   and `npm run build:cf` completes. File comment warns not to rename back.
+2. **command-palette `useMemo` deps**: `fmtNum(..., locale)` is used inside the
+   `commands` useMemo, but `locale` was missing from the deps array → CI lint
+   (`eslint-plugin-react-hooks@7.0.1`, the bun.lock-pinned version) flagged
+   `react-hooks/preserve-manual-memoization`. Added `locale` to the deps.
+   (Reproduced locally by pinning the CI-matching plugin versions; npm had
+   resolved newer ones that masked it. The explicit devDep pins were NOT committed —
+   they're transitive deps of eslint-config-next.)

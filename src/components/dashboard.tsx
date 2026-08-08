@@ -201,7 +201,7 @@ export function Dashboard({ onExit }: { onExit: () => void }) {
       <main id="dashboard-main" className="app-main container mx-auto px-4 py-6" role="main">
         <div className="flex gap-6">
           {/* Desktop sidebar rail — grouped, collapsible nav (UI-UX §4-P0) */}
-          <aside className="hidden lg:block w-64 shrink-0" aria-label="Sidebar">
+          <aside className="hidden lg:block w-64 shrink-0 self-start" aria-label="Sidebar">
             <div className="sticky top-20 max-h-[calc(100vh-6.5rem)] overflow-y-auto scrollbar-mlk pr-2 -mr-2">
               <div className="sidebar-rail p-3">
                 <SidebarNav />

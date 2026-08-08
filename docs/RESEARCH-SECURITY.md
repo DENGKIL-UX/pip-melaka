@@ -110,7 +110,8 @@ request came from `evil.com`.
    - Cookie value === header value (double-submit).
    - HMAC signature is valid (so an attacker can't forge a token even if they
      can plant a cookie).
-   - Constant-time comparison on the HMAC via `crypto.timingSafeEqual`.
+   - Constant-time comparison on the HMAC (WebCrypto `crypto.subtle`, so the
+     module stays Edge-runtime/Workers safe — no `node:crypto`).
 
 ### Why double-submit (not synchronizer token)
 
@@ -125,12 +126,13 @@ request came from `evil.com`.
 import { validateCSRFRequest, issueCSRFToken } from "@/lib/csrf";
 
 export const POST = withCORS(async (req) => {
-  if (!validateCSRFRequest(req)) {
+  // validateCSRFRequest is async (WebCrypto HMAC).
+  if (!(await validateCSRFRequest(req))) {
     return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
   // ... do the state change
   const res = NextResponse.json({ ok: true });
-  issueCSRFToken(res); // rotate the token on the response
+  await issueCSRFToken(res); // rotate the token on the response
   return res;
 });
 ```

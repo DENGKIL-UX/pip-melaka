@@ -873,9 +873,14 @@ function DataQueryCard() {
     setLoading(true);
     setResult(null);
     try {
+      const { getCSRFHeader, ensureToken } = await import("@/lib/use-csrf").then(m => m.useCSRF ? m : { getCSRFHeader: () => ({}), ensureToken: async () => null });
+      await ensureToken();
       const res = await fetch("/api/query", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getCSRFHeader(),
+        },
         body: JSON.stringify({ question: q }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

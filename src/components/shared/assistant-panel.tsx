@@ -6,6 +6,7 @@ import { Sparkles, X, Send, BookOpen, ShieldCheck, Database, Loader2, Cpu } from
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CF_MODELS } from "@/lib/cloudflare-ai";
+import { useCSRF } from "@/lib/use-csrf";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -101,6 +102,7 @@ export function AssistantPanel() {
   const [loading, setLoading] = useState(false);
   const [cfModel, setCfModel] = useState(CF_MODELS[0].id);
   const [deepResearch, setDeepResearch] = useState(false);
+  const { getCSRFHeader, ensureToken } = useCSRF();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
@@ -136,9 +138,14 @@ export function AssistantPanel() {
       const reqBody = deepResearch
         ? { question: q }
         : { messages: history.map((m) => ({ role: m.role, content: m.content })), model: cfModel };
+      // Ensure CSRF token before mutating POST
+      await ensureToken();
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getCSRFHeader(),
+        },
         body: JSON.stringify(reqBody),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

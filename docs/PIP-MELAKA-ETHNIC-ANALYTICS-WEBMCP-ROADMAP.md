@@ -1,6 +1,6 @@
 # PIP Melaka — Ethnic Electoral Analytics + WebMCP Roadmap & To-Do List
 
-**Branch:** `arena/019fe09d-pip-melaka`
+**Branch:** `arena/019fe0bb-pip-melaka`
 **Date:** 2026-08-08
 **Status:** Final implementation plan (Cloudflare-Free compatible prototype path)
 **Owner role:** Senior Software Engineer / Electoral-Analytics Lead
@@ -8,7 +8,7 @@
 **Targets:**
 - Production stack already in repo: **Next.js 16 + OpenNext/Cloudflare Workers**, **Leaflet 1.9** (not MapLibre yet), **Cloudflare D1/R2-ready**, `@opennextjs/cloudflare` deploy pipeline, existing `/api/electiondata` proxy and `/api/demographics` intelligence route, 6 parliament × 28 DUN Melaka coverage with `p134..p139` JSONL intelligence under `public/data/`.
 
-> **Free-tier verdict (researched 2026-08-08):** The roadmap is viable on Cloudflare Free as a staged prototype **if** heavy processing (3M-row parsing, H3 aggregation, MVT generation, multi-election joins) stays offline, and the Free Worker serves only pre-aggregated, indexed lookups. ElectionData.MY's API is free and unrate-limited (CC0 public domain, API-key only, no premium tier) which removes the third-party cost risk.
+> **Free-tier verdict (researched 2026-08-08):** The roadmap is viable on Cloudflare Free as a staged prototype **if** heavy processing (3M-row parsing, H3 aggregation, MVT generation, multi-election joins) stays offline, and the Free Worker serves only pre-aggregated, indexed lookups. ElectionData.MY's API requires a Bearer API key; public data licensing and API usage policy are separate matters. Use nightly pulls, caching, versioned snapshots, provenance metadata, and polite-use behaviour because no published hard public rate limit must not be treated as unlimited automated polling.
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|---|---|---|
 | 0 | Discovery & data audit | Inventory what exists, sign off on ethnic methodology | Data audit doc merged, thresholds agreed | 2–3 days |
 | 1A | Free-tier architecture & local pipeline | Offline build that emits aggregates + tiles; no in-request ETL | Local CLI runs end-to-end on Melaka GE15+PRN15; outputs fit in D1+R2 budgets per `docs/CLOUDFLARE-FREE-TIER-ARCHITECTURE.md` §10 | 3–4 days |
-| 1 | Data model & ingestion | D1 aggregate tables + ElectionData.MY nightly snapshot cron (free/unlimited API) | All Melaka GE15+PRN15 loaded, joins clean; writes <1K/day; D1 storage <50 MB | 1 week |
+| 1 | Data model & ingestion | D1 aggregate tables + ElectionData.MY nightly snapshot cron (API-key, polite-use cached pulls) | All Melaka GE15+PRN15 loaded, joins clean; writes <1K/day; D1 storage <50 MB | 1 week |
 | 2 | Privacy & aggregation pipeline | Thresholding, MVT tile pre-generation, R2 storage | K-anonymity review passed; vector tiles on R2; no in-request tile gen | 4–5 days |
 | 3 | Analytics service layer | Pure TS service functions (no HTTP); ≤2 D1 prepares/call | 100% unit coverage; P95 CPU <5 ms on warm Worker | 1 week |
 | 4 | MapLibre dashboard layers (v0 = 3 layers) | Composition choropleth (single segment), winner choropleth, turnout; scatterplot; time slider for GE15↔PRN15 | Layers render; Leaflet tab untouched; CPU/request budget met | 1 week |
@@ -116,9 +116,9 @@ Goal: build the data entirely **offline** on a developer laptop and prove the ou
 - [ ] Add a `npm run pipeline:local` that runs all of the above against fixtures first, then real Melaka data.
 
 ### Testing (Phase 1A)
-- [ ] Offline fixture test: run the pipeline on a synthetic fixture of 2 DUN × 2 elections; assert CSVs are produced, tile tree is valid (decode one tile per layer with `@mapbox/vt2geojson`), manifest has SHA-256.
+- [ ] Offline fixture test: run the pipeline on a deterministic fixture of 2 elections × 6 parliamentary areas × 28 DUN areas × 4 demographic segments. The fixture must use a fixed seed or fully explicit records and include known turnout values, known winning margins, known suppressed cells, and known source/version metadata. Assert CSVs are produced, tile tree is valid (decode one tile per layer with `@mapbox/vt2geojson`), manifest has SHA-256, and the canonical query returns the expected ranked DUN list.
 - [ ] Bundle-size check: ensure the OpenNext Worker bundle stays under the 3 MB gzip cap (the analytics service code should add < 80 KB gzipped).
-- [ ] Free-budget test: a `wrangler dev` run of 1,000 simulated requests must consume < 200 rows-read per request (so 100K requests/day uses < 20M row reads; wait — D1 free is 5M/day, so retune to ≤ 50 reads/request, which means only index lookups; add an assertion in tests).
+- [ ] Free-budget test: a `wrangler dev` run of 1,000 simulated requests must consume < 200 rows-scanned/read per request (so 100K requests/day uses < 20M scanned/read rows; wait — D1 free is 5M/day, so retune to ≤ 50 scanned/read rows/request, which means only index lookups; add an assertion in tests).
 
 ---
 
@@ -169,11 +169,12 @@ Move to D1 for aggregates. Use **raw SQL migrations** under `prisma/migrations/*
 - Indexes: all FKs, composite on `(geography_type, election_id)`, `(h3_cell, election_id)`, `(election_id, ethnic_segment)`.
 - [ ] Add migrations for D1 and document them in `docs/DATABASE-MIGRATIONS.md`.
 
-### 1.2 ElectionData.MY ingestion (free API, no premium tier)
+### 1.2 ElectionData.MY ingestion (API-key, polite-use cached pulls)
 Confirmed 2026-08 against the official docs [[electiondata openapi](https://electiondata.my/openapi/), [authentication](https://electiondata.my/openapi/authentication/)]:
-- The API is **free, public-domain (CC0), no hard rate limit, no premium tier**.
-- Auth is a free API key obtainable in seconds from the API Console; we must guard the key server-side (already the pattern in `src/app/api/electiondata/route.ts`).
-- Abuse protection is by key/IP revocation; be a polite consumer (cache aggressively, SWR, nightly pull only).
+- The API requires a Bearer API key; keep it server-side and never expose it to browser code (already the pattern in `src/app/api/electiondata/route.ts`).
+- Public data licensing and API usage policy are separate. Verify exact licence/attribution in Phase 0 before claiming CC0/public-domain status in product copy.
+- No hard public rate limit is documented here, but this is **not** permission for unlimited automated polling. Be a polite consumer: cache aggressively, use SWR, run nightly pulls only, avoid aggressive crawls, and snapshot/version all retrieved data.
+- Provenance metadata must include source URL, retrieval timestamp, API-key identity/account label, dataset version/hash, and snapshot pointer.
 
 Implementation:
 - [ ] Keep the existing `/api/electiondata` proxy as an on-demand fallback; **do not call it on every page load**.
@@ -184,7 +185,7 @@ Implementation:
   - Bumps a `data_version` manifest in KV (1 write).
 - [ ] Build a local CLI `scripts/ingest-electiondata.mjs` for backfill (`--dry-run`, `--full-refresh`); uses the free API key from `.dev.vars`.
 - [ ] Extend the allowlist in `/api/electiondata/route.ts` conservatively — each new endpoint is a PR with a justification.
-- [ ] Attribution footer reads "Data by SPR / ElectionData.MY (CC0) / DOSM / PIP-derived estimates."
+- [ ] Attribution footer reads "Data by SPR / ElectionData.MY / DOSM / PIP-derived estimates." Confirm exact licensing and attribution language during Phase 0; do not conflate public data licensing with API usage policy.
 
 ### 1.3 DOSM / census ingestion
 - [ ] Script `scripts/ingest-dosm.mjs` to load Melaka district-level ethnic composition + urban/rural + income into D1 as `demographic_estimate` rows with `source='dosm'` and `geography_type='ADM2'`.
@@ -256,8 +257,36 @@ Implementation:
 
 Implement pure TypeScript functions in `src/lib/analytics/` (new folder). These contain **no NextRequest/NextResponse** and **no fetch client-side**, so they are trivially testable and usable from REST, server actions, MCP, and future mobile clients.
 
+
+### 3.0 Runtime telemetry contract (build first)
+Every analytics, REST, MCP, and map-data request uses one shared telemetry envelope from `src/lib/analytics/runtime-telemetry.ts`:
+```ts
+type RuntimeTelemetry = {
+  requestId: string;
+  route: string;
+  tool?: string;
+  authenticated: boolean;
+  cacheStatus: "hit" | "miss" | "stale" | "bypass";
+  queryCount: number;
+  rowsRead: number; // D1 rows scanned/read during SQL execution, not result-row count
+  rowsWritten: number;
+  cpuMs?: number; // Worker CPU actually consumed, when available
+  durationMs: number; // total elapsed request time, including D1/R2/network waits
+  responseBytes: number;
+  status: number;
+  dataVersion?: string;
+};
+```
+
+Implementation notes:
+- [ ] Use the shared `runD1(statement, telemetry)` helper for D1 `.all()` calls. It increments `queryCount`, `rowsRead`, and `rowsWritten` from D1 result metadata (`rows_read`, `rows_written`) and tolerates missing metadata in local mocks. Treat `rowsRead` as D1 rows scanned/read during SQL execution, including index reads, **not** result-row count.
+- [ ] Keep `cpuMs` and `durationMs` distinct: Cloudflare Worker CPU excludes database/network wait time; total duration includes it.
+- [ ] Warning thresholds for v0: `queryCount <= 2`, `rowsRead <= 100` scanned/read rows, `responseBytes <= 8 KB`, CPU P95 `< 8 ms`, duration P95 `< 500 ms`, error rate `< 1%`. Treat these as warnings while fixtures and indexes stabilize; fail canonical acceptance tests once budgets are agreed. Add a separate `resultRows` field later if response cardinality needs to be tracked independently from query cost.
+- [ ] Test runtime telemetry with empty filters, invalid area codes, unknown elections, maximum allowed comparisons, suppressed demographic cells, cache hit/miss, unauthenticated MCP, expired Access session, repeated identical requests, and concurrent requests.
+- [ ] Do not treat WebMCP bridge injection as a security signal. `/mcp` authentication, authorization, audit logging, and safe tool responses must pass independently.
+
 ### 3.1 Service modules
-Design constraint for Free: every public service function performs **≤ 2 prepared D1 statements** and returns **≤ 20 rows / ≤ 8 KB JSON**. No in-memory joins over thousands of rows; joins are pre-materialised offline.
+Design constraint for Free: every public service function performs **≤ 2 prepared D1 statements** and returns **≤ 20 rows / ≤ 8 KB JSON**. No in-memory joins over thousands of rows; joins are pre-materialised offline. The statement-count target is necessary but not sufficient: runtime tests must also record **query count, rows read, CPU duration, response bytes, and cache status**, because a single poorly indexed query can still scan too many rows.
 
 - [ ] `src/lib/analytics/elections.ts`
   - `listElections(state?: 'Melaka'): ElectionMeta[]`
@@ -280,6 +309,8 @@ Design constraint for Free: every public service function performs **≤ 2 prepa
   - `compositionTernarySpec`, `smallMultiplesSpec` deferred to v0.1.
 - [ ] `src/lib/analytics/ethnic-vote.ts` (DEFERRED to v0.2+):
   - Survey/ecological-inference estimates are **not** in v0. The v0 dashboard presents composition + outcome side by side and explicitly says no individual vote prediction. Naming (when added): `getAreaVoteEstimateBySegment()` — never `getVoterEthnicity()`.
+- [ ] `src/lib/analytics/runtime-telemetry.ts`
+  - Shared request envelope, D1 wrapper, response-byte measurement, budget-warning helper, and tests for missing D1 metadata.
 - [ ] `src/lib/analytics/query-guard.ts`
   - Validates every call: allowlisted area codes (Melaka P134–P139, N.01–N.28), allowlisted election IDs (`GE15`, `PRN15_MELAKA` in v0), max returned rows, query budget (≤2 D1 calls), response size cap.
   - Throws `AnalyticsValidationError` that translates to 400/MCP error.
@@ -304,6 +335,8 @@ type AnalyticsEnvelope<T> = {
 ### Testing (Phase 3)
 - [ ] 100% unit coverage threshold on `src/lib/analytics/*` (enforced in `eslint`/CI with a coverage script — add `c8` or `vitest`).
 - [ ] Table-driven tests for each service function using fixture data in `tests/fixtures/`.
+- [ ] Runtime-budget tests wrap the D1 adapter and response serializer to assert: query count, rows scanned/read (from D1 result metadata where available), rows written, CPU duration, total duration, response bytes, and cache status. Fail tests when any canonical v0 lookup exceeds the documented budget. Add specific tests that two statements accumulate query count and D1 metadata counters, and that one failed statement records failure status, preserves `requestId`, returns a controlled error, and does not leak SQL or sensitive parameters.
+- [ ] `EXPLAIN QUERY PLAN` tests for all v0 SQL lookups; assert indexed access on geography/election/segment columns and reject table scans. Keep documented SQL fixtures such as `SELECT ... FROM area_profile WHERE election_id = ? AND area_code = ? LIMIT 20` and expected composite indexes such as `idx_area_profile_election_area ON area_profile(election_id, area_code)`.
 - [ ] Tests for edge cases:
   - Missing election → `AnalyticsValidationError`.
   - Suppressed cell → returns `null` with suppression reason in meta.
@@ -397,6 +430,7 @@ Deferred (v0.1+):
   - Happy path, 404 on unknown code, 400 on invalid election, 403 on disallowed endpoint, 429 on rate-limit.
   - Assert envelope shape and presence of `meta.disclaimer`.
 - [ ] End-to-end test with `next dev` + fetch against all endpoints; ensure response time P95 < 300ms on warm Worker.
+- [ ] Runtime telemetry contract test: every public endpoint records requestId, route, auth state, cache status, query count, rows scanned/read and rows written, CPU duration, total duration, response bytes, HTTP status, and data version; canonical responses stay under the query/rows-scanned/CPU/8 KB budgets.
 
 ---
 
@@ -467,7 +501,7 @@ Every tool response uses the `AnalyticsEnvelope` wrapper. Example:
   - 61 calls in one minute → 429.
 - [ ] Schema validation: every tool response validates against its TypeScript type at runtime (Zod) in tests.
 - [ ] Audit-log test: make N tool calls, assert N rows in `mcp_tool_audit` with expected fields.
-- [ ] End-to-end test with the MCP TypeScript client connecting to `wrangler dev` `/mcp` and answering the canonical test question (see §7.5).
+- [ ] End-to-end test with the MCP TypeScript client connecting to `wrangler dev` `/mcp` and answering the canonical test question (see §7.5). Assert requestId, tool, authenticated state, query count, rows scanned/read and rows written, CPU duration, total duration, response bytes, cache status, data version, and audit-log fields for the tool call.
 
 ---
 
@@ -479,7 +513,7 @@ WebMCP is Cloudflare’s experimental browser-agent bridge. Treat as **developer
 - [ ] In Cloudflare Dashboard → Agent Readiness → Labs, enable Site MCP Server pack for the `pip-melaka.ritz-analytics.workers.dev` zone.
 - [ ] Point the pack to same-origin `/mcp` (see §6).
 - [ ] Confirm the bridge injects `/.webmcp/bridge.js` with `data-packs="mcp-server-client" data-mcp-url="/mcp"` on dashboard HTML.
-  - If edge injection doesn’t fire reliably, manually add the script tag to `src/app/layout.tsx` behind the `NEXT_PUBLIC_ENABLE_WEBMCP=true` flag.
+  - If edge injection doesn’t fire reliably, manually add the script tag to `src/app/layout.tsx` only when server-side `WEBMCP_ENABLED=true` for the current preview/development hostname (production default remains `false`).
 
 ### 7.2 Frontend bridge
 - [ ] Create `src/lib/webmcp-client.ts`:
@@ -494,26 +528,30 @@ WebMCP is Cloudflare’s experimental browser-agent bridge. Treat as **developer
 - [ ] The agent can highlight geographies returned by `compare_areas` via a `highlight` source.
 
 ### 7.4 Feature flag & audience
-- [ ] Gate WebMCP behind `FEATURE_WEBMCP=preview` env (default `off`).
+- [ ] Gate WebMCP behind `WEBMCP_ENABLED=false` by default. Enable only on preview/development hostnames first; production remains off until REST, MCP, Access, and audit tests pass.
+- [ ] The Cloudflare bridge can be added without origin-code changes, but the `/mcp` endpoint, analytics tools, authentication, and audit logging still require independent tests.
 - [ ] Restrict to logged-in analysts initially (use `next-auth` session, which is already in dependencies).
 - [ ] UI shows an “AI Agent (Beta)” badge with link to known-limitations doc.
 
 ### 7.5 Canonical end-to-end acceptance question
-> “Show the Melaka DUN constituencies with the highest GE15 turnout, then compare their ethnic-composition estimates and winning margins.”
+> “Show Melaka DUN constituencies with the highest GE15 turnout, compare area-level ethnic-composition estimates and winning margins, and update the map.”
 
 The agent should:
 1. Call `list_available_elections` to get GE15 id.
 2. Call `get_area_profile` or `compare_areas` across N.01–N.28 with metrics `[turnout, margin, ethnic_composition]`.
 3. Sort by turnout desc, return top N.
 4. Call `show_map_metric({metric:'turnout', geography:'dun', election:'GE15'})`.
-5. Render a Vega-Lite bar chart via `generate_chart_spec`.
+5. Update the MapLibre metric deterministically, then render a supporting chart from the same service contract.
+
+Acceptance checks: correct election/geography filters; source and data-version metadata present; no individual-level records; no suppressed-cell leakage; response under documented size limit; query and row-read budgets respected; authenticated MCP succeeds; unauthenticated MCP fails; map update is deterministic; audit logging captures tool, user/session, parameters/hash, duration, rows returned, cache status, and outcome.
 6. Render natural-language answer with disclaimer meta visible.
 
 ### Testing (Phase 7)
 - [ ] Unit tests for `webmcp-client.ts` against a mocked bridge.
 - [ ] Integration test in headless Chromium (Playwright) with WebMCP flag enabled; simulate a tool call response and assert the MapLibre layer filter changes.
 - [ ] Negative test: with flag off, bridge script is NOT in DOM.
-- [ ] Audit-log verification: browser agent calls appear in `mcp_tool_audit` with session id.
+- [ ] Deployment check: `curl -s https://preview.example.com | grep -i webmcp` only succeeds when `WEBMCP_ENABLED=true` on an approved preview/development hostname. Verify `WEBMCP_ENABLED=false → no agent tools`, `WEBMCP_ENABLED=true → bridge present on preview only`, and production disabled until Access and MCP tests pass.
+- [ ] Audit-log verification: browser agent calls appear in `mcp_tool_audit` with session id. Do not interpret bridge presence as proof that `/mcp` is authenticated or safe.
 - [ ] Manual QA matrix: Chromium (Canary with `navigator.modelContext`), Chrome stable, Firefox, Safari — only Chromium shows the panel; others see a “not supported” notice.
 
 ---
@@ -558,14 +596,15 @@ The agent should:
 - [ ] **Free-tier quota telemetry (MUST ship in v0):**
   - `cf_worker_requests_total` (daily counter; alert at 80K).
   - `cf_d1_rows_read_total`, `cf_d1_rows_written_total` (alert at 4M/day read, 80K/day write).
-  - `cf_d1_storage_bytes` (from nightly `wrangler d1 info`; alert at 4 GB).
+  - `cf_d1_storage_bytes` (from nightly `wrangler d1 info`; alert at 400 MB per database and 4 GB total account storage).
   - `cf_r2_storage_bytes`, `cf_r2_class_a_ops_total`, `cf_r2_class_b_ops_total` (alert at 8 GB R2).
   - `cf_worker_cpu_ms` histogram (alert if P95 > 8 ms).
+  - `analytics_response_bytes{route}` and `analytics_cache_status{route,status}` for every public analytics response.
   - `electiondata_refresh_last_status`, `electiondata_refresh_last_ts`.
 - [ ] Expose a `/api/health/quota` endpoint that returns % of each Free allowance used; wire to Slack/discord webhook via existing `src/lib/alerting.ts`.
 - [ ] Graceful degradation on quota exhaustion:
   - Worker requests > 95% of daily cap return `503 Service Unavailable` with Retry-After (next UTC midnight) instead of surfacing CF Error 1027.
-  - D1 rows-read near cap → respond from edge cache / static fallback JSON.
+  - D1 rows-scanned/read near cap → respond from edge cache / static fallback JSON.
 - [ ] Add a dashboard panel (or Grafana-style view) for these metrics.
 
 ### 8.5 Documentation
@@ -656,4 +695,4 @@ v1 unlocks after Free budget is sustainably exceeded (see `CLOUDFLARE-FREE-TIER-
 
 ---
 
-*Prepared by: Senior Engineer, PIP Melaka. Next action: commit `docs/PIP-MELAKA-ETHNIC-ANALYTICS-WEBMCP-ROADMAP.md` + `docs/CLOUDFLARE-FREE-TIER-ARCHITECTURE.md` to `arena/019fe09d-pip-melaka` and open a PR titled “Ethnic Analytics + WebMCP Roadmap (Cloudflare-Free v0 prototype)” so Phase 0 can start.*
+*Prepared by: Senior Engineer, PIP Melaka. Next action: use `agent-ctx/ETHNIC-ANALYTICS-BUILD-PROMPT.md` for a fresh implementation session or `agent-ctx/ETHNIC-ANALYTICS-KICKER.md` for a phase-sized sub-agent, then open phase-sized PRs from the current Arena branch.*

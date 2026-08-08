@@ -2,7 +2,7 @@
 
 **Companion to:** `PIP-MELAKA-ETHNIC-ANALYTICS-WEBMCP-ROADMAP.md`
 **Date:** 2026-08-08
-**Scope:** Constrains the v0 (prototype) build to fit Cloudflare Free + free ElectionData.MY API.
+**Scope:** Constrains the v0 (prototype) build to fit Cloudflare Free + ElectionData.MY API-key, polite-use access.
 
 ---
 
@@ -21,13 +21,12 @@
 
 ### ElectionData.MY API (verified 2026-08 against [electiondata.my/openapi](https://electiondata.my/openapi/) and [electiondata.my/openapi/authentication](https://electiondata.my/openapi/authentication/))
 
-- **License:** CC0 1.0 Universal (public domain).
-- **Cost:** Free, no premium tier, **no hard rate limit**.
-- **Auth:** Free API key from the API Console (request with email; key returned instantly).
-- **Abuse policy:** They monitor and can revoke keys / blacklist IPs on abuse, so stay polite (cache aggressively, no aggressive crawling, use conditional GETs where supported).
-- **Architecture:** Sits in front of a highly-optimised static data lake; marginal cost per query is negligible.
+- **Auth:** Requires a Bearer API key from the API Console. Never expose the key to browser code; keep it server-side in the existing proxy/cron path.
+- **Licensing vs API usage:** Public data licensing and API usage policy are separate. Verify and document the exact licence/attribution requirements in Phase 0 provenance records.
+- **Rate limits:** No hard public rate limit is documented here, but that must not be interpreted as unlimited automated polling. Stay polite: nightly pull, cache aggressively, snapshot/version results, avoid aggressive crawling, and use conditional GETs where supported.
+- **Provenance:** Retain source URL, retrieval timestamp, API-key identity/account label, dataset version/hash, and raw snapshot pointer for every import.
 
-That removes the third-party API cost risk. We still cache responses (both edge-cache headers on `/api/electiondata` and R2 snapshots) to be good citizens.
+This reduces third-party API cost risk while preserving good-citizen behaviour. We cache responses (both edge-cache headers on `/api/electiondata` and R2 snapshots) and route all API-key calls through trusted server-side code.
 
 ---
 
@@ -90,6 +89,7 @@ Every request path is designed to:
 1. Return in **≤ 10 ms CPU** (validation → one or two indexed D1 prepares → JSON serialise).
 2. Use **≤ 5 subrequests** (≤ 2 D1, ≤ 1 R2 GET, ≤ 1 cache KV GET, ≤ 1 outbound fetch only during SWR refresh of ElectionData.MY).
 3. Never hold more than ~2 MB in memory (no large JSON loads).
+4. Emit a shared `RuntimeTelemetry` envelope for public analytics calls: request ID, route/tool, authenticated state, cache status, query count, D1 rows scanned/read and rows written from query metadata (`rows_read`, `rows_written`), Worker CPU when available, total duration, response bytes, status, and data version. `rowsRead` means rows scanned/read during SQL execution, including index reads, not rows returned. The ≤2 prepared-statement target is not enough by itself; tests must verify rows-scanned/read and `EXPLAIN QUERY PLAN` so one bad query cannot scan large tables.
 
 ---
 
@@ -114,6 +114,12 @@ To guarantee we stay inside 500 MB D1 + 10 GB R2, the v0 prototype is scoped to:
 ## 5. Build & deploy ordering (Free-optimised)
 
 Exact sequence to never hit quota:
+
+0. **Runtime contract first:**
+   1. Use `src/lib/analytics/runtime-telemetry.ts` for one request envelope per analytics/REST/MCP/map-data call.
+   2. Route all D1 `.all()` calls through `runD1(statement, telemetry)` so query count and D1 rows scanned/read and rows written come from actual D1 metadata, not estimates. Track response cardinality separately later as `resultRows` if needed.
+   3. Keep CPU (`cpuMs`) and wall-clock duration (`durationMs`) separate for diagnostics: CPU indicates JavaScript work; duration includes D1/R2/network waits.
+   4. Add tests for missing D1 metadata, cache hit/miss, invalid inputs, repeated/concurrent requests, unauthenticated MCP, and expired Access sessions.
 
 1. **Local-only (no Cloudflare cost):**
    1. Run PIP engine → produce `aggregates/` CSV+JSONL (DUN/PAR-level ethnic shares + turnout + results).
@@ -179,7 +185,8 @@ Cloudflare's WebMCP developer preview itself does not charge extra; it's an edge
 - [ ] Wave 1 is exactly 5 tools (see roadmap §6.2). Each tool performs ≤ 2 indexed D1 prepares and returns ≤ ~5 KB JSON.
 - [ ] Tool calls count as normal Worker requests — budget ~500 tool calls/day leaves 99,500 requests for UI traffic under the 100K free cap.
 - [ ] Response streaming / SSE not used (avoids long-lived CPU usage). Use Streamable HTTP (request/response) per latest MCP spec.
-- [ ] If the bridge requires a paid add-on or Cloudflare Agent Readiness becomes a paid feature post-preview, WebMCP is feature-flagged off — the REST dashboard continues to work.
+- [ ] WebMCP is controlled by `WEBMCP_ENABLED=false` by default and is enabled only on preview/development hostnames first.
+- [ ] If the bridge requires a paid add-on or Cloudflare Agent Readiness becomes a paid feature post-preview, WebMCP remains feature-flagged off — the REST dashboard continues to work.
 
 ---
 
@@ -190,7 +197,7 @@ Trigger conditions (any one = upgrade):
 1. Worker requests sustained > 80K/day for 7 days.
 2. A request path needs > 10 ms CPU (e.g. we add client-side H3 aggregation, real-time similarity search, or ecological-inference).
 3. We need more than 5 Cron Triggers.
-4. D1 storage grows past 5 GB (crossing the free account cap).
+4. Any D1 database approaches the 500 MB Free per-database cap, or total D1 account storage approaches 5 GB.
 5. We need more than 10 D1 databases.
 6. WebMCP is opened to public beta traffic.
 
@@ -206,7 +213,7 @@ Until any of these fire, v0 stays on Free. Paid Workers ($5/mo) removes the 100K
 | CPU per hot request | ~2–4 ms (indexed D1 only) | 10 ms | 60% |
 | D1 rows read/day | ~300K | 5M | 94% |
 | D1 rows written/day | ~500 (nightly upsert) | 100K | 99.5% |
-| D1 storage | ~15 MB (Melaka PAR/DUN aggregates) | 5 GB | 99.7% |
+| D1 storage | ~15 MB (Melaka PAR/DUN aggregates) | 500 MB per database (5 GB total account storage) | ~97% per-DB headroom |
 | R2 storage | ~200 MB (tiles + snapshots) | 10 GB | 98% |
 | R2 class A ops/month | ~5K | 1M | 99.5% |
 | Cron triggers | 1 | 5 | 80% |

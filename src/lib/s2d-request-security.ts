@@ -34,6 +34,7 @@ export function hasPrototypePollution(value: unknown): boolean {
 
 const SECRET_ENV_KEYS = [
   "APIFY_TOKEN",
+  "APIFY_API_TOKEN",
   "S2D_ALERT_WHATSAPP_TOKEN",
   "S2D_ALERT_EMAIL_TOKEN",
   "S2D_BURP_DAST_API_KEY",

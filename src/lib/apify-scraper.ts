@@ -110,8 +110,8 @@ export interface ScraperConfig {
 }
 
 export const DEFAULT_CONFIG: ScraperConfig = {
-  apifyToken: undefined, // Set via env: APIFY_API_TOKEN
-  enabled: false, // Sandbox: disabled. Production: set APIFY_API_TOKEN to enable.
+  apifyToken: undefined, // Set via env: APIFY_TOKEN (alias: APIFY_API_TOKEN)
+  enabled: false, // Sandbox: disabled. Production: set APIFY_TOKEN to enable.
   platforms: [PLATFORMS.TIKTOK, PLATFORMS.FACEBOOK, PLATFORMS.INSTAGRAM, PLATFORMS.THREADS, PLATFORMS.NEWS],
   melakaKeywords: [
     "Melaka", "Melaka election", "Masjid Tanah", "Alor Gajah", "Tangga Batu",
@@ -307,12 +307,12 @@ export function getScraperStats() {
 
 function getActorIdForPlatform(platform: string): string {
   const actors: Record<string, string> = {
-    TIKTOK: "apify/tiktok-scraper",
-    FACEBOOK: "apify/facebook-pages-scraper",
-    INSTAGRAM: "apify/instagram-scraper",
-    THREADS: "apify/threads-scraper",
-    NEWS: "apify/google-news-scraper",
-    OTHER: "apify/web-scraper",
+    TIKTOK: "clockworks~tiktok-scraper",
+    FACEBOOK: "apify~facebook-posts-scraper",
+    INSTAGRAM: "apify~instagram-scraper",
+    THREADS: "apify~threads-scraper",
+    NEWS: "apify~google-news-scraper",
+    OTHER: "apify~web-scraper",
   };
   return actors[platform] || "apify/web-scraper";
 }

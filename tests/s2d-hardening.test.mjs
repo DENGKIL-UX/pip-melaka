@@ -97,8 +97,14 @@ test("Apify plans enforce actor/source governance and never place token in URL",
     },
   });
   assert.equal(request.url.includes("TEST_SECRET"), false);
+  assert.equal(request.url.includes("/v2/actors/clockworks~tiktok-scraper/run-sync-get-dataset-items"), true);
+  assert.equal(request.url.includes("%7E"), false);
   assert.equal(request.init.headers.Authorization, "Bearer apify_api_TEST_SECRET");
   assert.equal(result.retained, 2);
+  assert.equal(apify.normalizeApifyActorId("apify/instagram-scraper"), "apify~instagram-scraper");
+  assert.equal(apify.isApifyTokenFormat("apify_api_TEST_SECRET"), true);
+  assert.equal(apify.isApifyTokenFormat("not-a-token"), false);
+  assert.equal(apify.resolveApifyToken({ APIFY_API_TOKEN: "apify_api_LEGACY_ALIAS_TOKEN" }), "apify_api_LEGACY_ALIAS_TOKEN");
 });
 
 test("embedded engine source, bundle paths and security fixtures are internally consistent", () => {

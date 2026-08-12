@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withCORS } from "@/lib/cors";
 import { authenticateSession, requireRole, unauthorizedResponse, forbiddenResponse } from "@/lib/s2d-auth";
 import { getRawToken } from "@/lib/s2d-credential-vault";
-import { buildS2dApifyPlan, runS2dApifyPlan, S2D_APPROVED_RECORD_CAP } from "@/lib/s2d-apify";
+import { buildS2dApifyPlan, resolveApifyToken, runS2dApifyPlan, S2D_APPROVED_RECORD_CAP } from "@/lib/s2d-apify";
 import { hasPrototypePollution, requestBodyTooLarge, sanitizeS2dError } from "@/lib/s2d-request-security";
 import { z } from "zod";
 
@@ -63,7 +63,7 @@ export const POST = withCORS(async (req: NextRequest) => {
   const keywords = data.keywords ?? (data.keyword ? [data.keyword] : []);
   const limit = data.limit ?? data.maxItems ?? 10;
   const localityCode = data.localityCode ?? "MELAKA";
-  const apifyToken = getRawToken("APIFY_TOKEN");
+  const apifyToken = getRawToken("APIFY_TOKEN") ?? resolveApifyToken();
 
   if (!apifyToken) {
     return NextResponse.json({

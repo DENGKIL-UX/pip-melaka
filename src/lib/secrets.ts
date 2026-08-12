@@ -55,8 +55,14 @@ export const SECRET_REGISTRY: SecretRequirement[] = [
   {
     name: "APIFY_TOKEN",
     required: false,
-    hint: "Apify token — live-verified via GET https://api.apify.com/v2/users/me (Gear Settings or wrangler secret put)",
-    minLength: 10,
+    hint: "Apify personal token (apify_api_…) — official name from docs.apify.com. Live-verified via GET /v2/users/me",
+    minLength: 20,
+  },
+  {
+    name: "APIFY_API_TOKEN",
+    required: false,
+    hint: "Legacy alias for APIFY_TOKEN — accepted if APIFY_TOKEN is unset",
+    minLength: 20,
   },
   {
     name: "S2D_ALERT_WHATSAPP_TOKEN",

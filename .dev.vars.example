@@ -35,7 +35,11 @@ ELECTIONDATA_API_TOKEN=your_edmy_api_token_here
 # Operators configure via Gear Settings Modal (PUT /api/s2d/credentials) or via env/Wrangler secrets.
 # Raw tokens are NEVER returned to browser (only masked metadata like apif***9x2a).
 # For production: npx wrangler secret put APIFY_TOKEN (and the rest below)
+# Official Apify env name (console.apify.com → Settings → API & Integrations).
+# Token format: apify_api_…  Auth: Authorization: Bearer <token>
 APIFY_TOKEN=apify_api_xxx
+# Legacy alias accepted if APIFY_TOKEN is unset
+# APIFY_API_TOKEN=
 S2D_ALERT_WHATSAPP_TOKEN=your_whatsapp_token_here
 S2D_ALERT_EMAIL_TOKEN=your_email_token_here
 S2D_BURP_DAST_API_KEY=your_burp_api_key_here

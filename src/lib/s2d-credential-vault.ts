@@ -82,7 +82,9 @@ export function getMaskedVault(): Partial<Record<S2dCredentialKey, Omit<VaultEnt
       continue;
     }
 
-    const environmentValue = process.env[key]?.trim();
+    const environmentValue = key === "APIFY_TOKEN"
+      ? (process.env.APIFY_TOKEN?.trim() || process.env.APIFY_API_TOKEN?.trim())
+      : process.env[key]?.trim();
     if (environmentValue) {
       out[key] = {
         key,
@@ -97,7 +99,15 @@ export function getMaskedVault(): Partial<Record<S2dCredentialKey, Omit<VaultEnt
 }
 
 export function getRawToken(key: S2dCredentialKey): string | undefined {
-  return vault.get(key)?._raw ?? (process.env[key]?.trim() || undefined);
+  const dynamic = vault.get(key)?._raw?.trim();
+  if (dynamic) return dynamic;
+  const environmentValue = process.env[key]?.trim();
+  if (environmentValue) return environmentValue;
+  // Official Apify env is APIFY_TOKEN; older PIP docs/UI used APIFY_API_TOKEN.
+  if (key === "APIFY_TOKEN") {
+    return process.env.APIFY_API_TOKEN?.trim() || undefined;
+  }
+  return undefined;
 }
 
 export function listVaultKeys(): S2dCredentialKey[] {

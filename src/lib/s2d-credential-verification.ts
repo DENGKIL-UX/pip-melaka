@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import { safeFetch, isSafeURL } from "@/lib/ssrf-protection";
 import type { S2dCredentialKey, VerificationMode } from "@/lib/s2d-credential-vault";
 import { sanitizeS2dError } from "@/lib/s2d-request-security";
+import { isApifyTokenFormat } from "@/lib/s2d-apify";
 
 export interface CredentialVerificationResult {
   verified: boolean;
@@ -44,13 +45,26 @@ export async function verifyS2dCredential(
   try {
     if (key === "APIFY_TOKEN") {
       const provider = "Apify";
+      if (!isApifyTokenFormat(value)) {
+        return failed(provider, "FORMAT_ONLY", "Token must look like apify_api_… from Console → Settings → API & Integrations");
+      }
+      // Official identity check: GET /v2/users/me with Authorization: Bearer
+      // https://docs.apify.com/api/v2/getting-started#verify-your-account
       const response = await providerFetch("https://api.apify.com/v2/users/me", {
         method: "GET",
         headers: { Accept: "application/json", Authorization: `Bearer ${value}` },
       }, fetchImpl);
-      if (!response.ok) return failed(provider, "LIVE_PROVIDER", `Provider rejected credential (HTTP ${response.status})`);
+      if (!response.ok) {
+        const hint = response.status === 401
+          ? "HTTP 401 — token is invalid, revoked, or copied with extra whitespace"
+          : response.status === 403
+            ? "HTTP 403 — token is not allowed to read account identity"
+            : `Provider rejected credential (HTTP ${response.status})`;
+        return failed(provider, "LIVE_PROVIDER", hint);
+      }
       const payload = await response.json().catch(() => null);
-      return payload?.data
+      const user = payload?.data;
+      return user && (user.id || user.username)
         ? { verified: true, provider, mode: "LIVE_PROVIDER" }
         : failed(provider, "LIVE_PROVIDER", "Provider response did not contain user data");
     }

@@ -2,9 +2,61 @@ export const S2D_SCRAPE_PLATFORMS = ["tiktok", "facebook", "instagram", "threads
 export type S2dScrapePlatform = typeof S2D_SCRAPE_PLATFORMS[number];
 
 export const S2D_APPROVED_RECORD_CAP = 20;
+/** Official REST base. Docs: https://docs.apify.com/api/v2 */
 const APIFY_BASE = "https://api.apify.com/v2";
-
 type RuntimeEnv = Record<string, string | undefined>;
+
+/** Personal tokens from Console → Settings → API & Integrations start with this prefix. */
+export const APIFY_TOKEN_PREFIX = "apify_api_";
+
+/**
+ * Resolve the Apify personal API token. Official env name is APIFY_TOKEN
+ * (docs.apify.com/api/v2/getting-started). Older PIP copy used APIFY_API_TOKEN.
+ */
+export function resolveApifyToken(env: RuntimeEnv = process.env): string | undefined {
+  const candidates = [env.APIFY_TOKEN, env.APIFY_API_TOKEN];
+  for (const value of candidates) {
+    const trimmed = value?.trim();
+    if (trimmed) return trimmed;
+  }
+  return undefined;
+}
+
+export function isApifyTokenFormat(token: string): boolean {
+  const value = token.trim();
+  return value.startsWith(APIFY_TOKEN_PREFIX) && value.length >= 20 && /^[A-Za-z0-9_.-]+$/.test(value);
+}
+
+/**
+ * Actor IDs in REST paths are either the internal id or `username~actor-name`.
+ * Slash form (`username/actor-name`) is a store URL, not a path segment.
+ * Do not encode `~` — `%7E` 404s on some Apify edge routes.
+ */
+export function normalizeApifyActorId(actorId: string): string {
+  const trimmed = actorId.trim();
+  if (!trimmed) return trimmed;
+  const slashForm = trimmed.replace(/^https?:\/\/apify\.com\//i, "");
+  return slashForm.replace("/", "~");
+}
+
+function encodeActorPathSegment(actorId: string): string {
+  const normalized = normalizeApifyActorId(actorId);
+  return encodeURIComponent(normalized).replace(/%7E/gi, "~");
+}
+
+async function readApifyError(response: Response): Promise<string> {
+  try {
+    const body = await response.json() as { error?: { type?: string; message?: string } };
+    const message = body?.error?.message || body?.error?.type;
+    if (message) return `Apify HTTP ${response.status}: ${message}`;
+  } catch {
+    // ignore non-JSON error bodies
+  }
+  if (response.status === 401) return "Apify rejected the token (HTTP 401). Create a new token in Console → Settings → API & Integrations.";
+  if (response.status === 403) return "Apify denied access (HTTP 403). Token may lack permission or the Actor is private.";
+  if (response.status === 402) return "Apify billing/usage limit reached (HTTP 402).";
+  return `Apify actor request failed (HTTP ${response.status})`;
+}
 
 export interface S2dApifyPlan {
   platform: S2dScrapePlatform;
@@ -53,11 +105,12 @@ function configuredFacebookPages(env: RuntimeEnv): string[] {
 }
 
 function resolveActor(platform: S2dScrapePlatform, env: RuntimeEnv): string {
-  if (platform === "tiktok") return env.S2D_APIFY_ACTOR_TIKTOK || "clockworks~tiktok-scraper";
-  if (platform === "instagram") return env.S2D_APIFY_ACTOR_INSTAGRAM || "apify~instagram-scraper";
-  if (platform === "facebook") return env.S2D_APIFY_ACTOR_FACEBOOK || "apify~facebook-posts-scraper";
-  if (platform === "x") return env.S2D_APIFY_ACTOR_X || env.APIFY_X_ACTOR || "apidojo~tweet-scraper";
-  return env.S2D_APIFY_ACTOR_THREADS || env.APIFY_THREADS_ACTOR || "";
+  const raw = platform === "tiktok" ? (env.S2D_APIFY_ACTOR_TIKTOK || "clockworks~tiktok-scraper")
+    : platform === "instagram" ? (env.S2D_APIFY_ACTOR_INSTAGRAM || "apify~instagram-scraper")
+    : platform === "facebook" ? (env.S2D_APIFY_ACTOR_FACEBOOK || "apify~facebook-posts-scraper")
+    : platform === "x" ? (env.S2D_APIFY_ACTOR_X || env.APIFY_X_ACTOR || "apidojo~tweet-scraper")
+    : (env.S2D_APIFY_ACTOR_THREADS || env.APIFY_THREADS_ACTOR || "");
+  return raw ? normalizeApifyActorId(raw) : "";
 }
 
 export function buildS2dApifyPlan(params: {
@@ -99,14 +152,15 @@ export function buildS2dApifyPlan(params: {
     else if (params.scanType === "Post URL") actorInput.postURLs = terms;
     else actorInput.searchQueries = terms;
   } else if (platform === "instagram") {
+    // apify/instagram-scraper: proxyConfiguration (not `proxy`) per Actor README.
     actorInput = params.scanType === "Post URL"
-      ? { directUrls: terms, resultsLimit: requestedMaximum, proxy: proxyConfiguration }
+      ? { directUrls: terms, resultsType: "posts", resultsLimit: requestedMaximum, proxyConfiguration }
       : {
           search: terms[0]?.replace(/^#/, "") || "Melaka",
           searchType: params.scanType === "Profile / Page" ? "user" : "hashtag",
           resultsType: "posts",
           resultsLimit: requestedMaximum,
-          proxy: proxyConfiguration,
+          proxyConfiguration,
         };
   } else if (platform === "facebook") {
     const sourcePages = configuredFacebookPages(env);
@@ -116,7 +170,7 @@ export function buildS2dApifyPlan(params: {
     actorInput = {
       startUrls: sourcePages.map((url) => ({ url })),
       resultsLimit: requestedMaximum,
-      proxy: proxyConfiguration,
+      proxyConfiguration,
     };
   } else if (platform === "threads") {
     actorInput = {
@@ -145,8 +199,11 @@ export async function runS2dApifyPlan(
   const timeoutMs = options.timeoutMs ?? 60_000;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-  const providerTimeoutSeconds = Math.max(5, Math.min(55, Math.floor(timeoutMs / 1000) - 2));
-  const url = `${APIFY_BASE}/acts/${encodeURIComponent(plan.actorId)}/run-sync-get-dataset-items?clean=true&limit=${plan.requestedMaximum}&timeout=${providerTimeoutSeconds}`;
+  const providerTimeoutSeconds = Math.max(5, Math.min(300, Math.floor(timeoutMs / 1000) - 2));
+  const actorSegment = encodeActorPathSegment(plan.actorId);
+  // Official path: POST /v2/actors/:actorId/run-sync-get-dataset-items
+  // Auth: Authorization: Bearer <APIFY_TOKEN> — never ?token= (leaks in logs).
+  const url = `${APIFY_BASE}/actors/${actorSegment}/run-sync-get-dataset-items?clean=true&limit=${plan.requestedMaximum}&maxItems=${plan.requestedMaximum}&timeout=${providerTimeoutSeconds}`;
 
   try {
     const response = await fetchImpl(url, {
@@ -156,7 +213,12 @@ export async function runS2dApifyPlan(
       redirect: "error",
       signal: controller.signal,
     });
-    if (!response.ok) throw Object.assign(new Error(`Apify actor request failed (HTTP ${response.status})`), { code: "S2D_APIFY_PROVIDER_ERROR" });
+    if (!response.ok) {
+      const detail = await readApifyError(response);
+      const status = response.status;
+      const code = status === 401 || status === 403 ? "S2D_APIFY_TOKEN_REJECTED" : "S2D_APIFY_PROVIDER_ERROR";
+      throw Object.assign(new Error(detail || `Apify actor request failed (HTTP ${status})`), { code, status });
+    }
 
     const payload = await response.json();
     if (!Array.isArray(payload)) throw Object.assign(new Error("Apify actor returned an invalid dataset payload"), { code: "S2D_APIFY_PROVIDER_ERROR" });

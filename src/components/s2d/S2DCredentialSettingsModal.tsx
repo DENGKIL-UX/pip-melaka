@@ -29,7 +29,7 @@ interface CredentialConfig {
 }
 
 const CREDENTIALS: CredentialConfig[] = [
-  { key: "APIFY_TOKEN", label: "Apify Token", hint: "From console.apify.com — live-verified via GET https://api.apify.com/v2/users/me", icon: Cloud, placeholder: "apify_api_••••••••" },
+  { key: "APIFY_TOKEN", label: "Apify Token", hint: "console.apify.com → Settings → API & Integrations. Must start with apify_api_. Live-verified via GET /v2/users/me (Bearer).", icon: Cloud, placeholder: "apify_api_••••••••" },
   { key: "S2D_ALERT_WHATSAPP_TOKEN", label: "WhatsApp Alert Token", hint: "WhatsApp Cloud API token for S2D alert delivery", icon: MessageSquare, placeholder: "EAAxxxxx••••" },
   { key: "S2D_ALERT_EMAIL_TOKEN", label: "Email Alert Token", hint: "SendGrid API key — live-verified against the provider profile endpoint", icon: Mail, placeholder: "SG.••••" },
   { key: "TIKTOK_API_KEY", label: "TikTok API Key", hint: "Format-validated unless S2D_TIKTOK_CREDENTIAL_TEST_URL is configured server-side", icon: KeyRound, placeholder: "tiktok_api_••••" },
